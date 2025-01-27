@@ -1,24 +1,18 @@
 // Type Imports
 import type { ChildrenType } from '@core/types'
-import type { Locale } from '@configs/i18n'
 
 // Component Imports
 import Providers from '@components/Providers'
 import BlankLayout from '@layouts/BlankLayout'
 
-// Config Imports
-import { i18n } from '@configs/i18n'
-
 // Util Imports
 import { getSystemMode } from '@core/utils/serverHelpers'
 
-type Props = ChildrenType & {
-  params: { lang: Locale }
-}
+type Props = ChildrenType
 
-const Layout = ({ children, params }: Props) => {
+const Layout = ({ children }: Props) => {
   // Vars
-  const direction = i18n.langDirection[params.lang]
+  const direction = 'ltr'
   const systemMode = getSystemMode()
 
   return (

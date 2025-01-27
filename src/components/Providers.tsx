@@ -33,7 +33,7 @@ const Providers = (props: Props) => {
         <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
           <ThemeProvider direction={direction} systemMode={systemMode}>
             <ReduxProvider>{children}</ReduxProvider>
-            <AppReactToastify direction={direction} hideProgressBar />
+            <AppReactToastify direction={direction} limit={4} hideProgressBar />
           </ThemeProvider>
         </SettingsProvider>
       </VerticalNavProvider>

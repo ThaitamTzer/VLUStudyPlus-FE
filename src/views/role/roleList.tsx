@@ -1,3 +1,5 @@
+'use client'
+
 import { styled, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 
 import type { Role } from '@/types/management/roleType'
@@ -5,6 +7,7 @@ import { TagPermissionNames } from '@/components/tagpermission'
 import { emptyRows } from '@/components/table/utils'
 import TableEmptyRows from '@/components/table/TableEmptyRows'
 import TableNoData from '@/components/table/TableNotFound'
+import RowAction from './rowAction'
 
 type RoleListProps = {
   roles: Role[]
@@ -51,7 +54,9 @@ export default function RoleList(props: RoleListProps) {
                 <TableCell>
                   <TagPermissionNames data={row} />
                 </TableCell>
-                <TableCell align='right'>{/* <RowAction role={row} /> */}</TableCell>
+                <TableCell align='right'>
+                  <RowAction role={row} />
+                </TableCell>
               </StyledTableRow>
             )
           })}

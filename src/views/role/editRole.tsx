@@ -2,6 +2,7 @@
 
 import Iconify from '@/components/iconify'
 import { useRoleStore } from '@/stores/role/role'
+
 import {
   Dialog,
   DialogActions,
@@ -24,11 +25,11 @@ import permission from '@/libs/permission.json'
 import CustomTextField from '@/@core/components/mui/TextField'
 import roleService from '@/services/role.service'
 import { KeyedMutator } from 'swr'
-import { RoleType } from '@/types/management/roleType'
-import { useState } from 'react'
+import { Role, RoleType } from '@/types/management/roleType'
+import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 
-type AddRoleProp = {
+type EditRoleProp = {
   mutate: KeyedMutator<RoleType>
 }
 
@@ -66,18 +67,19 @@ const schema = v.object({
 
 type FormData = InferInput<typeof schema>
 
-export default function AddRole(prop: AddRoleProp) {
+export default function EditRole(prop: EditRoleProp) {
+  const { openEditRoleModal, toogleEditRoleModal, role, setRole } = useRoleStore()
   const { mutate } = prop
-  const [loading, setLoading] = useState<boolean>(false)
 
-  const { openAddRoleModal, toogleAddRoleModal } = useRoleStore()
+  console.log(role)
+
+  const [loading, setLoading] = useState<boolean>(false)
 
   const {
     control,
     handleSubmit,
     reset,
-    setError,
-    formState: { errors }
+    formState: { errors, isValid }
   } = useForm<FormData>({
     resolver: valibotResolver(schema),
     mode: 'all',
@@ -87,41 +89,50 @@ export default function AddRole(prop: AddRoleProp) {
     }
   })
 
+  useEffect(() => {
+    if (role) {
+      reset({
+        name: role.name || '',
+        permissionID: role.permissionID?.map(Number) || []
+      })
+    }
+  }, [role, reset])
+
   const onSubmit = handleSubmit(async data => {
     setLoading(true)
-    await roleService.create(
+    await roleService.update(
       {
+        _id: role._id,
         name: data.name,
         permissionID: data.permissionID.map(Number),
         color: permission.find(i => i.id === Number(data.permissionID[0]))?.color.action_color,
         icon: 'icon'
       },
       () => {
-        toast.success('Thêm mới vai trò thành công')
+        toast.success('Cập nhật vai trò thành công')
         mutate()
         reset()
         setLoading(false)
+        handleClose()
       },
       error => {
-        toast.error('Thêm mới vai trò thất bại')
+        toast.error(error.response.data.message)
         setLoading(false)
-        if (error.message === 'Role already exists') {
-          setError('name', { type: 'manual', message: 'Vai trò đã tồn tại' })
-        }
       }
     )
   })
 
   const handleClose = () => {
-    toogleAddRoleModal()
+    toogleEditRoleModal()
     reset()
+    setRole({} as Role)
   }
 
   return (
-    <Dialog open={openAddRoleModal} onClose={handleClose} maxWidth='sm' fullWidth>
+    <Dialog open={openEditRoleModal} maxWidth='sm' fullWidth onClose={handleClose}>
       <form onSubmit={onSubmit}>
         <DialogTitle>
-          <Typography variant='h4'>Thêm mới vai trò</Typography>
+          <Typography variant='h4'>Điều chỉnh vai trò</Typography>
         </DialogTitle>
         <IconButton
           sx={{
@@ -136,7 +147,6 @@ export default function AddRole(prop: AddRoleProp) {
         <DialogContent>
           <Stack spacing={2}>
             <Controller
-              rules={{ required: true }}
               name='name'
               control={control}
               render={({ field }) => (
@@ -155,16 +165,17 @@ export default function AddRole(prop: AddRoleProp) {
                 <CustomTextField
                   {...field}
                   select
-                  label='Quyền'
+                  label='Chọn quyền'
+                  error={!!errors.permissionID}
+                  helperText={errors.permissionID?.message}
                   SelectProps={{
                     multiple: true,
                     renderValue: renderValue
                   }}
-                  {...(errors.permissionID && { error: true, helperText: errors.permissionID.message })}
                 >
                   {permission.map(item => (
                     <MenuItem key={item.id} value={item.id}>
-                      {item.namePermission.toLocaleUpperCase()}
+                      {item.namePermission}
                     </MenuItem>
                   ))}
                 </CustomTextField>
@@ -173,21 +184,20 @@ export default function AddRole(prop: AddRoleProp) {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Stack direction='row' spacing={1}>
-            <Button variant='outlined' color='error' onClick={handleClose} startIcon={<Iconify icon='mdi:close' />}>
-              Hủy
-            </Button>
-            <LoadingButton
-              loading={loading}
-              type='submit'
-              variant='contained'
-              color='primary'
-              loadingPosition='start'
-              startIcon={<Iconify icon='mdi:content-save-edit' />}
-            >
-              Thêm
-            </LoadingButton>
-          </Stack>
+          <Button variant='outlined' color='error' onClick={handleClose} startIcon={<Iconify icon='mdi:close' />}>
+            Hủy
+          </Button>
+          <LoadingButton
+            type='submit'
+            variant='contained'
+            color='primary'
+            loading={loading}
+            disabled={!isValid}
+            loadingPosition='start'
+            startIcon={<Iconify icon='mdi:content-save-edit' />}
+          >
+            Lưu
+          </LoadingButton>
         </DialogActions>
       </form>
     </Dialog>

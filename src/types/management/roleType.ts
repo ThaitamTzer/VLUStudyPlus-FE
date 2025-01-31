@@ -23,7 +23,7 @@ export type AddRoleType = {
 export type UpdateRoleType = {
   _id: string
   name: string
-  permissionID: number
+  permissionID: number[]
   icon: string
-  color: string
+  color: string | undefined
 }

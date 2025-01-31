@@ -14,6 +14,8 @@ import CustomTextField from '@/@core/components/mui/TextField'
 import Iconify from '@/components/iconify'
 import TablePaginationCustom from '@/components/table/TablePagination'
 import AddRole from './addRole'
+import EditRole from './editRole'
+import DeleteRole from './deleteRole'
 
 export default function RolePage() {
   const { setRoles, setTotal, roles, total, toogleAddRoleModal } = useRoleStore()
@@ -126,7 +128,9 @@ export default function RolePage() {
           }}
         />
       </Card>
+      <EditRole mutate={mutate} />
       <AddRole mutate={mutate} />
+      <DeleteRole mutate={mutate} />
     </>
   )
 }

@@ -1,14 +1,31 @@
-// Third-party Imports
-import { getServerSession } from 'next-auth'
+'use client'
 
-// Type Imports
+import { useEffect } from 'react'
+
+import { useRouter, usePathname } from 'next/navigation'
+
+// import AuthRedirect from '@/components/AuthRedirect'
 import type { ChildrenType } from '@core/types'
+import { useAuth } from '@/hooks/useAuth'
 
-// Component Imports
-import AuthRedirect from '@/components/AuthRedirect'
+export default function AuthGuard({ children }: ChildrenType) {
+  const { user } = useAuth()
+  const router = useRouter()
+  const pathName = usePathname()
 
-export default async function AuthGuard({ children }: ChildrenType) {
-  const session = await getServerSession()
+  useEffect(() => {
+    if (!router) {
+      return
+    }
 
-  return <>{session ? children : <AuthRedirect />}</>
+    if (user === null && !window.localStorage.getItem('accessToken')) {
+      if (pathName !== '/login') {
+        router.replace(`/login?returnTo=${encodeURIComponent(pathName)}`)
+      } else {
+        router.replace('/login')
+      }
+    }
+  }, [router, pathName, user])
+
+  return <>{children}</>
 }

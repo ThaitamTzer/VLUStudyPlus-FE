@@ -1,0 +1,125 @@
+'use client'
+
+// ** React Imports
+import type { ReactNode } from 'react'
+import { createContext, useEffect, useState } from 'react'
+
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+
+import Cookies from 'js-cookie'
+
+// ** Next Import
+
+// ** Axios
+import axiosClient from '@/libs/axios'
+
+// ** Config
+import authConfig from '@/configs/auth'
+
+// ** Types
+import type { AuthValuesType } from './AuthValuesType'
+import type { UserType } from '@/types/userType'
+
+// ** Defaults
+const defaultProvider: AuthValuesType = {
+  user: null,
+  loading: false,
+  setUser: () => null,
+  setLoading: () => Boolean,
+  logout: () => Promise.resolve(),
+  getProfile: () => Promise.resolve()
+}
+
+const AuthContext = createContext(defaultProvider)
+
+type Props = {
+  children: ReactNode
+}
+
+const AuthProvider = ({ children }: Props) => {
+  // ** States
+  const [user, setUser] = useState<UserType | null>(defaultProvider.user)
+  const [loading, setLoading] = useState<boolean>(defaultProvider.loading)
+
+  const setAllNull = () => {
+    setUser(null)
+  }
+
+  // ** Hooks
+  const router = useRouter()
+  const pathName = usePathname()
+  const searchParams = useSearchParams()
+
+  const accessToken = searchParams.get('accessToken')
+
+  useEffect(() => {
+    if (accessToken) {
+      localStorage.setItem('accessToken', accessToken)
+      Cookies.set('jwt', accessToken)
+      router.replace('/')
+    }
+  }, [accessToken, router])
+
+  useEffect(() => {
+    const initAuth = async (): Promise<void> => {
+      await axiosClient
+        .get('/api/auth/get-user-profile')
+        .then(async response => {
+          console.log(response)
+          setUser({ ...response.data })
+        })
+        .catch(() => {
+          setUser(null)
+          localStorage.clear()
+
+          if (authConfig.onTokenExpiration === 'logout' && !pathName.includes('login')) {
+            router.replace('/login')
+          }
+        })
+    }
+
+    initAuth()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [Cookies.get('jwt')])
+
+  const getProfile = async () => {
+    try {
+      const res = await axiosClient.get('/api/users/view-profile')
+
+      setUser(res.data)
+
+      return res.data
+    } catch {
+      setLoading(false)
+    }
+  }
+
+  const handleLogout = () => {
+    try {
+      axiosClient.patch(authConfig.logoutEndpoint).then(() => {
+        Cookies.remove('jwt')
+        localStorage.clear()
+        setAllNull()
+        router.push('/')
+      })
+    } catch {
+      Cookies.remove('jwt')
+      localStorage.clear()
+      setUser(null)
+      router.push('/')
+    }
+  }
+
+  const values = {
+    user,
+    loading,
+    setUser,
+    setLoading,
+    logout: handleLogout,
+    getProfile: getProfile
+  }
+
+  return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>
+}
+
+export { AuthContext, AuthProvider }

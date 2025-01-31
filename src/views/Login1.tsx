@@ -8,10 +8,6 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 // MUI Imports
-import Image from 'next/image'
-
-import { Montserrat } from 'next/font/google'
-
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { styled, useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
@@ -85,10 +81,6 @@ const schema = object({
   )
 })
 
-const montserrat = Montserrat({
-  subsets: ['latin', 'vietnamese']
-})
-
 const Login = ({ mode }: { mode: SystemMode }) => {
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
@@ -101,9 +93,6 @@ const Login = ({ mode }: { mode: SystemMode }) => {
   const lightIllustration = '/images/illustrations/auth/v2-login-light.png'
   const borderedDarkIllustration = '/images/illustrations/auth/v2-login-dark-border.png'
   const borderedLightIllustration = '/images/illustrations/auth/v2-login-light-border.png'
-
-  // const backgroundVLU = '/images/bg_login.jpg'
-  const backgroundVLU = '/images/bg_login_v1.jpg'
 
   // Hooks
   const router = useRouter()
@@ -137,112 +126,55 @@ const Login = ({ mode }: { mode: SystemMode }) => {
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
   const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
-    console.log(data)
+    const res = await signIn('credentials', {
+      email: data.email,
+      password: data.password,
+      redirect: false
+    })
 
-    localStorage.setItem('accessToken', 'khkcaghjcasucgas')
+    if (res && res.ok && res.error === null) {
+      // Vars
+      const redirectURL = searchParams.get('redirectTo') ?? '/'
 
-    router.replace('/')
+      router.replace(redirectURL)
+    } else {
+      if (res?.error) {
+        const error = JSON.parse(res.error)
 
-    // const res = await signIn('credentials', {
-    //   email: data.email,
-    //   password: data.password,
-    //   redirect: false
-    // })
-
-    // if (res && res.ok && res.error === null) {
-    //   // Vars
-    //   const redirectURL = searchParams.get('redirectTo') ?? '/'
-
-    //   localStorage.setItem('accessToken', 'khkcaghjcasucgas')
-
-    //   router.replace(redirectURL)
-    // } else {
-    //   if (res?.error) {
-    //     const error = JSON.parse(res.error)
-
-    //     setErrorState(error)
-    //   }
-    // }
+        setErrorState(error)
+      }
+    }
   }
 
   return (
     <div className='flex bs-full justify-center'>
       <div
         className={classnames(
-          'flex bs-full items-center justify-center flex-1 min-bs-[100dvh] relative max-md:hidden',
+          'flex bs-full items-center justify-center flex-1 min-bs-[100dvh] relative p-6 max-md:hidden',
           {
             'border-ie': settings.skin === 'bordered'
           }
         )}
       >
-        <div className='relative w-full h-full'>
-          <div className='absolute inset-0 z-10 flex items-center justify-center p-6'>
-            <div className='text-center text-white max-w-2xl space-y-4 p-6 bg-white/30 backdrop-blur-sm rounded-lg'>
-              <Typography variant='h3' className='!font-bold'>
-                Chào mừng đến với <span className='text-blue-800'>VLUStudy</span>
-                <span className='text-primary'>Plus</span>
-              </Typography>
-              <Typography variant='h6' className='!font-medium'>
-                PHẦN MỀM QUẢN LÝ, THEO DÕI VÀ XỬ LÝ QUÁ TRÌNH HỌC TẬP
-              </Typography>
-              <Typography variant='subtitle1'>Trường Đại học Văn Lang</Typography>
-            </div>
-          </div>
-          <Image
-            src={backgroundVLU}
-            alt='background-login'
-            fill
-            priority
-            quality={100}
-            className='object-cover object-center'
-          />
-        </div>
-        {/* <LoginIllustration src={characterIllustration} alt='character-illustration' /> */}
-        {/* <div className='flex flex-col gap-1'>
-          <Image src={backgroundVLU} alt='character-illustration' width={1920} height={1080} objectFit='cover' />
-        </div> */}
-        {/* {!hidden && <MaskImg alt='mask' src={authBackground} />} */}
+        <LoginIllustration src={characterIllustration} alt='character-illustration' />
+        {!hidden && <MaskImg alt='mask' src={authBackground} />}
       </div>
       <div className='flex justify-center items-center bs-full bg-backgroundPaper !min-is-full p-6 md:!min-is-[unset] md:p-12 md:is-[480px]'>
-        <div className='absolute z-[2] block-start-5 sm:block-start-[33px] inline-start-6 sm:inline-start-[38px]'>
+        <div className='absolute block-start-5 sm:block-start-[33px] inline-start-6 sm:inline-start-[38px]'>
           <Logo />
         </div>
         <div className='flex flex-col gap-6 is-full sm:is-auto md:is-full sm:max-is-[400px] md:max-is-[unset] mbs-8 sm:mbs-11 md:mbs-0'>
           <div className='flex flex-col gap-1'>
-            <Typography
-              className={montserrat.className}
-              variant='h4'
-            >{`Chào mừng đến với ${themeConfig.templateName}! 👋🏻`}</Typography>
-            {/* <Typography>Vui lòng đăng nhập bằng tài khoản do trường Đại học Văn Lang cung cấp</Typography> */}
+            <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}! 👋🏻`}</Typography>
+            <Typography>Please sign-in to your account and start the adventure</Typography>
           </div>
-          {/* <Alert icon={false} className='bg-[var(--mui-palette-primary-lightOpacity)]'>
+          <Alert icon={false} className='bg-[var(--mui-palette-primary-lightOpacity)]'>
             <Typography variant='body2' color='primary'>
               Email: <span className='font-medium'>admin@vuexy.com</span> / Pass:{' '}
               <span className='font-medium'>admin</span>
             </Typography>
-          </Alert> */}
-          <div className='flex flex-col items-center gap-3'>
-            <div className='w-40'>
-              <Image
-                src={'/images/logo-van-lang.png'}
-                alt='Van Lang University'
-                width={300}
-                height={100}
-                objectFit='contain'
-                className='w-full h-full'
-              />
-            </div>
-            <Button
-              fullWidth
-              variant='outlined'
-              startIcon={<Image src='/images/microsoft-365.png' alt='Google' width={50} height={30} />}
-              color='secondary'
-              onClick={() => router.push('https://vlustudy-production.up.railway.app/api/auth/microsoft')}
-            >
-              <Typography>Đăng nhập với Microsoft 365</Typography>
-            </Button>
-          </div>
-          {/* <form
+          </Alert>
+          <form
             noValidate
             autoComplete='off'
             action={() => {}}
@@ -322,11 +254,11 @@ const Login = ({ mode }: { mode: SystemMode }) => {
               className='self-center text-textPrimary'
               startIcon={<img src='/images/logos/google.png' alt='Google' width={22} />}
               sx={{ '& .MuiButton-startIcon': { marginInlineEnd: 3 } }}
-              onClick={() => signIn('microsoft')}
+              onClick={() => signIn('google')}
             >
               Sign in with Google
             </Button>
-          </form> */}
+          </form>
         </div>
       </div>
     </div>

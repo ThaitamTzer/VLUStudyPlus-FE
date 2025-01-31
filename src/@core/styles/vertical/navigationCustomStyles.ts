@@ -19,7 +19,7 @@ const navigationCustomStyles = (verticalNavOptions: VerticalNavState, theme: The
     zIndex: 'var(--drawer-z-index) !important',
     [`& .${verticalNavClasses.header}`]: {
       paddingBlock: theme.spacing(5),
-      paddingInline: theme.spacing(5.5, 4),
+      paddingInline: theme.spacing(3.2, 4),
 
       ...(collapsedNotHovered && {
         paddingInline: theme.spacing(((collapsedWidth as number) - 35) / 8),

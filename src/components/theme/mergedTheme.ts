@@ -7,12 +7,21 @@
  */
 
 // MUI Imports
+import { Montserrat } from 'next/font/google'
+
 import { deepmerge } from '@mui/utils'
 import type { Theme } from '@mui/material/styles'
 
 // Type Imports
 import type { Settings } from '@core/contexts/settingsContext'
 import type { SystemMode } from '@core/types'
+
+// Next Imports
+
+const montserrat = Montserrat({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['300', '400', '500', '600', '700', '800', '900']
+})
 
 // Core Theme Imports
 import coreTheme from '@core/theme'
@@ -21,13 +30,8 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
   // Vars
   const userTheme = {
     // Write your overrides here.
-    palette: {
-      action: {
-        hover: 'rgba(255, 255, 255, 0.8)'
-      },
-      primary: {
-        contrastText: '#fff'
-      }
+    typography: {
+      fontFamily: montserrat.style.fontFamily
     }
   } as Theme
 

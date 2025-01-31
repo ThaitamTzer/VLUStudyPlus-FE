@@ -11,10 +11,10 @@ import styled from '@emotion/styled'
 import type { VerticalNavContextProps } from '@menu/contexts/verticalNavContext'
 
 // Component Imports
-import VuexyLogo from '@core/svg/Logo'
+// import VuexyLogo from '@core/svg/Logo'
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
+// import themeConfig from '@configs/themeConfig'
 
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
@@ -38,9 +38,7 @@ const LogoText = styled.span<LogoTextProps>`
     `margin-inline-start ${transitionDuration}ms ease-in-out, opacity ${transitionDuration}ms ease-in-out`};
 
   ${({ isHovered, isCollapsed, isBreakpointReached }) =>
-    !isBreakpointReached && isCollapsed && !isHovered
-      ? 'opacity: 0; margin-inline-start: 0;'
-      : 'opacity: 1; margin-inline-start: 12px;'}
+    !isBreakpointReached && isCollapsed && !isHovered ? 'opacity: 0; margin-inline-start: 0;' : 'opacity: 1;'}
 `
 
 const Logo = ({ color }: { color?: CSSProperties['color'] }) => {
@@ -71,7 +69,8 @@ const Logo = ({ color }: { color?: CSSProperties['color'] }) => {
 
   return (
     <div className='flex items-center'>
-      <VuexyLogo className='text-2xl text-primary' />
+      {/* <VuexyLogo className='text-2xl text-primary' /> */}
+      <img src='/images/logos/logo_single.png' className='w-12 h-12' />
       <LogoText
         color={color}
         ref={logoTextRef}
@@ -80,7 +79,8 @@ const Logo = ({ color }: { color?: CSSProperties['color'] }) => {
         transitionDuration={transitionDuration}
         isBreakpointReached={isBreakpointReached}
       >
-        {themeConfig.templateName}
+        <span className='text-blue-900'>VLUStudy</span>
+        <span className='text-primary'>Plus</span>
       </LogoText>
     </div>
   )

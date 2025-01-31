@@ -46,7 +46,8 @@ const UserDropdown = () => {
 
   // Hooks
   const router = useRouter()
-  const { data: session } = useSession()
+
+  // const { data: session } = useSession()
   const { settings } = useSettings()
 
   const handleDropdownOpen = () => {
@@ -68,7 +69,9 @@ const UserDropdown = () => {
   const handleUserLogout = async () => {
     try {
       // Sign out from the app
-      await signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+      // await signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+      localStorage.removeItem('accessToken')
+      router.push('/login')
     } catch (error) {
       console.error(error)
 
@@ -88,8 +91,8 @@ const UserDropdown = () => {
       >
         <Avatar
           ref={anchorRef}
-          alt={session?.user?.name || ''}
-          src={session?.user?.image || ''}
+          alt={'cascascac'}
+          src={''}
           onClick={handleDropdownOpen}
           className='cursor-pointer bs-[38px] is-[38px]'
         />
@@ -113,12 +116,13 @@ const UserDropdown = () => {
               <ClickAwayListener onClickAway={e => handleDropdownClose(e as MouseEvent | TouchEvent)}>
                 <MenuList>
                   <div className='flex items-center plb-2 pli-6 gap-2' tabIndex={-1}>
-                    <Avatar alt={session?.user?.name || ''} src={session?.user?.image || ''} />
+                    <Avatar alt={'ckjkagsjc'} src={''} />
                     <div className='flex items-start flex-col'>
                       <Typography className='font-medium' color='text.primary'>
-                        {session?.user?.name || ''}
+                        {/* {session?.user?.name || ''} */}
+                        ckjkagsjc
                       </Typography>
-                      <Typography variant='caption'>{session?.user?.email || ''}</Typography>
+                      <Typography variant='caption'>hcahsc</Typography>
                     </div>
                   </div>
                   <Divider className='mlb-1' />

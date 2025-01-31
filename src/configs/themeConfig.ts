@@ -55,7 +55,7 @@ export type Config = {
 
 const themeConfig: Config = {
   templateName: 'VLUStudyPlus',
-  homePageUrl: '/dashboards/crm',
+  homePageUrl: '/homepage',
   settingsCookieName: 'VLUStudyPlus-next-demo-1',
   mode: 'light', // 'system', 'light', 'dark'
   skin: 'default', // 'default', 'bordered'

@@ -20,12 +20,13 @@ import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import MenuItem from '@mui/material/MenuItem'
 import Button from '@mui/material/Button'
+import { Stack } from '@mui/material'
 
 // Hook Imports
-import { Stack } from '@mui/material'
 
 import { useSettings } from '@core/hooks/useSettings'
 import { useAuth } from '@/hooks/useAuth'
+import useHidden from '@/libs/hidden'
 
 // Styled component for badge content
 const BadgeContentSpan = styled('span')({
@@ -47,6 +48,7 @@ const UserDropdown = () => {
   // Hooks
   const { setUser, user } = useAuth()
   const router = useRouter()
+  const hidden = useHidden()
 
   // const { data: session } = useSession()
   const { settings } = useSettings()
@@ -75,14 +77,25 @@ const UserDropdown = () => {
 
   return (
     <>
-      <Stack justifyContent='end' alignItems='end' ml={2}>
-        <Typography variant='h6' color='text.primary'>
-          {user?.userId + ' -' || ''} {user?.userName} {'- ' + user?.classCode || ''}
-        </Typography>
-        <Typography variant='caption' color='text.secondary'>
-          {user?.mail}
-        </Typography>
-      </Stack>
+      {!hidden ? (
+        <Stack justifyContent='end' alignItems='end' ml={2}>
+          <Typography variant='h6' color='text.primary'>
+            {user?.userId + ' -' || ''} {user?.userName} {'- ' + user?.classCode || ''}
+          </Typography>
+          <Typography variant='caption' color='text.secondary'>
+            {user?.mail}
+          </Typography>
+        </Stack>
+      ) : (
+        <Stack justifyContent='end' alignItems='end' ml={2}>
+          <Typography variant='h6' color='text.primary'>
+            {user?.userName}
+          </Typography>
+          <Typography variant='caption' color='text.secondary'>
+            {user?.mail}
+          </Typography>
+        </Stack>
+      )}
       <Badge
         ref={anchorRef}
         overlap='circular'
@@ -122,7 +135,7 @@ const UserDropdown = () => {
                       <Typography className='font-medium' color='text.primary'>
                         {user?.userName}
                       </Typography>
-                      <Typography variant='caption'>hcahsc</Typography>
+                      <Typography variant='caption'>{user?.role}</Typography>
                     </div>
                   </div>
                   <Divider className='mlb-1' />
@@ -133,14 +146,6 @@ const UserDropdown = () => {
                   <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/pages/account-settings')}>
                     <i className='tabler-settings' />
                     <Typography color='text.primary'>Settings</Typography>
-                  </MenuItem>
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/pages/pricing')}>
-                    <i className='tabler-currency-dollar' />
-                    <Typography color='text.primary'>Pricing</Typography>
-                  </MenuItem>
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/pages/faq')}>
-                    <i className='tabler-help-circle' />
-                    <Typography color='text.primary'>FAQ</Typography>
                   </MenuItem>
                   <div className='flex items-center plb-2 pli-3'>
                     <Button

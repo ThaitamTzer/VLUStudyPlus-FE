@@ -143,6 +143,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
         // menuItemStyles={menuItemStyles(verticalNavOptions, theme)}
       >
+        <MenuItem href='/homepage' icon={<i className='tabler-home' />} exactMatch={false} activeUrl='/homepage'>
+          Trang chủ
+        </MenuItem>
         <SubMenu
           label='dashboards'
           icon={<i className='tabler-smart-home' />}

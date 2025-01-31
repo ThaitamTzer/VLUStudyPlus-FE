@@ -1,191 +1,67 @@
 'use client'
 
-// React Imports
-import { useState } from 'react'
-
 // Next Imports
-import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 // MUI Imports
+import { Montserrat } from 'next/font/google'
 import Image from 'next/image'
 
-import { Montserrat } from 'next/font/google'
-
-import useMediaQuery from '@mui/material/useMediaQuery'
-import { styled, useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
-import IconButton from '@mui/material/IconButton'
-import InputAdornment from '@mui/material/InputAdornment'
-import Checkbox from '@mui/material/Checkbox'
-import Button from '@mui/material/Button'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Divider from '@mui/material/Divider'
-import Alert from '@mui/material/Alert'
 
 // Third-party Imports
-import { signIn } from 'next-auth/react'
-import { Controller, useForm } from 'react-hook-form'
-import { valibotResolver } from '@hookform/resolvers/valibot'
-import { email, object, minLength, string, pipe, nonEmpty } from 'valibot'
-import type { SubmitHandler } from 'react-hook-form'
-import type { InferInput } from 'valibot'
+import { motion } from 'framer-motion'
 import classnames from 'classnames'
-
-// Type Imports
-import type { SystemMode } from '@core/types'
+import { useMediaQuery, useTheme } from '@mui/material'
 
 // Component Imports
 import Logo from '@components/layout/shared/Logo'
-import CustomTextField from '@core/components/mui/TextField'
 
 // Config Imports
 import themeConfig from '@configs/themeConfig'
 
 // Hook Imports
-import { useImageVariant } from '@core/hooks/useImageVariant'
 import { useSettings } from '@core/hooks/useSettings'
 
-// Styled Custom Components
-const LoginIllustration = styled('img')(({ theme }) => ({
-  zIndex: 2,
-  blockSize: 'auto',
-  maxBlockSize: 680,
-  maxInlineSize: '100%',
-  margin: theme.spacing(12),
-  [theme.breakpoints.down(1536)]: {
-    maxBlockSize: 550
-  },
-  [theme.breakpoints.down('lg')]: {
-    maxBlockSize: 450
-  }
-}))
-
-const MaskImg = styled('img')({
-  blockSize: 'auto',
-  maxBlockSize: 355,
-  inlineSize: '100%',
-  position: 'absolute',
-  insetBlockEnd: 0,
-  zIndex: -1
-})
-
-type ErrorType = {
-  message: string[]
-}
-
-type FormData = InferInput<typeof schema>
-
-const schema = object({
-  email: pipe(string(), minLength(1, 'This field is required'), email('Email is invalid')),
-  password: pipe(
-    string(),
-    nonEmpty('This field is required'),
-    minLength(5, 'Password must be at least 5 characters long')
-  )
-})
-
+// Font Imports
 const montserrat = Montserrat({
   subsets: ['latin', 'vietnamese']
 })
 
-const Login = ({ mode }: { mode: SystemMode }) => {
-  // States
-  const [isPasswordShown, setIsPasswordShown] = useState(false)
-  const [errorState, setErrorState] = useState<ErrorType | null>(null)
-
-  // Vars
-  const darkImg = '/images/pages/auth-mask-dark.png'
-  const lightImg = '/images/pages/auth-mask-light.png'
-  const darkIllustration = '/images/illustrations/auth/v2-login-dark.png'
-  const lightIllustration = '/images/illustrations/auth/v2-login-light.png'
-  const borderedDarkIllustration = '/images/illustrations/auth/v2-login-dark-border.png'
-  const borderedLightIllustration = '/images/illustrations/auth/v2-login-light-border.png'
-
-  // const backgroundVLU = '/images/bg_login.jpg'
+const Login = () => {
   const backgroundVLU = '/images/bg_login_v1.jpg'
-
-  // Hooks
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
-  const { settings } = useSettings()
   const theme = useTheme()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
-  const authBackground = useImageVariant(mode, lightImg, darkImg)
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors }
-  } = useForm<FormData>({
-    resolver: valibotResolver(schema),
-    defaultValues: {
-      email: 'admin@vuexy.com',
-      password: 'admin'
-    }
-  })
-
-  const characterIllustration = useImageVariant(
-    mode,
-    lightIllustration,
-    darkIllustration,
-    borderedLightIllustration,
-    borderedDarkIllustration
-  )
-
-  const handleClickShowPassword = () => setIsPasswordShown(show => !show)
-
-  const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
-    console.log(data)
-
-    localStorage.setItem('accessToken', 'khkcaghjcasucgas')
-
-    router.replace('/')
-
-    // const res = await signIn('credentials', {
-    //   email: data.email,
-    //   password: data.password,
-    //   redirect: false
-    // })
-
-    // if (res && res.ok && res.error === null) {
-    //   // Vars
-    //   const redirectURL = searchParams.get('redirectTo') ?? '/'
-
-    //   localStorage.setItem('accessToken', 'khkcaghjcasucgas')
-
-    //   router.replace(redirectURL)
-    // } else {
-    //   if (res?.error) {
-    //     const error = JSON.parse(res.error)
-
-    //     setErrorState(error)
-    //   }
-    // }
-  }
+  const router = useRouter()
+  const { settings } = useSettings()
 
   return (
-    <div className='flex bs-full justify-center'>
+    <div className='flex bs-full justify-center relative bg-gray-900'>
+      {/* Left Side - Background Image */}
       <div
         className={classnames(
-          'flex bs-full items-center justify-center flex-1 min-bs-[100dvh] relative max-md:hidden',
+          'flex bs-full items-center justify-center flex-1 min-bs-[100dvh] relative max-md:hidden overflow-hidden',
           {
             'border-ie': settings.skin === 'bordered'
           }
         )}
       >
+        {/* Background Overlay */}
         <div className='relative w-full h-full'>
-          <div className='absolute inset-0 z-10 flex items-center justify-center p-6'>
-            <div className='text-center text-white max-w-2xl space-y-4 p-6 bg-white/30 backdrop-blur-sm rounded-lg'>
-              <Typography variant='h3' className='!font-bold'>
+          <div className='absolute inset-0 z-[2] blur-sm bg-[#fefefe]/5' />
+          <div className='absolute inset-0 z-20 flex items-center justify-center p-6'>
+            <div className='text-center text-white max-w-2xl space-y-4 p-6 bg-gradient-to-b from-slate-400 to-white/20 backdrop-blur-md rounded-xl shadow-lg'>
+              <Typography variant='h3' className='!font-bold text-white'>
                 Chào mừng đến với <span className='text-blue-800'>VLUStudy</span>
                 <span className='text-primary'>Plus</span>
+                👋🏻
               </Typography>
-              <Typography variant='h6' className='!font-medium'>
+              <Typography variant='h6' className='!font-medium text-white'>
                 PHẦN MỀM QUẢN LÝ, THEO DÕI VÀ XỬ LÝ QUÁ TRÌNH HỌC TẬP
               </Typography>
-              <Typography variant='subtitle1'>Trường Đại học Văn Lang</Typography>
+              <Typography variant='subtitle1' className='text-white'>
+                Trường Đại học Văn Lang
+              </Typography>
             </div>
           </div>
           <Image
@@ -197,34 +73,43 @@ const Login = ({ mode }: { mode: SystemMode }) => {
             className='object-cover object-center'
           />
         </div>
-        {/* <LoginIllustration src={characterIllustration} alt='character-illustration' /> */}
-        {/* <div className='flex flex-col gap-1'>
-          <Image src={backgroundVLU} alt='character-illustration' width={1920} height={1080} objectFit='cover' />
-        </div> */}
-        {/* {!hidden && <MaskImg alt='mask' src={authBackground} />} */}
       </div>
-      <div className='flex justify-center items-center bs-full bg-backgroundPaper !min-is-full p-6 md:!min-is-[unset] md:p-12 md:is-[480px]'>
-        <div className='absolute z-[2] block-start-5 sm:block-start-[33px] inline-start-6 sm:inline-start-[38px]'>
+
+      {/* Right Side - Login Form */}
+      <div
+        className='flex justify-center items-center bs-full !min-is-full p-6 md:!min-is-[unset] md:p-12 md:is-[480px] bg-white/10 rounded-lg shadow-xl border border-white/20'
+        style={{
+          backgroundImage: `url(/images/background/overlay_4.jpg)`
+        }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className='absolute z-[2] block-start-5 sm:block-start-[33px] inline-start-6 sm:inline-start-[38px]'
+        >
           <Logo />
-        </div>
-        <div className='flex flex-col gap-6 is-full sm:is-auto md:is-full sm:max-is-[400px] md:max-is-[unset] mbs-8 sm:mbs-11 md:mbs-0'>
-          <div className='flex flex-col gap-1'>
-            <Typography
-              className={montserrat.className}
-              variant='h4'
-            >{`Chào mừng đến với ${themeConfig.templateName}! 👋🏻`}</Typography>
-            {/* <Typography>Vui lòng đăng nhập bằng tài khoản do trường Đại học Văn Lang cung cấp</Typography> */}
+        </motion.div>
+        <div className='flex flex-col gap-6 is-full sm:is-auto md:is-full sm:max-is-[480px] md:max-is-[unset] mbs-8 sm:mbs-11 md:mbs-0'>
+          {/* Welcome Message */}
+          <div className='flex flex-col gap-1 text-center'>
+            {hidden ? (
+              <Typography className={montserrat.className} variant='h4'>
+                {`Chào mừng đến với ${themeConfig.templateName}! 👋🏻`}
+              </Typography>
+            ) : null}
+            <Typography className='text-gray-800'>Vui lòng đăng nhập bằng tài khoản Văn Lang</Typography>
           </div>
-          {/* <Alert icon={false} className='bg-[var(--mui-palette-primary-lightOpacity)]'>
-            <Typography variant='body2' color='primary'>
-              Email: <span className='font-medium'>admin@vuexy.com</span> / Pass:{' '}
-              <span className='font-medium'>admin</span>
-            </Typography>
-          </Alert> */}
-          <div className='flex flex-col items-center gap-3'>
-            <div className='w-40'>
+
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className='flex flex-col items-center gap-3 border border-gray-300 bg-white/20 hover:bg-white/30 transition-all rounded-md p-4 cursor-pointer shadow-lg'
+            onClick={() => router.push('https://vlustudy-production.up.railway.app/api/auth/microsoft')}
+          >
+            <div className='w-1/4'>
               <Image
-                src={'/images/logo-van-lang.png'}
+                src='/images/logo-van-lang.png'
                 alt='Van Lang University'
                 width={300}
                 height={100}
@@ -232,102 +117,16 @@ const Login = ({ mode }: { mode: SystemMode }) => {
                 className='w-full h-full'
               />
             </div>
-            <Button
-              fullWidth
-              variant='outlined'
-              startIcon={<Image src='/images/microsoft-365.png' alt='Google' width={50} height={30} />}
-              color='secondary'
-              onClick={() => router.push('https://vlustudy-production.up.railway.app/api/auth/microsoft')}
-            >
-              <Typography>Đăng nhập với Microsoft 365</Typography>
-            </Button>
-          </div>
-          {/* <form
-            noValidate
-            autoComplete='off'
-            action={() => {}}
-            onSubmit={handleSubmit(onSubmit)}
-            className='flex flex-col gap-6'
-          >
-            <Controller
-              name='email'
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <CustomTextField
-                  {...field}
-                  autoFocus
-                  fullWidth
-                  type='email'
-                  label='Email'
-                  placeholder='Enter your email'
-                  onChange={e => {
-                    field.onChange(e.target.value)
-                    errorState !== null && setErrorState(null)
-                  }}
-                  {...((errors.email || errorState !== null) && {
-                    error: true,
-                    helperText: errors?.email?.message || errorState?.message[0]
-                  })}
-                />
-              )}
-            />
-            <Controller
-              name='password'
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <CustomTextField
-                  {...field}
-                  fullWidth
-                  label='Password'
-                  placeholder='············'
-                  id='login-password'
-                  type={isPasswordShown ? 'text' : 'password'}
-                  onChange={e => {
-                    field.onChange(e.target.value)
-                    errorState !== null && setErrorState(null)
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position='end'>
-                        <IconButton edge='end' onClick={handleClickShowPassword} onMouseDown={e => e.preventDefault()}>
-                          <i className={isPasswordShown ? 'tabler-eye' : 'tabler-eye-off'} />
-                        </IconButton>
-                      </InputAdornment>
-                    )
-                  }}
-                  {...(errors.password && { error: true, helperText: errors.password.message })}
-                />
-              )}
-            />
-            <div className='flex justify-between items-center gap-x-3 gap-y-1 flex-wrap'>
-              <FormControlLabel control={<Checkbox defaultChecked />} label='Remember me' />
-              <Typography className='text-end' color='primary' component={Link} href={'/forgot-password'}>
-                Forgot password?
-              </Typography>
+            <div className='content w-full text-center'>
+              <p className='text-xl font-bold text-red-600'>Tiếp tục với tài khoản Văn Lang</p>
             </div>
-            <Button fullWidth variant='contained' type='submit'>
-              Login
-            </Button>
-            <div className='flex justify-center items-center flex-wrap gap-2'>
-              <Typography>New on our platform?</Typography>
-              <Typography component={Link} href={'/register'} color='primary'>
-                Create an account
-              </Typography>
-            </div>
-            <Divider className='gap-2'>or</Divider>
-            <Button
-              color='secondary'
-              className='self-center text-textPrimary'
-              startIcon={<img src='/images/logos/google.png' alt='Google' width={22} />}
-              sx={{ '& .MuiButton-startIcon': { marginInlineEnd: 3 } }}
-              onClick={() => signIn('microsoft')}
-            >
-              Sign in with Google
-            </Button>
-          </form> */}
+          </motion.div>
         </div>
+      </div>
+
+      {/* Footer */}
+      <div className='absolute block-end-5 inline-start-6 text-center text-gray-400'>
+        <Typography variant='body2'>© {new Date().getFullYear()} VanLangUniversity. All rights reserved.</Typography>
       </div>
     </div>
   )

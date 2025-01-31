@@ -5,32 +5,29 @@ import { useEffect, useState } from 'react'
 
 import { redirect } from 'next/navigation'
 
-// Third-party Imports
-import { getServerSession } from 'next-auth'
-
 // Type Imports
 import type { ChildrenType } from '@core/types'
 
 // Config Imports
 import themeConfig from '@configs/themeConfig'
+import { SplashScreen } from '@/components/loading-screen'
 
 // Util Imports
 
 const GuestOnlyRoute = ({ children }: ChildrenType) => {
-  const [token, setToken] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const storedToken = localStorage.getItem('accessToken')
 
-    setToken(storedToken)
+    if (storedToken) {
+      redirect(themeConfig.homePageUrl)
+    } else {
+      setLoading(false)
+    }
   }, [])
 
-  if (token) {
-    console.log('accessToken guest', token)
-    redirect(themeConfig.homePageUrl)
-  }
-
-  return <>{children}</>
+  return <>{loading ? <SplashScreen /> : children}</>
 }
 
 // const GuestOnlyRoute = async ({ children }: ChildrenType) => {

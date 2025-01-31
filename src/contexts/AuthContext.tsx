@@ -23,7 +23,7 @@ import type { UserType } from '@/types/userType'
 // ** Defaults
 const defaultProvider: AuthValuesType = {
   user: null,
-  loading: false,
+  loading: true,
   setUser: () => null,
   setLoading: () => Boolean,
   logout: () => Promise.resolve(),
@@ -55,22 +55,32 @@ const AuthProvider = ({ children }: Props) => {
   useEffect(() => {
     if (accessToken) {
       localStorage.setItem('accessToken', accessToken)
-      Cookies.set('jwt', accessToken)
       router.replace('/')
     }
   }, [accessToken, router])
 
   useEffect(() => {
     const initAuth = async (): Promise<void> => {
+      console.log('initAuth')
+
+      if (!localStorage.getItem('accessToken')) {
+        localStorage.clear()
+        setUser(null)
+        router.replace('/login?returnTo=' + pathName)
+        setLoading(false)
+      }
+
       await axiosClient
         .get('/api/auth/get-user-profile')
         .then(async response => {
           console.log(response)
           setUser({ ...response.data })
+          setLoading(false)
         })
         .catch(() => {
           setUser(null)
           localStorage.clear()
+          setLoading(false)
 
           if (authConfig.onTokenExpiration === 'logout' && !pathName.includes('login')) {
             router.replace('/login')

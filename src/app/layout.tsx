@@ -11,9 +11,9 @@ import '@/app/globals.css'
 import '@assets/iconify-icons/generated-icons.css'
 
 export const metadata = {
-  title: 'Vuexy - MUI Next.js Admin Dashboard Template',
+  title: 'VLUStudyPlus',
   description:
-    'Vuexy - MUI Next.js Admin Dashboard Template - is the most developer friendly & highly customizable Admin Dashboard Template based on MUI v5.'
+    'VLUStudyPlus là phần mềm quản lý, theo dõi và hỗ trợ học tập cho sinh viên trường Đại học Văn Lang. Phần mềm giúp sinh viên quản lý thời gian, theo dõi tiến độ học tập, hỗ trợ việc học tập và nghiên cứu, cũng như giúp sinh viên tìm kiếm thông tin về các khóa học, giáo viên, lịch học, lịch thi, điểm thi, và nhiều thông tin khác.'
 }
 
 const RootLayout = ({ children }: ChildrenType) => {

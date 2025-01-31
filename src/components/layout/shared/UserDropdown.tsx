@@ -21,11 +21,11 @@ import Divider from '@mui/material/Divider'
 import MenuItem from '@mui/material/MenuItem'
 import Button from '@mui/material/Button'
 
-// Third-party Imports
-import { signOut, useSession } from 'next-auth/react'
-
 // Hook Imports
+import { Stack } from '@mui/material'
+
 import { useSettings } from '@core/hooks/useSettings'
+import { useAuth } from '@/hooks/useAuth'
 
 // Styled component for badge content
 const BadgeContentSpan = styled('span')({
@@ -45,6 +45,7 @@ const UserDropdown = () => {
   const anchorRef = useRef<HTMLDivElement>(null)
 
   // Hooks
+  const { setUser, user } = useAuth()
   const router = useRouter()
 
   // const { data: session } = useSession()
@@ -67,21 +68,21 @@ const UserDropdown = () => {
   }
 
   const handleUserLogout = async () => {
-    try {
-      // Sign out from the app
-      // await signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
-      localStorage.removeItem('accessToken')
-      router.push('/login')
-    } catch (error) {
-      console.error(error)
-
-      // Show above error in a toast like following
-      // toastService.error((err as Error).message)
-    }
+    router.push('/login')
+    localStorage.removeItem('accessToken')
+    setUser(null)
   }
 
   return (
     <>
+      <Stack justifyContent='end' alignItems='end' ml={2}>
+        <Typography variant='h6' color='text.primary'>
+          {user?.userId + ' -' || ''} {user?.userName} {'- ' + user?.classCode || ''}
+        </Typography>
+        <Typography variant='caption' color='text.secondary'>
+          {user?.mail}
+        </Typography>
+      </Stack>
       <Badge
         ref={anchorRef}
         overlap='circular'
@@ -91,10 +92,10 @@ const UserDropdown = () => {
       >
         <Avatar
           ref={anchorRef}
-          alt={'cascascac'}
-          src={''}
+          alt={user?.userName || ''}
+          src={user?.avatar || ''}
           onClick={handleDropdownOpen}
-          className='cursor-pointer bs-[38px] is-[38px]'
+          className='cursor-pointer bs-[38px] is-[38px] border border-primary'
         />
       </Badge>
       <Popper
@@ -119,8 +120,7 @@ const UserDropdown = () => {
                     <Avatar alt={'ckjkagsjc'} src={''} />
                     <div className='flex items-start flex-col'>
                       <Typography className='font-medium' color='text.primary'>
-                        {/* {session?.user?.name || ''} */}
-                        ckjkagsjc
+                        {user?.userName}
                       </Typography>
                       <Typography variant='caption'>hcahsc</Typography>
                     </div>

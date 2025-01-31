@@ -23,6 +23,7 @@ import AuthGuard from '@/hocs/AuthGuard'
 // Util Imports
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
 import { AuthProvider } from '@/contexts/AuthContext'
+import ProgressProvider from '@/contexts/procesWrapper'
 
 const Layout = async ({ children }: ChildrenType) => {
   // Vars
@@ -42,6 +43,7 @@ const Layout = async ({ children }: ChildrenType) => {
                 navbar={<Navbar />}
                 footer={<VerticalFooter />}
               >
+                <ProgressProvider />
                 {children}
               </VerticalLayout>
             }

@@ -5,18 +5,16 @@ import type { Metadata } from 'next'
 import Login from '@/views/Login'
 
 // Server Action Imports
-import { getServerMode } from '@core/utils/serverHelpers'
 
 export const metadata: Metadata = {
-  title: 'Login',
-  description: 'Login to your account'
+  title: 'Đăng nhập | VLUStudyPlus',
+  description: 'Đăng nhập vào hệ thống VLUStudyPlus để sử dụng các tính năng của hệ thống.'
 }
 
 const LoginPage = () => {
   // Vars
-  const mode = getServerMode()
 
-  return <Login mode={mode} />
+  return <Login />
 }
 
 export default LoginPage

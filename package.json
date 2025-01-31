@@ -58,6 +58,7 @@
     "framer-motion": "^12.0.6",
     "input-otp": "1.2.4",
     "keen-slider": "6.8.6",
+    "lodash": "^4.17.21",
     "mapbox-gl": "3.5.2",
     "next": "14.2.5",
     "next-auth": "4.24.7",
@@ -77,13 +78,17 @@
     "react-use": "17.5.1",
     "recharts": "2.12.7",
     "server-only": "0.0.1",
-    "valibot": "0.36.0"
+    "swr": "^2.3.0",
+    "valibot": "0.36.0",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@iconify/json": "2.2.230",
+    "@iconify/react": "^5.2.0",
     "@iconify/tools": "4.0.4",
     "@iconify/types": "2.0.0",
     "@iconify/utils": "2.1.25",
+    "@types/lodash": "^4.17.15",
     "@types/mapbox-gl": "^3.1.0",
     "@types/node": "^20.14.12",
     "@types/react": "^18.3.3",

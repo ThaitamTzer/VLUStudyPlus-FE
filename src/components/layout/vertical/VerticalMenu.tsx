@@ -24,6 +24,7 @@ import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNav
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 
 import { menuClasses } from '@menu/utils/menuClasses'
+import Iconify from '@/components/iconify'
 
 // import menuItemStyles from '@/configs/menuItemStyles'
 
@@ -143,9 +144,24 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
         // menuItemStyles={menuItemStyles(verticalNavOptions, theme)}
       >
-        <MenuItem href='/homepage' icon={<i className='tabler-home' />} exactMatch={false} activeUrl='/homepage'>
+        <MenuItem
+          href='/homepage'
+          icon={<Iconify icon='solar:home-2-linear' />}
+          exactMatch={false}
+          activeUrl='/homepage'
+        >
           Trang chủ
         </MenuItem>
+        <MenuSection label='Quản lý'>
+          <MenuItem
+            href='/role-management'
+            icon={<Iconify icon='solar:shield-user-linear' />}
+            exactMatch={false}
+            activeUrl='/role-management'
+          >
+            Quản lý vai trò
+          </MenuItem>
+        </MenuSection>
         <SubMenu
           label='dashboards'
           icon={<i className='tabler-smart-home' />}

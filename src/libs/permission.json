@@ -1,0 +1,52 @@
+[
+  {
+    "id": 0,
+    "namePermission": "Quản lý",
+    "action": "manage",
+    "subject": "all",
+    "color": {
+      "subject_color": "#FF0000",
+      "action_color": "#FF69B4"
+    }
+  },
+  {
+    "id": 1,
+    "namePermission": "Xem vai trò",
+    "action": "read",
+    "subject": "role",
+    "color": {
+      "subject_color": "#4CAF50",
+      "action_color": "#8BC34A"
+    }
+  },
+  {
+    "id": 2,
+    "namePermission": "Tạo vai trò",
+    "action": "create",
+    "subject": "role",
+    "color": {
+      "subject_color": "#2196F3",
+      "action_color": "#03A9F4"
+    }
+  },
+  {
+    "id": 3,
+    "namePermission": "Cập nhật vai trò",
+    "action": "update",
+    "subject": "role",
+    "color": {
+      "subject_color": "#9C27B0",
+      "action_color": "#E91E63"
+    }
+  },
+  {
+    "id": 4,
+    "namePermission": "Xóa vai trò",
+    "action": "delete",
+    "subject": "role",
+    "color": {
+      "subject_color": "#F44336",
+      "action_color": "#FF5722"
+    }
+  }
+]

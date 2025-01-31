@@ -138,6 +138,9 @@ importers:
       keen-slider:
         specifier: 6.8.6
         version: 6.8.6
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       mapbox-gl:
         specifier: 3.5.2
         version: 3.5.2
@@ -195,13 +198,22 @@ importers:
       server-only:
         specifier: 0.0.1
         version: 0.0.1
+      swr:
+        specifier: ^2.3.0
+        version: 2.3.0(react@18.3.1)
       valibot:
         specifier: 0.36.0
         version: 0.36.0
+      zustand:
+        specifier: ^5.0.3
+        version: 5.0.3(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)(use-sync-external-store@1.4.0(react@18.3.1))
     devDependencies:
       '@iconify/json':
         specifier: 2.2.230
         version: 2.2.230
+      '@iconify/react':
+        specifier: ^5.2.0
+        version: 5.2.0(react@18.3.1)
       '@iconify/tools':
         specifier: 4.0.4
         version: 4.0.4
@@ -211,6 +223,9 @@ importers:
       '@iconify/utils':
         specifier: 2.1.25
         version: 2.1.25
+      '@types/lodash':
+        specifier: ^4.17.15
+        version: 4.17.15
       '@types/mapbox-gl':
         specifier: ^3.1.0
         version: 3.1.0
@@ -707,6 +722,11 @@ packages:
 
   '@iconify/json@2.2.230':
     resolution: {integrity: sha512-SbwqcrYfHMnH7Na3S5RNNUdZvX0cLqgkONVMzI8BOfgVCQSY3tXHyHqeu2VkVoxJX9OcHMmfjeavpno7/y3Mfw==}
+
+  '@iconify/react@5.2.0':
+    resolution: {integrity: sha512-7Sdjrqq3fkkQNks9SY3adGC37NQTHsBJL2PRKlQd455PoDi9s+Es9AUTY+vGLFOYs5yO9w9yCE42pmxCwG26WA==}
+    peerDependencies:
+      react: '>=16'
 
   '@iconify/tools@4.0.4':
     resolution: {integrity: sha512-hX1Z3i1Tm6JxyrDv45jNEijPpepZZfal/4leFGtUC04H9LsgRo597BOBFB9PUZsQdFGLOxVUUfv6lqU/dC+xXw==}
@@ -1396,6 +1416,9 @@ packages:
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
 
+  '@types/lodash@4.17.15':
+    resolution: {integrity: sha512-w/P33JFeySuhN6JLkysYUK2gEmy9kHHFN7E8ro0tkfmlDOgxBDzWEZ/J8cWA+fHqFevpswDTFZnDx+R9lbL6xw==}
+
   '@types/mapbox-gl@3.1.0':
     resolution: {integrity: sha512-hI6cQDjw1bkJw7MC/eHMqq5TWUamLwsujnUUeiIX2KDRjxRNSYMjnHz07+LATz9I9XIsKumOtUz4gRYnZOJ/FA==}
 
@@ -2000,6 +2023,10 @@ packages:
   delayed-stream@1.0.0:
     resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
     engines: {node: '>=0.4.0'}
+
+  dequal@2.0.3:
+    resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
+    engines: {node: '>=6'}
 
   detect-node-es@1.1.0:
     resolution: {integrity: sha512-ypdmJU/TbBby2Dxibuv7ZLW3Bs1QEmM7nHjEANfohJLvE0XVujisn1qPJcZxg+qDucsr+bP6fLD1rPS3AhJ7EQ==}
@@ -3926,6 +3953,11 @@ packages:
     engines: {node: '>=14.0.0'}
     hasBin: true
 
+  swr@2.3.0:
+    resolution: {integrity: sha512-NyZ76wA4yElZWBHzSgEJc28a0u6QZvhb6w0azeL2k7+Q1gAzVK+IqQYXhVOC/mzi+HZIozrZvBVeSeOZNR2bqA==}
+    peerDependencies:
+      react: ^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   tabbable@6.2.0:
     resolution: {integrity: sha512-Cat63mxsVJlzYvN51JmVXIgNoUokrIaT2zLclCXjRd8boZ0004U4KCs/sToJ75C6sdlByWxpYnb5Boif1VSFew==}
 
@@ -4109,6 +4141,11 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
 
+  use-sync-external-store@1.4.0:
+    resolution: {integrity: sha512-9WXSPC5fMv61vaupRkCKCxsPxBocVnwakBEkMIHHpkTTg6icbJtg6jzgtLDm4bl3cSHAca52rYWih0k4K3PfHw==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
@@ -4189,6 +4226,24 @@ packages:
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  zustand@5.0.3:
+    resolution: {integrity: sha512-14fwWQtU3pH4dE0dOpdMiWjddcH+QzKIgk1cl8epwSE7yag43k/AD/m4L6+K7DytAOr9gGBe3/EXj9g7cdostg==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      '@types/react': '>=18.0.0'
+      immer: '>=9.0.6'
+      react: '>=18.0.0'
+      use-sync-external-store: '>=1.2.0'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      immer:
+        optional: true
+      react:
+        optional: true
+      use-sync-external-store:
+        optional: true
 
 snapshots:
 
@@ -4579,6 +4634,11 @@ snapshots:
     dependencies:
       '@iconify/types': 2.0.0
       pathe: 1.1.2
+
+  '@iconify/react@5.2.0(react@18.3.1)':
+    dependencies:
+      '@iconify/types': 2.0.0
+      react: 18.3.1
 
   '@iconify/tools@4.0.4':
     dependencies:
@@ -5243,6 +5303,8 @@ snapshots:
   '@types/js-cookie@2.2.7': {}
 
   '@types/json5@0.0.29': {}
+
+  '@types/lodash@4.17.15': {}
 
   '@types/mapbox-gl@3.1.0':
     dependencies:
@@ -5931,6 +5993,8 @@ snapshots:
       object-keys: 1.1.1
 
   delayed-stream@1.0.0: {}
+
+  dequal@2.0.3: {}
 
   detect-node-es@1.1.0: {}
 
@@ -8174,6 +8238,12 @@ snapshots:
       csso: 5.0.5
       picocolors: 1.0.1
 
+  swr@2.3.0(react@18.3.1):
+    dependencies:
+      dequal: 2.0.3
+      react: 18.3.1
+      use-sync-external-store: 1.4.0(react@18.3.1)
+
   tabbable@6.2.0: {}
 
   table@6.8.2:
@@ -8411,6 +8481,10 @@ snapshots:
     dependencies:
       react: 18.3.1
 
+  use-sync-external-store@1.4.0(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+
   util-deprecate@1.0.2: {}
 
   uuid@8.3.2: {}
@@ -8521,3 +8595,10 @@ snapshots:
       fd-slicer: 1.1.0
 
   yocto-queue@0.1.0: {}
+
+  zustand@5.0.3(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)(use-sync-external-store@1.4.0(react@18.3.1)):
+    optionalDependencies:
+      '@types/react': 18.3.3
+      immer: 10.1.1
+      react: 18.3.1
+      use-sync-external-store: 1.4.0(react@18.3.1)

@@ -31,8 +31,8 @@ const Providers = (props: Props) => {
     <VerticalNavProvider>
       <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
         <ThemeProvider direction={direction} systemMode={systemMode}>
+          <AppReactToastify direction={direction} position='top-center' limit={4} hideProgressBar />
           <ReduxProvider>{children}</ReduxProvider>
-          <AppReactToastify direction={direction} limit={4} hideProgressBar />
         </ThemeProvider>
       </SettingsProvider>
     </VerticalNavProvider>

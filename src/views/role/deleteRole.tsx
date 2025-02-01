@@ -1,15 +1,18 @@
 'use client'
 
 import { useState } from 'react'
+
 import { toast } from 'react-toastify'
 import { LoadingButton } from '@mui/lab'
 import { Dialog, DialogTitle, DialogActions, DialogContent, IconButton, Typography } from '@mui/material'
+
+import type { KeyedMutator } from 'swr'
+
 import Iconify from '@/components/iconify'
 
 import { useRoleStore } from '@/stores/role/role'
 import roleService from '@/services/role.service'
-import { KeyedMutator } from 'swr'
-import { RoleType, Role } from '@/types/management/roleType'
+import type { RoleType, Role } from '@/types/management/roleType'
 
 type DeleteRoleProps = {
   mutate: KeyedMutator<RoleType>

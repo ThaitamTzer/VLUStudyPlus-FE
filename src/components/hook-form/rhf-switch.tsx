@@ -1,18 +1,19 @@
-import { Controller, useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form'
 
-import Switch from '@mui/material/Switch';
-import FormHelperText from '@mui/material/FormHelperText';
-import FormControlLabel, { FormControlLabelProps } from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch'
+import FormHelperText from '@mui/material/FormHelperText'
+import type { FormControlLabelProps } from '@mui/material/FormControlLabel'
+import FormControlLabel from '@mui/material/FormControlLabel'
 
 // ----------------------------------------------------------------------
 
 interface Props extends Omit<FormControlLabelProps, 'control'> {
-  name: string;
-  helperText?: React.ReactNode;
+  name: string
+  helperText?: React.ReactNode
 }
 
 export default function RHFSwitch({ name, helperText, ...other }: Props) {
-  const { control } = useFormContext();
+  const { control } = useFormContext()
 
   return (
     <Controller
@@ -28,5 +29,5 @@ export default function RHFSwitch({ name, helperText, ...other }: Props) {
         </div>
       )}
     />
-  );
+  )
 }

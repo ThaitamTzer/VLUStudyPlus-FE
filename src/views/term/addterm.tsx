@@ -362,7 +362,7 @@ export default function AddTerm(props: AddTermProps) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Hủy</Button>
-          <LoadingButton type='submit' variant='contained'>
+          <LoadingButton loading={loading} type='submit' variant='contained'>
             Thêm
           </LoadingButton>
         </DialogActions>

@@ -1,7 +1,6 @@
 'use client'
 
-import Iconify from '@/components/iconify'
-import { useRoleStore } from '@/stores/role/role'
+import { useEffect, useState } from 'react'
 
 import {
   Dialog,
@@ -16,18 +15,25 @@ import {
   Box,
   Chip
 } from '@mui/material'
+
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useForm, Controller } from 'react-hook-form'
 import type { InferInput } from 'valibot'
 import { valibotResolver } from '@hookform/resolvers/valibot'
 import * as v from 'valibot'
+
+import type { KeyedMutator } from 'swr'
+
+import { toast } from 'react-toastify'
+
 import permission from '@/libs/permission.json'
 import CustomTextField from '@/@core/components/mui/TextField'
 import roleService from '@/services/role.service'
-import { KeyedMutator } from 'swr'
-import { Role, RoleType } from '@/types/management/roleType'
-import { useEffect, useState } from 'react'
-import { toast } from 'react-toastify'
+
+import type { Role, RoleType } from '@/types/management/roleType'
+
+import { useRoleStore } from '@/stores/role/role'
+import Iconify from '@/components/iconify'
 
 type EditRoleProp = {
   mutate: KeyedMutator<RoleType>

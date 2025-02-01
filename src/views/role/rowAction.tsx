@@ -1,10 +1,12 @@
 'use client'
 
-import { useRoleStore } from '@/stores/role/role'
 import { useCallback, useState } from 'react'
+
 import { Menu, MenuItem, IconButton, Typography } from '@mui/material'
+
+import { useRoleStore } from '@/stores/role/role'
 import Iconify from '@/components/iconify'
-import { Role } from '@/types/management/roleType'
+import type { Role } from '@/types/management/roleType'
 
 export default function RowAction({ role }: { role: Role }) {
   const [isOpen, setOpen] = useState<null | HTMLElement>(null)

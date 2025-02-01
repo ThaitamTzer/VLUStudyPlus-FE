@@ -1,10 +1,12 @@
 'use client'
 
-import Iconify from '@/components/iconify'
-import { IconButton, Menu, MenuItem } from '@mui/material'
 import { useCallback, useState } from 'react'
 
-import { Term } from '@/types/management/termType'
+import { IconButton, Menu, MenuItem } from '@mui/material'
+
+import Iconify from '@/components/iconify'
+
+import type { Term } from '@/types/management/termType'
 import { useTermStore } from '@/stores/term/term'
 
 type RowActionProps = {
@@ -14,7 +16,6 @@ type RowActionProps = {
 export default function RowAction({ term }: RowActionProps) {
   const [isOpen, setOpen] = useState<null | HTMLElement>(null)
   const { toogleDeleteTerm, toogleUpdateTerm } = useTermStore()
-
 
   const handleOpen = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
     setOpen(event.currentTarget)

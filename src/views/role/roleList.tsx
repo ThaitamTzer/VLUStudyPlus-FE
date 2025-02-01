@@ -4,8 +4,6 @@ import { styled, Table, TableBody, TableCell, TableContainer, TableHead, TableRo
 
 import type { Role } from '@/types/management/roleType'
 import { TagPermissionNames } from '@/components/tagpermission'
-import { emptyRows } from '@/components/table/utils'
-import TableEmptyRows from '@/components/table/TableEmptyRows'
 import TableNoData from '@/components/table/TableNotFound'
 import RowAction from './rowAction'
 
@@ -14,7 +12,6 @@ type RoleListProps = {
   page: number
   limit: number
   total: number
-  pagination?: React.ReactNode
 }
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
@@ -29,7 +26,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }))
 
 export default function RoleList(props: RoleListProps) {
-  const { roles, page, limit, total, pagination } = props
+  const { roles, page, limit, total } = props
 
   const notFound = total === 0
 
@@ -60,7 +57,6 @@ export default function RoleList(props: RoleListProps) {
               </StyledTableRow>
             )
           })}
-          <TableEmptyRows emptyRows={emptyRows(page, limit, roles.length)} />
           <TableNoData notFound={notFound} title='Không tìm thấy người dùng nào' />
         </TableBody>
       </Table>

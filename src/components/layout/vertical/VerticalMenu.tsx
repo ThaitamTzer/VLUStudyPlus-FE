@@ -161,6 +161,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           >
             Quản lý vai trò
           </MenuItem>
+          <MenuItem
+            href='/term-management'
+            icon={<Iconify icon='solar:calendar-mark-linear' />}
+            exactMatch={false}
+            activeUrl='/term-management'
+          >
+            Quản lý học kỳ
+          </MenuItem>
         </MenuSection>
         <SubMenu
           label='dashboards'

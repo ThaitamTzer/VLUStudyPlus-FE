@@ -1,10 +1,12 @@
 'use client'
 
+import { useState, useCallback } from 'react'
+
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import { Button, Card, InputAdornment, MenuItem, Pagination, Stack, TablePagination, Typography } from '@mui/material'
+
+import { Button, Card, InputAdornment, MenuItem, TablePagination } from '@mui/material'
 import useSWR from 'swr'
 import debounce from 'lodash/debounce'
-import { useState, useCallback } from 'react'
 
 import { useRoleStore } from '@/stores/role/role'
 import RoleList from './roleList'
@@ -32,11 +34,13 @@ export default function RolePage() {
   const updateQueryParams = useCallback(
     debounce(value => {
       const params = new URLSearchParams()
+
       if (value) {
         params.set('searchKey', value)
       } else {
         params.delete('searchKey')
       }
+
       params.set('page', '1') // Reset về page 1 khi tìm kiếm
       params.set('limit', limit.toString())
       router.push(`${pathname}?${params.toString()}`)
@@ -46,11 +50,13 @@ export default function RolePage() {
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
+
     setSearchValue(value)
     updateQueryParams(value)
   }
 
   const fetcher = ['/api/role', page, limit, searchKey]
+
   const { mutate } = useSWR(fetcher, () => roleService.getAll(page, limit, searchKey), {
     revalidateOnFocus: false,
     onSuccess: data => {
@@ -70,11 +76,14 @@ export default function RolePage() {
             value={limit}
             onChange={e => {
               const params = new URLSearchParams()
+
               params.set('page', '1')
               params.set('limit', e.target.value)
+
               if (searchKey) {
                 params.set('searchKey', searchKey)
               }
+
               router.push(`?${params.toString()}`)
             }}
           >
@@ -119,11 +128,14 @@ export default function RolePage() {
           rowsPerPageOptions={[10, 25, 50]}
           onPageChange={(_, page) => {
             const params = new URLSearchParams()
+
             params.set('page', page.toString())
             params.set('limit', limit.toString())
+
             if (searchKey) {
               params.set('searchKey', searchKey)
             }
+
             router.push(`?${params.toString()}`)
           }}
         />

@@ -1,16 +1,18 @@
-import { Pagination, Typography } from '@mui/material'
 import { useRouter } from 'next/navigation'
+
+import { Pagination, Typography } from '@mui/material'
 
 type TablePaginationProps = {
   data: any[]
   page: number
   limit: number
   total: number
-  searchKey: string
+  searchKey?: string
 }
 
 export default function TablePaginationCustom({ data, page, limit, total, searchKey }: TablePaginationProps) {
   const router = useRouter()
+
   return (
     <div className='flex md:justify-between justify-center items-center flex-wrap pli-6 border-bs bs-auto plb-[12.5px] gap-2'>
       <Typography>
@@ -26,11 +28,14 @@ export default function TablePaginationCustom({ data, page, limit, total, search
         page={page}
         onChange={(_, page) => {
           const params = new URLSearchParams()
+
           params.set('page', page.toString())
           params.set('limit', String(limit))
+
           if (searchKey) {
             params.set('searchKey', searchKey)
           }
+
           router.push(`?${params.toString()}`)
         }}
         showFirstButton

@@ -71,7 +71,18 @@ export default function TermFilter(props: TermFilterProps) {
             label='Năm học'
             value={academicYear}
             onChange={onChangeAcademicYear}
+            SelectProps={{
+              displayEmpty: true,
+              MenuProps: {
+                PaperProps: {
+                  sx: {
+                    maxHeight: '300px'
+                  }
+                }
+              }
+            }}
           >
+            <MenuItem value=''>Tất cả</MenuItem>
             {getTermYears()
               .reverse()
               .map(year => (

@@ -18,7 +18,8 @@ export default function TermList(props: TermListProps) {
     <TableContainer
       sx={{
         position: 'relative',
-        overflowX: 'auto'
+        overflowX: 'auto',
+        maxHeight: 'calc(100vh - 300px)'
       }}
     >
       <Table
@@ -29,7 +30,6 @@ export default function TermList(props: TermListProps) {
       >
         <TableHead>
           <StyledTableRow>
-            <TableCell>Mã học kỳ</TableCell>
             <TableCell>Tên học kỳ</TableCell>
             <TableCell>Năm học</TableCell>
             <TableCell>Ngày bắt đầu</TableCell>
@@ -40,7 +40,6 @@ export default function TermList(props: TermListProps) {
           {terms.map(row => {
             return (
               <StyledTableRow key={row._id}>
-                <TableCell>{row.termId}</TableCell>
                 <TableCell>{row.termName}</TableCell>
                 <TableCell>{row.academicYear}</TableCell>
                 <TableCell>{fDate(row.startDate, 'dd/MM/yyyy')}</TableCell>

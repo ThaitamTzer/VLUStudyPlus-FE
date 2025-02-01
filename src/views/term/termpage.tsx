@@ -31,16 +31,29 @@ import CustomTextField from '@/@core/components/mui/TextField'
 import Iconify from '@/components/iconify'
 import TermFilter from './termfilter'
 import AddTerm from './addterm'
+import UpdateTerm from './updateterm'
+import AlertDelete from './alert'
+
+// const getTermYears = () => {
+//   const currentYear = new Date().getFullYear()
+
+//   const termYears = [
+//     `${currentYear - 2}-${currentYear - 1}`,
+//     `${currentYear - 1}-${currentYear}`,
+//     `${currentYear}-${currentYear + 1}`,
+//     `${currentYear + 1}-${currentYear + 2}`
+//   ]
+
+//   return termYears
+// }
 
 const getTermYears = () => {
   const currentYear = new Date().getFullYear()
+  const termYears = []
 
-  const termYears = [
-    `${currentYear - 2}-${currentYear - 1}`,
-    `${currentYear - 1}-${currentYear}`,
-    `${currentYear}-${currentYear + 1}`,
-    `${currentYear + 1}-${currentYear + 2}`
-  ]
+  for (let i = -10; i <= 10; i++) {
+    termYears.push(`${currentYear + i}-${currentYear + i + 1}`)
+  }
 
   return termYears
 }
@@ -68,7 +81,7 @@ export default function TermPage() {
   const filterValue = searchParams.get('filterValue') || ''
   const startDate = searchParams.get('startDate') || ''
   const endDate = searchParams.get('endDate') || ''
-  const academicYear = searchParams.get('academicYear') || getTermYears()[1]
+  const academicYear = searchParams.get('academicYear') || ''
 
   const fetcher = ['api/term', page, limit, filterField, filterValue, startDate, endDate, academicYear]
 
@@ -259,6 +272,8 @@ export default function TermPage() {
         />
       </Card>
       <AddTerm mutate={mutate} />
+      <UpdateTerm mutate={mutate} />
+      <AlertDelete mutate={mutate} />
     </>
   )
 }

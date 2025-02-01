@@ -18,7 +18,6 @@ export type TermType = {
 }
 
 export type AddTermType = {
-  termId: string
   termName: string
   academicYear: string
   startDate: string | Date

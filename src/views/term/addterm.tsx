@@ -19,7 +19,6 @@ import { toast } from 'react-toastify'
 import { useForm, Controller, useWatch } from 'react-hook-form'
 import { valibotResolver } from '@hookform/resolvers/valibot'
 import type { InferInput } from 'valibot'
-import * as v from 'valibot'
 
 import { format } from 'date-fns'
 
@@ -31,71 +30,14 @@ import { useTermStore } from '@/stores/term/term'
 import CustomTextField from '@/@core/components/mui/TextField'
 import Iconify from '@/components/iconify'
 import { fDate } from '@/utils/format-time'
+import { getEndYear, getStartYear } from './helper'
+import { termFormSchema } from '@/schema/termSchema'
 
 type AddTermProps = {
   mutate: KeyedMutator<TermType>
 }
 
-const getStartYear = () => {
-  const currentYear = new Date().getFullYear()
-  const startYear = currentYear - 4
-  const endYear = currentYear + 10
-
-  const years: string[] = []
-
-  for (let i = startYear; i <= endYear; i++) {
-    years.push(i.toString())
-  }
-
-  return years
-}
-
-const getEndYear = (startYear: string) => {
-  const endYear = Number(startYear) + 10
-  const years: string[] = []
-
-  for (let i = Number(startYear); i <= endYear; i++) {
-    years.push(i.toString())
-  }
-
-  return years
-}
-
-const schema = v.object({
-  termId: v.pipe(
-    v.string(),
-    v.trim(),
-    v.nonEmpty('Mã học kỳ không được để trống'),
-    v.minLength(3, 'Mã học kỳ không được ít hơn 3 kí tự'),
-    v.maxLength(10, 'Mã học kỳ không được quá 10 kí tự'),
-    v.regex(/^\S*$/, 'Mã học kỳ không được chứa khoảng trắng')
-  ),
-  termName: v.pipe(
-    v.string(),
-    v.trim(),
-    v.nonEmpty('Tên học kỳ không được để trống'),
-    v.minLength(3, 'Tên học kỳ không được ít hơn 3 kí tự'),
-    v.maxLength(20, 'Tên học kỳ không được quá 20 kí tự')
-  ),
-  startYear: v.pipe(
-    v.string(),
-    v.trim(),
-    v.nonEmpty('Năm bắt đầu không được để trống'),
-    v.minLength(4, 'Năm bắt đầu không hợp lệ'),
-    v.maxLength(4, 'Năm bắt đầu không hợp lệ')
-  ),
-  endYear: v.pipe(
-    v.string(),
-    v.trim(),
-    v.nonEmpty('Năm kết thúc không được để trống'),
-    v.minLength(4, 'Năm kết thúc không hợp lệ'),
-    v.maxLength(4, 'Năm kết thúc không hợp lệ')
-  ),
-  startDate: v.pipe(v.string(), v.trim(), v.nonEmpty('Ngày bắt đầu không được để trống')),
-  endDate: v.pipe(v.string(), v.trim(), v.nonEmpty('Ngày kết thúc không được để trống'))
-})
-
-type TermForm = InferInput<typeof schema>
+type TermForm = InferInput<typeof termFormSchema>
 
 export default function AddTerm(props: AddTermProps) {
   const { openAddTerm, toogleAddTerm } = useTermStore()
@@ -110,10 +52,9 @@ export default function AddTerm(props: AddTermProps) {
     getValues,
     setValue
   } = useForm<TermForm>({
-    resolver: valibotResolver(schema),
+    resolver: valibotResolver(termFormSchema),
     mode: 'all',
     defaultValues: {
-      termId: '',
       termName: '',
       startYear: new Date().getFullYear().toString(),
       endYear: '',
@@ -141,7 +82,6 @@ export default function AddTerm(props: AddTermProps) {
     setLoading(true)
     await termService.create(
       {
-        termId: data.termId,
         termName: data.termName,
         academicYear: `${data.startYear}-${data.endYear}`,
         startDate: fDate(data.startDate, 'dd/MM/yyyy'),
@@ -151,6 +91,7 @@ export default function AddTerm(props: AddTermProps) {
         toast.success('Thêm học kỳ thành công')
         mutate()
         setLoading(false)
+        reset()
       },
       err => {
         toast.error(err.message)
@@ -197,20 +138,6 @@ export default function AddTerm(props: AddTermProps) {
         </IconButton>
         <DialogContent>
           <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Controller
-                name='termId'
-                control={control}
-                render={({ field }) => (
-                  <CustomTextField
-                    {...field}
-                    fullWidth
-                    label='Mã học kỳ'
-                    {...(errors.termId && { error: true, helperText: errors.termId.message })}
-                  />
-                )}
-              />
-            </Grid>
             <Grid item xs={12}>
               <Controller
                 name='termName'
@@ -302,7 +229,9 @@ export default function AddTerm(props: AddTermProps) {
                     onBlur={onBlur}
                     selected={value ? new Date(value) : null}
                     locale='vi'
+                    minDate={startYear ? new Date(`${startYear}-01-01`) : new Date(`${new Date().getFullYear()}-01-01`)}
                     dateFormat='dd/MM/yyyy'
+                    showYearDropdown
                     showMonthDropdown
                     placeholderText='Ngày bắt đầu'
                     customInput={
@@ -342,6 +271,7 @@ export default function AddTerm(props: AddTermProps) {
                     id='endDate'
                     locale='vi'
                     dateFormat='dd/MM/yyyy'
+                    showYearDropdown
                     showMonthDropdown
                     minDate={startDate ? new Date(startDate) : undefined}
                     placeholderText='Ngày kết thúc'
@@ -361,7 +291,9 @@ export default function AddTerm(props: AddTermProps) {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Hủy</Button>
+          <Button variant='outlined' onClick={handleClose}>
+            Hủy
+          </Button>
           <LoadingButton loading={loading} type='submit' variant='contained'>
             Thêm
           </LoadingButton>

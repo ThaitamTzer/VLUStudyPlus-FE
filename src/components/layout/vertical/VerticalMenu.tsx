@@ -177,6 +177,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           >
             Quản lý niên khóa
           </MenuItem>
+          <MenuItem
+            href='/major-management'
+            icon={<Iconify icon='ph:certificate' />}
+            exactMatch={false}
+            activeUrl='/major-management'
+          >
+            Quản lý chuyên ngành
+          </MenuItem>
         </MenuSection>
         <SubMenu
           label='dashboards'

@@ -1,7 +1,7 @@
 const getStartYear = () => {
   const currentYear = new Date().getFullYear()
-  const startYear = currentYear - 4
-  const endYear = currentYear + 10
+  const startYear = currentYear - 5
+  const endYear = currentYear + 20
 
   const years: string[] = []
 
@@ -13,7 +13,7 @@ const getStartYear = () => {
 }
 
 const getEndYear = (startYear: string) => {
-  const endYear = Number(startYear) + 10
+  const endYear = Number(startYear) + 20
   const years: string[] = []
 
   for (let i = Number(startYear); i <= endYear; i++) {
@@ -22,6 +22,5 @@ const getEndYear = (startYear: string) => {
 
   return years
 }
-
 
 export { getStartYear, getEndYear }

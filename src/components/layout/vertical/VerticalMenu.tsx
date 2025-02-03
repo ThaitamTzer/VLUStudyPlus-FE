@@ -169,6 +169,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           >
             Quản lý học kỳ
           </MenuItem>
+          <MenuItem
+            href='/cohort-management'
+            icon={<Iconify icon='hugeicons:students' />}
+            exactMatch={false}
+            activeUrl='/cohort-management'
+          >
+            Quản lý niên khóa
+          </MenuItem>
         </MenuSection>
         <SubMenu
           label='dashboards'

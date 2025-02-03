@@ -34,7 +34,11 @@ export default function RoleList(props: RoleListProps) {
     <TableContainer sx={{ position: 'relative', overflowX: 'auto' }}>
       <Table stickyHeader sx={{ minWidth: 800 }}>
         <TableHead>
-          <StyledTableRow>
+          <StyledTableRow
+            sx={{
+              textTransform: 'uppercase'
+            }}
+          >
             <TableCell>STT</TableCell>
             <TableCell>Tên vai trò</TableCell>
             <TableCell colSpan={2}>Quyền hạn</TableCell>
@@ -46,12 +50,12 @@ export default function RoleList(props: RoleListProps) {
 
             return (
               <StyledTableRow key={row._id}>
-                <TableCell>{stt}</TableCell>
-                <TableCell>{row.name}</TableCell>
-                <TableCell>
+                <TableCell size='small'>{stt}</TableCell>
+                <TableCell size='small'>{row.name}</TableCell>
+                <TableCell size='small'>
                   <TagPermissionNames data={row} />
                 </TableCell>
-                <TableCell align='right'>
+                <TableCell size='small' align='right'>
                   <RowAction role={row} />
                 </TableCell>
               </StyledTableRow>

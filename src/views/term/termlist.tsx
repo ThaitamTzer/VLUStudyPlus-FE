@@ -29,7 +29,11 @@ export default function TermList(props: TermListProps) {
         }}
       >
         <TableHead>
-          <StyledTableRow>
+          <StyledTableRow
+            sx={{
+              textTransform: 'uppercase'
+            }}
+          >
             <TableCell>Tên học kỳ</TableCell>
             <TableCell>Năm học</TableCell>
             <TableCell>Ngày bắt đầu</TableCell>
@@ -40,11 +44,11 @@ export default function TermList(props: TermListProps) {
           {terms.map(row => {
             return (
               <StyledTableRow key={row._id}>
-                <TableCell>{row.termName}</TableCell>
-                <TableCell>{row.academicYear}</TableCell>
-                <TableCell>{fDate(row.startDate, 'dd/MM/yyyy')}</TableCell>
-                <TableCell>{fDate(row.endDate, 'dd/MM/yyyy')}</TableCell>
-                <TableCell align='right'>
+                <TableCell size='small'>{row.termName}</TableCell>
+                <TableCell size='small'>{row.academicYear}</TableCell>
+                <TableCell size='small'>{fDate(row.startDate, 'dd/MM/yyyy')}</TableCell>
+                <TableCell size='small'>{fDate(row.endDate, 'dd/MM/yyyy')}</TableCell>
+                <TableCell size='small' align='right'>
                   <RowAction term={row} />
                 </TableCell>
               </StyledTableRow>

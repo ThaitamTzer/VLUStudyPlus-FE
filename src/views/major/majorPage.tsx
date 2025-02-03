@@ -1,10 +1,14 @@
 'use client'
 
+import { useState } from 'react'
+
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import useSWR from 'swr'
 
 import { Button, Card, MenuItem, TablePagination } from '@mui/material'
+
+import { toast } from 'react-toastify'
 
 import { useMajorStore } from '@/stores/major/major'
 
@@ -15,9 +19,16 @@ import DebouncedInput from '@/components/debouncedInput'
 import MajorList from './majorList'
 import TablePaginationCustom from '@/components/table/TablePagination'
 import AddMajor from './addMajor'
+import UpdateMajor from './updateMajor'
+import AlertDelete from '@/components/alertModal'
+import type { Major } from '@/types/management/majorType'
+import ViewMajor from './viewMajor'
 
 export default function MajorPage() {
-  const { setMajors, setTotal, majors, total, toogleAddMajor } = useMajorStore()
+  const { setMajors, setTotal, majors, total, toogleAddMajor, major, toogleDeleteMajor, openDeleteMajor, setMajor } =
+    useMajorStore()
+
+  const [loading, setLoading] = useState<boolean>(false)
 
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -120,6 +131,42 @@ export default function MajorPage() {
         />
       </Card>
       <AddMajor mutate={mutate} />
+      <UpdateMajor mutate={mutate} />
+      <ViewMajor />
+      <AlertDelete
+        content={
+          <p>
+            Bạn có chắc chắn muốn xóa chuyên ngành <strong>{major?.majorName}</strong> không?
+          </p>
+        }
+        loading={loading}
+        onClose={() => {
+          toogleDeleteMajor()
+          setMajor({} as Major)
+        }}
+        open={openDeleteMajor}
+        title='Xóa chuyên ngành'
+        cancelText='Hủy'
+        submitText='Xóa'
+        onSubmit={async () => {
+          setLoading(true)
+          if (!major) return
+
+          await majorService.delete(
+            major?._id,
+            () => {
+              toast.success('Xóa chuyên ngành thành công')
+              setLoading(false)
+              toogleDeleteMajor()
+              mutate()
+            },
+            () => {
+              setLoading(false)
+              toast.error('Xóa chuyên ngành thất bại')
+            }
+          )
+        }}
+      />
     </>
   )
 }

@@ -6,7 +6,7 @@ type AlertModalProps = {
   open: boolean
   onClose: () => void
   title: string
-  content: string
+  content: string | JSX.Element
   loading: boolean
   cancelText?: string
   submitText?: string

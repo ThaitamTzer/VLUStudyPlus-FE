@@ -5,7 +5,10 @@ export type UserType = {
   academicYear: string
   userName: string
   mail: string
-  role: string
+  role: {
+    _id: string
+    name: string
+  }
   avatar: string
   isBlock: boolean
   createdAt: string | Date

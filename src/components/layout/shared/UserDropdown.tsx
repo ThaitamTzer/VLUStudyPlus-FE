@@ -135,17 +135,17 @@ const UserDropdown = () => {
                       <Typography className='font-medium' color='text.primary'>
                         {user?.userName}
                       </Typography>
-                      <Typography variant='caption'>{user?.role}</Typography>
+                      <Typography variant='caption'>{user?.role.name}</Typography>
                     </div>
                   </div>
                   <Divider className='mlb-1' />
                   <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/pages/user-profile')}>
                     <i className='tabler-user' />
-                    <Typography color='text.primary'>My Profile</Typography>
+                    <Typography color='text.primary'>Hồ sơ của tôi</Typography>
                   </MenuItem>
                   <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/pages/account-settings')}>
                     <i className='tabler-settings' />
-                    <Typography color='text.primary'>Settings</Typography>
+                    <Typography color='text.primary'>Cài đặt</Typography>
                   </MenuItem>
                   <div className='flex items-center plb-2 pli-3'>
                     <Button
@@ -157,7 +157,7 @@ const UserDropdown = () => {
                       onClick={handleUserLogout}
                       sx={{ '& .MuiButton-endIcon': { marginInlineStart: 1.5 } }}
                     >
-                      Logout
+                      Đăng xuất
                     </Button>
                   </div>
                 </MenuList>

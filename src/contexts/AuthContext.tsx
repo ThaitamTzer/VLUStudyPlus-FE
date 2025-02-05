@@ -61,8 +61,6 @@ const AuthProvider = ({ children }: Props) => {
 
   useEffect(() => {
     const initAuth = async (): Promise<void> => {
-      console.log('initAuth')
-
       if (!localStorage.getItem('accessToken')) {
         localStorage.clear()
         setUser(null)
@@ -89,8 +87,7 @@ const AuthProvider = ({ children }: Props) => {
     }
 
     initAuth()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [Cookies.get('jwt')])
+  }, [pathName, router])
 
   const getProfile = async () => {
     try {

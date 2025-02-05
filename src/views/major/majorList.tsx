@@ -26,7 +26,7 @@ export default function MajorList({ page, limit, majors, total }: MajorListProps
         maxHeight: 'calc(100vh - 300px)'
       }}
     >
-      <Table stickyHeader>
+      <Table stickyHeader sx={{ minWidth: 900 }}>
         <TableHead>
           <TableRow
             sx={{

@@ -105,7 +105,7 @@ const Login = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className='flex flex-col items-center gap-3 border border-gray-300 bg-white/20 hover:bg-white/30 transition-all rounded-md p-4 cursor-pointer shadow-lg'
-            onClick={() => router.push('https://vlustudy-production.up.railway.app/api/auth/microsoft')}
+            onClick={() => router.push(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/microsoft`)}
           >
             <div className='w-1/4'>
               <Image

@@ -12,7 +12,7 @@ const getStartYear = () => {
   return years
 }
 
-const getEndYear = (startYear: string) => {
+const getEndYear = (startYear: string | undefined) => {
   const endYear = Number(startYear) + 20
   const years: string[] = []
 

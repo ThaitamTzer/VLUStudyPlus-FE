@@ -3,6 +3,7 @@ export type Student = {
   userId: string
   classCode: string
   academicYear: string
+  cohortId: string
   userName: string
   mail: string
   role: {
@@ -14,6 +15,7 @@ export type Student = {
   createdAt: string | Date
   updatedAt: string | Date
   accessTime: string | Date
+  dateOfBirth: string | Date
 }
 
 export type StudentType = {
@@ -29,8 +31,9 @@ export type FormStudent = {
   userId: string
   userName: string
   classCode: string
-  academicYear: string
+  cohortId: string
   mail: string
+  dateOfBirth: string
 }
 
 export type UpdateStudent = FormStudent & {

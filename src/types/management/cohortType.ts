@@ -7,8 +7,8 @@ export type Cohort = {
 }
 
 export type CohortForm = {
-  cohortId: string
-  cohortName: string
-  startYear: string
-  endYear: string
+  cohortId: string | undefined
+  cohortName: string | undefined
+  startYear: string | undefined
+  endYear: string | undefined
 }

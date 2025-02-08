@@ -208,8 +208,8 @@ importers:
         specifier: ^2.3.0
         version: 2.3.0(react@18.3.1)
       valibot:
-        specifier: 0.36.0
-        version: 0.36.0
+        specifier: 0.42.1
+        version: 0.42.1(typescript@5.5.4)
       zustand:
         specifier: ^5.0.3
         version: 5.0.3(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)(use-sync-external-store@1.4.0(react@18.3.1))
@@ -4194,8 +4194,13 @@ packages:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
 
-  valibot@0.36.0:
-    resolution: {integrity: sha512-CjF1XN4sUce8sBK9TixrDqFM7RwNkuXdJu174/AwmQUB62QbCQADg5lLe8ldBalFgtj1uKj+pKwDJiNo4Mn+eQ==}
+  valibot@0.42.1:
+    resolution: {integrity: sha512-3keXV29Ar5b//Hqi4MbSdV7lfVp6zuYLZuA9V1PvQUsXqogr+u5lvLPLk3A4f74VUXDnf/JfWMN6sB+koJ/FFw==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   victory-vendor@36.9.2:
     resolution: {integrity: sha512-PnpQQMuxlwYdocC8fIJqVXvkeViHYzotI+NJrCuav0ZYFoq912ZHBk3mCeuj+5/VpodOjPe1z0Fk2ihgzlXqjQ==}
@@ -8572,7 +8577,9 @@ snapshots:
 
   uuid@8.3.2: {}
 
-  valibot@0.36.0: {}
+  valibot@0.42.1(typescript@5.5.4):
+    optionalDependencies:
+      typescript: 5.5.4
 
   victory-vendor@36.9.2:
     dependencies:

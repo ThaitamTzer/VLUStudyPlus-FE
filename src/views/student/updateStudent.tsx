@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 
 import type { KeyedMutator } from 'swr'
 
-type AddStudentProps = {
+type UpdateStudentProps = {
   mutate: KeyedMutator<any>
 }
 
@@ -40,18 +40,23 @@ import { toast } from 'react-toastify'
 import Iconify from '@/components/iconify'
 
 import { useStudentStore } from '@/stores/student/student'
-import { schema } from '@/schema/studentSchema'
+import { UpdateSchema } from '@/schema/studentSchema'
 import CustomTextField from '@/@core/components/mui/TextField'
 
 import studentService from '@/services/student.service'
 import cohortService from '@/services/cohort.service'
+import { fDate } from '@/utils/format-time'
+import roleService from '@/services/role.service'
 
-type FormData = InferInput<typeof schema>
+type FormData = InferInput<typeof UpdateSchema>
 
-export default function AddStudent({ mutate }: AddStudentProps) {
-  const { openAddStudent, toogleAddStudent } = useStudentStore()
+export default function UpdateStudent({ mutate }: UpdateStudentProps) {
+  const { openUpdateStudent, toogleUpdateStudent, student, setStudent } = useStudentStore()
   const [loading, setLoading] = useState<boolean>(false)
   const { data: cohorts } = useSWR('cohorts', cohortService.getAll)
+  const { data: roles } = useSWR('roles', () => roleService.getAll(1, 999, ''))
+
+  console.log(roles)
 
   const {
     control,
@@ -60,7 +65,7 @@ export default function AddStudent({ mutate }: AddStudentProps) {
     setValue,
     formState: { errors }
   } = useForm<FormData>({
-    resolver: valibotResolver(schema),
+    resolver: valibotResolver(UpdateSchema),
     mode: 'all',
     defaultValues: {
       userId: '',
@@ -68,9 +73,24 @@ export default function AddStudent({ mutate }: AddStudentProps) {
       cohortId: '',
       mail: '',
       userName: '',
+      role: '',
       dateOfBirth: ''
     }
   })
+
+  useEffect(() => {
+    if (student) {
+      reset({
+        userId: student.userId,
+        userName: student.userName,
+        mail: student.mail,
+        cohortId: student.cohortId || '',
+        classCode: student.classCode || '',
+        dateOfBirth: fDate(student.dateOfBirth, 'yyyy-MM-dd') || '',
+        role: student?.role?._id || ''
+      })
+    }
+  }, [reset, student])
 
   const cohortId = useWatch({ control, name: 'cohortId' })
   const userId = useWatch({ control, name: 'userId' })
@@ -109,42 +129,54 @@ export default function AddStudent({ mutate }: AddStudentProps) {
   }
 
   const handleClose = () => {
-    toogleAddStudent()
+    toogleUpdateStudent()
     reset()
     setLoading(false)
+    setStudent({} as any)
   }
 
   const onSubmit = handleSubmit(async data => {
+    if (!student) return
     setLoading(true)
-    await studentService.create(
-      data,
+
+    await studentService.update(
+      student._id,
+      {
+        userId: data.userId,
+        userName: data.userName,
+        mail: data.mail,
+        cohortId: data.cohortId,
+        classCode: data.classCode,
+        dateOfBirth: fDate(data.dateOfBirth, 'yyyy-MM-dd'),
+        role: data.role
+      },
       () => {
+        toast.success('Cập nhật sinh viên thành công')
+        mutate()
         setLoading(false)
         handleClose()
-        mutate()
-        toast.success('Thêm sinh viên thành công')
       },
       err => {
-        setLoading(false)
-
         switch (err.message) {
-          case 'Student already exists':
-            toast.error('Sinh viên đã tồn tại')
+          case 'userId is exists':
+            toast.error('Mã sinh viên đã tồn tại')
             break
-
-          default: {
-            toast.error('Đã có lỗi xảy ra, vui lòng thử lại sau!')
-          }
+          case 'mail is exists':
+            toast.error('Email đã tồn tại')
+            break
+          default:
+            toast.error(err.message)
+            break
         }
       }
     )
   })
 
   return (
-    <Dialog open={openAddStudent} onClose={handleClose} maxWidth='sm' fullWidth>
+    <Dialog open={openUpdateStudent} onClose={handleClose} maxWidth='sm' fullWidth>
       <form onSubmit={onSubmit} autoComplete='off'>
         <DialogTitle>
-          <Typography variant='h4'>Thêm sinh viên</Typography>
+          <Typography variant='h4'>Cập nhật sinh viên</Typography>
           <IconButton
             onClick={handleClose}
             sx={{
@@ -319,6 +351,38 @@ export default function AddStudent({ mutate }: AddStudentProps) {
                   //     />
                   //   }
                   // />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Controller
+                name='role'
+                control={control}
+                render={({ field }) => (
+                  <CustomTextField
+                    {...field}
+                    fullWidth
+                    select
+                    label='Vai trò'
+                    SelectProps={{
+                      displayEmpty: true,
+                      MenuProps: {
+                        sx: {
+                          maxHeight: 350
+                        }
+                      }
+                    }}
+                    {...(errors.role && { error: true, helperText: errors.role.message })}
+                  >
+                    <MenuItem value='' disabled>
+                      Chọn vai trò
+                    </MenuItem>
+                    {roles?.data?.roles?.map(role => (
+                      <MenuItem key={role._id} value={role._id}>
+                        {role.name}
+                      </MenuItem>
+                    ))}
+                  </CustomTextField>
                 )}
               />
             </Grid>

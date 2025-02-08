@@ -10,6 +10,7 @@ type AlertModalProps = {
   loading: boolean
   cancelText?: string
   submitText?: string
+  submitColor?: 'primary' | 'secondary' | 'error'
 }
 
 export default function AlertDelete(props: AlertModalProps) {
@@ -29,7 +30,13 @@ export default function AlertDelete(props: AlertModalProps) {
         <Button variant='outlined' onClick={handleClose}>
           {props.cancelText || 'Hủy'}
         </Button>
-        <LoadingButton loading={loading} variant='contained' onClick={onSubmit} autoFocus>
+        <LoadingButton
+          loading={loading}
+          color={props.submitColor || 'error'}
+          variant='contained'
+          onClick={onSubmit}
+          autoFocus
+        >
           {props.submitText || 'Xóa'}
         </LoadingButton>
       </DialogActions>

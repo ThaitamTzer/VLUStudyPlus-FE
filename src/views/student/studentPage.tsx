@@ -1,10 +1,14 @@
 'use client'
 
+import { useState } from 'react'
+
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import { Button, Card, MenuItem, TablePagination } from '@mui/material'
 
 import useSWR from 'swr'
+
+import { toast } from 'react-toastify'
 
 import PageHeader from '@/components/page-header'
 
@@ -16,9 +20,24 @@ import TablePaginationCustom from '@/components/table/TablePagination'
 import CustomTextField from '@/@core/components/mui/TextField'
 import DebouncedInput from '@/components/debouncedInput'
 import AddStudent from './addStudent'
+import UpdateStudent from './updateStudent'
+import AlertModal from '@/components/alertModal'
 
 export default function StudentPage() {
-  const { students, setStudents, total, setTotal, toogleAddStudent } = useStudentStore()
+  const {
+    students,
+    setStudents,
+    total,
+    setTotal,
+    toogleAddStudent,
+    student,
+    toogleBlockStudent,
+    toogleUnBlockStudent,
+    openUnBlockStudent,
+    openBlockStudent
+  } = useStudentStore()
+
+  const [loading, setLoading] = useState<boolean>(false)
 
   const router = useRouter()
 
@@ -37,8 +56,6 @@ export default function StudentPage() {
       setTotal(data.pagination.totalItems)
     }
   })
-
-  console.log(students)
 
   return (
     <>
@@ -123,6 +140,85 @@ export default function StudentPage() {
         />
       </Card>
       <AddStudent mutate={mutate} />
+      <UpdateStudent mutate={mutate} />
+      <AlertModal
+        title='Xác nhận khóa sinh viên'
+        content={
+          <div className='space-y-4'>
+            <p>
+              Bạn có chắc chắn muốn khóa sinh viên <strong>{student?.userName}</strong> với mã sinh viên là{' '}
+              <strong>{student?.userId}</strong> không?
+            </p>
+            <p className='text-red-500'>
+              <strong>Lưu ý:</strong> Sinh viên sẽ không thể truy cập vào hệ thống nếu bạn khóa tài khoản của họ.
+            </p>
+          </div>
+        }
+        loading={loading}
+        submitText='Khóa'
+        cancelText='Hủy'
+        onSubmit={async () => {
+          if (!student) return
+
+          setLoading(true)
+          await studentService.block(
+            student._id,
+            true,
+            () => {
+              setLoading(false)
+              mutate()
+              toogleBlockStudent()
+              toast.success('Khóa sinh viên thành công')
+            },
+            err => {
+              setLoading(false)
+              toast.error(err.message)
+            }
+          )
+        }}
+        onClose={() => {
+          toogleBlockStudent()
+        }}
+        open={openBlockStudent}
+      />
+      <AlertModal
+        title='Xác nhận mở khóa sinh viên'
+        content={
+          <div className='space-y-4'>
+            <p>
+              Bạn có chắc chắn muốn mở khóa sinh viên <strong>{student?.userName}</strong> với mã sinh viên là{' '}
+              <strong>{student?.userId}</strong> không?
+            </p>
+          </div>
+        }
+        loading={loading}
+        submitText='Mở khóa'
+        cancelText='Hủy'
+        submitColor='primary'
+        onSubmit={async () => {
+          if (!student) return
+
+          setLoading(true)
+          await studentService.block(
+            student._id,
+            false,
+            () => {
+              setLoading(false)
+              mutate()
+              toogleUnBlockStudent()
+              toast.success('Mở khóa sinh viên thành công')
+            },
+            err => {
+              setLoading(false)
+              toast.error(err.message)
+            }
+          )
+        }}
+        onClose={() => {
+          toogleUnBlockStudent()
+        }}
+        open={openUnBlockStudent}
+      />
     </>
   )
 }

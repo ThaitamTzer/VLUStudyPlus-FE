@@ -30,7 +30,7 @@ const studentService = {
 
   create: async (data: FormStudent, successCallBack?: (res: any) => void, errorCallBack?: (res: any) => void) => {
     try {
-      return await axiosClient.post('/api/students', data).then(res => {
+      return await axiosClient.post('/api/student', data).then(res => {
         successCallBack && successCallBack(res)
 
         return res
@@ -51,7 +51,7 @@ const studentService = {
     errorCallBack?: (res: any) => void
   ) => {
     try {
-      return await axiosClient.put(`/api/students/${id}`, data).then(res => {
+      return await axiosClient.put(`/api/student/${id}`, data).then(res => {
         successCallBack && successCallBack(res)
 
         return res
@@ -72,7 +72,7 @@ const studentService = {
     errorCallBack?: (res: any) => void
   ) => {
     try {
-      return await axiosClient.put(`/api/student/block-student/${id}`, { status }).then(res => {
+      return await axiosClient.patch(`/api/student/block-student/${id}`, { status }).then(res => {
         successCallBack && successCallBack(res)
 
         return res

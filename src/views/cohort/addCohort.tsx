@@ -54,7 +54,13 @@ export default function AddCohort(props: AddCohortProps) {
     setError,
     formState: { errors }
   } = useForm<FormData>({
-    resolver: valibotResolver(schema)
+    resolver: valibotResolver(schema),
+    defaultValues: {
+      cohortId: '',
+      cohortName: '',
+      startYear: '',
+      endYear: ''
+    }
   })
 
   const startYear = useWatch({ control, name: 'startYear' })

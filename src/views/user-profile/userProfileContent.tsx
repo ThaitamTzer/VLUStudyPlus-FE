@@ -24,24 +24,30 @@ export default function UserProfileContent({ user }: { user: any }) {
                   <div className='flex items-center gap-2'>
                     <Iconify icon='solar:user-id-linear' width={27} />
                     <div className='flex items-center flex-wrap gap-2'>
-                      <Typography className='font-medium'>MSSV:</Typography>
+                      <Typography className='font-medium'>
+                        {user?.role.name === 'Sinh viên' ? 'MSSV:' : 'Mã giảng viên:'}
+                      </Typography>
                       <Typography> {user?.userId}</Typography>
                     </div>
                   </div>
-                  <div className='flex items-center gap-2'>
-                    <Iconify icon='icon-park-outline:system' width={27} />
-                    <div className='flex items-center flex-wrap gap-2'>
-                      <Typography className='font-medium'>Mã lớp:</Typography>
-                      <Typography> {user?.classCode}</Typography>
+                  {user?.classCode && (
+                    <div className='flex items-center gap-2'>
+                      <Iconify icon='icon-park-outline:system' width={27} />
+                      <div className='flex items-center flex-wrap gap-2'>
+                        <Typography className='font-medium'>Mã lớp:</Typography>
+                        <Typography> {user?.classCode}</Typography>
+                      </div>
                     </div>
-                  </div>
-                  <div className='flex items-center gap-2'>
-                    <Iconify icon='hugeicons:student' width={27} />
-                    <div className='flex items-center flex-wrap gap-2'>
-                      <Typography className='font-medium'>Niên khóa:</Typography>
-                      <Typography> {user?.cohortId}</Typography>
+                  )}
+                  {user?.cohortId && (
+                    <div className='flex items-center gap-2'>
+                      <Iconify icon='hugeicons:student' width={27} />
+                      <div className='flex items-center flex-wrap gap-2'>
+                        <Typography className='font-medium'>Niên khóa:</Typography>
+                        <Typography> {user?.cohortId}</Typography>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

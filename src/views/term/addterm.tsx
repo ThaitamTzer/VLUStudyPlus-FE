@@ -3,17 +3,7 @@
 import { useState } from 'react'
 
 import type { KeyedMutator } from 'swr'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton,
-  Button,
-  Typography,
-  Grid,
-  MenuItem
-} from '@mui/material'
+import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Button, Typography, Grid } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
 import { toast } from 'react-toastify'
 import { useForm, Controller, useWatch } from 'react-hook-form'
@@ -30,7 +20,6 @@ import { useTermStore } from '@/stores/term/term'
 import CustomTextField from '@/@core/components/mui/TextField'
 import Iconify from '@/components/iconify'
 import { fDate } from '@/utils/format-time'
-import { getEndYear, getStartYear } from './helper'
 import { termFormSchema } from '@/schema/termSchema'
 
 type AddTermProps = {
@@ -56,16 +45,10 @@ export default function AddTerm(props: AddTermProps) {
     mode: 'all',
     defaultValues: {
       termName: '',
-      startYear: new Date().getFullYear().toString(),
-      endYear: '',
+      maxCourse: 0,
       startDate: '',
       endDate: ''
     }
-  })
-
-  const startYear = useWatch({
-    control,
-    name: 'startYear'
   })
 
   const startDate = useWatch({
@@ -83,7 +66,7 @@ export default function AddTerm(props: AddTermProps) {
     await termService.create(
       {
         termName: data.termName,
-        academicYear: `${data.startYear}-${data.endYear}`,
+        maxCourse: Number(data.maxCourse),
         startDate: fDate(data.startDate, 'dd/MM/yyyy'),
         endDate: fDate(data.endDate, 'dd/MM/yyyy')
       },
@@ -138,7 +121,7 @@ export default function AddTerm(props: AddTermProps) {
         </IconButton>
         <DialogContent>
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid item xs={6}>
               <Controller
                 name='termName'
                 control={control}
@@ -154,63 +137,22 @@ export default function AddTerm(props: AddTermProps) {
             </Grid>
             <Grid item xs={6}>
               <Controller
-                name='startYear'
+                name='maxCourse'
                 control={control}
-                render={({ field }) => (
+                render={({ field: { onChange, value, ...field } }) => (
                   <CustomTextField
                     {...field}
-                    fullWidth
-                    label='Năm bắt đầu'
-                    select
-                    {...(errors.startYear && { error: true, helperText: errors.startYear.message })}
-                    SelectProps={{
-                      displayEmpty: true,
-                      MenuProps: {
-                        PaperProps: {
-                          style: {
-                            maxHeight: 250
-                          }
-                        }
-                      }
+                    value={value === 0 ? '' : value}
+                    onChange={e => {
+                      const val = e.target.value === '' ? 0 : Number(e.target.value)
+
+                      onChange(val)
                     }}
-                  >
-                    {getStartYear().map(year => (
-                      <MenuItem key={year} value={year}>
-                        {year}
-                      </MenuItem>
-                    ))}
-                  </CustomTextField>
-                )}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <Controller
-                name='endYear'
-                control={control}
-                render={({ field }) => (
-                  <CustomTextField
-                    {...field}
                     fullWidth
-                    label='Năm kết thúc'
-                    select
-                    {...(errors.endYear && { error: true, helperText: errors.endYear.message })}
-                    SelectProps={{
-                      displayEmpty: true,
-                      MenuProps: {
-                        PaperProps: {
-                          style: {
-                            maxHeight: 250
-                          }
-                        }
-                      }
-                    }}
-                  >
-                    {getEndYear(startYear).map(year => (
-                      <MenuItem key={year} value={year}>
-                        {year}
-                      </MenuItem>
-                    ))}
-                  </CustomTextField>
+                    label='Số lớp tối đa'
+                    type='number'
+                    {...(errors.maxCourse && { error: true, helperText: errors.maxCourse.message })}
+                  />
                 )}
               />
             </Grid>
@@ -229,7 +171,6 @@ export default function AddTerm(props: AddTermProps) {
                     onBlur={onBlur}
                     selected={value ? new Date(value) : null}
                     locale='vi'
-                    minDate={startYear ? new Date(`${startYear}-01-01`) : new Date(`${new Date().getFullYear()}-01-01`)}
                     dateFormat='dd/MM/yyyy'
                     showYearDropdown
                     showMonthDropdown

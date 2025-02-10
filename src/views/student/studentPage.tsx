@@ -139,7 +139,7 @@ export default function StudentPage() {
               params.set('searchKey', searchKey)
             }
 
-            router.push(`?${params.toString()}`, {
+            router.replace(`?${params.toString()}`, {
               scroll: false
             })
           }}

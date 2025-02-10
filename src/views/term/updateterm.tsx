@@ -3,17 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import type { KeyedMutator } from 'swr'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton,
-  Button,
-  Typography,
-  Grid,
-  MenuItem
-} from '@mui/material'
+import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Button, Typography, Grid } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
 import { toast } from 'react-toastify'
 import { useForm, Controller, useWatch } from 'react-hook-form'
@@ -30,7 +20,6 @@ import { useTermStore } from '@/stores/term/term'
 import CustomTextField from '@/@core/components/mui/TextField'
 import Iconify from '@/components/iconify'
 import { fDate } from '@/utils/format-time'
-import { getEndYear, getStartYear } from './helper'
 
 import { termFormSchema } from '@/schema/termSchema'
 
@@ -57,8 +46,7 @@ export default function UpdateTerm(props: UpdateTermProps) {
     mode: 'all',
     defaultValues: {
       termName: '',
-      startYear: '',
-      endYear: '',
+      maxCourse: 0,
       startDate: '',
       endDate: ''
     }
@@ -68,18 +56,12 @@ export default function UpdateTerm(props: UpdateTermProps) {
     if (term) {
       reset({
         termName: term.termName,
-        startYear: String(term.academicYear?.split('-')[0]),
-        endYear: String(term.academicYear?.split('-')[1]),
+        maxCourse: term.maxCourse,
         startDate: fDate(term.startDate, 'yyyy-MM-dd'),
         endDate: fDate(term.endDate, 'yyyy-MM-dd')
       })
     }
   }, [term, reset])
-
-  const startYear = useWatch({
-    control,
-    name: 'startYear'
-  })
 
   const startDate = useWatch({
     control,
@@ -98,7 +80,6 @@ export default function UpdateTerm(props: UpdateTermProps) {
       term._id,
       {
         termName: data.termName,
-        academicYear: `${data.startYear}-${data.endYear}`,
         startDate: fDate(data.startDate, 'dd/MM/yyyy'),
         endDate: fDate(data.endDate, 'dd/MM/yyyy')
       },
@@ -167,68 +148,6 @@ export default function UpdateTerm(props: UpdateTermProps) {
                 )}
               />
             </Grid>
-            <Grid item xs={6}>
-              <Controller
-                name='startYear'
-                control={control}
-                render={({ field }) => (
-                  <CustomTextField
-                    {...field}
-                    fullWidth
-                    label='Năm bắt đầu'
-                    select
-                    {...(errors.startYear && { error: true, helperText: errors.startYear.message })}
-                    SelectProps={{
-                      displayEmpty: true,
-                      MenuProps: {
-                        PaperProps: {
-                          style: {
-                            maxHeight: 250
-                          }
-                        }
-                      }
-                    }}
-                  >
-                    {getStartYear().map(year => (
-                      <MenuItem key={year} value={year}>
-                        {year}
-                      </MenuItem>
-                    ))}
-                  </CustomTextField>
-                )}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <Controller
-                name='endYear'
-                control={control}
-                render={({ field }) => (
-                  <CustomTextField
-                    {...field}
-                    fullWidth
-                    label='Năm kết thúc'
-                    select
-                    {...(errors.endYear && { error: true, helperText: errors.endYear.message })}
-                    SelectProps={{
-                      displayEmpty: true,
-                      MenuProps: {
-                        PaperProps: {
-                          style: {
-                            maxHeight: 250
-                          }
-                        }
-                      }
-                    }}
-                  >
-                    {getEndYear(startYear).map(year => (
-                      <MenuItem key={year} value={year}>
-                        {year}
-                      </MenuItem>
-                    ))}
-                  </CustomTextField>
-                )}
-              />
-            </Grid>
             <Grid item xs={12} sm={6}>
               <Controller
                 name='startDate'
@@ -244,7 +163,6 @@ export default function UpdateTerm(props: UpdateTermProps) {
                     onBlur={onBlur}
                     selected={value ? new Date(value) : null}
                     locale='vi'
-                    minDate={startYear ? new Date(`${startYear}-01-01`) : new Date(`${new Date().getFullYear()}-01-01`)}
                     dateFormat='dd/MM/yyyy'
                     showYearDropdown
                     showMonthDropdown

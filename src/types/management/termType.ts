@@ -1,12 +1,9 @@
 export type Term = {
   _id: string
-  termId: string
   termName: string
-  academicYear: string
+  maxCourse: number
   startDate: string | Date
   endDate: string | Date
-  createdAt: string | Date
-  updatedAt: string | Date
 }
 
 export type TermType = {
@@ -20,14 +17,13 @@ export type TermType = {
 
 export type AddTermType = {
   termName: string
-  academicYear: string
+  maxCourse: number
   startDate: string | Date
   endDate: string | Date
 }
 
 export type UpdateTermType = {
   termName: string
-  academicYear: string
   startDate: string | Date
   endDate: string | Date
 }

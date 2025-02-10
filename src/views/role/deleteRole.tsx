@@ -40,7 +40,7 @@ export default function DeleteRole(prop: DeleteRoleProps) {
       },
       error => {
         setLoading(false)
-        toast.error(error.response.data.message)
+        toast.error(error.message)
         handleClose()
       }
     )
@@ -49,7 +49,6 @@ export default function DeleteRole(prop: DeleteRoleProps) {
   return (
     <Dialog open={openDeleteRoleModal} onClose={handleClose} maxWidth='sm' fullWidth>
       <DialogTitle>
-        {' '}
         <Typography variant='h4'>Xóa vai trò</Typography>
       </DialogTitle>
       <IconButton

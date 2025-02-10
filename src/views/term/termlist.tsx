@@ -5,14 +5,16 @@ import StyledTableRow from '@/components/table/StyledTableRow'
 import { fDate } from '@/utils/format-time'
 import type { Term } from '@/types/management/termType'
 import RowAction from './rowAction'
+import TableLoading from '@/components/table/TableLoading'
 
 type TermListProps = {
   terms: Term[]
   total: number
+  loading?: boolean
 }
 
 export default function TermList(props: TermListProps) {
-  const { terms, total } = props
+  const { terms, total, loading } = props
 
   return (
     <TableContainer
@@ -54,7 +56,11 @@ export default function TermList(props: TermListProps) {
               </StyledTableRow>
             )
           })}
-          <TableNoData notFound={total === 0} title='Không tìm thấy học kỳ nào' />
+          {loading && total === 0 ? (
+            <TableLoading colSpan={12} />
+          ) : (
+            <TableNoData notFound={total === 0} title='Không tìm thấy sinh viên nào' />
+          )}
         </TableBody>
       </Table>
     </TableContainer>

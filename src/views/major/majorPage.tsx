@@ -25,8 +25,7 @@ import type { Major } from '@/types/management/majorType'
 import ViewMajor from './viewMajor'
 
 export default function MajorPage() {
-  const { setMajors, setTotal, majors, total, toogleAddMajor, major, toogleDeleteMajor, openDeleteMajor, setMajor } =
-    useMajorStore()
+  const { toogleAddMajor, major, toogleDeleteMajor, openDeleteMajor, setMajor } = useMajorStore()
 
   const [loading, setLoading] = useState<boolean>(false)
 
@@ -40,12 +39,9 @@ export default function MajorPage() {
 
   const fetcher = ['/api/major', page, limit, filterField, filterValue, searchKey]
 
-  const { mutate } = useSWR(fetcher, () => majorService.getAll(page, limit, filterField, filterValue, searchKey), {
-    onSuccess: data => {
-      setMajors(data.majors)
-      setTotal(data.pagination.totalItems)
-    }
-  })
+  const { mutate, data, isLoading } = useSWR(fetcher, () =>
+    majorService.getAll(page, limit, filterField, filterValue, searchKey)
+  )
 
   const onChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     const params = new URLSearchParams()
@@ -120,10 +116,23 @@ export default function MajorPage() {
             </Button>
           </div>
         </div>
-        <MajorList total={total} limit={limit} page={page} majors={majors} />
+        <MajorList
+          total={data?.pagination.totalItems || 0}
+          limit={limit}
+          page={page}
+          majors={data?.majors || []}
+          loading={isLoading}
+        />
         <TablePagination
-          component={() => <TablePaginationCustom page={page} limit={limit} total={total} data={majors} />}
-          count={total}
+          component={() => (
+            <TablePaginationCustom
+              page={page}
+              limit={limit}
+              total={data?.pagination.totalItems || 0}
+              data={data?.majors || []}
+            />
+          )}
+          count={data?.pagination.totalItems || 0}
           page={page - 1}
           rowsPerPage={limit}
           rowsPerPageOptions={[10, 25, 50]}

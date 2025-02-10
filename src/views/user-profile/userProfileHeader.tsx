@@ -3,16 +3,17 @@
 import { Button, Card, CardContent, CardMedia, Stack, Typography } from '@mui/material'
 
 import { useStudentStore } from '@/stores/student/student'
+import { useAuth } from '@/hooks/useAuth'
 
-import type { UserType } from '@/types/userType'
 import Iconify from '@/components/iconify'
 
 type UserProfileHeaderProps = {
-  user: UserType | null
+  user: any | null
 }
 
 export default function UserProfileHeader({ user }: UserProfileHeaderProps) {
   const { toogleViewAvatar, toogleUpdateAvatar } = useStudentStore()
+  const { user: currentUser } = useAuth()
 
   return (
     <Card>
@@ -30,15 +31,17 @@ export default function UserProfileHeader({ user }: UserProfileHeaderProps) {
               >
                 Xem
               </Button>
-              <Button
-                variant='contained'
-                size='small'
-                className='invisible group-hover:visible'
-                startIcon={<Iconify icon='tabler:edit' />}
-                onClick={toogleUpdateAvatar}
-              >
-                Thay đổi
-              </Button>
+              {currentUser?._id === user?._id && (
+                <Button
+                  variant='contained'
+                  size='small'
+                  className='invisible group-hover:visible'
+                  startIcon={<Iconify icon='tabler:edit' />}
+                  onClick={toogleUpdateAvatar}
+                >
+                  Thay đổi
+                </Button>
+              )}
             </Stack>
           </div>
           <img height={120} width={120} src={user?.avatar} className='rounded' alt='Profile Background' />
@@ -49,7 +52,7 @@ export default function UserProfileHeader({ user }: UserProfileHeaderProps) {
             <div className='flex flex-wrap gap-6 justify-center sm:justify-normal'>
               <div className='flex items-center gap-2'>
                 <Iconify icon='solar:user-outline' />
-                <Typography className='font-medium'>{user?.role.name}</Typography>
+                <Typography className='font-medium'>{user?.role?.name || 'Chưa phân quyền'}</Typography>
               </div>
               <div className='flex items-center gap-2'>
                 <Iconify icon='tabler:mail' />

@@ -13,6 +13,7 @@ export type TermType = {
   pagination: {
     currentPage: number
     totalPages: number
+    totalItems: number
   }
   terms: Term[]
 }

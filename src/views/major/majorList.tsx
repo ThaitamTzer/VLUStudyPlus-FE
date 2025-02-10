@@ -7,15 +7,17 @@ import RowAction from '@/components/rowAction'
 import Iconify from '@/components/iconify'
 
 import { useMajorStore } from '@/stores/major/major'
+import TableLoading from '@/components/table/TableLoading'
 
 type MajorListProps = {
   page: number
   limit: number
   majors: Major[]
   total: number
+  loading: boolean
 }
 
-export default function MajorList({ page, limit, majors, total }: MajorListProps) {
+export default function MajorList({ page, limit, majors, total, loading }: MajorListProps) {
   const { setMajor, toogleUpdateMajor, toogleDeleteMajor, toogleViewMajor } = useMajorStore()
 
   return (
@@ -84,7 +86,11 @@ export default function MajorList({ page, limit, majors, total }: MajorListProps
               </TableRow>
             )
           })}
-          <TableNoData notFound={total === 0} title='Không tìm thấy chuyên ngành nào' />
+         {loading && total === 0 ? (
+            <TableLoading colSpan={12} />
+          ) : (
+            <TableNoData notFound={total === 0} title='Không tìm thấy sinh viên nào' />
+          )}
         </TableBody>
       </Table>
     </TableContainer>

@@ -29,6 +29,22 @@ const studentService = {
     return response.data as StudentProfile
   },
 
+  import: async (data: FormData, successCallBack?: (res: any) => void, errorCallBack?: (res: any) => void) => {
+    try {
+      return await axiosUpload.post('/api/student/import-student', data).then(res => {
+        successCallBack && successCallBack(res)
+
+        return res
+      })
+    } catch (error) {
+      if (errorCallBack) {
+        errorCallBack(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+
   create: async (data: FormStudent, successCallBack?: (res: any) => void, errorCallBack?: (res: any) => void) => {
     try {
       return await axiosClient.post('/api/student', data).then(res => {

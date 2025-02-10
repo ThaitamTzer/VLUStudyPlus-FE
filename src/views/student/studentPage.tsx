@@ -4,6 +4,8 @@ import { useState } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 
+import dynamic from 'next/dynamic'
+
 import { Button, Card, MenuItem, TablePagination } from '@mui/material'
 
 import useSWR from 'swr'
@@ -15,27 +17,19 @@ import PageHeader from '@/components/page-header'
 import studentService from '@/services/student.service'
 
 import { useStudentStore } from '@/stores/student/student'
-import StudentList from './studentList'
 import TablePaginationCustom from '@/components/table/TablePagination'
 import CustomTextField from '@/@core/components/mui/TextField'
 import DebouncedInput from '@/components/debouncedInput'
-import AddStudent from './addStudent'
-import UpdateStudent from './updateStudent'
-import AlertModal from '@/components/alertModal'
+import StudentFiller from './fillter'
+
+const StudentList = dynamic(() => import('./studentList'), { ssr: true })
+const AddStudent = dynamic(() => import('./addStudent'), { ssr: false })
+const UpdateStudent = dynamic(() => import('./updateStudent'), { ssr: false })
+const AlertModal = dynamic(() => import('@/components/alertModal'), { ssr: false })
 
 export default function StudentPage() {
-  const {
-    students,
-    setStudents,
-    total,
-    setTotal,
-    toogleAddStudent,
-    student,
-    toogleBlockStudent,
-    toogleUnBlockStudent,
-    openUnBlockStudent,
-    openBlockStudent
-  } = useStudentStore()
+  const { toogleAddStudent, student, toogleBlockStudent, toogleUnBlockStudent, openUnBlockStudent, openBlockStudent } =
+    useStudentStore()
 
   const [loading, setLoading] = useState<boolean>(false)
 
@@ -50,12 +44,9 @@ export default function StudentPage() {
 
   const fetcher = ['/api/student', page, limit, filterField, filterValue, searchKey]
 
-  const { mutate } = useSWR(fetcher, () => studentService.getList(page, limit, filterField, filterValue, searchKey), {
-    onSuccess: data => {
-      setStudents(data.students)
-      setTotal(data.pagination.totalItems)
-    }
-  })
+  const { mutate, data, isLoading } = useSWR(fetcher, () =>
+    studentService.getList(page, limit, filterField, filterValue, searchKey)
+  )
 
   return (
     <>
@@ -65,6 +56,7 @@ export default function StudentPage() {
           mt: 4
         }}
       >
+        <StudentFiller filterField={filterField} filterValue={filterValue} />
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <CustomTextField
             select
@@ -116,12 +108,24 @@ export default function StudentPage() {
           </div>
         </div>
 
-        <StudentList limit={limit} page={page} students={students} />
+        <StudentList
+          limit={limit}
+          page={page}
+          total={data?.pagination.totalItems || 0}
+          loading={isLoading}
+          students={data?.students}
+        />
         <TablePagination
           component={() => (
-            <TablePaginationCustom data={students} page={page} limit={limit} total={total} searchKey={searchKey} />
+            <TablePaginationCustom
+              data={data?.students || []}
+              page={page}
+              limit={limit}
+              total={data?.pagination.totalItems || 0}
+              searchKey={searchKey}
+            />
           )}
-          count={total}
+          count={data?.pagination.totalItems || 0}
           page={page - 1}
           rowsPerPage={limit}
           rowsPerPageOptions={[10, 25, 50]}
@@ -135,7 +139,9 @@ export default function StudentPage() {
               params.set('searchKey', searchKey)
             }
 
-            router.push(`?${params.toString()}`)
+            router.push(`?${params.toString()}`, {
+              scroll: false
+            })
           }}
         />
       </Card>

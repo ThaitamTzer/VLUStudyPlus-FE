@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+
 import {
   Avatar,
   MenuItem,
@@ -19,11 +21,15 @@ import IsBlock from './isBlock'
 import { fDate, fToNow } from '@/utils/format-time'
 import RowAction from '@/components/rowAction'
 import Iconify from '@/components/iconify'
+import TableNoData from '@/components/table/TableNotFound'
+import TableLoading from '@/components/table/TableLoading'
 
 type StudentListProps = {
-  students: Student[]
+  students: Student[] | undefined
   page: number
   limit: number
+  loading: boolean
+  total: number
 }
 
 const UserInfor = (data: Student) => {
@@ -47,9 +53,8 @@ const UserInfor = (data: Student) => {
   )
 }
 
-export default function StudentList({ students }: StudentListProps) {
-  const { toogleUnBlockStudent, toogleBlockStudent, toogleUpdateStudent, toogleViewDetail, setStudent } =
-    useStudentStore()
+export default function StudentList({ students, total, loading }: StudentListProps) {
+  const { toogleUnBlockStudent, toogleBlockStudent, toogleUpdateStudent, setStudent } = useStudentStore()
 
   const BlockOption = (data: Student) => {
     return (
@@ -96,7 +101,7 @@ export default function StudentList({ students }: StudentListProps) {
           </StyledTableRow>
         </TableHead>
         <TableBody>
-          {students.map(student => {
+          {students?.map(student => {
             // const stt = (page - 1) * limit + index + 1
 
             return (
@@ -109,19 +114,20 @@ export default function StudentList({ students }: StudentListProps) {
                   {student.cohortId}
                 </TableCell>
                 <TableCell size='small'>{fDate(student.dateOfBirth, 'dd/MM/yyyy') || 'Chưa cập nhật'}</TableCell>
-                <TableCell size='small'>{student.role?.name || 'Chưa phân quyền'}</TableCell>
-                <TableCell size='small'>{IsBlock({ isBlock: student.isBlock })}</TableCell>
+                <TableCell width={110} size='small'>
+                  {student.role?.name || 'Chưa phân quyền'}
+                </TableCell>
+                <TableCell width={116} size='small'>
+                  {IsBlock({ isBlock: student.isBlock })}
+                </TableCell>
                 <TableCell size='small'>{fToNow(student.accessTime) || 'Chưa truy cập'}</TableCell>
-                <TableCell size='small'>
+                <TableCell width={1} size='small'>
                   <RowAction>
-                    <MenuItem
-                      onClick={() => {
-                        setStudent(student)
-                        toogleViewDetail()
-                      }}
-                    >
-                      <Iconify icon='solar:eye-linear' />
-                      Xem chi tiết
+                    <MenuItem>
+                      <Link href={`/profile/${student._id}`} prefetch={true} className='flex'>
+                        <Iconify icon='solar:eye-linear' className='mr-2' />
+                        Xem chi tiết
+                      </Link>
                     </MenuItem>
                     <MenuItem
                       onClick={() => {
@@ -138,6 +144,11 @@ export default function StudentList({ students }: StudentListProps) {
               </StyledTableRow>
             )
           })}
+          {loading && total === 0 ? (
+            <TableLoading colSpan={12} />
+          ) : (
+            <TableNoData notFound={total === 0} title='Không tìm thấy sinh viên nào' />
+          )}
         </TableBody>
       </Table>
     </TableContainer>

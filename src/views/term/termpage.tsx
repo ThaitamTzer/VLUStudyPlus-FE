@@ -72,7 +72,7 @@ const columnNames = [
 ]
 
 export default function TermPage() {
-  const { setTerms, setTotal, total, terms, toogleAddTerm } = useTermStore()
+  const { toogleAddTerm } = useTermStore()
   const router = useRouter()
   const searchParams = useSearchParams()
   const page = Number(searchParams.get('page')) || 1
@@ -85,16 +85,8 @@ export default function TermPage() {
 
   const fetcher = ['api/term', page, limit, filterField, filterValue, startDate, endDate, academicYear]
 
-  const { mutate } = useSWR(
-    fetcher,
-    () => termService.getAll(page, limit, filterField, filterValue, startDate, endDate, academicYear),
-    {
-      revalidateOnFocus: true,
-      onSuccess: data => {
-        setTerms(data.terms)
-        setTotal(data.pagination.totalPages)
-      }
-    }
+  const { data, mutate, isLoading } = useSWR(fetcher, () =>
+    termService.getAll(page, limit, filterField, filterValue, startDate, endDate, academicYear)
   )
 
   const onChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
@@ -107,7 +99,9 @@ export default function TermPage() {
     params.set('startDate', startDate)
     params.set('endDate', endDate)
     params.set('academicYear', academicYear)
-    router.push(`?${params.toString()}`)
+    router.push(`?${params.toString()}`, {
+      scroll: false
+    })
   }
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -191,7 +185,13 @@ export default function TermPage() {
             <MenuItem value='50'>50</MenuItem>
           </CustomTextField>
           <div className='flex flex-col sm:flex-row max-sm:is-full items-start sm:items-center gap-4'>
-            <Button onClick={toogleAddTerm} variant='contained' className='max-sm:is-full' sx={{ minWidth: 120 }}>
+            <Button
+              startIcon={<i className='tabler-plus' />}
+              onClick={toogleAddTerm}
+              variant='contained'
+              className='max-sm:is-full'
+              sx={{ minWidth: 120 }}
+            >
               Thêm học kỳ
             </Button>
             <Badge color='error' variant={filterField && filterValue ? 'dot' : 'standard'}>
@@ -261,10 +261,17 @@ export default function TermPage() {
             </Box>
           </Stack>
         </Popover>
-        <TermList terms={terms} total={total} />
+        <TermList loading={isLoading} terms={data?.terms || []} total={data?.pagination.totalItems || 0} />
         <TablePagination
-          component={() => <TablePaginationCustom page={page} limit={limit} total={total} data={terms} />}
-          count={total}
+          component={() => (
+            <TablePaginationCustom
+              page={page}
+              limit={limit}
+              total={data?.pagination.totalItems || 0}
+              data={data?.terms || []}
+            />
+          )}
+          count={data?.pagination.totalItems || 0}
           page={page - 1}
           rowsPerPage={limit}
           rowsPerPageOptions={[10, 25, 50]}

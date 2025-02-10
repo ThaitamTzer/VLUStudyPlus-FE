@@ -1,4 +1,5 @@
 import axiosClient from '@/libs/axios'
+import axiosUpload from '@/libs/axiosUpload'
 import type { StudentType, FormStudent, UpdateStudent, StudentProfile } from '@/types/management/studentType'
 
 const studentService = {
@@ -88,7 +89,7 @@ const studentService = {
 
   updateAvatar: async (data: FormData, successCallBack?: (res: any) => void, errorCallBack?: (res: any) => void) => {
     try {
-      return await axiosClient.patch(`/api/student/update-avatar`, data).then(res => {
+      return await axiosUpload.patch(`/api/student/update-avatar`, data).then(res => {
         successCallBack && successCallBack(res)
 
         return res

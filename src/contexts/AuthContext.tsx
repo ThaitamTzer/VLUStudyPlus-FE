@@ -90,15 +90,16 @@ const AuthProvider = ({ children }: Props) => {
   }, [pathName, router])
 
   const getProfile = async () => {
-    try {
-      const res = await axiosClient.get('/api/users/view-profile')
-
-      setUser(res.data)
-
-      return res.data
-    } catch {
-      setLoading(false)
-    }
+    await axiosClient
+      .get('/api/auth/get-user-profile')
+      .then(async response => {
+        console.log(response)
+        setUser({ ...response.data })
+      })
+      .catch(() => {
+        setUser(null)
+        localStorage.clear()
+      })
   }
 
   const handleLogout = () => {

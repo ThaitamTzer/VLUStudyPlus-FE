@@ -12,6 +12,7 @@ type State = {
   openUnBlockStudent: boolean
   openUpdateAvatar: boolean
   openViewDetail: boolean
+  openViewAvatar: boolean
 }
 
 type Action = {
@@ -24,6 +25,7 @@ type Action = {
   toogleUnBlockStudent: () => void
   toogleUpdateAvatar: () => void
   toogleViewDetail: () => void
+  toogleViewAvatar: () => void
 }
 
 export const useStudentStore = create<State & Action>(set => ({
@@ -36,6 +38,7 @@ export const useStudentStore = create<State & Action>(set => ({
   openUnBlockStudent: false,
   openUpdateAvatar: false,
   openViewDetail: false,
+  openViewAvatar: false,
   setStudents: students => set({ students }),
   setStudent: student => set({ student }),
   setTotal: total => set({ total }),
@@ -44,5 +47,6 @@ export const useStudentStore = create<State & Action>(set => ({
   toogleBlockStudent: () => set(state => ({ openBlockStudent: !state.openBlockStudent })),
   toogleUnBlockStudent: () => set(state => ({ openUnBlockStudent: !state.openUnBlockStudent })),
   toogleUpdateAvatar: () => set(state => ({ openUpdateAvatar: !state.openUpdateAvatar })),
-  toogleViewDetail: () => set(state => ({ openViewDetail: !state.openViewDetail }))
+  toogleViewDetail: () => set(state => ({ openViewDetail: !state.openViewDetail })),
+  toogleViewAvatar: () => set(state => ({ openViewAvatar: !state.openViewAvatar }))
 }))

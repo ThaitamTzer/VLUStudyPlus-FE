@@ -4,6 +4,7 @@ export type UserType = {
   classCode: string
   academicYear: string
   userName: string
+  cohortId: string
   mail: string
   role: {
     _id: string

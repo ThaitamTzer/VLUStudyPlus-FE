@@ -13,10 +13,28 @@ export default function HomePageView() {
     <Card>
       <div className='px-6 py-8 md:px-10 md:py-12'>
         <Stack spacing={1}>
-          <Typography variant='h3'>
+          <Typography
+            sx={{
+              fontSize: {
+                xs: '1rem',
+                sm: '1.5rem',
+                md: '1.75rem'
+              }
+            }}
+          >
             Chào, <span className='font-semibold text-primary'>{user?.userName}</span>! 👋
           </Typography>
-          <Typography variant='h4'>Chúc bạn một ngày tốt lành!</Typography>
+          <Typography
+            sx={{
+              fontSize: {
+                xs: '0.75rem',
+                sm: '1rem',
+                md: '1.25rem'
+              }
+            }}
+          >
+            Chúc bạn một ngày tốt lành!
+          </Typography>
         </Stack>
         <div className='flex flex-1'>
           <Image

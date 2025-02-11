@@ -3,19 +3,14 @@
 import { useState } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-
 import dynamic from 'next/dynamic'
 
 import { Button, Card, MenuItem, TablePagination } from '@mui/material'
-
 import useSWR from 'swr'
-
 import { toast } from 'react-toastify'
 
 import PageHeader from '@/components/page-header'
-
 import studentService from '@/services/student.service'
-
 import { useStudentStore } from '@/stores/student/student'
 import TablePaginationCustom from '@/components/table/TablePagination'
 import CustomTextField from '@/@core/components/mui/TextField'
@@ -56,7 +51,13 @@ export default function StudentPage() {
           mt: 4
         }}
       >
-        <StudentFiller filterField={filterField} filterValue={filterValue} />
+        <StudentFiller
+          filterField={filterField}
+          filterValue={filterValue}
+          page={page}
+          limit={limit}
+          searchKey={searchKey}
+        />
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <CustomTextField
             select
@@ -67,12 +68,16 @@ export default function StudentPage() {
 
               params.set('page', '1')
               params.set('limit', e.target.value)
+              params.set('filterField', filterField)
+              params.set('filterValue', filterValue)
 
               if (searchKey) {
                 params.set('searchKey', searchKey)
               }
 
-              router.push(`?${params.toString()}`)
+              router.push(`?${params.toString()}`, {
+                scroll: false
+              })
             }}
           >
             <MenuItem value='10'>10</MenuItem>
@@ -87,6 +92,8 @@ export default function StudentPage() {
 
                 params.set('page', '1')
                 params.set('limit', limit.toString())
+                params.set('filterField', filterField)
+                params.set('filterValue', filterValue)
 
                 if (value) {
                   params.set('searchKey', value as string)
@@ -121,6 +128,8 @@ export default function StudentPage() {
               data={data?.students || []}
               page={page}
               limit={limit}
+              filterField={filterField}
+              filterValue={filterValue}
               total={data?.pagination.totalItems || 0}
               searchKey={searchKey}
             />
@@ -129,11 +138,13 @@ export default function StudentPage() {
           page={page - 1}
           rowsPerPage={limit}
           rowsPerPageOptions={[10, 25, 50]}
-          onPageChange={(_, page) => {
+          onPageChange={(_, newPage) => {
             const params = new URLSearchParams()
 
-            params.set('page', page.toString())
+            params.set('page', (newPage + 1).toString())
             params.set('limit', limit.toString())
+            params.set('filterField', filterField)
+            params.set('filterValue', filterValue)
 
             if (searchKey) {
               params.set('searchKey', searchKey)

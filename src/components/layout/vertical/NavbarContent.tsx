@@ -110,14 +110,19 @@ import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
 const NavbarContent = () => {
   return (
     <div
-      className={classnames(verticalLayoutClasses.navbarContent, 'flex items-center justify-between gap-4 is-full ')}
+      className={classnames(
+        verticalLayoutClasses.navbarContent,
+        'flex items-center justify-between gap-0 md:gap-4 is-full '
+      )}
     >
       <div className='flex items-center gap-4'>
         <NavToggle />
         {/* <NavSearch /> */}
       </div>
       <div className='flex items-center'>
-        <ModeDropdown />
+        <div className='hidden md:block'>
+          <ModeDropdown />
+        </div>
         {/* <ShortcutsDropdown shortcuts={shortcuts} /> */}
         {/* <NotificationsDropdown notifications={notifications} /> */}
         <UserDropdown />

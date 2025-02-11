@@ -9,6 +9,8 @@ import classnames from 'classnames'
 import type { CSSObject } from '@emotion/styled'
 
 // Type Imports
+import { Box } from '@mui/material'
+
 import type { ChildrenType } from '@core/types'
 
 // Config Imports
@@ -68,7 +70,17 @@ const Navbar = (props: Props) => {
         scrolled: trigger
       })}
     >
-      <div className={classnames(verticalLayoutClasses.navbar, 'flex bs-full')}>{children}</div>
+      <Box
+        className={classnames(verticalLayoutClasses.navbar, 'flex bs-full')}
+        sx={{
+          inlineSize: {
+            xs: 'calc(100% - 16px) !important',
+            sm: 'calc(100% - 48px) !important'
+          }
+        }}
+      >
+        {children}
+      </Box>
     </StyledHeader>
   )
 }

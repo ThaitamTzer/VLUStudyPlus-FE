@@ -1,10 +1,14 @@
 'use client'
 
+import { useState } from 'react'
+
 import { useSearchParams, useRouter } from 'next/navigation'
 
 import useSWR from 'swr'
 
 import { Button, Card, MenuItem, TablePagination } from '@mui/material'
+
+import { Flip, toast } from 'react-toastify'
 
 import lecturerService from '@/services/lecturer.service'
 import PageHeader from '@/components/page-header'
@@ -15,10 +19,21 @@ import TablePaginationCustom from '@/components/table/TablePagination'
 import { useLecturerStore } from '@/stores/lecturer/lecturer'
 import AddLecturer from './addLecturer'
 import UpdateLecturer from './updateLecturer'
+import AlertBlock from '@/components/alertModal'
 
 export default function LecturerPage() {
+  const [loading, setLoading] = useState<boolean>(false)
+
   const router = useRouter()
-  const { toogleAddLecturer } = useLecturerStore()
+
+  const {
+    toogleAddLecturer,
+    lecturer,
+    openBlockLecturer,
+    openUnBlockLecturer,
+    toogleBlockLecturer,
+    toogleUnBlockLecturer
+  } = useLecturerStore()
 
   const searchParams = useSearchParams()
   const page = Number(searchParams.get('page')) || 1
@@ -32,6 +47,80 @@ export default function LecturerPage() {
   const { data, isLoading, mutate } = useSWR(fetcher, () =>
     lecturerService.getAll(page, limit, filterField, filterValue, searchKey)
   )
+
+  const onBlock = async () => {
+    if (!lecturer) {
+      return
+    }
+
+    setLoading(true)
+
+    const toastId = toast.loading('Đang thực hiện...')
+
+    await lecturerService.block(
+      lecturer?._id,
+      true,
+      () => {
+        toogleBlockLecturer()
+        toast.update(toastId, {
+          render: 'Khóa thành công',
+          type: 'success',
+          autoClose: 2000,
+          isLoading: false,
+          transition: Flip
+        })
+        mutate()
+        setLoading(false)
+      },
+      err => {
+        toast.update(toastId, {
+          render: err.message,
+          type: 'error',
+          autoClose: 2000,
+          isLoading: false,
+          transition: Flip
+        })
+        setLoading(false)
+      }
+    )
+  }
+
+  const onUnBlock = async () => {
+    if (!lecturer) {
+      return
+    }
+
+    setLoading(true)
+
+    const toastId = toast.loading('Đang thực hiện...')
+
+    await lecturerService.block(
+      lecturer?._id,
+      false,
+      () => {
+        toogleUnBlockLecturer()
+        toast.update(toastId, {
+          render: 'Mở khóa thành công',
+          type: 'success',
+          autoClose: 2000,
+          isLoading: false,
+          transition: Flip
+        })
+        mutate()
+        setLoading(false)
+      },
+      err => {
+        toast.update(toastId, {
+          render: err.message,
+          type: 'error',
+          autoClose: 2000,
+          isLoading: false,
+          transition: Flip
+        })
+        setLoading(false)
+      }
+    )
+  }
 
   return (
     <>
@@ -131,6 +220,45 @@ export default function LecturerPage() {
       </Card>
       <AddLecturer mutate={mutate} />
       <UpdateLecturer mutate={mutate} />
+      <AlertBlock
+        title='Xác nhận khóa'
+        content={
+          <div className='space-y-4'>
+            <p>
+              Bạn có chắc chắn muốn khóa giảng viên <strong>{lecturer?.userName}</strong> với mã giảng viên là{' '}
+              <strong>{lecturer?.userId}</strong> không?
+            </p>
+            <p className='text-red-500'>
+              <strong>Lưu ý:</strong> Giảng viên sẽ không thể truy cập vào hệ thống nếu bạn khóa tài khoản của họ.
+            </p>
+          </div>
+        }
+        loading={loading}
+        open={openBlockLecturer}
+        onClose={toogleBlockLecturer}
+        cancelText='Hủy'
+        submitText='Khóa'
+        onSubmit={onBlock}
+        submitColor='error'
+      />
+      <AlertBlock
+        title='Xác nhận mở khóa'
+        content={
+          <div className='space-y-4'>
+            <p>
+              Bạn có chắc chắn muốn mở khóa giảng viên <strong>{lecturer?.userName}</strong> với mã giảng viên là{' '}
+              <strong>{lecturer?.userId}</strong> không?
+            </p>
+          </div>
+        }
+        loading={loading}
+        open={openUnBlockLecturer}
+        onClose={toogleUnBlockLecturer}
+        cancelText='Hủy'
+        submitText='Mở khóa'
+        onSubmit={onUnBlock}
+        submitColor='primary'
+      />
     </>
   )
 }

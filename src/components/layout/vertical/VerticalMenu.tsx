@@ -9,7 +9,8 @@ import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Me
 
 // Component Imports
 import { Menu, SubMenu, MenuItem, MenuSection } from '@menu/vertical-menu'
-import CustomChip from '@core/components/mui/Chip'
+
+// import CustomChip from '@core/components/mui/Chip'
 
 // import { GenerateVerticalMenu } from '@components/GenerateMenu'
 
@@ -190,7 +191,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             <MenuItem href='/student-management'>Quản lý sinh viên</MenuItem>
           </SubMenu>
         </MenuSection>
-        <SubMenu
+        {/* <SubMenu
           label='dashboards'
           icon={<i className='tabler-smart-home' />}
           suffix={<CustomChip label='5' size='small' color='error' round='true' />}
@@ -473,7 +474,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             </SubMenu>
             <MenuItem disabled>disabledMenu</MenuItem>
           </SubMenu>
-        </MenuSection>
+        </MenuSection> */}
       </Menu>
       {/* <Menu
         popoutMenuOffset={{ mainAxis: 23 }}

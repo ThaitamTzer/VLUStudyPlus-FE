@@ -8,9 +8,19 @@ type TablePaginationProps = {
   limit: number
   total: number
   searchKey?: string
+  filterField?: string
+  filterValue?: string
 }
 
-export default function TablePaginationCustom({ data, page, limit, total, searchKey }: TablePaginationProps) {
+export default function TablePaginationCustom({
+  data,
+  page,
+  limit,
+  total,
+  searchKey,
+  filterField,
+  filterValue
+}: TablePaginationProps) {
   const router = useRouter()
 
   return (
@@ -32,11 +42,21 @@ export default function TablePaginationCustom({ data, page, limit, total, search
           params.set('page', page.toString())
           params.set('limit', String(limit))
 
+          if (filterField) {
+            params.set('filterField', filterField)
+          }
+
+          if (filterValue) {
+            params.set('filterValue', filterValue)
+          }
+
           if (searchKey) {
             params.set('searchKey', searchKey)
           }
 
-          router.push(`?${params.toString()}`)
+          router.push(`?${params.toString()}`, {
+            scroll: false
+          })
         }}
         showFirstButton
         showLastButton

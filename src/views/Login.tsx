@@ -77,7 +77,7 @@ const Login = () => {
 
       {/* Right Side - Login Form */}
       <div
-        className='flex justify-center items-center bs-full !min-is-full p-6 md:!min-is-[unset] md:p-12 md:is-[480px] bg-white/10 rounded-lg shadow-xl border border-white/20'
+        className='flex justify-center items-center bs-full !min-is-full p-6 md:!min-is-[unset] md:p-12 md:is-[480px] bg-white/10  shadow-xl border border-white/20'
         style={{
           backgroundImage: `url(/images/background/overlay_4.jpg)`
         }}

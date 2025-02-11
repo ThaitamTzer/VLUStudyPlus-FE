@@ -88,10 +88,28 @@ const UserDropdown = () => {
         </Stack>
       ) : (
         <Stack justifyContent='end' alignItems='end' ml={2}>
-          <Typography variant='h6' color='text.primary'>
+          <Typography
+            sx={{
+              fontSize: {
+                xs: '0.75rem',
+                sm: '1rem',
+                md: '1.25rem'
+              }
+            }}
+            color='text.primary'
+          >
             {user?.userName}
           </Typography>
-          <Typography variant='caption' color='text.secondary'>
+          <Typography
+            sx={{
+              fontSize: {
+                xs: '0.6rem',
+                sm: '0.875rem',
+                md: '1rem'
+              }
+            }}
+            color='text.secondary'
+          >
             {user?.mail}
           </Typography>
         </Stack>

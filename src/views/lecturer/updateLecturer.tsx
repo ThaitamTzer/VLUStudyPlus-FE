@@ -42,7 +42,7 @@ const schema = v.object({
     v.maxLength(100, 'Tên giảng viên không quá')
   ),
   typeLecturer: v.pipe(
-    v.union([v.literal('permanent'), v.literal('visiting')]),
+    v.union([v.literal('permanent'), v.literal('visiting')], 'Vui lòng chọn loại giảng viên'),
     v.nonEmpty('Loại giảng viên không được để trống')
   ),
   mail: v.pipe(v.string(), v.nonEmpty('Email không được để trống'), v.includes('@vlu.edu.vn', 'Email không hợp lệ')),
@@ -86,7 +86,7 @@ export default function UpdateLecturer({ mutate }: Props) {
       userId: lecturer.userId,
       userName: lecturer.userName,
       mail: lecturer.mail,
-      typeLecturer: lecturer.typeLecturer || 'permanent',
+      typeLecturer: lecturer.typeLecturer || '',
       role: lecturer.role._id
     })
   }, [reset, lecturer])
@@ -234,10 +234,16 @@ export default function UpdateLecturer({ mutate }: Props) {
                     {...field}
                     label='Loại giảng viên'
                     select
-                    error={Boolean(errors.role)}
-                    helperText={errors.role?.message}
+                    error={Boolean(errors.typeLecturer)}
+                    helperText={errors.typeLecturer?.message}
                     fullWidth
+                    SelectProps={{
+                      displayEmpty: true
+                    }}
                   >
+                    <MenuItem value='' disabled>
+                      Chọn loại giảng viên
+                    </MenuItem>
                     <MenuItem value='permanent'>Cơ hửu</MenuItem>
                     <MenuItem value='visiting'>Thỉnh giảng</MenuItem>
                   </CustomTextField>

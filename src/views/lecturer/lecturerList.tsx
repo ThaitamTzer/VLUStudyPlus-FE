@@ -92,6 +92,7 @@ export default function LecturerList({ lecturers, total, loading }: LecturerList
             <TableCell>Giảng viên</TableCell>
             <TableCell>Mã giảng viên</TableCell>
             <TableCell>Vai trò</TableCell>
+            <TableCell>Loại giảng viên</TableCell>
             <TableCell>Trạng thái</TableCell>
             <TableCell colSpan={2}>Thời gian truy cập</TableCell>
           </StyledTableRow>
@@ -105,14 +106,17 @@ export default function LecturerList({ lecturers, total, loading }: LecturerList
                 {/* <TableCell size='small'>{stt}</TableCell> */}
                 <TableCell size='small'>{UserInfor(lecturer)}</TableCell>
                 <TableCell size='small'>{lecturer.userId}</TableCell>
-                <TableCell width={110} size='small'>
-                  {lecturer.role?.name || 'Chưa phân quyền'}
+                <TableCell size='small'>{lecturer.role?.name || 'Chưa phân quyền'}</TableCell>
+                <TableCell size='small'>
+                  {lecturer.typeLecturer
+                    ? lecturer.typeLecturer === 'permanent'
+                      ? 'Cơ hữu'
+                      : 'Thỉnh giảng'
+                    : 'Chưa phân loại'}
                 </TableCell>
-                <TableCell width={116} size='small'>
-                  {IsBlock({ isBlock: lecturer.isBlock })}
-                </TableCell>
+                <TableCell size='small'>{IsBlock({ isBlock: lecturer.isBlock })}</TableCell>
                 <TableCell size='small'>{fToNow(lecturer.accessTime) || 'Chưa truy cập'}</TableCell>
-                <TableCell width={1} size='small'>
+                <TableCell width={10} size='small'>
                   <RowAction>
                     <MenuItem>
                       <Link href={`/lecturer/${lecturer._id}`} prefetch={true} className='flex'>

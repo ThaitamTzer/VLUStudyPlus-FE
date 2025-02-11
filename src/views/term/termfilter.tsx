@@ -1,6 +1,6 @@
 import { useRouter } from 'next/navigation'
 
-import { CardContent, Grid, MenuItem } from '@mui/material'
+import { CardContent, Grid } from '@mui/material'
 
 import CustomTextField from '@/@core/components/mui/TextField'
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
@@ -17,22 +17,22 @@ type TermFilterProps = {
 }
 
 export default function TermFilter(props: TermFilterProps) {
-  const { academicYear, startDate, endDate, limit, filterField, filterValue, getTermYears } = props
+  const { academicYear, startDate, endDate, limit, filterField, filterValue } = props
 
   const router = useRouter()
 
-  const onChangeAcademicYear = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const params = new URLSearchParams()
+  // const onChangeAcademicYear = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const params = new URLSearchParams()
 
-    params.set('page', '1')
-    params.set('limit', limit.toString())
-    params.set('filterField', filterField)
-    params.set('filterValue', filterValue)
-    params.set('startDate', startDate)
-    params.set('endDate', endDate)
-    params.set('academicYear', e.target.value)
-    router.push(`?${params.toString()}`)
-  }
+  //   params.set('page', '1')
+  //   params.set('limit', limit.toString())
+  //   params.set('filterField', filterField)
+  //   params.set('filterValue', filterValue)
+  //   params.set('startDate', startDate)
+  //   params.set('endDate', endDate)
+  //   params.set('academicYear', e.target.value)
+  //   router.push(`?${params.toString()}`)
+  // }
 
   const onChangeStartDate = (date: Date | null) => {
     const params = new URLSearchParams()
@@ -63,7 +63,7 @@ export default function TermFilter(props: TermFilterProps) {
   return (
     <CardContent>
       <Grid container spacing={6}>
-        <Grid item xs={12} sm={4}>
+        {/* <Grid item xs={12} sm={4}>
           <CustomTextField
             select
             fullWidth
@@ -91,7 +91,7 @@ export default function TermFilter(props: TermFilterProps) {
                 </MenuItem>
               ))}
           </CustomTextField>
-        </Grid>
+        </Grid> */}
         <Grid item xs={12} sm={4}>
           <AppReactDatepicker
             isClearable

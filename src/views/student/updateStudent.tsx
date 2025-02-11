@@ -56,8 +56,6 @@ export default function UpdateStudent({ mutate }: UpdateStudentProps) {
   const { data: cohorts } = useSWR('cohorts', cohortService.getAll)
   const { data: roles } = useSWR('roles', () => roleService.getAll(1, 999, ''))
 
-  console.log(roles)
-
   const {
     control,
     handleSubmit,

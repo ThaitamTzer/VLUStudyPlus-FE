@@ -20,6 +20,7 @@ import Iconify from '@/components/iconify'
 
 import AutoAdd from './autoAdd'
 import { useLecturerStore } from '@/stores/lecturer/lecturer'
+import ManualAdd from './manualAdd'
 
 export default function AddLecturer({ mutate }: AddLecturerProps) {
   const { openAddLecturer, toogleAddLecturer } = useLecturerStore()
@@ -62,7 +63,7 @@ export default function AddLecturer({ mutate }: AddLecturerProps) {
             <AutoAdd mutate={mutate} />
           </TabPanel>
           <TabPanel value='2'>
-            
+            <ManualAdd mutate={mutate} />
           </TabPanel>
         </TabContext>
       </DialogContent>

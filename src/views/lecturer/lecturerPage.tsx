@@ -14,6 +14,7 @@ import LecturerList from './lecturerList'
 import TablePaginationCustom from '@/components/table/TablePagination'
 import { useLecturerStore } from '@/stores/lecturer/lecturer'
 import AddLecturer from './addLecturer'
+import UpdateLecturer from './updateLecturer'
 
 export default function LecturerPage() {
   const router = useRouter()
@@ -32,11 +33,9 @@ export default function LecturerPage() {
     lecturerService.getAll(page, limit, filterField, filterValue, searchKey)
   )
 
-  console.log(data)
-
   return (
     <>
-      <PageHeader title='Danh sách giảng viên' />
+      <PageHeader title='Danh sách cán bộ giảng viên' />
       <Card
         sx={{
           mt: 4
@@ -81,6 +80,7 @@ export default function LecturerPage() {
               }}
               placeholder='Tìm kiếm'
               className='max-sm:is-full sm:is-[300px]'
+              SelectProps={{}}
             />
             <Button
               onClick={toogleAddLecturer}
@@ -130,6 +130,7 @@ export default function LecturerPage() {
         />
       </Card>
       <AddLecturer mutate={mutate} />
+      <UpdateLecturer mutate={mutate} />
     </>
   )
 }

@@ -186,7 +186,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             Quản lý chuyên ngành
           </MenuItem>
           <SubMenu label='Người dùng' icon={<Iconify icon='solar:users-group-rounded-linear' />}>
-            <MenuItem href='/lecturer-management'>Quản lý CB GV</MenuItem>
+            <MenuItem href='/lecturer-management'>Quản lý CBGV</MenuItem>
             <MenuItem href='/student-management'>Quản lý sinh viên</MenuItem>
           </SubMenu>
         </MenuSection>

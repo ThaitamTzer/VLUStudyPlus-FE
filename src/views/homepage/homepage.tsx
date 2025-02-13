@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 
-import { Stack, Typography } from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
 
 import { useSettings } from '@/@core/hooks/useSettings'
 
@@ -29,20 +29,26 @@ export default function HomePageView() {
   }, [])
 
   return (
-    <div
-      className='absolute -top-[71px] left-0 right-0 h-full'
-      style={{
-        height: 'calc(100% + 123px)'
+    <Box
+      className='absolute -top-[71px] left-0 right-0 bottom-0'
+      sx={{
+        height: {
+          xs: 'calc(100% + 143px)',
+          sm: 'calc(100% + 123px)'
+        }
       }}
     >
       <div
-        className={`relative w-full h-full overflow-clip flex justify-center items-center ${!videoRef.current?.ended ? 'before:content-["*"]' : ''} before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0 before:opacity-45 before:bg-custom-gradient before:z-[0]`}
+        className={`relative w-full h-full overflow-hidden flex justify-center items-center ${!videoRef.current?.ended ? 'before:content-["*"]' : ''} before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0 before:opacity-45 before:bg-custom-gradient before:z-[0]`}
       >
         <div className='w-[600px] h-24 mx-auto z-0'>
           <Stack justifyContent='center' alignItems='center' spacing={2}>
             <Typography
               sx={{
-                fontSize: '2.5rem',
+                fontSize: {
+                  xs: '1.5rem',
+                  sm: '2.5rem'
+                },
                 color: 'white'
               }}
             >
@@ -50,7 +56,10 @@ export default function HomePageView() {
             </Typography>
             <Typography
               sx={{
-                fontSize: '3rem',
+                fontSize: {
+                  xs: '1.5rem',
+                  sm: '3rem'
+                },
                 color: 'white'
               }}
             >
@@ -58,7 +67,10 @@ export default function HomePageView() {
             </Typography>
             <Typography
               sx={{
-                fontSize: '1.5rem',
+                fontSize: {
+                  xs: '1rem',
+                  sm: '1.5rem'
+                },
                 color: 'white'
               }}
             >
@@ -81,6 +93,6 @@ export default function HomePageView() {
           }
         ></video>
       </div>
-    </div>
+    </Box>
   )
 }

@@ -1,11 +1,12 @@
 'use client'
 
-import { styled, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import { Table, TableBody, TableCell, TableContainer, TableHead } from '@mui/material'
 
 import type { Role } from '@/types/management/roleType'
 import { TagPermissionNames } from '@/components/tagpermission'
 import TableNoData from '@/components/table/TableNotFound'
 import RowAction from './rowAction'
+import StyledTableRow from '@/components/table/StyledTableRow'
 
 type RoleListProps = {
   roles: Role[]
@@ -13,17 +14,6 @@ type RoleListProps = {
   limit: number
   total: number
 }
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(even)': {
-    backgroundColor: theme.palette.action.hover
-  },
-
-  // hide last border
-  '&:last-child td, &:last-child th': {
-    border: 0
-  }
-}))
 
 export default function RoleList(props: RoleListProps) {
   const { roles, page, limit, total } = props
@@ -39,7 +29,7 @@ export default function RoleList(props: RoleListProps) {
               textTransform: 'uppercase'
             }}
           >
-            <TableCell>STT</TableCell>
+            <TableCell width={1}>STT</TableCell>
             <TableCell>Tên vai trò</TableCell>
             <TableCell colSpan={2}>Quyền hạn</TableCell>
           </StyledTableRow>
@@ -61,8 +51,8 @@ export default function RoleList(props: RoleListProps) {
               </StyledTableRow>
             )
           })}
-          <TableNoData notFound={notFound} title='Không tìm thấy người dùng nào' />
         </TableBody>
+        <TableNoData notFound={notFound} title='Không tìm thấy vai trò nào' />
       </Table>
     </TableContainer>
   )

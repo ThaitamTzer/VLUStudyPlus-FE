@@ -1,103 +1,62 @@
 'use client'
 
-// React Imports
-import { useState } from 'react'
-
 // Next Imports
 import Link from 'next/link'
 
-// MUI Imports
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import Typography from '@mui/material/Typography'
-import IconButton from '@mui/material/IconButton'
-import InputAdornment from '@mui/material/InputAdornment'
-import Checkbox from '@mui/material/Checkbox'
-import Button from '@mui/material/Button'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Divider from '@mui/material/Divider'
-
 // Component Imports
+import { Button, Typography } from '@mui/material'
+
 import Logo from '@components/layout/shared/Logo'
-import CustomTextField from '@core/components/mui/TextField'
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
 
 // Styled Component Imports
-import AuthIllustrationWrapper from './AuthIllustrationWrapper'
 
 const LoginV1 = () => {
-  // States
-  const [isPasswordShown, setIsPasswordShown] = useState(false)
-
-  // Hooks
-
-  const handleClickShowPassword = () => setIsPasswordShown(show => !show)
-
   return (
-    <AuthIllustrationWrapper>
-      <Card className='flex flex-col sm:is-[450px]'>
-        <CardContent className='sm:!p-12'>
-          <Link href={'/'} className='flex justify-center mbe-6'>
+    <div className='w-full h-full z-0 relative'>
+      <div
+        className='w-full h-full flex justify-center items-center before:content-["*"] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-gradient-to-t before:from-[#3777FF] before:to-slate-600 before:opacity-50 before:z-[-1] overflow-hidden'
+        style={{
+          backgroundImage: 'url("/images/background/loginv1.jpg")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          position: 'relative',
+          zIndex: 0
+        }}
+      >
+        <div
+          className='container mx-auto space-y-6'
+          style={{
+            width: 'calc(100% - 10rem)'
+          }}
+        >
+          <Link href={'/'} className='flex justify-center scale-150'>
             <Logo />
           </Link>
-          <div className='flex flex-col gap-1 mbe-6'>
-            <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}! 👋🏻`}</Typography>
-            <Typography>Please sign-in to your account and start the adventure</Typography>
+          <div className='text-center max-w-[870px] mx-auto'>
+            <h2 className='text-[35px] text-[#fefef3] font-bold'>
+              PHẦN MỀM QUẢN LÝ, THEO DÕI VÀ XỬ LÝ QUÁ TRÌNH HỌC TẬP CỦA SINH VIÊN KHOA CNTT
+            </h2>
           </div>
-          <form noValidate autoComplete='off' onSubmit={e => e.preventDefault()} className='flex flex-col gap-6'>
-            <CustomTextField autoFocus fullWidth label='Email or Username' placeholder='Enter your email or username' />
-            <CustomTextField
-              fullWidth
-              label='Password'
-              placeholder='············'
-              id='outlined-adornment-password'
-              type={isPasswordShown ? 'text' : 'password'}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position='end'>
-                    <IconButton edge='end' onClick={handleClickShowPassword} onMouseDown={e => e.preventDefault()}>
-                      <i className={isPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }}
-            />
-            <div className='flex justify-between items-center gap-x-3 gap-y-1 flex-wrap'>
-              <FormControlLabel control={<Checkbox />} label='Remember me' />
-              <Typography className='text-end' color='primary' component={Link} href={'/pages/auth/forgot-password-v1'}>
-                Forgot password?
-              </Typography>
+          <div className='w-fit max-w-[500px] mx-auto'>
+            <div className='min-h-[300px] bg-black/40 rounded-md flex flex-col justify-center items-center p-6 space-y-6'>
+              <img src='/images/logo-van-lang.png' className='w-[100px] mx-auto' alt='Đại học văn lang' />
+              <p className='text-[20px] font-bold text-[#fefef3]'>Đăng nhập với tài khoản Văn Lang</p>
+              <Button variant='contained' size='large' className='w-full bg-red-600 text-white'>
+                <Link href={`${process.env.NEXT_PUBLIC_API_URL}/api/auth/microsoft`}>Đăng nhập</Link>
+              </Button>
             </div>
-            <Button fullWidth variant='contained' type='submit'>
-              Login
-            </Button>
-            <div className='flex justify-center items-center flex-wrap gap-2'>
-              <Typography>New on our platform?</Typography>
-              <Typography component={Link} href={'/pages/auth/register-v1'} color='primary'>
-                Create an account
-              </Typography>
-            </div>
-            <Divider className='gap-2 text-textPrimary'>or</Divider>
-            <div className='flex justify-center items-center gap-1.5'>
-              <IconButton className='text-facebook' size='small'>
-                <i className='tabler-brand-facebook-filled' />
-              </IconButton>
-              <IconButton className='text-twitter' size='small'>
-                <i className='tabler-brand-twitter-filled' />
-              </IconButton>
-              <IconButton className='text-textPrimary' size='small'>
-                <i className='tabler-brand-github-filled' />
-              </IconButton>
-              <IconButton className='text-error' size='small'>
-                <i className='tabler-brand-google-filled' />
-              </IconButton>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </AuthIllustrationWrapper>
+          </div>
+          <div className='text-center'>
+            <Typography variant='body2' className='text-white text-[18px]'>
+              © {new Date().getFullYear()} - Bản Quyền Thuộc Phòng Đào Tạo, Trường Đại Học Văn Lang.
+            </Typography>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 

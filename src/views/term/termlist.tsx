@@ -56,12 +56,12 @@ export default function TermList(props: TermListProps) {
               </StyledTableRow>
             )
           })}
-          {loading && total === 0 ? (
-            <TableLoading colSpan={12} />
-          ) : (
-            <TableNoData notFound={total === 0} title='Không tìm thấy sinh viên nào' />
-          )}
         </TableBody>
+        {loading && total === 0 ? (
+          <TableLoading colSpan={12} />
+        ) : (
+          <TableNoData notFound={total === 0} title='Không tìm thấy sinh viên nào' />
+        )}
       </Table>
     </TableContainer>
   )

@@ -32,6 +32,44 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
     // Write your overrides here.
     typography: {
       fontFamily: montserrat.style.fontFamily
+    },
+    colorSchemes: {
+      light: {
+        palette: {
+          text: {
+            primary: '#000'
+          },
+          action: {
+            hover: 'rgba(0, 0, 0, .08)'
+          }
+        }
+      },
+      dark: {
+        palette: {
+          text: {
+            primary: '#fff'
+          },
+          action: {
+            hover: 'rgba(255, 255, 255, .1)'
+          }
+        }
+      }
+    },
+    components: {
+      MuiTableCell: {
+        styleOverrides: {
+          root: {
+            fontSize: '13px',
+            border: '1px solid rgba(0, 0, 0, .3)'
+          },
+          stickyHeader: {
+            borderBottom: '1px solid rgba(0, 0, 0, .3)',
+            borderLeft: 0,
+            borderRight: 0,
+            overflow: 'hidden'
+          }
+        }
+      }
     }
   } as Theme
 

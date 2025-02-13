@@ -10,7 +10,7 @@ import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Me
 // Component Imports
 import { Menu, SubMenu, MenuItem, MenuSection } from '@menu/vertical-menu'
 
-// import CustomChip from '@core/components/mui/Chip'
+import CustomChip from '@core/components/mui/Chip'
 
 // import { GenerateVerticalMenu } from '@components/GenerateMenu'
 
@@ -151,16 +151,16 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           exactMatch={false}
           activeUrl='/homepage'
         >
-          Trang chủ
+          TRANG CHỦ
         </MenuItem>
-        <MenuSection label='Quản lý'>
+        <SubMenu label='DANH MỤC' icon={<Iconify icon='solar:widget-2-linear' />}>
           <MenuItem
             href='/role-management'
             icon={<Iconify icon='solar:shield-user-linear' />}
             exactMatch={false}
             activeUrl='/role-management'
           >
-            Quản lý vai trò
+            VAI TRÒ
           </MenuItem>
           <MenuItem
             href='/term-management'
@@ -168,7 +168,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             exactMatch={false}
             activeUrl='/term-management'
           >
-            Quản lý học kỳ
+            HỌC KỲ
           </MenuItem>
           <MenuItem
             href='/cohort-management'
@@ -176,7 +176,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             exactMatch={false}
             activeUrl='/cohort-management'
           >
-            Quản lý niên khóa
+            NIÊN KHÓA
           </MenuItem>
           <MenuItem
             href='/major-management'
@@ -184,14 +184,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             exactMatch={false}
             activeUrl='/major-management'
           >
-            Quản lý chuyên ngành
+            CHUYÊN NGÀNH
           </MenuItem>
-          <SubMenu label='Người dùng' icon={<Iconify icon='solar:users-group-rounded-linear' />}>
-            <MenuItem href='/lecturer-management'>Quản lý CBGV</MenuItem>
-            <MenuItem href='/student-management'>Quản lý sinh viên</MenuItem>
-          </SubMenu>
-        </MenuSection>
-        {/* <SubMenu
+        </SubMenu>
+        <SubMenu label='NGƯỜI DÙNG' icon={<Iconify icon='solar:users-group-rounded-linear' />}>
+          <MenuItem href='/lecturer-management'>CBGVNV</MenuItem>
+          <MenuItem href='/student-management'>SINH VIÊN</MenuItem>
+        </SubMenu>
+        <SubMenu
           label='dashboards'
           icon={<i className='tabler-smart-home' />}
           suffix={<CustomChip label='5' size='small' color='error' round='true' />}
@@ -474,7 +474,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             </SubMenu>
             <MenuItem disabled>disabledMenu</MenuItem>
           </SubMenu>
-        </MenuSection> */}
+        </MenuSection>
       </Menu>
       {/* <Menu
         popoutMenuOffset={{ mainAxis: 23 }}

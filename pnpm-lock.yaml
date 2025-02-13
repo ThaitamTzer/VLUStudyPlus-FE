@@ -204,6 +204,9 @@ importers:
       server-only:
         specifier: 0.0.1
         version: 0.0.1
+      spacetime:
+        specifier: ^7.7.0
+        version: 7.7.0
       swr:
         specifier: ^2.3.0
         version: 2.3.0(react@18.3.1)
@@ -3822,6 +3825,9 @@ packages:
   source-map@0.6.1:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
     engines: {node: '>=0.10.0'}
+
+  spacetime@7.7.0:
+    resolution: {integrity: sha512-m97vi+g9OdEZWmvpWFpoDjx9ApsUX8pcTw2VcTc39SCysg/pmPfTD7zhs+XSg5tfA1yr7SlRpzzprgAVFLUdeA==}
 
   split-string@3.1.0:
     resolution: {integrity: sha512-NzNVhJDYpwceVVii8/Hu6DKfD2G+NrQHlS/V/qgv763EYudVwEcMQNxd2lh+0VrUByXN/oJkl5grOhYWvQUYiw==}
@@ -8093,6 +8099,8 @@ snapshots:
   source-map@0.5.7: {}
 
   source-map@0.6.1: {}
+
+  spacetime@7.7.0: {}
 
   split-string@3.1.0:
     dependencies:

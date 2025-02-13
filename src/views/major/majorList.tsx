@@ -1,4 +1,4 @@
-import { IconButton, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import { IconButton, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead } from '@mui/material'
 
 import { fDate } from '@/utils/format-time'
 import type { Major } from '@/types/management/majorType'
@@ -8,6 +8,7 @@ import Iconify from '@/components/iconify'
 
 import { useMajorStore } from '@/stores/major/major'
 import TableLoading from '@/components/table/TableLoading'
+import StyledTableRow from '@/components/table/StyledTableRow'
 
 type MajorListProps = {
   page: number
@@ -30,7 +31,7 @@ export default function MajorList({ page, limit, majors, total, loading }: Major
     >
       <Table stickyHeader sx={{ minWidth: 900 }}>
         <TableHead>
-          <TableRow
+          <StyledTableRow
             sx={{
               textTransform: 'uppercase'
             }}
@@ -40,14 +41,14 @@ export default function MajorList({ page, limit, majors, total, loading }: Major
             <TableCell>Tên chuyên ngành</TableCell>
             <TableCell>Ngày tạo</TableCell>
             <TableCell colSpan={2}>Ngày cập nhật</TableCell>
-          </TableRow>
+          </StyledTableRow>
         </TableHead>
         <TableBody>
           {majors.map((major, index) => {
             const stt = (page - 1) * limit + index + 1
 
             return (
-              <TableRow key={major._id}>
+              <StyledTableRow key={major._id}>
                 <TableCell size='small'>{stt}</TableCell>
                 <TableCell size='small'>{major.majorId}</TableCell>
                 <TableCell size='small'>{major.majorName}</TableCell>
@@ -83,10 +84,10 @@ export default function MajorList({ page, limit, majors, total, loading }: Major
                     </MenuItem>
                   </RowAction>
                 </TableCell>
-              </TableRow>
+              </StyledTableRow>
             )
           })}
-         {loading && total === 0 ? (
+          {loading && total === 0 ? (
             <TableLoading colSpan={12} />
           ) : (
             <TableNoData notFound={total === 0} title='Không tìm thấy sinh viên nào' />

@@ -34,6 +34,7 @@ export const TagPermissionNames = ({ data }: { data: Role }) => {
           key={item.id}
           sx={{
             color: settings.settings.mode === 'light' ? `${item.color.action_color}` : `${item.color.action_color}`,
+            fontWeight: 600,
             whiteSpace: 'pre-line',
             backgroundColor:
               settings.settings.mode === 'light' ? `${item.color.action_color}3D` : `${item.color.action_color}2D`,

@@ -16,7 +16,9 @@ const FooterContent = () => {
     <div
       className={classnames(verticalLayoutClasses.footerContent, 'flex items-center justify-between flex-wrap gap-4')}
     >
-      <Typography variant='body2'>© {new Date().getFullYear()} VanLangUniversity. All rights reserved.</Typography>
+      <Typography variant='body2'>
+        © {new Date().getFullYear()} - Bản Quyền Thuộc Phòng Đào Tạo, Trường Đại Học Văn Lang.
+      </Typography>
     </div>
   )
 }

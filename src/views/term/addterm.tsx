@@ -3,7 +3,17 @@
 import { useState } from 'react'
 
 import type { KeyedMutator } from 'swr'
-import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Button, Typography, Grid } from '@mui/material'
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  Button,
+  Typography,
+  Grid,
+  MenuItem
+} from '@mui/material'
 import { LoadingButton } from '@mui/lab'
 import { toast } from 'react-toastify'
 import { useForm, Controller, useWatch } from 'react-hook-form'
@@ -21,6 +31,7 @@ import CustomTextField from '@/@core/components/mui/TextField'
 import Iconify from '@/components/iconify'
 import { fDate } from '@/utils/format-time'
 import { termFormSchema } from '@/schema/termSchema'
+import { getAcademicYear } from './helper'
 
 type AddTermProps = {
   mutate: KeyedMutator<TermType>
@@ -45,7 +56,8 @@ export default function AddTerm(props: AddTermProps) {
     mode: 'all',
     defaultValues: {
       termName: '',
-      maxCourse: 0,
+      abbreviatName: '',
+      academicYear: '',
       startDate: '',
       endDate: ''
     }
@@ -56,6 +68,11 @@ export default function AddTerm(props: AddTermProps) {
     name: 'startDate'
   })
 
+  const academicYear = useWatch({
+    control,
+    name: 'academicYear'
+  })
+
   const handleClose = () => {
     toogleAddTerm()
     reset()
@@ -63,12 +80,16 @@ export default function AddTerm(props: AddTermProps) {
 
   const onSubmit = handleSubmit(async (data: TermForm) => {
     setLoading(true)
+
+    console.log(data)
+
     await termService.create(
       {
         termName: data.termName,
-        maxCourse: Number(data.maxCourse),
-        startDate: fDate(data.startDate, 'dd/MM/yyyy'),
-        endDate: fDate(data.endDate, 'dd/MM/yyyy')
+        abbreviatName: data.abbreviatName,
+        academicYear: data.academicYear,
+        startDate: fDate(data.startDate, 'yyyy-MM-dd'),
+        endDate: fDate(data.endDate, 'yyyy-MM-dd')
       },
       () => {
         toast.success('Thêm học kỳ thành công')
@@ -129,6 +150,7 @@ export default function AddTerm(props: AddTermProps) {
                   <CustomTextField
                     {...field}
                     fullWidth
+                    placeholder='Học kỳ 2'
                     label='Tên học kỳ'
                     {...(errors.termName && { error: true, helperText: errors.termName.message })}
                   />
@@ -137,22 +159,49 @@ export default function AddTerm(props: AddTermProps) {
             </Grid>
             <Grid item xs={6}>
               <Controller
-                name='maxCourse'
+                name='abbreviatName'
                 control={control}
-                render={({ field: { onChange, value, ...field } }) => (
+                render={({ field }) => (
                   <CustomTextField
                     {...field}
-                    value={value === 0 ? '' : value}
-                    onChange={e => {
-                      const val = e.target.value === '' ? 0 : Number(e.target.value)
-
-                      onChange(val)
-                    }}
                     fullWidth
-                    label='Số lớp tối đa'
-                    type='number'
-                    {...(errors.maxCourse && { error: true, helperText: errors.maxCourse.message })}
+                    label='Tên viết tắt'
+                    placeholder='VD: HK252'
+                    {...(errors.abbreviatName && { error: true, helperText: errors.abbreviatName.message })}
                   />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Controller
+                name='academicYear'
+                control={control}
+                render={({ field }) => (
+                  <CustomTextField
+                    {...field}
+                    select
+                    label='Năm học'
+                    fullWidth
+                    SelectProps={{
+                      displayEmpty: true,
+                      MenuProps: {
+                        sx: { maxHeight: 300 }
+                      }
+                    }}
+                    onChange={e => {
+                      field.onChange(e)
+
+                      // Reset dates when academic year changes
+                      setValue('startDate', '')
+                      setValue('endDate', '')
+                    }}
+                  >
+                    {getAcademicYear().map(year => (
+                      <MenuItem key={year} value={year}>
+                        {year}
+                      </MenuItem>
+                    ))}
+                  </CustomTextField>
                 )}
               />
             </Grid>
@@ -161,32 +210,41 @@ export default function AddTerm(props: AddTermProps) {
                 name='startDate'
                 control={control}
                 rules={{ required: 'Ngày bắt đầu không được để trống' }}
-                render={({ field: { value, onChange, onBlur } }) => (
-                  <AppReactDatepicker
-                    id='startDate'
-                    onChange={date => {
-                      handleStartDateChange(date)
-                      onChange(date ? format(date, 'yyyy-MM-dd') : '')
-                    }}
-                    onBlur={onBlur}
-                    selected={value ? new Date(value) : null}
-                    locale='vi'
-                    dateFormat='dd/MM/yyyy'
-                    showYearDropdown
-                    showMonthDropdown
-                    placeholderText='Ngày bắt đầu'
-                    customInput={
-                      <CustomTextField
-                        value={value}
-                        onChange={onChange}
-                        onBlur={onBlur}
-                        fullWidth
-                        label='Ngày bắt đầu'
-                        {...(errors.startDate && { error: true, helperText: errors.startDate.message })}
-                      />
-                    }
-                  />
-                )}
+                render={({ field: { value, onChange, onBlur } }) => {
+                  const [startYear] = academicYear ? academicYear.split('-') : []
+                  const minDate = startYear ? new Date(`${startYear}-01-01`) : undefined
+                  const maxDate = startYear ? new Date(`${Number(startYear) + 1}-12-31`) : undefined
+
+                  return (
+                    <AppReactDatepicker
+                      id='startDate'
+                      onChange={date => {
+                        handleStartDateChange(date)
+                        onChange(date ? format(date, 'yyyy-MM-dd') : '')
+                      }}
+                      onBlur={onBlur}
+                      selected={value ? new Date(value) : null}
+                      locale='vi'
+                      dateFormat='dd/MM/yyyy'
+                      showYearDropdown
+                      showMonthDropdown
+                      minDate={minDate}
+                      maxDate={maxDate}
+                      placeholderText='Ngày bắt đầu'
+                      disabled={!academicYear}
+                      customInput={
+                        <CustomTextField
+                          value={value}
+                          onChange={onChange}
+                          onBlur={onBlur}
+                          fullWidth
+                          label='Ngày bắt đầu'
+                          {...(errors.startDate && { error: true, helperText: errors.startDate.message })}
+                        />
+                      }
+                    />
+                  )
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -205,28 +263,36 @@ export default function AddTerm(props: AddTermProps) {
                     )
                   }
                 }}
-                render={({ field: { value, onChange } }) => (
-                  <AppReactDatepicker
-                    selected={value ? new Date(value) : null}
-                    onChange={date => onChange(date ? format(date, 'yyyy-MM-dd') : '')}
-                    id='endDate'
-                    locale='vi'
-                    dateFormat='dd/MM/yyyy'
-                    showYearDropdown
-                    showMonthDropdown
-                    minDate={startDate ? new Date(startDate) : undefined}
-                    placeholderText='Ngày kết thúc'
-                    customInput={
-                      <CustomTextField
-                        value={value}
-                        onChange={onChange}
-                        fullWidth
-                        label='Ngày kết thúc'
-                        {...(errors.endDate && { error: true, helperText: errors.endDate.message })}
-                      />
-                    }
-                  />
-                )}
+                render={({ field: { value, onChange } }) => {
+                  const [startYear] = academicYear ? academicYear.split('-') : []
+                  const minDate = startDate ? new Date(startDate) : undefined
+                  const maxDate = startYear ? new Date(`${Number(startYear) + 1}-12-31`) : undefined
+
+                  return (
+                    <AppReactDatepicker
+                      selected={value ? new Date(value) : null}
+                      onChange={date => onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                      id='endDate'
+                      locale='vi'
+                      dateFormat='dd/MM/yyyy'
+                      showYearDropdown
+                      showMonthDropdown
+                      minDate={minDate}
+                      maxDate={maxDate}
+                      placeholderText='Ngày kết thúc'
+                      disabled={!academicYear}
+                      customInput={
+                        <CustomTextField
+                          value={value}
+                          onChange={onChange}
+                          fullWidth
+                          label='Ngày kết thúc'
+                          {...(errors.endDate && { error: true, helperText: errors.endDate.message })}
+                        />
+                      }
+                    />
+                  )
+                }}
               />
             </Grid>
           </Grid>

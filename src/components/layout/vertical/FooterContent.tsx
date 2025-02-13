@@ -1,9 +1,10 @@
 'use client'
 
 // Third-party Imports
+import { usePathname } from 'next/navigation'
+
 import classnames from 'classnames'
 
-// Hook Imports
 import { Typography } from '@mui/material'
 
 // Util Imports
@@ -11,12 +12,21 @@ import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
 
 const FooterContent = () => {
   // Hooks
+  const pathname = usePathname()
 
   return (
     <div
-      className={classnames(verticalLayoutClasses.footerContent, 'flex items-center justify-between flex-wrap gap-4')}
+      className={classnames(
+        verticalLayoutClasses.footerContent,
+        'flex items-center justify-between flex-wrap gap-4 relative z-0'
+      )}
     >
-      <Typography variant='body2'>
+      <Typography
+        variant='body2'
+        sx={{
+          color: pathname !== '/homepage' ? 'text.secondary' : '#fff'
+        }}
+      >
         © {new Date().getFullYear()} - Bản Quyền Thuộc Phòng Đào Tạo, Trường Đại Học Văn Lang.
       </Typography>
     </div>

@@ -40,7 +40,8 @@ export default function TermList(props: TermListProps) {
           >
             <TableCell width={1}>STT</TableCell>
             <TableCell>Tên học kỳ</TableCell>
-            <TableCell>Số lượng học phần</TableCell>
+            <TableCell>Tên viết tắt</TableCell>
+            <TableCell>Năm học</TableCell>
             <TableCell>Ngày bắt đầu</TableCell>
             <TableCell colSpan={2}>Ngày kết thúc</TableCell>
           </StyledTableRow>
@@ -53,7 +54,8 @@ export default function TermList(props: TermListProps) {
               <StyledTableRow key={row._id}>
                 <TableCell size='small'>{stt}</TableCell>
                 <TableCell size='small'>{row.termName}</TableCell>
-                <TableCell size='small'>{row.maxCourse}</TableCell>
+                <TableCell size='small'>{row.abbreviatName}</TableCell>
+                <TableCell size='small'>{row.academicYear}</TableCell>
                 <TableCell size='small'>{fDate(row.startDate, 'dd/MM/yyyy')}</TableCell>
                 <TableCell size='small'>{fDate(row.endDate, 'dd/MM/yyyy')}</TableCell>
                 <TableCell size='small' align='right'>

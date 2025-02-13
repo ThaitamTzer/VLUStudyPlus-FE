@@ -89,7 +89,7 @@ export default function StudentList({ students, total, loading, page, limit }: S
       <Table stickyHeader sx={{ minWidth: 1100 }}>
         <TableHead>
           <StyledTableRow sx={{ textTransform: 'uppercase' }}>
-            <TableCell>STT</TableCell>
+            <TableCell width='1px'>STT</TableCell>
             <TableCell>Sinh viên</TableCell>
             <TableCell width={90}>Khóa</TableCell>
             <TableCell>Ngày sinh</TableCell>

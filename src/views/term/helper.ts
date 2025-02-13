@@ -23,4 +23,18 @@ const getEndYear = (startYear: string | undefined) => {
   return years
 }
 
-export { getStartYear, getEndYear }
+const getAcademicYear = () => {
+  // get from +- 10 years
+  const currentYear = new Date().getFullYear()
+  const startYear = currentYear - 10
+  const endYear = currentYear + 10
+  const academicYears = []
+
+  for (let i = startYear; i <= endYear; i++) {
+    academicYears.push(`${i}-${i + 1}`)
+  }
+
+  return academicYears
+}
+
+export { getStartYear, getEndYear, getAcademicYear }

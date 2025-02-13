@@ -261,7 +261,13 @@ export default function TermPage() {
             </Box>
           </Stack>
         </Popover>
-        <TermList loading={isLoading} terms={data?.terms || []} total={data?.pagination.totalItems || 0} />
+        <TermList
+          loading={isLoading}
+          terms={data?.terms || []}
+          total={data?.pagination.totalItems || 0}
+          limit={limit}
+          page={page}
+        />
         <TablePagination
           component={() => (
             <TablePaginationCustom

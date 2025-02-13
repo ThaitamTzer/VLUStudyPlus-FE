@@ -53,7 +53,7 @@ const UserInfor = (data: Lecturer) => {
   )
 }
 
-export default function LecturerList({ lecturers, total, loading }: LecturerListProps) {
+export default function LecturerList({ lecturers, total, loading, limit, page }: LecturerListProps) {
   const { toogleUnBlockLecturer, toogleBlockLecturer, toogleUpdateLecturer, setLecturer } = useLecturerStore()
 
   const BlockOption = (data: Lecturer) => {
@@ -89,6 +89,7 @@ export default function LecturerList({ lecturers, total, loading }: LecturerList
       <Table stickyHeader sx={{ minWidth: 1100 }}>
         <TableHead>
           <StyledTableRow sx={{ textTransform: 'uppercase' }}>
+            <TableCell width='1px'>STT</TableCell>
             <TableCell>Giảng viên</TableCell>
             <TableCell>Mã giảng viên</TableCell>
             <TableCell>Vai trò</TableCell>
@@ -98,12 +99,12 @@ export default function LecturerList({ lecturers, total, loading }: LecturerList
           </StyledTableRow>
         </TableHead>
         <TableBody>
-          {lecturers?.map(lecturer => {
-            // const stt = (page - 1) * limit + index + 1
+          {lecturers?.map((lecturer, index) => {
+            const stt = (page - 1) * limit + index + 1
 
             return (
               <StyledTableRow key={lecturer._id}>
-                {/* <TableCell size='small'>{stt}</TableCell> */}
+                <TableCell size='small'>{stt}</TableCell>
                 <TableCell size='small'>{UserInfor(lecturer)}</TableCell>
                 <TableCell size='small'>{lecturer.userId}</TableCell>
                 <TableCell size='small'>{lecturer.role?.name || 'Chưa phân quyền'}</TableCell>

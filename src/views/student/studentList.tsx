@@ -53,7 +53,7 @@ const UserInfor = (data: Student) => {
   )
 }
 
-export default function StudentList({ students, total, loading }: StudentListProps) {
+export default function StudentList({ students, total, loading, page, limit }: StudentListProps) {
   const { toogleUnBlockStudent, toogleBlockStudent, toogleUpdateStudent, setStudent } = useStudentStore()
 
   const BlockOption = (data: Student) => {
@@ -89,34 +89,26 @@ export default function StudentList({ students, total, loading }: StudentListPro
       <Table stickyHeader sx={{ minWidth: 1100 }}>
         <TableHead>
           <StyledTableRow sx={{ textTransform: 'uppercase' }}>
-            {/* <TableCell>STT</TableCell> */}
+            <TableCell>STT</TableCell>
             <TableCell>Sinh viên</TableCell>
-            {/* <TableCell>Mã sinh viên</TableCell> */}
-            {/* <TableCell>Mã lớp</TableCell> */}
             <TableCell width={90}>Khóa</TableCell>
             <TableCell>Ngày sinh</TableCell>
-            <TableCell>Vai trò</TableCell>
             <TableCell>Trạng thái</TableCell>
             <TableCell colSpan={2}>Thời gian truy cập</TableCell>
           </StyledTableRow>
         </TableHead>
         <TableBody>
-          {students?.map(student => {
-            // const stt = (page - 1) * limit + index + 1
+          {students?.map((student, index) => {
+            const stt = (page - 1) * limit + index + 1
 
             return (
               <StyledTableRow key={student._id}>
-                {/* <TableCell size='small'>{stt}</TableCell> */}
+                <TableCell size='small'>{stt}</TableCell>
                 <TableCell size='small'>{UserInfor(student)}</TableCell>
-                {/* <TableCell size='small'>{student.userId}</TableCell> */}
-                {/* <TableCell size='small'>{student.classCode}</TableCell> */}
                 <TableCell width={80} size='small'>
                   {student.cohortId}
                 </TableCell>
                 <TableCell size='small'>{fDate(student.dateOfBirth, 'dd/MM/yyyy') || 'Chưa cập nhật'}</TableCell>
-                <TableCell width={110} size='small'>
-                  {student.role?.name || 'Chưa phân quyền'}
-                </TableCell>
                 <TableCell width={116} size='small'>
                   {IsBlock({ isBlock: student.isBlock })}
                 </TableCell>

@@ -37,6 +37,7 @@ import AlertDelete from '@/components/alertModal'
 import ViewCohort from './viewCohort'
 
 type CohortTypeWithAction = Cohort & {
+  stt?: number
   action?: string
 }
 
@@ -68,6 +69,14 @@ export default function CohortPage() {
 
   const columns = useMemo<ColumnDef<CohortTypeWithAction, any>[]>(
     () => [
+      columnHelper.accessor('stt', {
+        header: 'STT',
+        cell: info => info.row.index + 1,
+        sortingFn: 'basic',
+        meta: {
+          width: '1'
+        }
+      }),
       columnHelper.accessor('cohortId', {
         header: 'Mã niên khóa',
         cell: info => info.getValue(),

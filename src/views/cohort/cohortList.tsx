@@ -40,15 +40,22 @@ export default function CohortList({ table }: CohortListProps) {
           </StyledTableRow>
         </TableHead>
         <TableBody>
-          {table.getRowModel().rows.map(row => (
-            <StyledTableRow key={row.id}>
-              {row.getVisibleCells().map(cell => (
-                <TableCell size='small' align={(cell.column.columnDef.meta as any)?.algin} key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </StyledTableRow>
-          ))}
+          {table.getRowModel().rows.map(row => {
+            return (
+              <StyledTableRow key={row.id}>
+                {row.getVisibleCells().map(cell => (
+                  <TableCell
+                    width={(cell.column.columnDef.meta as any)?.width}
+                    size='small'
+                    align={(cell.column.columnDef.meta as any)?.algin}
+                    key={cell.id}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </StyledTableRow>
+            )
+          })}
         </TableBody>
         <TableNoData notFound={table.getRowModel().rows.length === 0} title='Không tìm thấy niên khóa nào' />
       </MuiTable>

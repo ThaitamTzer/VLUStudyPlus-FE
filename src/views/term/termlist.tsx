@@ -11,10 +11,12 @@ type TermListProps = {
   terms: Term[]
   total: number
   loading?: boolean
+  page: number
+  limit: number
 }
 
 export default function TermList(props: TermListProps) {
-  const { terms, total, loading } = props
+  const { terms, total, loading, limit, page } = props
 
   return (
     <TableContainer
@@ -36,6 +38,7 @@ export default function TermList(props: TermListProps) {
               textTransform: 'uppercase'
             }}
           >
+            <TableCell width={1}>STT</TableCell>
             <TableCell>Tên học kỳ</TableCell>
             <TableCell>Số lượng học phần</TableCell>
             <TableCell>Ngày bắt đầu</TableCell>
@@ -43,9 +46,12 @@ export default function TermList(props: TermListProps) {
           </StyledTableRow>
         </TableHead>
         <TableBody>
-          {terms.map(row => {
+          {terms.map((row, index) => {
+            const stt = (page - 1) * limit + index + 1
+
             return (
               <StyledTableRow key={row._id}>
+                <TableCell size='small'>{stt}</TableCell>
                 <TableCell size='small'>{row.termName}</TableCell>
                 <TableCell size='small'>{row.maxCourse}</TableCell>
                 <TableCell size='small'>{fDate(row.startDate, 'dd/MM/yyyy')}</TableCell>

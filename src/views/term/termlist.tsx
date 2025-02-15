@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableContainer, TableHead } from '@mui/material'
+import { IconButton, Table, TableBody, TableCell, TableContainer, TableHead, Tooltip } from '@mui/material'
 
 import TableNoData from '@/components/table/TableNotFound'
 import StyledTableRow from '@/components/table/StyledTableRow'
@@ -6,6 +6,7 @@ import { fDate } from '@/utils/format-time'
 import type { Term } from '@/types/management/termType'
 import RowAction from './rowAction'
 import TableLoading from '@/components/table/TableLoading'
+import Iconify from '@/components/iconify'
 
 type TermListProps = {
   terms: Term[]
@@ -13,10 +14,12 @@ type TermListProps = {
   loading?: boolean
   page: number
   limit: number
+  setTerm: (term: Term) => void
+  toogleViewTerm: () => void
 }
 
 export default function TermList(props: TermListProps) {
-  const { terms, total, loading, limit, page } = props
+  const { terms, total, loading, limit, page, setTerm, toogleViewTerm } = props
 
   return (
     <TableContainer
@@ -58,7 +61,23 @@ export default function TermList(props: TermListProps) {
                 <TableCell size='small'>{row.academicYear}</TableCell>
                 <TableCell size='small'>{fDate(row.startDate, 'dd/MM/yyyy')}</TableCell>
                 <TableCell size='small'>{fDate(row.endDate, 'dd/MM/yyyy')}</TableCell>
-                <TableCell size='small' align='right'>
+                <TableCell
+                  sx={{
+                    width: 'fit-content'
+                  }}
+                  size='small'
+                  align='right'
+                >
+                  <Tooltip title='Xem chi tiết'>
+                    <IconButton
+                      onClick={() => {
+                        setTerm(row)
+                        toogleViewTerm()
+                      }}
+                    >
+                      <Iconify icon='solar:eye-outline' />
+                    </IconButton>
+                  </Tooltip>
                   <RowAction term={row} />
                 </TableCell>
               </StyledTableRow>

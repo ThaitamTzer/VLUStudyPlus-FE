@@ -20,6 +20,7 @@ import { useLecturerStore } from '@/stores/lecturer/lecturer'
 import AddLecturer from './addLecturer'
 import UpdateLecturer from './updateLecturer'
 import AlertBlock from '@/components/alertModal'
+import PreviewLecturerImport from './previewLectureImport'
 
 export default function LecturerPage() {
   const [loading, setLoading] = useState<boolean>(false)
@@ -124,7 +125,7 @@ export default function LecturerPage() {
 
   return (
     <>
-      <PageHeader title='Danh sách cán bộ giảng viên' />
+      <PageHeader title='Danh sách cán bộ giảng viên nhân viên' />
       <Card
         sx={{
           mt: 4
@@ -219,6 +220,7 @@ export default function LecturerPage() {
         />
       </Card>
       <AddLecturer mutate={mutate} />
+      <PreviewLecturerImport />
       <UpdateLecturer mutate={mutate} />
       <AlertBlock
         title='Xác nhận khóa'

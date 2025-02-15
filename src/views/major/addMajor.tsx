@@ -58,7 +58,7 @@ export default function AddMajor({ mutate }: AddMajorProps) {
     await majorService.create(
       data,
       () => {
-        toast.success('Thêm chuyên ngành thành công')
+        toast.success('Thêm ngành thành công')
         setLoading(false)
         handleClose()
         mutate()
@@ -66,13 +66,13 @@ export default function AddMajor({ mutate }: AddMajorProps) {
       err => {
         switch (err.message) {
           case 'MajorId already exists':
-            setError('majorId', { type: 'manual', message: 'Mã chuyên ngành đã tồn tại' })
+            setError('majorId', { type: 'manual', message: 'Mã ngành đã tồn tại' })
             break
           case 'Major name already exists':
-            setError('majorName', { type: 'manual', message: 'Tên chuyên ngành đã tồn tại' })
+            setError('majorName', { type: 'manual', message: 'Tên ngành đã tồn tại' })
             break
           default:
-            toast.error('Thêm chuyên ngành thất bại')
+            toast.error('Thêm ngành thất bại')
         }
 
         console.log(err)
@@ -85,7 +85,7 @@ export default function AddMajor({ mutate }: AddMajorProps) {
     <Dialog open={openAddMajor} onClose={handleClose} fullWidth maxWidth='sm'>
       <form onSubmit={onSubmit} autoComplete='off'>
         <DialogTitle>
-          <Typography variant='h4'>Thêm chuyên ngành</Typography>
+          <Typography variant='h4'>Thêm ngành</Typography>
         </DialogTitle>
         <IconButton
           sx={{
@@ -107,7 +107,8 @@ export default function AddMajor({ mutate }: AddMajorProps) {
                   <CustomTextField
                     {...field}
                     fullWidth
-                    label='Mã chuyên ngành'
+                    autoFocus
+                    label='Mã ngành'
                     {...(errors.majorId && { error: true, helperText: errors.majorId.message })}
                   />
                 )}
@@ -121,7 +122,7 @@ export default function AddMajor({ mutate }: AddMajorProps) {
                   <CustomTextField
                     {...field}
                     fullWidth
-                    label='Tên chuyên ngành'
+                    label='Tên ngành'
                     {...(errors.majorName && { error: true, helperText: errors.majorName.message })}
                   />
                 )}
@@ -134,7 +135,7 @@ export default function AddMajor({ mutate }: AddMajorProps) {
             Hủy
           </Button>
           <LoadingButton type='submit' loading={loading} variant='contained'>
-            Thêm
+            Lưu
           </LoadingButton>
         </DialogActions>
       </form>

@@ -60,7 +60,7 @@ export default function MajorPage() {
 
   return (
     <>
-      <PageHeader title='Danh sách chuyên ngành' />
+      <PageHeader title='Danh sách ngành' />
       <Card
         sx={{
           mt: 4
@@ -112,7 +112,7 @@ export default function MajorPage() {
               onClick={toogleAddMajor}
               className='max-sm:is-full'
             >
-              Thêm chuyên ngành
+              Thêm ngành
             </Button>
           </div>
         </div>
@@ -145,7 +145,7 @@ export default function MajorPage() {
       <AlertDelete
         content={
           <p>
-            Bạn có chắc chắn muốn xóa chuyên ngành <strong>{major?.majorName}</strong> không?
+            Bạn có chắc chắn muốn xóa ngành <strong>{major?.majorName}</strong> không?
           </p>
         }
         loading={loading}
@@ -154,7 +154,7 @@ export default function MajorPage() {
           setMajor({} as Major)
         }}
         open={openDeleteMajor}
-        title='Xóa chuyên ngành'
+        title='Xóa ngành'
         cancelText='Hủy'
         submitText='Xóa'
         onSubmit={async () => {
@@ -164,14 +164,14 @@ export default function MajorPage() {
           await majorService.delete(
             major?._id,
             () => {
-              toast.success('Xóa chuyên ngành thành công')
+              toast.success('Xóa ngành thành công')
               setLoading(false)
               toogleDeleteMajor()
               mutate()
             },
             () => {
               setLoading(false)
-              toast.error('Xóa chuyên ngành thất bại')
+              toast.error('Xóa ngành thất bại')
             }
           )
         }}

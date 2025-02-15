@@ -33,6 +33,7 @@ import TermFilter from './termfilter'
 import AddTerm from './addterm'
 import UpdateTerm from './updateterm'
 import AlertDelete from './alert'
+import ViewTerm from './viewterm'
 
 // const getTermYears = () => {
 //   const currentYear = new Date().getFullYear()
@@ -72,7 +73,7 @@ const columnNames = [
 ]
 
 export default function TermPage() {
-  const { toogleAddTerm } = useTermStore()
+  const { toogleAddTerm, toogleViewTerm, setTerm } = useTermStore()
   const router = useRouter()
   const searchParams = useSearchParams()
   const page = Number(searchParams.get('page')) || 1
@@ -262,6 +263,8 @@ export default function TermPage() {
           </Stack>
         </Popover>
         <TermList
+          setTerm={setTerm}
+          toogleViewTerm={toogleViewTerm}
           loading={isLoading}
           terms={data?.terms || []}
           total={data?.pagination.totalItems || 0}
@@ -287,6 +290,7 @@ export default function TermPage() {
       <AddTerm mutate={mutate} />
       <UpdateTerm mutate={mutate} />
       <AlertDelete mutate={mutate} />
+      <ViewTerm />
     </>
   )
 }

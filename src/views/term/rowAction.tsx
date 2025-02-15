@@ -45,7 +45,7 @@ export default function RowAction({ term }: RowActionProps) {
         slotProps={{
           paper: {
             sx: {
-              width: 120
+              width: 'f'
             }
           }
         }}

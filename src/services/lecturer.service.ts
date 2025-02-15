@@ -1,6 +1,11 @@
 import axiosClient from '@/libs/axios'
 import axiosUpload from '@/libs/axiosUpload'
-import type { FormLecturer, LecturerProfile, LecturerType } from '@/types/management/lecturerType'
+import type {
+  FormLecturer,
+  LecturerImportPreview,
+  LecturerProfile,
+  LecturerType
+} from '@/types/management/lecturerType'
 
 const lecturerService = {
   getAll: async (page?: number, limit?: number, filterField?: string, filterValue?: string, searchKey?: string) => {
@@ -29,10 +34,14 @@ const lecturerService = {
     return response.data as LecturerProfile
   },
 
-  import: async (data: FormData, successCallBack?: (res: any) => void, errorCallBack?: (res: any) => void) => {
+  import: async (
+    data: FormData,
+    successCallBack?: (res: LecturerImportPreview) => void,
+    errorCallBack?: (res: any) => void
+  ) => {
     try {
       return await axiosUpload.post('/api/lecturer/import-lecturer', data).then(res => {
-        successCallBack && successCallBack(res)
+        successCallBack && successCallBack(res.data)
 
         return res
       })

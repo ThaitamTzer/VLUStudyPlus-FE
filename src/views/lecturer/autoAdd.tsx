@@ -34,7 +34,15 @@ type AutoAddForm = {
 export default function AutoAdd({ mutate }: { mutate: KeyedMutator<any> }) {
   const [files, setFiles] = useState<File[]>([])
   const [loading, setLoading] = useState<boolean>(false)
-  const { toogleAddLecturer } = useLecturerStore()
+
+  const {
+    toogleAddLecturer,
+    setDuplicateRows,
+    setLecturersResult,
+    setMissingInfoRows,
+    setUpdateLecturers,
+    setOpenPreviewImport
+  } = useLecturerStore()
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles: File[]) => {
@@ -104,15 +112,22 @@ export default function AutoAdd({ mutate }: { mutate: KeyedMutator<any> }) {
 
     await lecturerService.import(
       formData,
-      () => {
+      res => {
+        console.log(res)
         toast.update(toastId, {
-          render: 'Đã hoàn tất xử lý dữ liệu',
+          render: res.data.message,
           type: 'success',
           isLoading: false,
-          autoClose: 5000,
+          autoClose: 3000,
           transition: Flip,
           closeButton: true
         })
+        setOpenPreviewImport(true)
+        setDuplicateRows(res.data.duplicateRows)
+        setLecturersResult(res.data.lecturers)
+        setMissingInfoRows(res.data.missingInfoRows)
+        setUpdateLecturers(res.data.updateLec)
+
         mutate()
       },
       err => {

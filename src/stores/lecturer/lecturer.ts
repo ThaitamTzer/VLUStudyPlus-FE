@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { Lecturer } from '@/types/management/lecturerType'
+import type { DuplicateRows, Lecturer, LecturerResult, MissingInfoRows } from '@/types/management/lecturerType'
 
 type State = {
   lecturers: Lecturer[]
@@ -13,6 +13,12 @@ type State = {
   openUpdateAvatar: boolean
   openViewDetail: boolean
   openViewAvatar: boolean
+
+  openPreviewImport: boolean
+  lecturersResult: LecturerResult[]
+  updateLecturers: LecturerResult[]
+  missingInfoRows: MissingInfoRows[]
+  duplicateRows: DuplicateRows[]
 }
 
 type Action = {
@@ -26,6 +32,12 @@ type Action = {
   toogleUpdateAvatar: () => void
   toogleViewDetail: () => void
   toogleViewAvatar: () => void
+
+  setOpenPreviewImport: (open: boolean) => void
+  setLecturersResult: (lecturers: LecturerResult[]) => void
+  setUpdateLecturers: (lecturers: LecturerResult[]) => void
+  setMissingInfoRows: (missingInfoRows: MissingInfoRows[]) => void
+  setDuplicateRows: (duplicateRows: DuplicateRows[]) => void
 }
 
 export const useLecturerStore = create<State & Action>(set => ({
@@ -39,6 +51,13 @@ export const useLecturerStore = create<State & Action>(set => ({
   openUpdateAvatar: false,
   openViewDetail: false,
   openViewAvatar: false,
+
+  openPreviewImport: false,
+  lecturersResult: [],
+  updateLecturers: [],
+  missingInfoRows: [],
+  duplicateRows: [],
+
   setLecturers: lecturers => set({ lecturers }),
   setLecturer: lecturer => set({ lecturer }),
   setTotal: total => set({ total }),
@@ -48,5 +67,10 @@ export const useLecturerStore = create<State & Action>(set => ({
   toogleUnBlockLecturer: () => set(state => ({ openUnBlockLecturer: !state.openUnBlockLecturer })),
   toogleUpdateAvatar: () => set(state => ({ openUpdateAvatar: !state.openUpdateAvatar })),
   toogleViewDetail: () => set(state => ({ openViewDetail: !state.openViewDetail })),
-  toogleViewAvatar: () => set(state => ({ openViewAvatar: !state.openViewAvatar }))
+  toogleViewAvatar: () => set(state => ({ openViewAvatar: !state.openViewAvatar })),
+  setOpenPreviewImport: open => set({ openPreviewImport: open }),
+  setLecturersResult: lecturers => set({ lecturersResult: lecturers }),
+  setUpdateLecturers: lecturers => set({ updateLecturers: lecturers }),
+  setMissingInfoRows: missingInfoRows => set({ missingInfoRows }),
+  setDuplicateRows: duplicateRows => set({ duplicateRows })
 }))

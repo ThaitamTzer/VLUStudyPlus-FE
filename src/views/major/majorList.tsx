@@ -1,6 +1,5 @@
-import { IconButton, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead } from '@mui/material'
+import { IconButton, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, Tooltip } from '@mui/material'
 
-import { fDate } from '@/utils/format-time'
 import type { Major } from '@/types/management/majorType'
 import TableNoData from '@/components/table/TableNotFound'
 import RowAction from '@/components/rowAction'
@@ -37,10 +36,8 @@ export default function MajorList({ page, limit, majors, total, loading }: Major
             }}
           >
             <TableCell>STT</TableCell>
-            <TableCell>Mã chuyên ngành</TableCell>
-            <TableCell>Tên chuyên ngành</TableCell>
-            <TableCell>Ngày tạo</TableCell>
-            <TableCell colSpan={2}>Ngày cập nhật</TableCell>
+            <TableCell>Mã ngành</TableCell>
+            <TableCell colSpan={2}>Tên ngành</TableCell>
           </StyledTableRow>
         </TableHead>
         <TableBody>
@@ -49,20 +46,22 @@ export default function MajorList({ page, limit, majors, total, loading }: Major
 
             return (
               <StyledTableRow key={major._id}>
-                <TableCell size='small'>{stt}</TableCell>
+                <TableCell width={1} size='small'>
+                  {stt}
+                </TableCell>
                 <TableCell size='small'>{major.majorId}</TableCell>
                 <TableCell size='small'>{major.majorName}</TableCell>
-                <TableCell size='small'>{fDate(major.createdAt, 'dd/MM/yyy')}</TableCell>
-                <TableCell size='small'>{fDate(major.updatedAt, 'dd/MM/yyyy')}</TableCell>
                 <TableCell size='small' align='right'>
-                  <IconButton
-                    onClick={() => {
-                      setMajor(major)
-                      toogleViewMajor()
-                    }}
-                  >
-                    <Iconify icon='solar:eye-bold-duotone' />
-                  </IconButton>
+                  <Tooltip title='Xem chi tiết'>
+                    <IconButton
+                      onClick={() => {
+                        setMajor(major)
+                        toogleViewMajor()
+                      }}
+                    >
+                      <Iconify icon='solar:eye-bold-duotone' />
+                    </IconButton>
+                  </Tooltip>
                   <RowAction>
                     <MenuItem
                       onClick={() => {

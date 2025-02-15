@@ -2,6 +2,8 @@
 
 import Link from 'next/link'
 
+import { useRouter } from 'next/navigation'
+
 import Typography from '@mui/material/Typography'
 
 // Component Imports
@@ -10,6 +12,8 @@ import { Box, Button } from '@mui/material'
 import Logo from '@components/layout/shared/Logo'
 
 const Login = () => {
+  const router = useRouter()
+
   return (
     <div className='w-full h-full z-0 relative'>
       <div
@@ -49,8 +53,13 @@ const Login = () => {
             <div className='min-h-[300px] bg-black/40 rounded-md flex flex-col justify-center items-center p-6 space-y-6'>
               <img src='/images/logo-van-lang.png' className='w-[100px] mx-auto' alt='Đại học văn lang' />
               <p className=' sm:text-[20px] font-bold text-[#fefef3]'>Đăng nhập với tài khoản Văn Lang</p>
-              <Button variant='contained' size='large' className='w-full bg-red-600 text-white'>
-                <Link href={`${process.env.NEXT_PUBLIC_API_URL}/api/auth/microsoft`}>Đăng nhập</Link>
+              <Button
+                variant='contained'
+                size='large'
+                className='w-full bg-red-600 text-white'
+                onClick={() => router.push(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/microsoft`)}
+              >
+                Đăng nhập
               </Button>
             </div>
           </div>

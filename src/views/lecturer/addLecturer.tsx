@@ -24,7 +24,7 @@ import ManualAdd from './manualAdd'
 
 export default function AddLecturer({ mutate }: AddLecturerProps) {
   const { openAddLecturer, toogleAddLecturer } = useLecturerStore()
-  const [tab, setTab] = useState<string>('1')
+  const [tab, setTab] = useState<string>('2')
 
   const onChangeTab = (event: React.SyntheticEvent, newValue: string) => {
     setTab(newValue)
@@ -32,6 +32,7 @@ export default function AddLecturer({ mutate }: AddLecturerProps) {
 
   const handleClose = () => {
     toogleAddLecturer()
+    setTab('2')
   }
 
   return (
@@ -56,14 +57,14 @@ export default function AddLecturer({ mutate }: AddLecturerProps) {
       >
         <TabContext value={tab}>
           <TabList onChange={onChangeTab}>
-            <Tab value='1' label='Tự động' />
             <Tab value='2' label='Thủ công' />
+            <Tab value='1' label='Import' />
           </TabList>
-          <TabPanel value='1'>
-            <AutoAdd mutate={mutate} />
-          </TabPanel>
           <TabPanel value='2'>
             <ManualAdd mutate={mutate} />
+          </TabPanel>
+          <TabPanel value='1'>
+            <AutoAdd mutate={mutate} />
           </TabPanel>
         </TabContext>
       </DialogContent>

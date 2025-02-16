@@ -13,6 +13,7 @@ type State = {
   openUpdateAvatar: boolean
   openViewDetail: boolean
   openViewAvatar: boolean
+
 }
 
 type Action = {

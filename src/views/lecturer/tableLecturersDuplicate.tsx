@@ -29,14 +29,20 @@ export default function TableLecturersDuplicate({ duplicateRows }: { duplicateRo
         <TableBody>
           {duplicateRows.map((row, index) => (
             <TableRow key={index}>
-              <TableCell size='small'>Dòng thứ {row.row} trong file Excel</TableCell>
+              <TableCell size='small'>
+                {row.stt ? (
+                  <>
+                    STT {row.stt} (dòng {row.row})
+                  </>
+                ) : (
+                  <>dòng {row.row}</>
+                )}
+              </TableCell>
               <TableCell size='small'>{row.message}</TableCell>
               <TableCell size='small'>
-                {row.details.maGV || <p className='text-red-600'>Không có thông tin</p>}
+                {row.details.maGV || <p className='text-red-600'>Không có mã giảng viên</p>}
               </TableCell>
-              <TableCell size='small'>
-                {row.details.mail || <p className='text-red-600'>Không có thông tin</p>}
-              </TableCell>
+              <TableCell size='small'>{row.details.mail || <p className='text-red-600'>Không có mail</p>}</TableCell>
             </TableRow>
           ))}
         </TableBody>

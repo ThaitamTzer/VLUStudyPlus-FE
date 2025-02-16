@@ -33,6 +33,7 @@ export default function AddStudent({ mutate }: AddStudentProps) {
 
   const handleClose = () => {
     toogleAddStudent()
+    setTab('1')
   }
 
   return (
@@ -57,14 +58,14 @@ export default function AddStudent({ mutate }: AddStudentProps) {
       >
         <TabContext value={tab}>
           <TabList onChange={onChangeTab}>
-            <Tab value='1' label='Tự động' />
-            <Tab value='2' label='Thủ công' />
+            <Tab value='1' label='Thủ công' />
+            <Tab value='2' label='Import' />
           </TabList>
           <TabPanel value='1'>
-            <AutoAdd mutate={mutate} />
+            <ManualAdd mutate={mutate} />
           </TabPanel>
           <TabPanel value='2'>
-            <ManualAdd mutate={mutate} />
+            <AutoAdd mutate={mutate} />
           </TabPanel>
         </TabContext>
       </DialogContent>

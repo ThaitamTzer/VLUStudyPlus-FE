@@ -39,8 +39,12 @@ export default function StudentPage() {
 
   const fetcher = ['/api/student', page, limit, filterField, filterValue, searchKey]
 
-  const { mutate, data, isLoading } = useSWR(fetcher, () =>
-    studentService.getList(page, limit, filterField, filterValue, searchKey)
+  const { mutate, data, isLoading } = useSWR(
+    fetcher,
+    () => studentService.getList(page, limit, filterField, filterValue, searchKey),
+    {
+      revalidateOnFocus: true
+    }
   )
 
   return (

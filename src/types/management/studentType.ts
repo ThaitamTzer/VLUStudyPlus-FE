@@ -55,3 +55,28 @@ export type StudentProfile = {
   isBlock: boolean
   accessTime: string | Date
 }
+
+export type StudentResult = {
+  userId: string
+  classCode: string
+  cohortId: string
+  userName: string
+  mail: string
+  dateOfBirth: string
+  role: string
+  avatar: string
+  isBlock: boolean
+  _id: string
+  createdAt: string | Date
+  updatedAt: string | Date
+}
+
+export type ImportStudentRes = {
+  message: string
+  data: {
+    message: string
+    students: StudentResult[]
+    updatedStudents: StudentResult[]
+    missingInfoRows: number[]
+  }
+}

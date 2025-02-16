@@ -191,6 +191,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           <MenuItem href='/lecturer-management'>CBGVNV</MenuItem>
           <MenuItem href='/student-management'>SINH VIÊN</MenuItem>
         </SubMenu>
+        <MenuItem href='/class-management' icon={<Iconify icon='fluent:class-24-regular' />}>
+          LỚP NIÊN CHẾ
+        </MenuItem>
         <SubMenu
           label='dashboards'
           icon={<i className='tabler-smart-home' />}

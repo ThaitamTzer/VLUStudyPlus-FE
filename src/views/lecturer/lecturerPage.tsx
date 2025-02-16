@@ -187,7 +187,7 @@ export default function LecturerPage() {
           page={page}
           limit={limit}
           loading={isLoading}
-          total={data?.pagination.totalItems || 0}
+          total={data?.pagination?.totalItems || 0}
         />
         <TablePagination
           component={() => (
@@ -195,11 +195,11 @@ export default function LecturerPage() {
               data={data?.lecturers || []}
               page={page}
               limit={limit}
-              total={data?.pagination.totalItems || 0}
+              total={data?.pagination?.totalItems || 0}
               searchKey={searchKey}
             />
           )}
-          count={data?.pagination.totalItems || 0}
+          count={data?.pagination?.totalItems || 0}
           page={page - 1}
           rowsPerPage={limit}
           rowsPerPageOptions={[10, 25, 50]}

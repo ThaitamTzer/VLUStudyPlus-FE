@@ -6,6 +6,8 @@ import { createContext, useEffect, useState } from 'react'
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 
+import useSWR from 'swr'
+
 import Cookies from 'js-cookie'
 
 // ** Next Import
@@ -19,6 +21,8 @@ import authConfig from '@/configs/auth'
 // ** Types
 import type { AuthValuesType } from './AuthValuesType'
 import type { UserType } from '@/types/userType'
+import lecturerService from '@/services/lecturer.service'
+import type { Lecturer } from '@/types/management/lecturerType'
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -27,7 +31,9 @@ const defaultProvider: AuthValuesType = {
   setUser: () => null,
   setLoading: () => Boolean,
   logout: () => Promise.resolve(),
-  getProfile: () => Promise.resolve()
+  getProfile: () => Promise.resolve(),
+  lecturerData: null,
+  setLecturerData: () => null
 }
 
 const AuthContext = createContext(defaultProvider)
@@ -40,6 +46,7 @@ const AuthProvider = ({ children }: Props) => {
   // ** States
   const [user, setUser] = useState<UserType | null>(defaultProvider.user)
   const [loading, setLoading] = useState<boolean>(defaultProvider.loading)
+  const [lecturerData, setLecturerData] = useState<Lecturer[] | null>(defaultProvider.lecturerData)
 
   const setAllNull = () => {
     setUser(null)
@@ -118,13 +125,24 @@ const AuthProvider = ({ children }: Props) => {
     }
   }
 
+  // có user thì mới thực hiện useSWR
+  useSWR(user ? 'optionsUpdateLecturers' : null, () => lecturerService.getAll(1, 999), {
+    onSuccess: data => {
+      setLecturerData(data.lecturers)
+    },
+    revalidateOnFocus: false,
+    keepPreviousData: true
+  })
+
   const values = {
     user,
     loading,
     setUser,
     setLoading,
     logout: handleLogout,
-    getProfile: getProfile
+    getProfile: getProfile,
+    lecturerData,
+    setLecturerData
   }
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>

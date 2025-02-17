@@ -26,7 +26,6 @@ export type ClassType = {
 
 export type FormClass = {
   lectureId?: string
-  userId?: string
   classId?: string
   cohortId?: string
   numberStudent?: number

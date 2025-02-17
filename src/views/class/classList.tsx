@@ -1,12 +1,14 @@
+'use client'
+
 import { MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableSortLabel } from '@mui/material'
 
 import StyledTableRow from '@/components/table/StyledTableRow'
 import type { Class } from '@/types/management/classType'
 import RowAction from '@/components/rowAction'
-import Link from '@/components/Link'
 import Iconify from '@/components/iconify'
 import TableLoading from '@/components/table/TableLoading'
 import TableNoData from '@/components/table/TableNotFound'
+import { useClassStore } from '@/stores/class/class'
 
 type ClassListProps = {
   classes: Class[] | undefined
@@ -29,6 +31,8 @@ export default function ClassList({
   sortOrder,
   handleSort
 }: ClassListProps) {
+  const { toogleOpenEditClassModal, toogleOpenDeleteClassModal, toogleOpenViewDetailModal, setClass } = useClassStore()
+
   return (
     <TableContainer sx={{ position: 'relative', overflowX: 'auto', maxHeight: 'calc(100vh - 300px)' }}>
       <Table stickyHeader sx={{ minWidth: 1100 }}>
@@ -88,11 +92,32 @@ export default function ClassList({
                 <TableCell size='small'>{c.numberStudent}</TableCell>
                 <TableCell width={1} size='small'>
                   <RowAction>
-                    <MenuItem>
-                      <Link href={`/profile/${c._id}`} prefetch={true} className='flex'>
-                        <Iconify icon='solar:eye-linear' className='mr-2' />
-                        Xem chi tiết
-                      </Link>
+                    <MenuItem
+                      onClick={() => {
+                        setClass(c)
+                        toogleOpenViewDetailModal()
+                      }}
+                    >
+                      <Iconify icon='solar:eye-linear' className='mr-2' />
+                      Xem chi tiết
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        setClass(c)
+                        toogleOpenEditClassModal()
+                      }}
+                    >
+                      <Iconify icon='eva:edit-2-outline' className='mr-2' />
+                      Sửa
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        setClass(c)
+                        toogleOpenDeleteClassModal()
+                      }}
+                    >
+                      <Iconify icon='eva:trash-2-outline' className='mr-2' />
+                      Xóa
                     </MenuItem>
                   </RowAction>
                 </TableCell>

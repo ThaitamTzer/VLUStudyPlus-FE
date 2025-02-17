@@ -2,6 +2,8 @@
 
 import { useSearchParams, useRouter } from 'next/navigation'
 
+import dynamic from 'next/dynamic'
+
 import { Button, Card, MenuItem, TablePagination } from '@mui/material'
 
 import useSWR from 'swr'
@@ -12,8 +14,14 @@ import ClassList from './classList'
 import TablePaginationCustom from '@/components/table/TablePagination'
 import DebouncedInput from '@/components/debouncedInput'
 import CustomTextField from '@/@core/components/mui/TextField'
+import { useClassStore } from '@/stores/class/class'
+import UpdateModal from './updateModal'
+
+const AddModal = dynamic(() => import('./addModal'))
 
 export default function ClassPage() {
+  const { toogleOpenAddClassModal } = useClassStore()
+
   const router = useRouter()
 
   const searchParams = useSearchParams()
@@ -59,7 +67,7 @@ export default function ClassPage() {
     })
   }
 
-  const { data, isLoading } = useSWR(
+  const { data, isLoading, mutate } = useSWR(
     ['/api/class', params],
     () => classService.getAll(page, limit, filterField, filterValue, sortField, sortOrder, typeList, searchKey),
     {
@@ -123,7 +131,12 @@ export default function ClassPage() {
               placeholder='Tìm kiếm'
               className='max-sm:is-full sm:is-[300px]'
             />
-            <Button variant='contained' startIcon={<i className='tabler-plus' />} className='max-sm:is-full'>
+            <Button
+              onClick={toogleOpenAddClassModal}
+              variant='contained'
+              startIcon={<i className='tabler-plus' />}
+              className='max-sm:is-full'
+            >
               Thêm lớp niên chế
             </Button>
           </div>
@@ -176,6 +189,8 @@ export default function ClassPage() {
           }}
         />
       </Card>
+      <AddModal mutate={mutate} />
+      <UpdateModal mutate={mutate} />
     </>
   )
 }

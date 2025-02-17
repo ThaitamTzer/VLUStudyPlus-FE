@@ -10,6 +10,8 @@ type TablePaginationProps = {
   searchKey?: string
   filterField?: string
   filterValue?: string
+  sortField?: string
+  sortOrder?: string
 }
 
 export default function TablePaginationCustom({
@@ -19,7 +21,9 @@ export default function TablePaginationCustom({
   total,
   searchKey,
   filterField,
-  filterValue
+  filterValue,
+  sortField,
+  sortOrder
 }: TablePaginationProps) {
   const router = useRouter()
 
@@ -48,6 +52,14 @@ export default function TablePaginationCustom({
 
           if (filterValue) {
             params.set('filterValue', filterValue)
+          }
+
+          if (sortField) {
+            params.set('sortField', sortField)
+          }
+
+          if (sortOrder) {
+            params.set('sortOrder', sortOrder)
           }
 
           if (searchKey) {

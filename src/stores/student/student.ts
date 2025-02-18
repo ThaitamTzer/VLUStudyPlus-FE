@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { Student } from '@/types/management/studentType'
+import type { ErrorImport, Student, StudentResult } from '@/types/management/studentType'
 
 type State = {
   students: Student[]
@@ -14,6 +14,11 @@ type State = {
   openViewDetail: boolean
   openViewAvatar: boolean
 
+  openImportResult: boolean
+  studentsResult: StudentResult[]
+  updatedStudents: StudentResult[]
+  missingInfoRows: ErrorImport[]
+  duplicateRows: ErrorImport[]
 }
 
 type Action = {
@@ -27,6 +32,12 @@ type Action = {
   toogleUpdateAvatar: () => void
   toogleViewDetail: () => void
   toogleViewAvatar: () => void
+
+  toogleImportResult: () => void
+  setStudentsResult: (students: StudentResult[]) => void
+  setUpdatedStudents: (students: StudentResult[]) => void
+  setMissingInfoRows: (students: ErrorImport[]) => void
+  setDuplicateRows: (students: ErrorImport[]) => void
 }
 
 export const useStudentStore = create<State & Action>(set => ({
@@ -40,6 +51,13 @@ export const useStudentStore = create<State & Action>(set => ({
   openUpdateAvatar: false,
   openViewDetail: false,
   openViewAvatar: false,
+
+  openImportResult: false,
+  studentsResult: [],
+  updatedStudents: [],
+  missingInfoRows: [],
+  duplicateRows: [],
+
   setStudents: students => set({ students }),
   setStudent: student => set({ student }),
   setTotal: total => set({ total }),
@@ -49,5 +67,11 @@ export const useStudentStore = create<State & Action>(set => ({
   toogleUnBlockStudent: () => set(state => ({ openUnBlockStudent: !state.openUnBlockStudent })),
   toogleUpdateAvatar: () => set(state => ({ openUpdateAvatar: !state.openUpdateAvatar })),
   toogleViewDetail: () => set(state => ({ openViewDetail: !state.openViewDetail })),
-  toogleViewAvatar: () => set(state => ({ openViewAvatar: !state.openViewAvatar }))
+  toogleViewAvatar: () => set(state => ({ openViewAvatar: !state.openViewAvatar })),
+
+  toogleImportResult: () => set(state => ({ openImportResult: !state.openImportResult })),
+  setStudentsResult: students => set({ studentsResult: students }),
+  setUpdatedStudents: students => set({ updatedStudents: students }),
+  setMissingInfoRows: students => set({ missingInfoRows: students }),
+  setDuplicateRows: students => set({ duplicateRows: students })
 }))

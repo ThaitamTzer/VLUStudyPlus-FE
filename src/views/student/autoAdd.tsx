@@ -19,6 +19,7 @@ import AppReactDropzone from '@/libs/styles/AppReactDropzone'
 import Iconify from '@/components/iconify'
 import studentService from '@/services/student.service'
 import { useStudentStore } from '@/stores/student/student'
+import type { ImportStudentRes } from '@/types/management/studentType'
 
 const schema = v.object({
   file: v.pipe(
@@ -34,7 +35,15 @@ type AutoAddForm = {
 export default function AutoAdd({ mutate }: { mutate: KeyedMutator<any> }) {
   const [files, setFiles] = useState<File[]>([])
   const [loading, setLoading] = useState<boolean>(false)
-  const { toogleAddStudent } = useStudentStore()
+
+  const {
+    toogleAddStudent,
+    toogleImportResult,
+    setStudentsResult,
+    setUpdatedStudents,
+    setDuplicateRows,
+    setMissingInfoRows
+  } = useStudentStore()
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles: File[]) => {
@@ -92,6 +101,13 @@ export default function AutoAdd({ mutate }: { mutate: KeyedMutator<any> }) {
     setFiles(filteredFiles)
   }
 
+  const handleViewResult = (data: ImportStudentRes) => {
+    setStudentsResult(data.data.students)
+    setUpdatedStudents(data.data.updatedStudents)
+    setDuplicateRows(data.data.duplicateRows)
+    setMissingInfoRows(data.data.missingInfoRows)
+  }
+
   const handleUpload = handleSubmit(async data => {
     setLoading(true)
     const formData = new FormData()
@@ -104,12 +120,15 @@ export default function AutoAdd({ mutate }: { mutate: KeyedMutator<any> }) {
 
     await studentService.import(
       formData,
-      () => {
+      res => {
+        toogleImportResult()
+        handleViewResult(res)
+        console.log(res)
         toast.update(toastId, {
           render: 'Đã hoàn tất xử lý dữ liệu',
           type: 'success',
           isLoading: false,
-          autoClose: 5000,
+          autoClose: 2000,
           transition: Flip,
           closeButton: true
         })
@@ -120,7 +139,7 @@ export default function AutoAdd({ mutate }: { mutate: KeyedMutator<any> }) {
           render: err.message,
           type: 'error',
           isLoading: false,
-          autoClose: 5000,
+          autoClose: 2000,
           transition: Flip,
           closeButton: true
         })

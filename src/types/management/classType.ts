@@ -2,7 +2,6 @@ export type Class = {
   _id: string
   lectureId: {
     _id: string
-    userId: string
     userName: string
   }
   userId: string
@@ -15,13 +14,30 @@ export type Class = {
   statusImport: boolean
 }
 
+export type ClassData = {
+  classId: string
+  cohortId: {
+    _id: string
+    cohortId: string
+  }
+  numberStudent: number
+}
+export type ClassGroupByLecturer = {
+  lectureId: {
+    _id: string
+    userName: string
+    userId: string
+    classes: ClassData[]
+  }
+}
+
 export type ClassType = {
   pagination: {
     currentPage: number
     totalPages: number
     totalItems: number
   }
-  classs: Class[]
+  data: Class[] & ClassGroupByLecturer[]
 }
 
 export type FormClass = {

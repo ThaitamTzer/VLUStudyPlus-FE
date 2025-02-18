@@ -71,12 +71,26 @@ export type StudentResult = {
   updatedAt: string | Date
 }
 
+export type ErrorImport = {
+  sheet: string
+  row: number
+  message: string
+  details: {
+    userId: string
+    userName: string
+    mail: string
+    classCode: string
+    dateOfBirth: string
+  }
+}
+
 export type ImportStudentRes = {
   message: string
   data: {
     message: string
     students: StudentResult[]
     updatedStudents: StudentResult[]
-    missingInfoRows: number[]
+    missingInfoRows: ErrorImport[]
+    duplicateRows: ErrorImport[]
   }
 }

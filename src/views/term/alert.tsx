@@ -50,7 +50,9 @@ export default function AlertDelete(props: AlertDeleteProps) {
     <Dialog open={openDeleteTerm} onClose={handleClose}>
       <DialogTitle>Xác nhận xóa</DialogTitle>
       <DialogContent>
-        <DialogContentText>Bạn có chắc chắn muốn xóa học kỳ {term.termName} này không?</DialogContentText>
+        <DialogContentText>
+          Bạn có chắc chắn muốn xóa học kỳ <strong>{term.termName}</strong> này không?
+        </DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button variant='outlined' onClick={handleClose}>

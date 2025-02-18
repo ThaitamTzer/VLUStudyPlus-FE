@@ -19,11 +19,13 @@ export default function TableLecturersDuplicate({ duplicateRows }: { duplicateRo
     >
       <Table stickyHeader sx={{ minWidth: 1000 }}>
         <TableHead>
-          <TableRow>
+          <TableRow sx={{ textTransform: 'uppercase' }}>
             <TableCell>Dòng</TableCell>
             <TableCell>Thông báo lỗi</TableCell>
             <TableCell>Mã giảng viên</TableCell>
             <TableCell>Mail</TableCell>
+            <TableCell>Họ và tên</TableCell>
+            <TableCell>Vai trò</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -43,6 +45,12 @@ export default function TableLecturersDuplicate({ duplicateRows }: { duplicateRo
                 {row.details.maGV || <p className='text-red-600'>Không có mã giảng viên</p>}
               </TableCell>
               <TableCell size='small'>{row.details.mail || <p className='text-red-600'>Không có mail</p>}</TableCell>
+              <TableCell size='small'>
+                {row.details.hoVaTen || <p className='text-red-600'>Không có họ và tên</p>}
+              </TableCell>
+              <TableCell size='small'>
+                {row.details.vaiTro || <p className='text-red-600'>Không có vai trò</p>}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

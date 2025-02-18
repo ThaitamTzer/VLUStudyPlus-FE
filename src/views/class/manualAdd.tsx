@@ -26,7 +26,12 @@ type ManualAddClassProps = {
 
 const schema = v.object({
   lectureId: v.pipe(v.string(), v.nonEmpty('Vui lòng chọn giảng viên')),
-  classId: v.pipe(v.string(), v.nonEmpty('Vui lòng nhập mã lớp')),
+  classId: v.pipe(
+    v.string(),
+    v.nonEmpty('Vui lòng nhập mã lớp'),
+    v.minLength(9, 'Mã lớp phải có ít nhất 9 ký tự'),
+    v.maxLength(11, 'Mã lớp không được vượt quá 11 ký tự')
+  ),
   cohortId: v.pipe(v.string(), v.nonEmpty('Vui lòng chọn niên khóa')),
   numberStudent: v.pipe(
     v.number(),
@@ -110,12 +115,16 @@ export default function ManualAddClass({ mutate }: ManualAddClassProps) {
         setLoading(false)
       },
       err => {
-        toast.update(toastId, {
-          render: err.message,
-          type: 'error',
-          isLoading: false,
-          autoClose: 3000
-        })
+        err.message.map(
+          (m: any) =>
+            toast.update(toastId, {
+              render: m,
+              type: 'error',
+              isLoading: false,
+              autoClose: 3000
+            }),
+          3000
+        )
         setLoading(false)
       }
     )

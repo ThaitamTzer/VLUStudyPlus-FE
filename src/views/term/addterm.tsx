@@ -302,7 +302,7 @@ export default function AddTerm(props: AddTermProps) {
             Hủy
           </Button>
           <LoadingButton loading={loading} type='submit' variant='contained'>
-            Thêm
+            Lưu
           </LoadingButton>
         </DialogActions>
       </form>

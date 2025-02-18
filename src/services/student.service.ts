@@ -1,6 +1,12 @@
 import axiosClient from '@/libs/axios'
 import axiosUpload from '@/libs/axiosUpload'
-import type { StudentType, FormStudent, UpdateStudent, StudentProfile } from '@/types/management/studentType'
+import type {
+  StudentType,
+  FormStudent,
+  UpdateStudent,
+  StudentProfile,
+  ImportStudentRes
+} from '@/types/management/studentType'
 
 const studentService = {
   getList: async (page?: number, limit?: number, filterField?: string, filterValue?: string, searchKey?: string) => {
@@ -29,10 +35,14 @@ const studentService = {
     return response.data as StudentProfile
   },
 
-  import: async (data: FormData, successCallBack?: (res: any) => void, errorCallBack?: (res: any) => void) => {
+  import: async (
+    data: FormData,
+    successCallBack?: (res: ImportStudentRes) => void,
+    errorCallBack?: (res: any) => void
+  ) => {
     try {
       return await axiosUpload.post('/api/student/import-student', data).then(res => {
-        successCallBack && successCallBack(res)
+        successCallBack && successCallBack(res.data)
 
         return res
       })

@@ -42,6 +42,8 @@ export type DuplicateRows = {
   details: {
     mail: string
     maGV: string
+    hoVaTen: string
+    vaiTro: string
   }
 }
 

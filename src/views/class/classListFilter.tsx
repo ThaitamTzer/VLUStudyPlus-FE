@@ -3,7 +3,7 @@
 import { MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableSortLabel } from '@mui/material'
 
 import StyledTableRow from '@/components/table/StyledTableRow'
-import type { Class } from '@/types/management/classType'
+import type { ClassGroupByLecturer } from '@/types/management/classType'
 import RowAction from '@/components/rowAction'
 import Iconify from '@/components/iconify'
 import TableLoading from '@/components/table/TableLoading'
@@ -11,7 +11,7 @@ import TableNoData from '@/components/table/TableNotFound'
 import { useClassStore } from '@/stores/class/class'
 
 type ClassListProps = {
-  classes: Class[] | undefined
+  data: ClassGroupByLecturer[] | undefined
   page: number
   limit: number
   loading: boolean
@@ -21,8 +21,8 @@ type ClassListProps = {
   handleSort: (field: string) => void
 }
 
-export default function ClassList({
-  classes,
+export default function ClassListFilter({
+  data,
   total,
   loading,
   page,
@@ -31,7 +31,7 @@ export default function ClassList({
   sortOrder,
   handleSort
 }: ClassListProps) {
-  const { toogleOpenEditClassModal, toogleOpenDeleteClassModal, toogleOpenViewDetailModal, setClass } = useClassStore()
+  const {} = useClassStore()
 
   return (
     <TableContainer sx={{ position: 'relative', overflowX: 'auto', maxHeight: 'calc(100vh - 300px)' }}>
@@ -45,7 +45,7 @@ export default function ClassList({
                 direction={sortOrder === 'desc' ? 'desc' : 'asc'}
                 onClick={() => handleSort('classId')}
               >
-                Mã lớp
+                Mã giảng viên
               </TableSortLabel>
             </TableCell>
             <TableCell>
@@ -54,68 +54,33 @@ export default function ClassList({
                 direction={sortOrder === 'desc' ? 'desc' : 'asc'}
                 onClick={() => handleSort('cohortId')}
               >
-                Khóa
+                Tên giảng viên
               </TableSortLabel>
             </TableCell>
-            <TableCell>
-              <TableSortLabel
-                active={sortField === 'lectureId'}
-                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
-                onClick={() => handleSort('lectureId')}
-              >
-                Người phụ trách
-              </TableSortLabel>
-            </TableCell>
-            <TableCell colSpan={2}>
-              <TableSortLabel
-                active={sortField === 'numberStudent'}
-                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
-                onClick={() => handleSort('numberStudent')}
-              >
-                Số lượng sinh viên
-              </TableSortLabel>
-            </TableCell>
+            <TableCell colSpan={2}>Các lớp niên chế </TableCell>
           </StyledTableRow>
         </TableHead>
         <TableBody>
-          {classes?.map((c, index) => {
+          {data?.map((lecturer, index) => {
             const stt = (page - 1) * limit + index + 1
 
             return (
-              <StyledTableRow key={c._id}>
+              <StyledTableRow key={lecturer.lectureId._id}>
                 <TableCell size='small'>{stt}</TableCell>
-                <TableCell size='small'>{c.classId}</TableCell>
-                <TableCell size='small'>{c.cohortId.cohortId}</TableCell>
-                <TableCell size='small'>
-                  {c.lectureId.userName} - {c.userId}
-                </TableCell>
-                <TableCell size='small'>{c.numberStudent}</TableCell>
+                <TableCell size='small'>{lecturer.lectureId.userId}</TableCell>
+                <TableCell size='small'>{lecturer.lectureId.userName}</TableCell>
+                <TableCell size='small'>{lecturer.lectureId.classes.map(c => c.classId).join(', ')}</TableCell>
                 <TableCell width={1} size='small'>
                   <RowAction>
-                    <MenuItem
-                      onClick={() => {
-                        setClass(c)
-                        toogleOpenViewDetailModal()
-                      }}
-                    >
+                    <MenuItem>
                       <Iconify icon='solar:eye-linear' className='mr-2' />
                       Xem chi tiết
                     </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        setClass(c)
-                        toogleOpenEditClassModal()
-                      }}
-                    >
+                    <MenuItem>
                       <Iconify icon='eva:edit-2-outline' className='mr-2' />
                       Sửa
                     </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        setClass(c)
-                        toogleOpenDeleteClassModal()
-                      }}
-                    >
+                    <MenuItem>
                       <Iconify icon='eva:trash-2-outline' className='mr-2' />
                       Xóa
                     </MenuItem>
@@ -127,7 +92,7 @@ export default function ClassList({
           {loading && total === 0 ? (
             <TableLoading colSpan={12} />
           ) : (
-            <TableNoData notFound={total === 0} title='Không tìm thấy sinh viên nào' />
+            <TableNoData notFound={total === 0} title='Không tìm lớp nào' />
           )}
         </TableBody>
       </Table>

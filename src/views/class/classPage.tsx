@@ -1,12 +1,16 @@
 'use client'
 
+import { useState } from 'react'
+
 import { useSearchParams, useRouter } from 'next/navigation'
 
 import dynamic from 'next/dynamic'
 
-import { Button, Card, MenuItem, TablePagination } from '@mui/material'
+import { Button, Card, CardContent, Grid, MenuItem, TablePagination } from '@mui/material'
 
 import useSWR from 'swr'
+
+import { Flip, toast } from 'react-toastify'
 
 import classService from '@/services/class.service'
 import PageHeader from '@/components/page-header'
@@ -16,11 +20,14 @@ import DebouncedInput from '@/components/debouncedInput'
 import CustomTextField from '@/@core/components/mui/TextField'
 import { useClassStore } from '@/stores/class/class'
 import UpdateModal from './updateModal'
+import AlertDelete from '@/components/alertModal'
+import ClassListFilter from './classListFilter'
 
 const AddModal = dynamic(() => import('./addModal'))
 
 export default function ClassPage() {
-  const { toogleOpenAddClassModal } = useClassStore()
+  const { toogleOpenAddClassModal, classRoom, toogleOpenDeleteClassModal, openDeleteClassModal } = useClassStore()
+  const [loading, setLoading] = useState<boolean>(false)
 
   const router = useRouter()
 
@@ -57,6 +64,7 @@ export default function ClassPage() {
     params.set('filterValue', filterValue)
     params.set('sortField', field)
     params.set('sortOrder', newSortOrder)
+    params.set('typeList', typeList)
 
     if (searchKey) {
       params.set('searchKey', searchKey)
@@ -68,12 +76,45 @@ export default function ClassPage() {
   }
 
   const { data, isLoading, mutate } = useSWR(
-    ['/api/class', params],
+    ['/api/classData', params],
     () => classService.getAll(page, limit, filterField, filterValue, sortField, sortOrder, typeList, searchKey),
     {
       revalidateOnFocus: false
     }
   )
+
+  console.log(data)
+
+  const onDelete = async () => {
+    if (!classRoom) return
+    const toastId = toast.loading('Đang xóa lớp niên chế')
+
+    setLoading(true)
+    await classService.delete(
+      classRoom._id,
+      () => {
+        mutate()
+        toast.update(toastId, {
+          render: 'Xóa lớp niên chế thành công',
+          type: 'success',
+          isLoading: false,
+          transition: Flip,
+          autoClose: 3000
+        })
+        setLoading(false)
+      },
+      err => {
+        toast.update(toastId, {
+          render: err.message,
+          type: 'error',
+          isLoading: false,
+          transition: Flip,
+          autoClose: 3000
+        })
+        setLoading(false)
+      }
+    )
+  }
 
   return (
     <>
@@ -83,6 +124,40 @@ export default function ClassPage() {
           mt: 4
         }}
       >
+        <CardContent>
+          <Grid container spacing={6}>
+            <Grid item xs={4}>
+              <CustomTextField
+                select
+                fullWidth
+                SelectProps={{
+                  displayEmpty: true
+                }}
+                onChange={e => {
+                  const params = new URLSearchParams()
+
+                  params.set('page', '1')
+                  params.set('limit', limit.toString())
+                  params.set('filterField', e.target.value)
+                  params.set('filterValue', filterValue)
+                  params.append('typeList', e.target.value)
+
+                  if (searchKey) {
+                    params.set('searchKey', searchKey)
+                  }
+
+                  router.push(`?${params.toString()}`, {
+                    scroll: false
+                  })
+                }}
+                value={typeList}
+              >
+                <MenuItem value=''>Tất cả</MenuItem>
+                <MenuItem value='groupedByLecture'>Xem lớp theo giảng viên</MenuItem>
+              </CustomTextField>
+            </Grid>
+          </Grid>
+        </CardContent>
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <CustomTextField
             select
@@ -121,6 +196,7 @@ export default function ClassPage() {
                 params.set('filterValue', filterValue)
                 params.set('sortField', sortField)
                 params.set('sortOrder', sortOrder)
+                params.set('typeList', typeList)
 
                 if (value) {
                   params.set('searchKey', value as string)
@@ -141,20 +217,34 @@ export default function ClassPage() {
             </Button>
           </div>
         </div>
-        <ClassList
-          classes={data?.classs || []}
-          total={data?.pagination.totalItems || 0}
-          loading={isLoading}
-          limit={params.limit}
-          page={params.page}
-          sortField={params.sortField}
-          sortOrder={params.sortOrder}
-          handleSort={handleSort}
-        />
+        {typeList === 'groupedByLecture' ? (
+          <ClassListFilter
+            data={data?.data || []}
+            handleSort={handleSort}
+            sortField={params.sortField}
+            sortOrder={params.sortOrder}
+            limit={params.limit}
+            loading={isLoading}
+            page={params.page}
+            total={data?.pagination.totalItems || 0}
+          />
+        ) : (
+          <ClassList
+            classes={data?.data || []}
+            total={data?.pagination.totalItems || 0}
+            loading={isLoading}
+            limit={params.limit}
+            page={params.page}
+            sortField={params.sortField}
+            sortOrder={params.sortOrder}
+            handleSort={handleSort}
+          />
+        )}
+
         <TablePagination
           component={() => (
             <TablePaginationCustom
-              data={data?.classs || []}
+              data={data?.data || []}
               page={params.page}
               limit={params.limit}
               filterField={params.filterField}
@@ -162,6 +252,7 @@ export default function ClassPage() {
               total={data?.pagination.totalItems || 0}
               sortField={params.sortField}
               sortOrder={params.sortOrder}
+              typeList={params.typeList}
               searchKey={searchKey}
             />
           )}
@@ -178,6 +269,7 @@ export default function ClassPage() {
             params.set('filterValue', filterValue)
             params.set('sortField', sortField)
             params.set('sortOrder', sortOrder)
+            params.set('typeList', typeList)
 
             if (searchKey) {
               params.set('searchKey', searchKey)
@@ -191,6 +283,20 @@ export default function ClassPage() {
       </Card>
       <AddModal mutate={mutate} />
       <UpdateModal mutate={mutate} />
+      <AlertDelete
+        content={
+          <p>
+            Bạn có chắc chắn muốn xóa lớp niên chế <strong>{classRoom?.classId}</strong> không?
+          </p>
+        }
+        open={openDeleteClassModal}
+        onClose={toogleOpenDeleteClassModal}
+        loading={loading}
+        title='Xóa lớp niên chế'
+        onSubmit={onDelete}
+        submitText='Xóa'
+        submitColor='error'
+      />
     </>
   )
 }

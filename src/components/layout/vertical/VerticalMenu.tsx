@@ -8,9 +8,9 @@ import PerfectScrollbar from 'react-perfect-scrollbar'
 import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Menu'
 
 // Component Imports
-import { Menu, SubMenu, MenuItem, MenuSection } from '@menu/vertical-menu'
+import { Menu, SubMenu, MenuItem } from '@menu/vertical-menu'
 
-import CustomChip from '@core/components/mui/Chip'
+// import CustomChip from '@core/components/mui/Chip'
 
 // import { GenerateVerticalMenu } from '@components/GenerateMenu'
 
@@ -153,15 +153,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         >
           TRANG CHỦ
         </MenuItem>
-        <SubMenu label='DANH MỤC' icon={<Iconify icon='solar:widget-2-linear' />}>
-          <MenuItem
-            href='/role-management'
-            icon={<Iconify icon='solar:shield-user-linear' />}
-            exactMatch={false}
-            activeUrl='/role-management'
-          >
-            VAI TRÒ
-          </MenuItem>
+        <SubMenu label='ĐÀO TẠO' icon={<Iconify icon='solar:widget-2-linear' />}>
           <MenuItem
             href='/term-management'
             icon={<Iconify icon='solar:calendar-mark-linear' />}
@@ -188,13 +180,16 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           </MenuItem>
         </SubMenu>
         <SubMenu label='NGƯỜI DÙNG' icon={<Iconify icon='solar:users-group-rounded-linear' />}>
+          <MenuItem href='/role-management' exactMatch={false} activeUrl='/role-management'>
+            VAI TRÒ
+          </MenuItem>
           <MenuItem href='/lecturer-management'>CBGVNV</MenuItem>
           <MenuItem href='/student-management'>SINH VIÊN</MenuItem>
         </SubMenu>
         <MenuItem href='/class-management' icon={<Iconify icon='fluent:class-24-regular' />}>
           LỚP NIÊN CHẾ
         </MenuItem>
-        <SubMenu
+        {/* <SubMenu
           label='dashboards'
           icon={<i className='tabler-smart-home' />}
           suffix={<CustomChip label='5' size='small' color='error' round='true' />}
@@ -477,7 +472,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             </SubMenu>
             <MenuItem disabled>disabledMenu</MenuItem>
           </SubMenu>
-        </MenuSection>
+        </MenuSection> */}
       </Menu>
       {/* <Menu
         popoutMenuOffset={{ mainAxis: 23 }}

@@ -12,6 +12,7 @@ type TablePaginationProps = {
   filterValue?: string
   sortField?: string
   sortOrder?: string
+  typeList?: string
 }
 
 export default function TablePaginationCustom({
@@ -23,7 +24,8 @@ export default function TablePaginationCustom({
   filterField,
   filterValue,
   sortField,
-  sortOrder
+  sortOrder,
+  typeList
 }: TablePaginationProps) {
   const router = useRouter()
 
@@ -56,6 +58,10 @@ export default function TablePaginationCustom({
 
           if (sortField) {
             params.set('sortField', sortField)
+          }
+
+          if (typeList) {
+            params.set('typeList', typeList)
           }
 
           if (sortOrder) {

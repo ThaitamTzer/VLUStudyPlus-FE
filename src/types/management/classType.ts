@@ -15,12 +15,14 @@ export type Class = {
 }
 
 export type ClassData = {
+  _id: string
   classId: string
   cohortId: {
     _id: string
     cohortId: string
   }
   numberStudent: number
+  statusImport: boolean
 }
 export type ClassGroupByLecturer = {
   lectureId: {

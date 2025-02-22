@@ -11,6 +11,9 @@ const config: Config = {
     extend: {
       backgroundImage: {
         'custom-gradient': 'linear-gradient(to right bottom, #002982, #0052a6, #0076b9, #5daaf1, #99dfff)'
+      },
+      backgroundColor: {
+        login: 'rgba(107, 25, 45, 0.4)'
       }
     }
   }

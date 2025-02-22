@@ -1,6 +1,8 @@
+import dynamic from 'next/dynamic'
+
 import type { Metadata } from 'next'
 
-import ClassPage from '@/views/class/classPage'
+const ClassPage = dynamic(() => import('@/views/class/classPage'))
 
 export const metadata: Metadata = {
   title: 'Quản lý lớp niên chế',

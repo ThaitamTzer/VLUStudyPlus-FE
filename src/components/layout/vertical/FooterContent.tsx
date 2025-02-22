@@ -20,6 +20,9 @@ const FooterContent = () => {
         verticalLayoutClasses.footerContent,
         'flex items-center justify-between flex-wrap gap-4 relative z-0'
       )}
+      style={{
+        justifyContent: pathname !== '/homepage' ? 'flex-start' : 'center'
+      }}
     >
       <Typography
         variant='body2'

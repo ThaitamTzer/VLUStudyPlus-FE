@@ -31,7 +31,12 @@ export default function ClassListFilter({
   sortOrder,
   handleSort
 }: ClassListProps) {
-  const {} = useClassStore()
+  const {
+    toogleOpenEditClassfilterModal,
+    toogleOpenDeleteClassfilterModal,
+    toogleOpenViewDetailfilterModal,
+    setClassFilter
+  } = useClassStore()
 
   return (
     <TableContainer sx={{ position: 'relative', overflowX: 'auto', maxHeight: 'calc(100vh - 300px)' }}>
@@ -72,15 +77,30 @@ export default function ClassListFilter({
                 <TableCell size='small'>{lecturer.lectureId.classes.map(c => c.classId).join(', ')}</TableCell>
                 <TableCell width={1} size='small'>
                   <RowAction>
-                    <MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        setClassFilter(lecturer)
+                        toogleOpenViewDetailfilterModal()
+                      }}
+                    >
                       <Iconify icon='solar:eye-linear' className='mr-2' />
                       Xem chi tiết
                     </MenuItem>
-                    <MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        setClassFilter(lecturer)
+                        toogleOpenEditClassfilterModal()
+                      }}
+                    >
                       <Iconify icon='eva:edit-2-outline' className='mr-2' />
                       Sửa
                     </MenuItem>
-                    <MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        setClassFilter(lecturer)
+                        toogleOpenDeleteClassfilterModal()
+                      }}
+                    >
                       <Iconify icon='eva:trash-2-outline' className='mr-2' />
                       Xóa
                     </MenuItem>

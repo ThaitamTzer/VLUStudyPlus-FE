@@ -9,8 +9,8 @@ import type { KeyedMutator } from 'swr'
 import { useClassStore } from '@/stores/class/class'
 
 import ManualAddClass from './manualAdd'
-import ImportAddClass from './importAdd'
 import Iconify from '@/components/iconify'
+import ImportClass from './importAdd'
 
 type AddModalProps = {
   mutate: KeyedMutator<any>
@@ -47,7 +47,7 @@ export default function AddModal({ mutate }: AddModalProps) {
             <ManualAddClass mutate={mutate} />
           </TabPanel>
           <TabPanel value='2'>
-            <ImportAddClass />
+            <ImportClass mutate={mutate} />
           </TabPanel>
         </TabContext>
       </DialogContent>

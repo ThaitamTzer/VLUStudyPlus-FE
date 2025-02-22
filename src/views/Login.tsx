@@ -17,7 +17,7 @@ const Login = () => {
   return (
     <div className='w-full h-full z-0 relative'>
       <div
-        className='w-full h-full flex justify-center items-center before:content-["*"] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-gradient-to-t before:from-[#3777FF] before:to-slate-600 before:opacity-50 before:z-[-1] overflow-hidden'
+        className='w-full h-full flex justify-center items-center before:content-["*"] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-login before:z-[-1] overflow-hidden'
         style={{
           backgroundImage: 'url("/images/background/loginv1.jpg")',
           backgroundSize: 'cover',
@@ -39,14 +39,26 @@ const Login = () => {
           <Link href={'/'} className='flex justify-center scale-150'>
             <Logo />
           </Link>
-          <div className='text-center max-w-[870px] mx-auto'>
+          <div className='text-center max-w-[px] mx-auto'>
             <h2
               className='text-base sm:text-[35px] text-[#fefef3] sm:font-bold'
               style={{
-                lineHeight: '1.5'
+                lineHeight: '1.5',
+                whiteSpace: 'pre-wrap', // Cho phép ngắt dòng theo ý muốn
+                margin: '0 auto' // Căn giữa văn bản
               }}
             >
-              PHẦN MỀM QUẢN LÝ, THEO DÕI VÀ XỬ LÝ QUÁ TRÌNH HỌC TẬP CỦA SINH VIÊN KHOA CNTT
+              {`PHẦN MỀM QUẢN LÝ, THEO DÕI VÀ XỬ LÝ `}
+            </h2>
+            <h2
+              className='text-base sm:text-[35px] text-[#fefef3] sm:font-bold'
+              style={{
+                lineHeight: '1.5',
+                whiteSpace: 'pre-wrap', // Cho phép ngắt dòng theo ý muốn
+                margin: '0 auto' // Căn giữa văn bản
+              }}
+            >
+              {`QUÁ TRÌNH HỌC TẬP CỦA SINH VIÊN KHOA CNTT`}
             </h2>
           </div>
           <div className='w-fit max-w-[500px] mx-auto'>

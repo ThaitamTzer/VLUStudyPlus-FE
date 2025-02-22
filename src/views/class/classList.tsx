@@ -87,7 +87,7 @@ export default function ClassList({
                 <TableCell size='small'>{c.classId}</TableCell>
                 <TableCell size='small'>{c.cohortId.cohortId}</TableCell>
                 <TableCell size='small'>
-                  {c.lectureId.userName} - {c.userId}
+                  {c?.lectureId?.userName} - {c?.userId}
                 </TableCell>
                 <TableCell size='small'>{c.numberStudent}</TableCell>
                 <TableCell width={1} size='small'>

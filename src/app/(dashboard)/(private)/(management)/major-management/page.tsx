@@ -1,6 +1,8 @@
+import dynamic from 'next/dynamic'
+
 import type { Metadata } from 'next'
 
-import MajorPage from '@/views/major/majorPage'
+const MajorPage = dynamic(() => import('@/views/major/majorPage'), { ssr: false })
 
 export const metadata: Metadata = {
   title: 'Quản lý chuyên ngành',

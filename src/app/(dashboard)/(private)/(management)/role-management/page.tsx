@@ -1,6 +1,8 @@
+import dynamic from 'next/dynamic'
+
 import type { Metadata } from 'next'
 
-import RolePage from '@/views/role/rolepage'
+const RolePage = dynamic(() => import('@/views/role/rolepage'), { ssr: false })
 
 export const metadata: Metadata = {
   title: 'Quản lý vai trò',

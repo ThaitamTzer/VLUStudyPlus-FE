@@ -78,6 +78,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         popoutMenuOffset={{ mainAxis: 23 }}
         renderExpandIcon={({ open }) => <RenderExpandIcon open={open} transitionDuration={transitionDuration} />}
         renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
+        subMenuOpenBehavior='collapse'
         menuSectionStyles={{
           ...menuSectionStyles(verticalNavOptions, theme),
           label: {
@@ -140,10 +141,16 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
                 backgroundColor: 'var(--mui-palette-action-selected)'
               }
             })
-          })
-        }}
+          }),
+          subMenuContent(params) {
+            const { level } = params
 
-        // menuItemStyles={menuItemStyles(verticalNavOptions, theme)}
+            return {
+              paddingBlock: '8px',
+              paddingInline: level === 1 ? '5px' : '10px'
+            }
+          }
+        }}
       >
         <MenuItem
           href='/homepage'
@@ -153,14 +160,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         >
           TRANG CHỦ
         </MenuItem>
-        <SubMenu label='ĐÀO TẠO' icon={<Iconify icon='solar:widget-2-linear' />}>
+        <SubMenu label='DANH MỤC' icon={<Iconify icon='solar:widget-2-linear' />}>
           <MenuItem
             href='/term-management'
             icon={<Iconify icon='solar:calendar-mark-linear' />}
             exactMatch={false}
             activeUrl='/term-management'
           >
-            HỌC KỲ
+            Học kỳ
           </MenuItem>
           <MenuItem
             href='/cohort-management'
@@ -168,7 +175,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             exactMatch={false}
             activeUrl='/cohort-management'
           >
-            NIÊN KHÓA
+            Niên khóa
           </MenuItem>
           <MenuItem
             href='/major-management'
@@ -176,19 +183,36 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             exactMatch={false}
             activeUrl='/major-management'
           >
-            CHUYÊN NGÀNH
+            Ngành
           </MenuItem>
         </SubMenu>
         <SubMenu label='NGƯỜI DÙNG' icon={<Iconify icon='solar:users-group-rounded-linear' />}>
-          <MenuItem href='/role-management' exactMatch={false} activeUrl='/role-management'>
-            VAI TRÒ
+          <MenuItem
+            href='/role-management'
+            icon={<Iconify icon='solar:shield-user-linear' />}
+            exactMatch={false}
+            activeUrl='/role-management'
+          >
+            Vai trò
           </MenuItem>
-          <MenuItem href='/lecturer-management'>CBGVNV</MenuItem>
-          <MenuItem href='/student-management'>SINH VIÊN</MenuItem>
+          <MenuItem href='/lecturer-management' icon={<Iconify icon='clarity:employee-group-line' />}>
+            Cbgvnv
+          </MenuItem>
+          <MenuItem href='/student-management' icon={<Iconify icon='ph:student' />}>
+            Sinh viên
+          </MenuItem>
         </SubMenu>
-        <MenuItem href='/class-management' icon={<Iconify icon='fluent:class-24-regular' />}>
-          LỚP NIÊN CHẾ
+        <MenuItem href='/class-management' icon={<Iconify icon='ph:chalkboard-teacher' />}>
+          Phân công lớp
         </MenuItem>
+        <SubMenu label='LỚP NIÊN CHẾ' icon={<Iconify icon='fluent:class-24-regular' />}>
+          <MenuItem href='/classLecturer' icon={<Iconify icon='fluent:class-24-regular' />}>
+            Lớp học
+          </MenuItem>
+          <MenuItem href='/classStudent' icon={<Iconify icon='hugeicons:students' />}>
+            Sinh viên
+          </MenuItem>
+        </SubMenu>
         {/* <SubMenu
           label='dashboards'
           icon={<i className='tabler-smart-home' />}

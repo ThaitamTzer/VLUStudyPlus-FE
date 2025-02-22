@@ -22,11 +22,16 @@ import { useClassStore } from '@/stores/class/class'
 import UpdateModal from './updateModal'
 import AlertDelete from '@/components/alertModal'
 import ClassListFilter from './classListFilter'
+import EditClassModal from './editClassModal'
+import DeleteModal from './deleteModal'
+import type { ClassGroupByLecturer } from '@/types/management/classType'
 
 const AddModal = dynamic(() => import('./addModal'))
 
 export default function ClassPage() {
-  const { toogleOpenAddClassModal, classRoom, toogleOpenDeleteClassModal, openDeleteClassModal } = useClassStore()
+  const { toogleOpenAddClassModal, classRoom, toogleOpenDeleteClassModal, openDeleteClassModal, setClassFilter } =
+    useClassStore()
+
   const [loading, setLoading] = useState<boolean>(false)
 
   const router = useRouter()
@@ -79,11 +84,14 @@ export default function ClassPage() {
     ['/api/classData', params],
     () => classService.getAll(page, limit, filterField, filterValue, sortField, sortOrder, typeList, searchKey),
     {
-      revalidateOnFocus: false
+      revalidateOnFocus: false,
+      onSuccess: newData => {
+        if (typeList === 'groupedByLecture') {
+          setClassFilter(newData.data as unknown as ClassGroupByLecturer)
+        }
+      }
     }
   )
-
-  console.log(data)
 
   const onDelete = async () => {
     if (!classRoom) return
@@ -152,8 +160,8 @@ export default function ClassPage() {
                 }}
                 value={typeList}
               >
-                <MenuItem value=''>Tất cả</MenuItem>
-                <MenuItem value='groupedByLecture'>Xem lớp theo giảng viên</MenuItem>
+                <MenuItem value=''>Xem theo lớp</MenuItem>
+                <MenuItem value='groupedByLecture'>Xem theo giảng viên</MenuItem>
               </CustomTextField>
             </Grid>
           </Grid>
@@ -283,6 +291,8 @@ export default function ClassPage() {
       </Card>
       <AddModal mutate={mutate} />
       <UpdateModal mutate={mutate} />
+      <EditClassModal mutate={mutate} />
+      <DeleteModal mutate={mutate} />
       <AlertDelete
         content={
           <p>

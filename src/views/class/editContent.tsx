@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 
+import { useSearchParams } from 'next/navigation'
+
 import { Autocomplete, Button, Grid, Stack } from '@mui/material'
 
 import * as v from 'valibot'
@@ -10,8 +12,7 @@ import { useForm, Controller } from 'react-hook-form'
 
 import { valibotResolver } from '@hookform/resolvers/valibot'
 
-import type { KeyedMutator } from 'swr'
-import useSWR from 'swr'
+import useSWR, { mutate } from 'swr'
 
 import { LoadingButton } from '@mui/lab'
 
@@ -22,6 +23,7 @@ import type { ClassData } from '@/types/management/classType'
 import { useAuth } from '@/hooks/useAuth'
 import cohortService from '@/services/cohort.service'
 import classService from '@/services/class.service'
+import { useClassStore } from '@/stores/class/class'
 
 const schema = v.object({
   lectureId: v.pipe(v.string(), v.nonEmpty('Vui lòng chọn giảng viên')),
@@ -40,17 +42,25 @@ type ManualUpdateClassInput = v.InferInput<typeof schema>
 export default function EditContent({
   classData,
   lecturer,
-  handleClose,
-  mutate
+  handleClose
 }: {
-  classData: ClassData
-  lecturer: string
+  classData: ClassData | undefined
+  lecturer: string | undefined
   handleClose: () => void
-  mutate: KeyedMutator<any>
 }) {
   const [loading, setLoading] = useState(false)
+  const searchParams = useSearchParams()
+  const page = Number(searchParams.get('page')) || 1
+  const limit = Number(searchParams.get('limit')) || 10
+  const filterField = searchParams.get('filterField') || ''
+  const filterValue = searchParams.get('filterValue') || ''
+  const sortField = searchParams.get('sortField') || ''
+  const sortOrder = searchParams.get('sortOrder') || ''
+  const typeList = searchParams.get('typeList') || ''
+  const searchKey = searchParams.get('searchKey') || ''
 
   const { lecturerData } = useAuth()
+  const { setClassID } = useClassStore()
 
   const { data: cohortsData } = useSWR('cohortOptions', () => cohortService.getAll(), {
     revalidateOnFocus: false
@@ -104,8 +114,18 @@ export default function EditContent({
           isLoading: false,
           autoClose: 3000
         })
-        mutate()
+        mutate(['/api/classData', page, limit, filterField, filterValue, sortField, sortOrder, typeList, searchKey])
         setLoading(false)
+        setClassID('')
+        reset(
+          {
+            lectureId: '',
+            classId: '',
+            cohortId: '',
+            numberStudent: 0
+          },
+          { keepValues: false }
+        )
       },
       err => {
         toast.update(toastId, {

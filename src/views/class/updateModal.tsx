@@ -81,7 +81,7 @@ export default function UpdateModal({ mutate }: ManualUpdateClassProps) {
     }
 
     reset({
-      lectureId: classRoom.lectureId._id,
+      lectureId: classRoom.lectureId,
       classId: classRoom.classId,
       cohortId: classRoom.cohortId._id,
       numberStudent: classRoom.numberStudent

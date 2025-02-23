@@ -1,10 +1,8 @@
 export type Class = {
   _id: string
-  lectureId: {
-    _id: string
-    userName: string
-  }
+  lectureId: string
   userId: string
+  userName: string
   classId: string
   cohortId: {
     _id: string
@@ -48,4 +46,18 @@ export type FormClass = {
   cohortId?: string
   numberStudent?: number
   statusImport?: boolean
+}
+
+export type MissingError = {
+  stt: string
+  row: number
+  message: string
+  details: {
+    userId: string
+    userName: string
+    userEmail: string
+    numberStudents: number
+    classId: string
+    cohortId: string
+  }
 }

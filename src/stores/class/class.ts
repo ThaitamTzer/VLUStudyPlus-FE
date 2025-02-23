@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { Class, ClassGroupByLecturer } from '@/types/management/classType'
+import type { Class, ClassData, ClassGroupByLecturer } from '@/types/management/classType'
 
 type States = {
   classRoom: Class | null
@@ -9,6 +9,8 @@ type States = {
   openEditClassModal: boolean
   openDeleteClassModal: boolean
   openViewDetailModal: boolean
+  classForUpdate: ClassData
+  classID: string
 
   openEditClassfilterModal: boolean
   openDeleteClassfilterModal: boolean
@@ -22,6 +24,8 @@ type Actions = {
   toogleOpenDeleteClassModal: () => void
   toogleOpenViewDetailModal: () => void
   setClassFilter: (classData: ClassGroupByLecturer) => void
+  setClassForUpdate: (classData: ClassData) => void
+  setClassID: (classID: string) => void
 
   toogleOpenEditClassfilterModal: () => void
   toogleOpenDeleteClassfilterModal: () => void
@@ -35,6 +39,8 @@ export const useClassStore = create<States & Actions>(set => ({
   openDeleteClassModal: false,
   openViewDetailModal: false,
   classFilter: null,
+  classForUpdate: {} as ClassData,
+  classID: '',
 
   openEditClassfilterModal: false,
   openDeleteClassfilterModal: false,
@@ -46,6 +52,8 @@ export const useClassStore = create<States & Actions>(set => ({
   toogleOpenDeleteClassModal: () => set(state => ({ openDeleteClassModal: !state.openDeleteClassModal })),
   toogleOpenViewDetailModal: () => set(state => ({ openViewDetailModal: !state.openViewDetailModal })),
   setClassFilter: classData => set({ classFilter: classData }),
+  setClassForUpdate: classData => set({ classForUpdate: classData }),
+  setClassID: classID => set({ classID }),
 
   toogleOpenEditClassfilterModal: () => set(state => ({ openEditClassfilterModal: !state.openEditClassfilterModal })),
   toogleOpenDeleteClassfilterModal: () =>

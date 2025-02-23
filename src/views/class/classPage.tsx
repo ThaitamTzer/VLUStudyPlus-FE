@@ -29,8 +29,14 @@ import type { ClassGroupByLecturer } from '@/types/management/classType'
 const AddModal = dynamic(() => import('./addModal'))
 
 export default function ClassPage() {
-  const { toogleOpenAddClassModal, classRoom, toogleOpenDeleteClassModal, openDeleteClassModal, setClassFilter } =
-    useClassStore()
+  const {
+    toogleOpenAddClassModal,
+    classRoom,
+    toogleOpenDeleteClassModal,
+    openDeleteClassModal,
+    setClassFilter,
+    classFilter
+  } = useClassStore()
 
   const [loading, setLoading] = useState<boolean>(false)
 
@@ -45,17 +51,6 @@ export default function ClassPage() {
   const sortOrder = searchParams.get('sortOrder') || ''
   const typeList = searchParams.get('typeList') || ''
   const searchKey = searchParams.get('searchKey') || ''
-
-  const params = {
-    page,
-    limit,
-    filterField,
-    filterValue,
-    sortField,
-    sortOrder,
-    typeList,
-    searchKey
-  }
 
   const handleSort = (field: string) => {
     const isAsc = sortField === field && sortOrder === 'asc'
@@ -81,17 +76,25 @@ export default function ClassPage() {
   }
 
   const { data, isLoading, mutate } = useSWR(
-    ['/api/classData', params],
+    ['/api/classData', page, limit, filterField, filterValue, sortField, sortOrder, typeList, searchKey],
     () => classService.getAll(page, limit, filterField, filterValue, sortField, sortOrder, typeList, searchKey),
     {
       revalidateOnFocus: false,
       onSuccess: newData => {
         if (typeList === 'groupedByLecture') {
-          setClassFilter(newData.data as unknown as ClassGroupByLecturer)
+          const convertData = newData.data as unknown as ClassGroupByLecturer[]
+
+          const foundClass = convertData.find(item => item.lectureId._id === classFilter?.lectureId._id)
+
+          if (foundClass) {
+            setClassFilter(foundClass)
+          }
         }
       }
     }
   )
+
+  console.log('classFilter', classFilter)
 
   const onDelete = async () => {
     if (!classRoom) return
@@ -229,11 +232,11 @@ export default function ClassPage() {
           <ClassListFilter
             data={data?.data || []}
             handleSort={handleSort}
-            sortField={params.sortField}
-            sortOrder={params.sortOrder}
-            limit={params.limit}
+            sortField={sortField}
+            sortOrder={sortOrder}
+            limit={limit}
             loading={isLoading}
-            page={params.page}
+            page={page}
             total={data?.pagination.totalItems || 0}
           />
         ) : (
@@ -241,10 +244,10 @@ export default function ClassPage() {
             classes={data?.data || []}
             total={data?.pagination.totalItems || 0}
             loading={isLoading}
-            limit={params.limit}
-            page={params.page}
-            sortField={params.sortField}
-            sortOrder={params.sortOrder}
+            limit={limit}
+            page={page}
+            sortField={sortField}
+            sortOrder={sortOrder}
             handleSort={handleSort}
           />
         )}
@@ -253,14 +256,14 @@ export default function ClassPage() {
           component={() => (
             <TablePaginationCustom
               data={data?.data || []}
-              page={params.page}
-              limit={params.limit}
-              filterField={params.filterField}
-              filterValue={params.filterValue}
+              page={page}
+              limit={limit}
+              filterField={filterField}
+              filterValue={filterValue}
               total={data?.pagination.totalItems || 0}
-              sortField={params.sortField}
-              sortOrder={params.sortOrder}
-              typeList={params.typeList}
+              sortField={sortField}
+              sortOrder={sortOrder}
+              typeList={typeList}
               searchKey={searchKey}
             />
           )}
@@ -291,7 +294,7 @@ export default function ClassPage() {
       </Card>
       <AddModal mutate={mutate} />
       <UpdateModal mutate={mutate} />
-      <EditClassModal mutate={mutate} />
+      <EditClassModal />
       <DeleteModal mutate={mutate} />
       <AlertDelete
         content={

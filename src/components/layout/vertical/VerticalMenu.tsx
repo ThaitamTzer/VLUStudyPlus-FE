@@ -203,7 +203,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           </MenuItem>
         </SubMenu>
         <MenuItem href='/class-management' icon={<Iconify icon='ph:chalkboard-teacher' />}>
-          Phân công lớp
+          PHÂN CÔNG LỚP
         </MenuItem>
         <SubMenu label='LỚP NIÊN CHẾ' icon={<Iconify icon='fluent:class-24-regular' />}>
           <MenuItem href='/classLecturer' icon={<Iconify icon='fluent:class-24-regular' />}>
@@ -212,6 +212,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           <MenuItem href='/classStudent' icon={<Iconify icon='hugeicons:students' />}>
             Sinh viên
           </MenuItem>
+        </SubMenu>
+        <SubMenu label='XỬ LÝ HỌC TẬP' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
+          <MenuItem href=''></MenuItem>
         </SubMenu>
         {/* <SubMenu
           label='dashboards'

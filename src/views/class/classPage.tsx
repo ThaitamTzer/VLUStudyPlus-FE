@@ -25,6 +25,7 @@ import ClassListFilter from './classListFilter'
 import EditClassModal from './editClassModal'
 import DeleteModal from './deleteModal'
 import type { ClassGroupByLecturer } from '@/types/management/classType'
+import PreviewImport from './previewImport'
 
 const AddModal = dynamic(() => import('./addModal'))
 
@@ -296,6 +297,7 @@ export default function ClassPage() {
       <UpdateModal mutate={mutate} />
       <EditClassModal />
       <DeleteModal mutate={mutate} />
+      <PreviewImport />
       <AlertDelete
         content={
           <p>

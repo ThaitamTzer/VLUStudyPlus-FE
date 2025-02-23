@@ -19,6 +19,7 @@ import AppReactDropzone from '@/libs/styles/AppReactDropzone'
 import Iconify from '@/components/iconify'
 import classService from '@/services/class.service'
 import { useClassStore } from '@/stores/class/class'
+import type { ViewImport } from '@/types/management/classType'
 
 const schema = v.object({
   file: v.pipe(
@@ -35,7 +36,15 @@ export default function ImportClass({ mutate }: { mutate: KeyedMutator<any> }) {
   const [files, setFiles] = useState<File[]>([])
   const [loading, setLoading] = useState<boolean>(false)
 
-  const { toogleOpenAddClassModal } = useClassStore()
+  const {
+    toogleOpenAddClassModal,
+    toogleOpenImportResultModal,
+    setImportResultData,
+    setLecturerDataImported,
+    setDuplicateClassData,
+    setMissingErrorData,
+    setUpdateSuccessData
+  } = useClassStore()
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles: File[]) => {
@@ -93,12 +102,13 @@ export default function ImportClass({ mutate }: { mutate: KeyedMutator<any> }) {
     setFiles(filteredFiles)
   }
 
-  // const handleViewResult = (data: ImportStudentRes) => {
-  //   setStudentsResult(data.data.students)
-  //   setUpdatedStudents(data.data.updatedStudents)
-  //   setDuplicateRows(data.data.duplicateRows)
-  //   setMissingInfoRows(data.data.missingInfoRows)
-  // }
+  const handleViewResult = (data: ViewImport) => {
+    setImportResultData(data.data)
+    setLecturerDataImported(data.lecturerData)
+    setMissingErrorData(data.missingInfoRows)
+    setUpdateSuccessData(data.updateInfoRows)
+    setDuplicateClassData(data.duplicateClass)
+  }
 
   const handleUpload = handleSubmit(async data => {
     setLoading(true)
@@ -108,12 +118,11 @@ export default function ImportClass({ mutate }: { mutate: KeyedMutator<any> }) {
 
     const toastId = toast.loading('Dữ liệu đang được xử lý, vui lòng chờ trong giây lát')
 
-    handleClose()
-
     await classService.import(
       formData,
       res => {
-        console.log(res)
+        handleViewResult(res)
+        toogleOpenImportResultModal()
         toast.update(toastId, {
           render: 'Đã hoàn tất xử lý dữ liệu',
           type: 'success',

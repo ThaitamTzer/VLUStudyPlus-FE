@@ -36,8 +36,7 @@ const schema = v.object({
   numberStudent: v.pipe(
     v.number(),
     v.integer('Số lượng học viên phải là số nguyên'),
-    v.minValue(1, 'Số lượng học viên phải lớn hơn 0'),
-    v.maxValue(100, 'Số lượng học viên không được vượt quá 100')
+    v.minValue(1, 'Số lượng học viên phải lớn hơn 0')
   )
 })
 

@@ -48,7 +48,7 @@ export type FormClass = {
   statusImport?: boolean
 }
 
-export type MissingError = {
+export type UpdateSuccess = {
   stt: string
   row: number
   message: string
@@ -58,6 +58,44 @@ export type MissingError = {
     userEmail: string
     numberStudents: number
     classId: string
+  }
+}
+
+export type MissingError = UpdateSuccess & {
+  details: {
     cohortId: string
   }
+}
+export type DuplicateClass = MissingError
+export type ImportLecturer = {
+  userId: string
+  userName: string
+  typeLecturer: string
+  mail: string
+  role: string
+  avatar: string
+  isBlock: boolean
+  _id: string
+  createdAt: string | Date
+  updatedAt: string | Date
+}
+export type ImportSuccess = {
+  _id: string
+  userId: string
+  userName: string
+  classId: string
+  cohortId: string
+  numberStudent: number
+  statusImport: false
+  createdAt: string | Date
+  updatedAt: string | Date
+}
+
+export type ViewImport = {
+  message: string
+  data: ImportSuccess[]
+  lecturerData: ImportLecturer[]
+  missingInfoRows: MissingError[]
+  updateInfoRows: UpdateSuccess[]
+  duplicateClass: DuplicateClass[]
 }

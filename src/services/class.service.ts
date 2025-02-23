@@ -1,6 +1,6 @@
 import axiosClient from '@/libs/axios'
 import axiosUpload from '@/libs/axiosUpload'
-import type { Class, ClassType, FormClass } from '@/types/management/classType'
+import type { Class, ClassType, FormClass, ViewImport } from '@/types/management/classType'
 
 const classService = {
   getAll: async (
@@ -88,7 +88,7 @@ const classService = {
     }
   },
 
-  import: async (data: FormData, successCallBack?: (res: any) => void, errorCallBack?: (res: any) => void) => {
+  import: async (data: FormData, successCallBack?: (res: ViewImport) => void, errorCallBack?: (res: any) => void) => {
     try {
       return await axiosUpload.post('/api/class/import-class', data).then(res => {
         successCallBack && successCallBack(res.data)

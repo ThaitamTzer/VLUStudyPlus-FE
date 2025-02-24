@@ -214,7 +214,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           </MenuItem>
         </SubMenu>
         <SubMenu label='XỬ LÝ HỌC TẬP' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
-          <MenuItem href=''></MenuItem>
+          <MenuItem href='type-process' icon={<Iconify icon='ic:twotone-list' />}>
+            Loại xử lý
+          </MenuItem>
         </SubMenu>
         {/* <SubMenu
           label='dashboards'

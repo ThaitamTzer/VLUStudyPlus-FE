@@ -2,71 +2,63 @@
 
 import { useMemo, useState } from 'react'
 
-import { Button, Card, IconButton, MenuItem, TablePagination } from '@mui/material'
+import { Button, Card, MenuItem, TablePagination } from '@mui/material'
+
 import useSWR from 'swr'
-import {
-  createColumnHelper,
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  getPaginationRowModel,
-  getFilteredRowModel,
-  getFacetedRowModel,
-  getFacetedMinMaxValues,
-  getFacetedUniqueValues
-} from '@tanstack/react-table'
 
 import type { ColumnDef, SortingState, Table } from '@tanstack/react-table'
+import {
+  createColumnHelper,
+  getCoreRowModel,
+  getFacetedMinMaxValues,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable
+} from '@tanstack/react-table'
 
 import { toast } from 'react-toastify'
 
 import PageHeader from '@/components/page-header'
-import cohortService from '@/services/cohort.service'
-import { useCohortStore } from '@/stores/cohort/cohort'
-import type { Cohort } from '@/types/management/cohortType'
+import TableTypeProcess from './list'
+import typeProcessService from '@/services/typeprocess.service'
+import type { TypeProcessType } from '@/types/management/typeProcessType'
+import RowAction from '@/components/rowAction'
 import Iconify from '@/components/iconify'
 import { fuzzyFilter } from '../apps/invoice/list/InvoiceListTable'
-import TablePaginationComponent from '@/components/TablePaginationComponent'
-import CohortList from './cohortList'
 import CustomTextField from '@/@core/components/mui/TextField'
 import DebouncedInput from '@/components/debouncedInput'
-import AddCohort from './addCohort'
-import RowAction from '@/components/rowAction'
-import UpdateCohort from './updateCohort'
+import TablePaginationComponent from '@/components/TablePaginationComponent'
+import AddTypeProcess from './addTypeProcess'
+import { useTypeProcessStore } from '@/stores/typeprocess/typeProcess.store'
+import UpdateTypeProcess from './updateTypeProcess'
 import AlertDelete from '@/components/alertModal'
-import ViewCohort from './viewCohort'
 
-type CohortTypeWithAction = Cohort & {
+type TypeProcessWithAction = TypeProcessType & {
   stt?: number
   action?: string
 }
 
-const columnHelper = createColumnHelper<CohortTypeWithAction>()
+const columnHelper = createColumnHelper<TypeProcessWithAction>()
 
-export default function CohortPage() {
-  const {
-    cohorts,
-    setCohorts,
-    toogleAddCohort,
-    toogleUpdateCohort,
-    setCohort,
-    cohort,
-    toogleDeleteCohort,
-    openDeleteCohort,
-    toogleViewCohort
-  } = useCohortStore()
-
-  const { mutate } = useSWR('/api/cohort', cohortService.getAll, {
-    onSuccess: data => {
-      setCohorts(data)
-    }
-  })
-
+export default function TypeProcessPage() {
+  const { data, isLoading, mutate } = useSWR('/api/type-process', typeProcessService.getAll)
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [loading, setLoading] = useState<boolean>(false)
 
-  const columns = useMemo<ColumnDef<CohortTypeWithAction, any>[]>(
+  const {
+    toogleAddTypeProcess,
+    toogleUpdateTypeProcess,
+    toogleDeleteTypeProcess,
+    setTypeProcess,
+    typeProcess,
+    openDeleteTypeProcess
+  } = useTypeProcessStore()
+
+  const columns = useMemo<ColumnDef<TypeProcessWithAction, any>[]>(
     () => [
       columnHelper.accessor('stt', {
         header: 'STT',
@@ -76,25 +68,15 @@ export default function CohortPage() {
           width: '1'
         }
       }),
-      columnHelper.accessor('cohortId', {
-        header: 'Mã niên khóa',
+      columnHelper.accessor('typeProcessingId', {
+        header: 'MÃ LOẠI XỬ LÝ',
         cell: info => info.getValue(),
         sortingFn: 'alphanumeric'
       }),
-      columnHelper.accessor('cohortName', {
-        header: 'Tên niên khóa',
+      columnHelper.accessor('typeProcessingName', {
+        header: 'TÊN LOẠI XỬ LÝ',
         cell: info => info.getValue(),
         sortingFn: 'alphanumeric'
-      }),
-      columnHelper.accessor('startYear', {
-        header: 'Năm bắt đầu',
-        cell: info => info.getValue(),
-        sortingFn: 'basic'
-      }),
-      columnHelper.accessor('endYear', {
-        header: 'Năm kết thúc',
-        cell: info => info.getValue(),
-        sortingFn: 'basic'
       }),
       columnHelper.accessor('action', {
         header: '',
@@ -102,67 +84,36 @@ export default function CohortPage() {
           algin: 'right'
         },
         cell: infor => (
-          <>
-            <IconButton
+          <RowAction>
+            <MenuItem
               onClick={() => {
-                toogleViewCohort()
-                setCohort(infor.row.original)
+                setTypeProcess(infor.row.original)
+                toogleUpdateTypeProcess()
               }}
             >
-              <Iconify icon='solar:eye-bold-duotone' />
-            </IconButton>
-            <RowAction>
-              <MenuItem
-                onClick={() => {
-                  toogleUpdateCohort()
-                  setCohort(infor.row.original)
-                }}
-              >
-                <Iconify icon='solar:pen-2-linear' />
-                Sửa
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  toogleDeleteCohort()
-                  setCohort(infor.row.original)
-                }}
-              >
-                <Iconify icon='solar:trash-bin-2-linear' />
-                Xóa
-              </MenuItem>
-            </RowAction>
-          </>
+              <Iconify icon='solar:pen-2-linear' />
+              Sửa
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setTypeProcess(infor.row.original)
+                toogleDeleteTypeProcess()
+              }}
+            >
+              <Iconify icon='solar:trash-bin-2-linear' />
+              Xóa
+            </MenuItem>
+          </RowAction>
         ),
         enableSorting: false
       })
     ],
-    [toogleUpdateCohort, setCohort, toogleDeleteCohort, toogleViewCohort]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   )
 
-  const handleDelete = async () => {
-    if (!cohort) {
-      return
-    }
-
-    setLoading(true)
-    await cohortService.delete(
-      cohort._id,
-      () => {
-        toogleDeleteCohort()
-        mutate()
-        toast.success('Xóa niên khóa thành công')
-        setLoading(false)
-      },
-      () => {
-        toogleDeleteCohort()
-        setLoading(false)
-        toast.error('Xóa niên khóa thất bại')
-      }
-    )
-  }
-
   const table = useReactTable({
-    data: cohorts,
+    data: data || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -184,10 +135,43 @@ export default function CohortPage() {
     onGlobalFilterChange: setGlobalFilter
   })
 
+  const handleDelete = async () => {
+    if (!typeProcess) {
+      return
+    }
+
+    setLoading(true)
+    const toastID = toast.loading('Đang xóa loại xử lý...')
+
+    await typeProcessService.delete(
+      typeProcess._id,
+      () => {
+        toast.update(toastID, {
+          render: 'Xóa loại xử lý thành công',
+          type: 'success',
+          isLoading: false,
+          autoClose: 2000
+        })
+        toogleDeleteTypeProcess()
+        mutate()
+        setLoading(false)
+      },
+      err => {
+        toast.update(toastID, {
+          render: err.message,
+          type: 'error',
+          isLoading: false,
+          autoClose: 2000
+        })
+        setLoading(false)
+      }
+    )
+  }
+
   return (
     <>
-      <PageHeader title='Danh sách niên khóa' />
-      <Card sx={{ mt: 4 }}>
+      <PageHeader title='Danh sách loại xử lý' />
+      <Card>
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <CustomTextField
             select
@@ -210,13 +194,13 @@ export default function CohortPage() {
               variant='contained'
               startIcon={<i className='tabler-plus' />}
               className='max-sm:is-full'
-              onClick={toogleAddCohort}
+              onClick={toogleAddTypeProcess}
             >
-              Thêm niên khóa
+              Thêm loại xử lý
             </Button>
           </div>
         </div>
-        <CohortList table={table} />
+        <TableTypeProcess table={table} loading={isLoading} />
         <TablePagination
           component={() => <TablePaginationComponent table={table as Table<unknown>} />}
           count={table.getFilteredRowModel().rows.length}
@@ -225,15 +209,14 @@ export default function CohortPage() {
           onPageChange={(_, page) => table.setPageIndex(page - 1)}
         />
       </Card>
-      <AddCohort mutate={mutate} />
-      <UpdateCohort mutate={mutate} />
-      <ViewCohort />
+      <AddTypeProcess mutate={mutate} />
+      <UpdateTypeProcess mutate={mutate} />
       <AlertDelete
-        open={openDeleteCohort}
-        onClose={toogleDeleteCohort}
-        content='Bạn có chắc chắn muốn xóa niên khóa này không?'
+        open={openDeleteTypeProcess}
+        onClose={toogleDeleteTypeProcess}
+        content='Bạn có chắc chắn muốn xóa loại xử lý này không?'
         loading={loading}
-        title='Xóa niên khóa'
+        title='Xóa loại xử lý'
         onSubmit={handleDelete}
         cancelText='Hủy'
         submitText='Xóa'

@@ -95,8 +95,6 @@ export default function ClassPage() {
     }
   )
 
-  console.log('classFilter', classFilter)
-
   const onDelete = async () => {
     if (!classRoom) return
     const toastId = toast.loading('Đang xóa lớp niên chế')

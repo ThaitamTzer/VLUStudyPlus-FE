@@ -5,8 +5,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     backgroundColor: theme.palette.action.hover
   },
 
-  textTransform: 'uppercase',
-
   // hide last border
   '&:last-child td, &:last-child th': {
     borderBottom: 0

@@ -27,7 +27,7 @@ export default function PreviewImport() {
   return (
     <Dialog open={openImportResult} onClose={handleClose} maxWidth='xl' fullWidth>
       <DialogTitle>
-        <Typography variant='h4'>Kết quả nhập giảng viên</Typography>
+        <Typography variant='h4'>Kết quả nhập sinh viên</Typography>
         <IconButton
           onClick={handleClose}
           sx={{

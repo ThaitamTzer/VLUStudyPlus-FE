@@ -3,9 +3,21 @@
 import { useState } from 'react'
 
 import { useDropzone } from 'react-dropzone'
-import { Box, Button, List, ListItem, Typography, IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material'
+import {
+  Box,
+  Button,
+  List,
+  ListItem,
+  Typography,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  MenuItem,
+  Grid
+} from '@mui/material'
 
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { valibotResolver } from '@hookform/resolvers/valibot'
 import * as v from 'valibot'
 
@@ -19,30 +31,37 @@ import Iconify from '@/components/iconify'
 import { useClassStudentStore } from '@/stores/classStudent/classStudent.store'
 import type { ImportStudentResult } from '@/types/management/classStudentType'
 import classStudentService from '@/services/classStudent.service'
+import type { ClassLecturer } from '@/types/management/classLecturerType'
+import CustomTextField from '@/@core/components/mui/TextField'
 
 const schema = v.object({
+  classCode: v.pipe(v.string(), v.nonEmpty('Chọn một lớp để thêm')),
   file: v.pipe(
     v.array(v.file(), 'Cần phải có tệp mới có thể thực hiện'),
     v.minLength(1, 'Cần phải có tệp mới có thể thực hiện')
   )
 })
 
-type AutoAddForm = {
-  file: File[]
-}
+type AutoAddForm = v.InferInput<typeof schema>
 
-export default function ImportStudent({ mutate, classCode }: { mutate: KeyedMutator<any>; classCode: string }) {
+export default function ImportStudent({
+  mutate,
+  classCode
+}: {
+  mutate: KeyedMutator<any>
+  classCode: ClassLecturer[]
+}) {
   const [files, setFiles] = useState<File[]>([])
   const [loading, setLoading] = useState<boolean>(false)
 
   const {
-    toogleImportStudent,
     setMissingInfoRows,
     setImportResult,
     setDuplicateRows,
     setUpdateResult,
     toogleImportResult,
-    openImportStudent
+    openImportAdd,
+    toogletImportAdd
   } = useClassStudentStore()
 
   const handleImportResult = (res: ImportStudentResult) => {
@@ -66,19 +85,23 @@ export default function ImportStudent({ mutate, classCode }: { mutate: KeyedMuta
   const {
     handleSubmit,
     setValue,
+    control,
+    reset,
     formState: { errors }
   } = useForm<AutoAddForm>({
     resolver: valibotResolver(schema),
     mode: 'all',
     defaultValues: {
-      file: []
+      file: [],
+      classCode: ''
     }
   })
 
   const handleClose = () => {
     setValue('file', [])
     setFiles([])
-    toogleImportStudent()
+    toogletImportAdd()
+    reset()
   }
 
   const renderFilePreview = (file: File) => {
@@ -112,7 +135,7 @@ export default function ImportStudent({ mutate, classCode }: { mutate: KeyedMuta
     setLoading(true)
     const formData = new FormData()
 
-    formData.append('classCode', classCode)
+    formData.append('classCode', data.classCode)
     formData.append('file', data.file[0])
 
     const toastId = toast.loading('Dữ liệu đang được xử lý, vui lòng chờ trong giây lát')
@@ -133,8 +156,10 @@ export default function ImportStudent({ mutate, classCode }: { mutate: KeyedMuta
         })
         toogleImportResult()
         mutate()
+        setLoading(false)
       },
       err => {
+        setLoading(false)
         toast.update(toastId, {
           render: err.message,
           type: 'error',
@@ -148,7 +173,7 @@ export default function ImportStudent({ mutate, classCode }: { mutate: KeyedMuta
   })
 
   return (
-    <Dialog open={openImportStudent} onClose={handleClose} fullWidth maxWidth='sm'>
+    <Dialog open={openImportAdd} onClose={handleClose} fullWidth maxWidth='sm'>
       {/* đưa file mẫu cho người dùng */}
       <DialogTitle>
         <IconButton
@@ -161,7 +186,7 @@ export default function ImportStudent({ mutate, classCode }: { mutate: KeyedMuta
         >
           <Iconify icon='mdi:close' />
         </IconButton>
-        <Typography variant='h4'>Import sinh viên vào lớp {classCode}</Typography>
+        <Typography variant='h4'>Import sinh viên</Typography>
       </DialogTitle>
       <DialogContent>
         <div className='flex flex-col items-center gap-2'>
@@ -177,26 +202,55 @@ export default function ImportStudent({ mutate, classCode }: { mutate: KeyedMuta
           </Button>
           <Typography variant='body2'>Chỉ hỗ trợ tệp Excel (.xls, .xlsx)</Typography>
         </div>
-        <section
-          style={{
-            border: '1px dashed #ccc',
-            borderRadius: '4px',
-            padding: '20px',
-            textAlign: 'center',
-            cursor: 'pointer'
-          }}
-        >
-          <div {...getRootProps({ className: 'dropzone' })}>
-            <input {...getInputProps()} />
-            <div className='flex items-center flex-col gap-2 text-center'>
-              <Typography variant='h5'>Kéo và thả files của bạn vào đây.</Typography>
-              <Typography color='text.disabled'>hoặc</Typography>
-              <Button variant='tonal' size='small'>
-                Chọn file
-              </Button>
-            </div>
-          </div>
-        </section>
+        <Grid container spacing={4}>
+          <Grid item xs={12}>
+            <Controller
+              name='classCode'
+              control={control}
+              render={({ field }) => (
+                <CustomTextField
+                  select
+                  fullWidth
+                  {...field}
+                  label='Chọn lớp'
+                  {...(errors.classCode && { error: true, helperText: errors.classCode.message })}
+                  SelectProps={{
+                    displayEmpty: true
+                  }}
+                >
+                  <MenuItem value=''>Chọn một lớp để thêm</MenuItem>
+                  {classCode?.map(option => (
+                    <MenuItem key={option.classId} value={option.classId}>
+                      {option.classId}
+                    </MenuItem>
+                  ))}
+                </CustomTextField>
+              )}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <section
+              style={{
+                border: '1px dashed #ccc',
+                borderRadius: '4px',
+                padding: '20px',
+                textAlign: 'center',
+                cursor: 'pointer'
+              }}
+            >
+              <div {...getRootProps({ className: 'dropzone' })}>
+                <input {...getInputProps()} />
+                <div className='flex items-center flex-col gap-2 text-center'>
+                  <Typography variant='h5'>Kéo và thả files của bạn vào đây.</Typography>
+                  <Typography color='text.disabled'>hoặc</Typography>
+                  <Button variant='tonal' size='small'>
+                    Chọn file
+                  </Button>
+                </div>
+              </div>
+            </section>
+          </Grid>
+        </Grid>
         {errors.file?.message && (
           <Typography color='error' variant='body2'>
             {errors.file.message}

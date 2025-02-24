@@ -13,6 +13,8 @@ export default function TableMissing({ missingInfoRows }: { missingInfoRows: Mis
     )
   }
 
+  console.log('missingInfoRows', missingInfoRows)
+
   return (
     <TableContainer
       sx={{ position: 'relative', overflowX: 'auto', maxHeight: 'calc(100vh - 300px)', border: '1px solid #000' }}
@@ -65,7 +67,9 @@ export default function TableMissing({ missingInfoRows }: { missingInfoRows: Mis
                   </TableCell>
                 </>
               ) : (
-                <TableCell colSpan={12}>Không tìm thấy mã sinh viên</TableCell>
+                <>
+                  <TableCell colSpan={12}>{row.message}</TableCell>
+                </>
               )}
             </StyledTableRow>
           ))}

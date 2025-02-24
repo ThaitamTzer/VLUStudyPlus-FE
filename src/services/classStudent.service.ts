@@ -1,6 +1,6 @@
 import axiosClient from '@/libs/axios'
 import axiosUpload from '@/libs/axiosUpload'
-import type { ImportStudentResult } from '@/types/management/classStudentType'
+import type { ClassStudentListType, ImportStudentResult } from '@/types/management/classStudentType'
 
 const classStudentService = {
   import: async (
@@ -25,10 +25,25 @@ const classStudentService = {
     }
   },
 
-  getListByClassCode: async (classCode: string) => {
-    const res = await axiosClient.get(`/api/student/view-list-student-of-CVHT/${classCode}`)
+  getListByClassCode: async (
+    classCode: string,
+    page?: number,
+    limit?: number,
+    sortField?: string,
+    sortOrder?: string,
+    searchKey?: string
+  ) => {
+    const params = {
+      ...(page && { page }),
+      ...(limit && { limit }),
+      ...(sortField && { sortField }),
+      ...(sortOrder && { sortOrder }),
+      ...(searchKey && { searchKey })
+    }
 
-    return res.data
+    const res = await axiosClient.get(`/api/student/view-list-student-of-CVHT/${classCode}`, { params })
+
+    return res.data as ClassStudentListType
   },
 
   updateStudent: async (

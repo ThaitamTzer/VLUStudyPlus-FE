@@ -170,7 +170,7 @@ export default function ImportStudent({ mutate, classCode }: { mutate: KeyedMuta
             variant='outlined'
             color='primary'
             onClick={() => {
-              window.open('/files/CVHT.xlsx')
+              window.open('/files/DSSV_CVHT.xlsx')
             }}
           >
             Tải file mẫu

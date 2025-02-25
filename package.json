@@ -1,6 +1,7 @@
 {
-  "name": "vuexy-mui-nextjs-admin-template",
-  "version": "3.1.0",
+  "name": "vlustudyplus",
+  "version": "1.0.0",
+  "description": "VLUStudyPlus",
   "license": "Commercial",
   "private": true,
   "scripts": {

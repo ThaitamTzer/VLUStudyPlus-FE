@@ -90,7 +90,13 @@ export default function ClassLecturerPage() {
     <>
       <PageHeader title='Danh sách lớp' />
       <Grid container spacing={5}>
-        {data ? data.map(item => <ClassCard key={item._id} item={item} />) : null}
+        {data ? (
+          data.map(item => <ClassCard key={item._id} item={item} />)
+        ) : (
+          <Typography variant='h3' color='textPrimary'>
+            Hiện tại bạn chưa được phân công lớp nào
+          </Typography>
+        )}
       </Grid>
       <ImportStudent mutate={mutate} classCode={classCode} />
       <PreviewImport />

@@ -28,7 +28,7 @@ const typeProcessService = {
 
   update: async (
     id: string,
-    data: { typeProcessingName: string },
+    data: { typeProcessingId: string; typeProcessingName: string },
     successCallback?: (res: any) => void,
     errorCallback?: (res: any) => void
   ) => {

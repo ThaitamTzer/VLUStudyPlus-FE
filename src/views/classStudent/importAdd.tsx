@@ -195,7 +195,7 @@ export default function ImportStudent({
             variant='outlined'
             color='primary'
             onClick={() => {
-              window.open('/files/CVHT.xlsx')
+              window.open('/files/DSSV_CVHT.xlsx')
             }}
           >
             Tải file mẫu

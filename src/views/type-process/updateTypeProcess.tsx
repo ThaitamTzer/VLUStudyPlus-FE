@@ -21,6 +21,7 @@ type UpdateTypeProcessProps = {
 }
 
 const schema = v.object({
+  typeProcessingId: v.pipe(v.string(), v.nonEmpty('Mã loại xử lý không được để trống')),
   typeProcessingName: v.pipe(
     v.string(),
     v.nonEmpty('Tên loại xử lý không được để trống'),
@@ -95,13 +96,28 @@ export default function UpdateTypeProcess(props: UpdateTypeProcessProps) {
     <Dialog open={openUpdateTypeProcess} onClose={handleClose} fullWidth maxWidth='sm'>
       <form onSubmit={onSubmit} autoComplete='off'>
         <DialogTitle>
-          <Typography variant='h4'>Thêm loại xử lý</Typography>
+          <Typography variant='h4'>Cập nhật loại xử lý</Typography>
           <IconButton sx={{ position: 'absolute', right: 8, top: 8 }} onClick={handleClose}>
             <Iconify icon='mdi:close' />
           </IconButton>
         </DialogTitle>
         <DialogContent>
           <Grid container spacing={4}>
+            <Grid item xs={12}>
+              <Controller
+                name='typeProcessingId'
+                control={control}
+                render={({ field }) => (
+                  <CustomTextField
+                    {...field}
+                    fullWidth
+                    label='Mã loại xử lý'
+                    disabled
+                    {...(errors.typeProcessingId && { error: true, helperText: errors.typeProcessingId.message })}
+                  />
+                )}
+              />
+            </Grid>
             <Grid item xs={12}>
               <Controller
                 name='typeProcessingName'

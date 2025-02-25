@@ -155,7 +155,7 @@ export default function ImportClass({ mutate }: { mutate: KeyedMutator<any> }) {
           variant='outlined'
           color='primary'
           onClick={() => {
-            window.open('/files/DSSV.xlsx')
+            window.open('/files/CVHT_Phan cong 2024_2025.xlsx')
           }}
         >
           Tải file mẫu

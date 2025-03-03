@@ -7,8 +7,8 @@ export type UserType = {
   cohortId: string
   mail: string
   role: {
-    _id: string
     name: string
+    permissionID: number[]
   }
   avatar: string
   isBlock: boolean

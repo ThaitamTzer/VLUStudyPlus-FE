@@ -9,6 +9,13 @@ export const metadata: Metadata = {
 
 const ClassLecturerPage = dynamic(() => import('@/views/classLecturer/classLecturerPage'))
 
-export default function Page() {
+const Page = () => {
   return <ClassLecturerPage />
 }
+
+Page.acl = {
+  action: 'read',
+  subject: 'class'
+}
+
+export default Page

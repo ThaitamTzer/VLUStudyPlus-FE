@@ -87,7 +87,7 @@ export default function AddAcedemicProcess(props: AddAcedemicProcessProps) {
     <Dialog open={openAddAcedemicProcess} onClose={handleClose} fullWidth maxWidth='sm'>
       <form onSubmit={onSubmit} autoComplete='off'>
         <DialogTitle>
-          <Typography variant='h4'>Thêm xử lý học tập</Typography>
+          <Typography variant='h4'>Thêm kỳ xử lý học tập</Typography>
           <IconButton sx={{ position: 'absolute', right: 8, top: 8 }} onClick={handleClose}>
             <Iconify icon='mdi:close' />
           </IconButton>

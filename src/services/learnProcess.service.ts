@@ -1,9 +1,9 @@
 import axiosClient from '@/libs/axios'
 import axiosUpload from '@/libs/axiosUpload'
-import type { LearnProcessType } from '@/types/management/learnProcessType'
+import type { AddProcessType, ImportResult, LearnProcessType } from '@/types/management/learnProcessType'
 
 const learnProcessService = {
-  import: async (data: FormData, sucessCallback?: (res: any) => void, errorCallback?: (res: any) => void) => {
+  import: async (data: FormData, sucessCallback?: (res: ImportResult) => void, errorCallback?: (res: any) => void) => {
     try {
       return await axiosUpload.post('/api/academic-processing/import', data).then(res => {
         if (sucessCallback) {
@@ -71,6 +71,28 @@ const learnProcessService = {
   delete: async (id: string, sucessCallback?: (res: any) => void, errorCallback?: (res: any) => void) => {
     try {
       return await axiosClient.delete(`/api/academic-processing/${id}`).then(res => {
+        if (sucessCallback) {
+          sucessCallback(res.data)
+        }
+
+        return res
+      })
+    } catch (error) {
+      if (errorCallback) {
+        errorCallback(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+
+  addProcess: async (
+    data: any | AddProcessType,
+    sucessCallback?: (res: any) => void,
+    errorCallback?: (res: any) => void
+  ) => {
+    try {
+      return await axiosClient.post('/api/academic-processing/create-academicProcessing', data).then(res => {
         if (sucessCallback) {
           sucessCallback(res.data)
         }

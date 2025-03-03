@@ -46,13 +46,14 @@ export default function UpdateTypeProcess(props: UpdateTypeProcessProps) {
     mode: 'all',
     resolver: valibotResolver(schema),
     defaultValues: {
+      typeProcessingId: typeProcess?.typeProcessingId,
       typeProcessingName: typeProcess?.typeProcessingName
     }
   })
 
   useEffect(() => {
     if (!typeProcess) return
-    reset({ typeProcessingName: typeProcess?.typeProcessingName })
+    reset({ typeProcessingId: typeProcess?.typeProcessingId, typeProcessingName: typeProcess?.typeProcessingName })
   }, [typeProcess, reset])
 
   const handleClose = () => {
@@ -112,7 +113,6 @@ export default function UpdateTypeProcess(props: UpdateTypeProcessProps) {
                     {...field}
                     fullWidth
                     label='Mã loại xử lý'
-                    disabled
                     {...(errors.typeProcessingId && { error: true, helperText: errors.typeProcessingId.message })}
                   />
                 )}

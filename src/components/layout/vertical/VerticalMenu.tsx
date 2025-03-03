@@ -214,10 +214,10 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           </MenuItem>
         </SubMenu>
         <SubMenu label='XỬ LÝ HỌC TẬP' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
-          <MenuItem href='type-process' icon={<Iconify icon='ic:twotone-list' />}>
+          <MenuItem href='/type-process' icon={<Iconify icon='ic:twotone-list' />}>
             Loại xử lý
           </MenuItem>
-          <MenuItem href='learning-processing' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
+          <MenuItem href='/learning-processing' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
             Xử lý học tập
           </MenuItem>
         </SubMenu>

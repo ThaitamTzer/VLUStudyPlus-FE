@@ -1,5 +1,8 @@
 // Type Imports
-import type { ChildrenType, Direction } from '@core/types'
+
+import { Flip } from 'react-toastify'
+
+import type { Direction } from '@core/types'
 
 // Context Imports
 // import { NextAuthProvider } from '@/contexts/nextAuthProvider'
@@ -14,13 +17,16 @@ import AppReactToastify from '@/libs/styles/AppReactToastify'
 // Util Imports
 import { getMode, getSettingsFromCookie, getSystemMode } from '@core/utils/serverHelpers'
 
-type Props = ChildrenType & {
+type Props = {
   direction: Direction
+  children: React.ReactNode
 }
 
 const Providers = (props: Props) => {
   // Props
   const { children, direction } = props
+
+  // const aclAbilities = Component?.acl ?? defaultACLObj
 
   // Vars
   const mode = getMode()
@@ -31,7 +37,7 @@ const Providers = (props: Props) => {
     <VerticalNavProvider>
       <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
         <ThemeProvider direction={direction} systemMode={systemMode}>
-          <AppReactToastify direction={direction} position='top-center' limit={4} hideProgressBar />
+          <AppReactToastify direction={direction} position='top-center' limit={4} transition={Flip} />
           <ReduxProvider>{children}</ReduxProvider>
         </ThemeProvider>
       </SettingsProvider>

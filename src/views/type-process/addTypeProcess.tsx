@@ -80,7 +80,7 @@ export default function AddTypeProcess(props: AddTypeProcessProps) {
       },
       err => {
         toast.update(toastID, {
-          render: err.message,
+          render: err.message[0],
           type: 'error',
           isLoading: false,
           autoClose: 2000

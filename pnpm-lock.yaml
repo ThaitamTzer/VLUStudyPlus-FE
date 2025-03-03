@@ -15,6 +15,12 @@ importers:
       '@auth/prisma-adapter':
         specifier: 2.4.1
         version: 2.4.1(@prisma/client@5.17.0(prisma@5.17.0))
+      '@casl/ability':
+        specifier: ^6.7.3
+        version: 6.7.3
+      '@casl/react':
+        specifier: ^5.0.0
+        version: 5.0.0(@casl/ability@6.7.3)(react@18.3.1)
       '@emoji-mart/data':
         specifier: 1.2.1
         version: 1.2.1
@@ -414,6 +420,15 @@ packages:
   '@babel/types@7.24.9':
     resolution: {integrity: sha512-xm8XrMKz0IlUdocVbYJe0Z9xEgidU7msskG8BbhnTPK/HZ2z/7FP7ykqPgrUH+C+r414mNfNWam1f2vqOjqjYQ==}
     engines: {node: '>=6.9.0'}
+
+  '@casl/ability@6.7.3':
+    resolution: {integrity: sha512-A4L28Ko+phJAsTDhRjzCOZWECQWN2jzZnJPnROWWHjJpyMq1h7h9ZqjwS2WbIUa3Z474X1ZPSgW0f1PboZGC0A==}
+
+  '@casl/react@5.0.0':
+    resolution: {integrity: sha512-jiwr6uOBnQA7h0gs+RJIbFVF24Dw6JLiUPL4pfU0OEjWSJFCcYBz6RPU21XNciWL6xwFDOds81cHosuElxfdmw==}
+    peerDependencies:
+      '@casl/ability': ^4.0.0 || ^5.1.0 || ^6.0.0
+      react: ^17.0.0 || ^18.0.0 || ^19.0.0
 
   '@csstools/css-parser-algorithms@2.7.1':
     resolution: {integrity: sha512-2SJS42gxmACHgikc1WGesXLIT8d/q2l0UFM7TaEeIzdFCE/FPMtTiizcPGGJtlPo2xuQzY09OhrLTzRxqJqwGw==}
@@ -1601,6 +1616,18 @@ packages:
   '@typescript-eslint/visitor-keys@7.2.0':
     resolution: {integrity: sha512-c6EIQRHhcpl6+tO8EMR+kjkkV+ugUNXOmeASA1rlzkd8EPIriavpWoiEz1HR/VLhbVIdhqnV6E7JZm00cBDx2A==}
     engines: {node: ^16.0.0 || >=18.0.0}
+
+  '@ucast/core@1.10.2':
+    resolution: {integrity: sha512-ons5CwXZ/51wrUPfoduC+cO7AS1/wRb0ybpQJ9RrssossDxVy4t49QxWoWgfBDvVKsz9VXzBk9z0wqTdZ+Cq8g==}
+
+  '@ucast/js@3.0.4':
+    resolution: {integrity: sha512-TgG1aIaCMdcaEyckOZKQozn1hazE0w90SVdlpIJ/er8xVumE11gYAtSbw/LBeUnA4fFnFWTcw3t6reqseeH/4Q==}
+
+  '@ucast/mongo2js@1.4.0':
+    resolution: {integrity: sha512-vR9RJ3BHlkI3RfKJIZFdVktxWvBCQRiSTeJSWN9NPxP5YJkpfXvcBWAMLwvyJx4HbB+qib5/AlSDEmQiuQyx2w==}
+
+  '@ucast/mongo@2.4.3':
+    resolution: {integrity: sha512-XcI8LclrHWP83H+7H2anGCEeDq0n+12FU2mXCTz6/Tva9/9ddK/iacvvhCyW6cijAAOILmt0tWplRyRhVyZLsA==}
 
   '@ungap/structured-clone@1.2.0':
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
@@ -4436,6 +4463,15 @@ snapshots:
       '@babel/helper-validator-identifier': 7.24.7
       to-fast-properties: 2.0.0
 
+  '@casl/ability@6.7.3':
+    dependencies:
+      '@ucast/mongo2js': 1.4.0
+
+  '@casl/react@5.0.0(@casl/ability@6.7.3)(react@18.3.1)':
+    dependencies:
+      '@casl/ability': 6.7.3
+      react: 18.3.1
+
   '@csstools/css-parser-algorithms@2.7.1(@csstools/css-tokenizer@2.4.1)':
     dependencies:
       '@csstools/css-tokenizer': 2.4.1
@@ -5605,6 +5641,22 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 7.2.0
       eslint-visitor-keys: 3.4.3
+
+  '@ucast/core@1.10.2': {}
+
+  '@ucast/js@3.0.4':
+    dependencies:
+      '@ucast/core': 1.10.2
+
+  '@ucast/mongo2js@1.4.0':
+    dependencies:
+      '@ucast/core': 1.10.2
+      '@ucast/js': 3.0.4
+      '@ucast/mongo': 2.4.3
+
+  '@ucast/mongo@2.4.3':
+    dependencies:
+      '@ucast/core': 1.10.2
 
   '@ungap/structured-clone@1.2.0': {}
 

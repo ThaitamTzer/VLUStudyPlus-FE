@@ -6,15 +6,7 @@ import StyledTableRow from '@/components/table/StyledTableRow'
 import TableLoading from '@/components/table/TableLoading'
 import TableNoData from '@/components/table/TableNotFound'
 
-export default function TableTypeProcess({
-  table,
-  loading,
-  title
-}: {
-  table: Table<any>
-  loading: boolean
-  title?: string
-}) {
+export default function TanstackTable({ table, title }: { table: Table<any>; title?: string }) {
   return (
     <TableContainer sx={{ position: 'relative', overflowX: 'auto', maxHeight: 'calc(100vh - 300px)' }}>
       <MuiTable stickyHeader sx={{ minWidth: 1000 }}>
@@ -57,13 +49,10 @@ export default function TableTypeProcess({
               </StyledTableRow>
             )
           })}
-          {loading && table.getRowModel().rows.length === 0 ? (
-            <TableLoading colSpan={12} />
+          {table.getRowModel().rows.length === 0 ? (
+            <TableLoading colSpan={20} />
           ) : (
-            <TableNoData
-              notFound={table.getRowModel().rows.length === 0}
-              title={title || 'Không tìm thấy loại xử lý nào'}
-            />
+            <TableNoData notFound={table.getRowModel().rows.length === 0} title={title || 'Không tìm thấy dữ liệu'} />
           )}
         </TableBody>
       </MuiTable>

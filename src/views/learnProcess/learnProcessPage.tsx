@@ -16,7 +16,7 @@ import {
   useReactTable
 } from '@tanstack/react-table'
 
-import { Button, Card, MenuItem, TablePagination } from '@mui/material'
+import { Button, Card, IconButton, MenuItem, TablePagination, Tooltip } from '@mui/material'
 
 import { toast } from 'react-toastify'
 
@@ -34,6 +34,9 @@ import TableTypeProcess from '../type-process/list'
 import AddAcedemicProcess from './addAcedemicProcess'
 import UpdateAcedemicProcess from './updateAcedemicProcess'
 import AlertDelete from '@/components/alertModal'
+import ImportModal from './importModal'
+import ImportResult from './importResult'
+import ManualAddAcedemicProcess from './manualAddAcedemicProcess'
 
 type AcedemicProcessWithAction = LearnProcessType & {
   stt?: number
@@ -51,7 +54,9 @@ export default function LearnProcessPage() {
     toogleUpdateAcedemicProcess,
     toogleDeleteAcedemicProcess,
     acedemicProcess,
-    openDeleteAcedemicProcess
+    openDeleteAcedemicProcess,
+    toogleImportModal,
+    toogleManualAdd
   } = useAcedemicProcessStore()
 
   const [sorting, setSorting] = useState<SortingState>([])
@@ -79,31 +84,53 @@ export default function LearnProcessPage() {
           algin: 'right'
         },
         cell: infor => (
-          <RowAction>
-            <MenuItem
-              onClick={() => {
-                setAcedemicProcess(infor.row.original)
-                toogleUpdateAcedemicProcess()
-              }}
-            >
-              <Iconify icon='solar:pen-2-linear' />
-              Sửa
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                setAcedemicProcess(infor.row.original)
-                toogleDeleteAcedemicProcess()
-              }}
-            >
-              <Iconify icon='solar:trash-bin-2-linear' />
-              Xóa
-            </MenuItem>
-          </RowAction>
+          <>
+            <Tooltip title='Thêm xử lý học tập' arrow>
+              <IconButton
+                onClick={() => {
+                  toogleManualAdd()
+                  setAcedemicProcess(infor.row.original)
+                }}
+              >
+                <Iconify icon='ic:twotone-add' color='green' />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Import danh sách xử lý học tập' arrow>
+              <IconButton
+                onClick={() => {
+                  toogleImportModal()
+                  setAcedemicProcess(infor.row.original)
+                }}
+              >
+                <Iconify icon='bx:import' color='green' />
+              </IconButton>
+            </Tooltip>
+            <RowAction>
+              <MenuItem
+                onClick={() => {
+                  setAcedemicProcess(infor.row.original)
+                  toogleUpdateAcedemicProcess()
+                }}
+              >
+                <Iconify icon='solar:pen-2-linear' />
+                Sửa
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setAcedemicProcess(infor.row.original)
+                  toogleDeleteAcedemicProcess()
+                }}
+              >
+                <Iconify icon='solar:trash-bin-2-linear' />
+                Xóa
+              </MenuItem>
+            </RowAction>
+          </>
         ),
         enableSorting: false
       })
     ],
-    [setAcedemicProcess, toogleUpdateAcedemicProcess, toogleDeleteAcedemicProcess]
+    [setAcedemicProcess, toogleUpdateAcedemicProcess, toogleDeleteAcedemicProcess, toogleImportModal]
   )
 
   const table = useReactTable({
@@ -192,7 +219,7 @@ export default function LearnProcessPage() {
               className='max-sm:is-full'
               onClick={toogleAddAcedemicProcess}
             >
-              Thêm xử lý học tập
+              Thêm kỳ xử lý học tập
             </Button>
           </div>
         </div>
@@ -206,7 +233,10 @@ export default function LearnProcessPage() {
         />
       </Card>
       <AddAcedemicProcess mutate={mutate} />
+      <ManualAddAcedemicProcess mutate={mutate} />
       <UpdateAcedemicProcess mutate={mutate} />
+      <ImportModal mutate={mutate} />
+      <ImportResult />
       <AlertDelete
         open={openDeleteAcedemicProcess}
         onClose={toogleDeleteAcedemicProcess}

@@ -13,6 +13,9 @@ type States = {
   missingInfoRows: MissingInfoRows[]
   duplicateRows: MissingInfoRows[]
   openManualAdd: boolean
+  openViewByCategory: boolean
+  openViewDetail: boolean
+  openManualAddFromViewByCate: boolean
 }
 
 type Actions = {
@@ -26,6 +29,9 @@ type Actions = {
   setMissingInfoRows: (missingInfoRows: MissingInfoRows[]) => void
   setDuplicateRows: (duplicateRows: MissingInfoRows[]) => void
   toogleManualAdd: () => void
+  toogleViewByCategory: () => void
+  toogleViewDetail: () => void
+  toogleManualAddFromViewByCate: () => void
 }
 
 export const useAcedemicProcessStore = create<States & Actions>(set => ({
@@ -39,6 +45,9 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
   missingInfoRows: [],
   duplicateRows: [],
   openManualAdd: false,
+  openViewByCategory: false,
+  openViewDetail: false,
+  openManualAddFromViewByCate: false,
   setInserted: inserted => set({ inserted }),
   setMissingInfoRows: missingInfoRows => set({ missingInfoRows }),
   setDuplicateRows: duplicateRows => set({ duplicateRows }),
@@ -48,5 +57,10 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
   toogleDeleteAcedemicProcess: () => set(state => ({ openDeleteAcedemicProcess: !state.openDeleteAcedemicProcess })),
   toogleImportModal: () => set(state => ({ openImportModal: !state.openImportModal })),
   toogleImportResultModal: () => set(state => ({ openImportResultModal: !state.openImportResultModal })),
-  toogleManualAdd: () => set(state => ({ openManualAdd: !state.openManualAdd }))
+  toogleManualAdd: () => set(state => ({ openManualAdd: !state.openManualAdd })),
+
+  toogleViewByCategory: () => set(state => ({ openViewByCategory: !state.openViewByCategory })),
+  toogleViewDetail: () => set(state => ({ openViewDetail: !state.openViewDetail })),
+  toogleManualAddFromViewByCate: () =>
+    set(state => ({ openManualAddFromViewByCate: !state.openManualAddFromViewByCate }))
 }))

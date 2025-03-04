@@ -112,7 +112,7 @@ export default function ImportModal(props: ImportModalProps) {
       reset={reset}
       errors={errors}
       loading={loading}
-      pathToFile='acedemicProcess'
+      pathToFile='/files/KCT_XLHV_HK222_HK223_GUI SV.xlsx'
     />
   )
 }

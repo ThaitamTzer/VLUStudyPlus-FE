@@ -37,6 +37,7 @@ import AlertDelete from '@/components/alertModal'
 import ImportModal from './importModal'
 import ImportResult from './importResult'
 import ManualAddAcedemicProcess from './manualAddAcedemicProcess'
+import ViewAcedemicProcess from './viewAcedemicProcess'
 
 type AcedemicProcessWithAction = LearnProcessType & {
   stt?: number
@@ -56,7 +57,9 @@ export default function LearnProcessPage() {
     acedemicProcess,
     openDeleteAcedemicProcess,
     toogleImportModal,
-    toogleManualAdd
+    toogleManualAdd,
+    toogleViewByCategory,
+    openManualAdd
   } = useAcedemicProcessStore()
 
   const [sorting, setSorting] = useState<SortingState>([])
@@ -85,6 +88,16 @@ export default function LearnProcessPage() {
         },
         cell: infor => (
           <>
+            <Tooltip title='Xem danh sách xử lý học tập' arrow>
+              <IconButton
+                onClick={() => {
+                  toogleViewByCategory()
+                  setAcedemicProcess(infor.row.original)
+                }}
+              >
+                <Iconify icon='mdi:eye' color='#2092ec' />
+              </IconButton>
+            </Tooltip>
             <Tooltip title='Thêm xử lý học tập' arrow>
               <IconButton
                 onClick={() => {
@@ -130,7 +143,14 @@ export default function LearnProcessPage() {
         enableSorting: false
       })
     ],
-    [setAcedemicProcess, toogleUpdateAcedemicProcess, toogleDeleteAcedemicProcess, toogleImportModal]
+    [
+      setAcedemicProcess,
+      toogleUpdateAcedemicProcess,
+      toogleDeleteAcedemicProcess,
+      toogleImportModal,
+      toogleManualAdd,
+      toogleViewByCategory
+    ]
   )
 
   const table = useReactTable({
@@ -233,10 +253,11 @@ export default function LearnProcessPage() {
         />
       </Card>
       <AddAcedemicProcess mutate={mutate} />
-      <ManualAddAcedemicProcess mutate={mutate} />
+      <ManualAddAcedemicProcess mutate={mutate} open={openManualAdd} onClose={toogleManualAdd} />
       <UpdateAcedemicProcess mutate={mutate} />
       <ImportModal mutate={mutate} />
       <ImportResult />
+      <ViewAcedemicProcess />
       <AlertDelete
         open={openDeleteAcedemicProcess}
         onClose={toogleDeleteAcedemicProcess}

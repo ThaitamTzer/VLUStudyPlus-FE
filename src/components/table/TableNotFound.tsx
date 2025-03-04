@@ -16,7 +16,7 @@ export default function TableNoData({ notFound, sx, title }: Props) {
   return (
     <TableRow>
       {notFound ? (
-        <TableCell colSpan={12}>
+        <TableCell colSpan={20}>
           <EmptyContent
             filled
             title={title || 'Không tìm thấy dữ liệu'}
@@ -27,7 +27,7 @@ export default function TableNoData({ notFound, sx, title }: Props) {
           />
         </TableCell>
       ) : (
-        <TableCell colSpan={12} sx={{ p: 0 }} />
+        <TableCell colSpan={20} sx={{ p: 0 }} />
       )}
     </TableRow>
   )

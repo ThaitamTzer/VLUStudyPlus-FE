@@ -38,13 +38,21 @@ import learnProcessService from '@/services/learnProcess.service'
 
 type FormData = InferInput<typeof addAcedemicProcessSchema>
 
-export default function ManualAddAcedemicProcess({ mutate }: { mutate: KeyedMutator<any> }) {
+export default function ManualAddAcedemicProcess({
+  mutate,
+  open,
+  onClose
+}: {
+  mutate: KeyedMutator<any>
+  open: boolean
+  onClose: () => void
+}) {
   const [loading, setLoading] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [anchorElCourse, setAnchorElCourse] = useState<null | HTMLElement>(null)
 
   const { studentOptions, termOptions, typeProcess } = useShare()
-  const { toogleManualAdd, openManualAdd, acedemicProcess } = useAcedemicProcessStore()
+  const { acedemicProcess } = useAcedemicProcessStore()
 
   const {
     control,
@@ -89,7 +97,7 @@ export default function ManualAddAcedemicProcess({ mutate }: { mutate: KeyedMuta
   } = useFieldArray({ control, name: 'courseRegistration' })
 
   const handleClose = () => {
-    toogleManualAdd()
+    onClose()
     reset({
       student: '',
       processing: [],
@@ -180,13 +188,20 @@ export default function ManualAddAcedemicProcess({ mutate }: { mutate: KeyedMuta
   })
 
   return (
-    <Dialog open={openManualAdd} onClose={handleClose} maxWidth='md' fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth='md' fullWidth>
       <form onSubmit={onSubmit} autoComplete='off'>
         <DialogTitle>
           <IconButton onClick={handleClose} sx={{ position: 'absolute', right: 8, top: 8 }}>
             <Iconify icon='mdi:close' />
           </IconButton>
-          <Typography variant='h4'>Thêm xử lý học tập</Typography>
+          <Typography
+            variant='h4'
+            sx={{
+              textTransform: 'capitalize'
+            }}
+          >
+            Thêm sinh viên vào {acedemicProcess?.title?.toLowerCase()}
+          </Typography>
         </DialogTitle>
         <DialogContent>
           <Grid container spacing={3}>
@@ -488,7 +503,7 @@ export default function ManualAddAcedemicProcess({ mutate }: { mutate: KeyedMuta
                   <CustomTextField
                     {...field}
                     fullWidth
-                    label='Trạng thái xử lý bởi'
+                    label='Diện XLHV (PĐT đề nghị)'
                     {...(errors.handlingStatusByAAO && {
                       error: true,
                       helperText: errors.handlingStatusByAAO.message?.toString()

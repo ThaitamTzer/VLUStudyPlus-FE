@@ -77,7 +77,12 @@ export default function ClassStudentPage() {
                 value={classCode}
                 label='Lọc theo lớp'
                 SelectProps={{
-                  displayEmpty: true
+                  displayEmpty: true,
+                  MenuProps: {
+                    sx: {
+                      maxHeight: 300
+                    }
+                  }
                 }}
                 onChange={e => {
                   const params = new URLSearchParams()

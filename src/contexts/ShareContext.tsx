@@ -14,8 +14,10 @@ import studentService from '@/services/student.service'
 import cohortService from '@/services/cohort.service'
 import classService from '@/services/class.service'
 import termService from '@/services/term.service'
+import classLecturerService from '@/services/classLecturer.service'
 import type { Student } from '@/types/management/studentType'
 import type { TypeProcessType } from '@/types/management/typeProcessType'
+import type { ClassLecturer } from '@/types/management/classLecturerType'
 
 type ShareContextType = {
   cohorOptions: Cohort[]
@@ -23,11 +25,13 @@ type ShareContextType = {
   termOptions: Term[]
   studentOptions: Student[]
   typeProcess: TypeProcessType[]
+  classCVHT: ClassLecturer[]
   setCohortOptions: (options: Cohort[]) => void
   setClassOptions: (options: Class[]) => void
   setTermOptions: (options: Term[]) => void
   setStudentOptions: (options: Student[]) => void
   setProcessType: (options: TypeProcessType[]) => void
+  setClassCVHT: (options: ClassLecturer[]) => void
 
   page: number
   setPage: (page: number) => void
@@ -65,7 +69,9 @@ const defaultProvider: ShareContextType = {
   limitStudent: 20,
   setLimitStudent: () => null,
   typeProcess: [],
-  setProcessType: () => null
+  setProcessType: () => null,
+  classCVHT: [],
+  setClassCVHT: () => null
 }
 
 const ShareContext = createContext(defaultProvider)
@@ -79,6 +85,7 @@ const ShareProvider = ({ children }: Props) => {
 
   const [typeProcess, setProcessType] = useState<TypeProcessType[]>([])
   const [studentOptions, setStudentOptions] = useState<Student[]>([])
+  const [classCVHT, setClassCVHT] = useState<ClassLecturer[]>([])
   const [cohorOptions, setCohortOptions] = useState<Cohort[]>([])
   const [classOptions, setClassOptions] = useState<Class[]>([])
   const [termOptions, setTermOptions] = useState<Term[]>([])
@@ -128,6 +135,13 @@ const ShareProvider = ({ children }: Props) => {
     revalidateOnFocus: false
   })
 
+  useSWR(user ? '/classCVHT' : null, classLecturerService.getList, {
+    onSuccess: data => {
+      setClassCVHT(data)
+    },
+    revalidateOnFocus: false
+  })
+
   const value = {
     cohorOptions,
     classOptions,
@@ -150,7 +164,9 @@ const ShareProvider = ({ children }: Props) => {
     limitStudent,
     setLimitStudent,
     typeProcess,
-    setProcessType
+    setProcessType,
+    classCVHT,
+    setClassCVHT
   }
 
   return <ShareContext.Provider value={value}>{children}</ShareContext.Provider>

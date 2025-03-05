@@ -3,19 +3,7 @@
 import { useState } from 'react'
 
 import { useDropzone } from 'react-dropzone'
-import {
-  Box,
-  Button,
-  List,
-  ListItem,
-  Typography,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  MenuItem,
-  Grid
-} from '@mui/material'
+import { Box, Button, List, ListItem, Typography, IconButton, MenuItem, Grid } from '@mui/material'
 
 import { Controller, useForm } from 'react-hook-form'
 import { valibotResolver } from '@hookform/resolvers/valibot'
@@ -60,8 +48,8 @@ export default function ImportStudent({
     setDuplicateRows,
     setUpdateResult,
     toogleImportResult,
-    openImportAdd,
-    toogletImportAdd
+    setOpenAddModal,
+    toogleProgress
   } = useClassStudentStore()
 
   const handleImportResult = (res: ImportStudentResult) => {
@@ -99,8 +87,8 @@ export default function ImportStudent({
 
   const handleClose = () => {
     setValue('file', [])
+    setOpenAddModal(false)
     setFiles([])
-    toogletImportAdd()
     reset()
   }
 
@@ -132,6 +120,7 @@ export default function ImportStudent({
   }
 
   const handleUpload = handleSubmit(async data => {
+    toogleProgress()
     setLoading(true)
     const formData = new FormData()
 
@@ -154,6 +143,7 @@ export default function ImportStudent({
           transition: Flip,
           closeButton: true
         })
+        toogleProgress()
         toogleImportResult()
         mutate()
         setLoading(false)
@@ -173,112 +163,96 @@ export default function ImportStudent({
   })
 
   return (
-    <Dialog open={openImportAdd} onClose={handleClose} fullWidth maxWidth='sm'>
-      {/* đưa file mẫu cho người dùng */}
-      <DialogTitle>
-        <IconButton
-          sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8
+    <>
+      <div className='flex flex-col items-center gap-2'>
+        <Typography variant='body2'>Tải file mẫu tại đây</Typography>
+        <Button
+          variant='outlined'
+          color='primary'
+          onClick={() => {
+            window.open('/files/DSSV_CVHT.xlsx')
           }}
-          onClick={handleClose}
         >
-          <Iconify icon='mdi:close' />
-        </IconButton>
-        <Typography variant='h4'>Import sinh viên</Typography>
-      </DialogTitle>
-      <DialogContent>
-        <div className='flex flex-col items-center gap-2'>
-          <Typography variant='body2'>Tải file mẫu tại đây</Typography>
-          <Button
-            variant='outlined'
-            color='primary'
-            onClick={() => {
-              window.open('/files/DSSV_CVHT.xlsx')
+          Tải file mẫu
+        </Button>
+        <Typography variant='body2'>Chỉ hỗ trợ tệp Excel (.xls, .xlsx)</Typography>
+      </div>
+      <Grid container spacing={4}>
+        <Grid item xs={12}>
+          <Controller
+            name='classCode'
+            control={control}
+            render={({ field }) => (
+              <CustomTextField
+                select
+                fullWidth
+                {...field}
+                label='Chọn lớp'
+                {...(errors.classCode && { error: true, helperText: errors.classCode.message })}
+                SelectProps={{
+                  displayEmpty: true
+                }}
+              >
+                <MenuItem value=''>Chọn một lớp để thêm</MenuItem>
+                {classCode?.map(option => (
+                  <MenuItem key={option.classId} value={option.classId}>
+                    {option.classId}
+                  </MenuItem>
+                ))}
+              </CustomTextField>
+            )}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <section
+            style={{
+              border: '1px dashed #ccc',
+              borderRadius: '4px',
+              padding: '20px',
+              textAlign: 'center',
+              cursor: 'pointer'
             }}
           >
-            Tải file mẫu
-          </Button>
-          <Typography variant='body2'>Chỉ hỗ trợ tệp Excel (.xls, .xlsx)</Typography>
-        </div>
-        <Grid container spacing={4}>
-          <Grid item xs={12}>
-            <Controller
-              name='classCode'
-              control={control}
-              render={({ field }) => (
-                <CustomTextField
-                  select
-                  fullWidth
-                  {...field}
-                  label='Chọn lớp'
-                  {...(errors.classCode && { error: true, helperText: errors.classCode.message })}
-                  SelectProps={{
-                    displayEmpty: true
-                  }}
-                >
-                  <MenuItem value=''>Chọn một lớp để thêm</MenuItem>
-                  {classCode?.map(option => (
-                    <MenuItem key={option.classId} value={option.classId}>
-                      {option.classId}
-                    </MenuItem>
-                  ))}
-                </CustomTextField>
-              )}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <section
-              style={{
-                border: '1px dashed #ccc',
-                borderRadius: '4px',
-                padding: '20px',
-                textAlign: 'center',
-                cursor: 'pointer'
-              }}
-            >
-              <div {...getRootProps({ className: 'dropzone' })}>
-                <input {...getInputProps()} />
-                <div className='flex items-center flex-col gap-2 text-center'>
-                  <Typography variant='h5'>Kéo và thả files của bạn vào đây.</Typography>
-                  <Typography color='text.disabled'>hoặc</Typography>
-                  <Button variant='tonal' size='small'>
-                    Chọn file
-                  </Button>
-                </div>
+            <div {...getRootProps({ className: 'dropzone' })}>
+              <input {...getInputProps()} />
+              <div className='flex items-center flex-col gap-2 text-center'>
+                <Typography variant='h5'>Kéo và thả files của bạn vào đây.</Typography>
+                <Typography color='text.disabled'>hoặc</Typography>
+                <Button variant='tonal' size='small'>
+                  Chọn file
+                </Button>
               </div>
-            </section>
-          </Grid>
+            </div>
+          </section>
         </Grid>
-        {errors.file?.message && (
-          <Typography color='error' variant='body2'>
-            {errors.file.message}
-          </Typography>
-        )}
-        {files.length > 0 && (
-          <Box mt={2}>
-            <List>
-              {files.map(file => (
-                <ListItem key={file.name} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Box>{renderFilePreview(file)}</Box>
-                  <IconButton onClick={() => handleRemoveFile(file)}>
-                    <Iconify icon='tabler:x' />
-                  </IconButton>
-                </ListItem>
-              ))}
-            </List>
-            <Box mt={2} display='flex' justifyContent='flex-end' gap={2}>
-              <Button variant='outlined' color='primary' onClick={handleClose}>
-                Hủy
-              </Button>
-              <LoadingButton loading={loading} variant='contained' color='primary' onClick={handleUpload}>
-                Thêm
-              </LoadingButton>
-            </Box>
+      </Grid>
+      {errors.file?.message && (
+        <Typography color='error' variant='body2'>
+          {errors.file.message}
+        </Typography>
+      )}
+      {files.length > 0 && (
+        <Box mt={2}>
+          <List>
+            {files.map(file => (
+              <ListItem key={file.name} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Box>{renderFilePreview(file)}</Box>
+                <IconButton onClick={() => handleRemoveFile(file)}>
+                  <Iconify icon='tabler:x' />
+                </IconButton>
+              </ListItem>
+            ))}
+          </List>
+          <Box mt={2} display='flex' justifyContent='flex-end' gap={2}>
+            <Button variant='outlined' color='primary' onClick={handleClose}>
+              Hủy
+            </Button>
+            <LoadingButton loading={loading} variant='contained' color='primary' onClick={handleUpload}>
+              Thêm
+            </LoadingButton>
           </Box>
-        )}
-      </DialogContent>
-    </Dialog>
+        </Box>
+      )}
+    </>
   )
 }

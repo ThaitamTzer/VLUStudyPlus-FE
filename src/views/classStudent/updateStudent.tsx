@@ -46,7 +46,7 @@ const schema = v.object({
 
 type ImportForm = v.InferInput<typeof schema>
 
-export default function ImportAddStudent({ mutate }: { mutate: KeyedMutator<any> }) {
+export default function UpdateAddStudent({ mutate }: { mutate: KeyedMutator<any> }) {
   const { toogleUpdateStudent, openUpdateStudent, student } = useClassStudentStore()
   const [loading, setLoading] = useState<boolean>(false)
 

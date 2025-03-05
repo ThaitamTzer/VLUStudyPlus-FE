@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 import { useDropzone } from 'react-dropzone'
-import { Box, Button, List, ListItem, Typography, IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material'
+import { Box, Button, List, ListItem, Typography, IconButton } from '@mui/material'
 
 import { useForm } from 'react-hook-form'
 import { valibotResolver } from '@hookform/resolvers/valibot'
@@ -15,8 +15,9 @@ import { Flip, toast } from 'react-toastify'
 
 import type { KeyedMutator } from 'swr'
 
+import { useUploadStore, useClassStudentStore } from '@/stores/classStudent/classStudent.store'
+
 import Iconify from '@/components/iconify'
-import { useClassStudentStore } from '@/stores/classStudent/classStudent.store'
 import type { ImportStudentResult } from '@/types/management/classStudentType'
 import classStudentService from '@/services/classStudent.service'
 
@@ -33,17 +34,17 @@ type AutoAddForm = {
 
 export default function ImportStudent({ mutate, classCode }: { mutate: KeyedMutator<any>; classCode: string }) {
   const [files, setFiles] = useState<File[]>([])
-  const [loading, setLoading] = useState<boolean>(false)
 
   const {
-    toogleImportStudent,
+    setOpenAddModal,
     setMissingInfoRows,
     setImportResult,
     setDuplicateRows,
     setUpdateResult,
-    toogleImportResult,
-    openImportStudent
+    toogleImportResult
   } = useClassStudentStore()
+
+  const { progress, loading, startProgress, setProgress, finishProgress, resetProgress } = useUploadStore()
 
   const handleImportResult = (res: ImportStudentResult) => {
     setImportResult(res.data.students)
@@ -78,7 +79,7 @@ export default function ImportStudent({ mutate, classCode }: { mutate: KeyedMuta
   const handleClose = () => {
     setValue('file', [])
     setFiles([])
-    toogleImportStudent()
+    setOpenAddModal(false)
   }
 
   const renderFilePreview = (file: File) => {
@@ -109,7 +110,8 @@ export default function ImportStudent({ mutate, classCode }: { mutate: KeyedMuta
   }
 
   const handleUpload = handleSubmit(async data => {
-    setLoading(true)
+    startProgress() // Bắt đầu tải lên
+
     const formData = new FormData()
 
     formData.append('classCode', classCode)
@@ -119,9 +121,16 @@ export default function ImportStudent({ mutate, classCode }: { mutate: KeyedMuta
 
     handleClose()
 
+    const interval = setInterval(() => {
+      //
+      setProgress(progress >= 90 ? progress : progress + 5)
+    }, 500)
+
     await classStudentService.import(
       formData,
       res => {
+        clearInterval(interval)
+        finishProgress() // Kết thúc tải lên
         handleImportResult(res)
         toast.update(toastId, {
           render: 'Thêm sinh viên thành công!',
@@ -131,10 +140,16 @@ export default function ImportStudent({ mutate, classCode }: { mutate: KeyedMuta
           transition: Flip,
           closeButton: true
         })
+
         toogleImportResult()
         mutate()
+
+        setTimeout(resetProgress, 500)
       },
       err => {
+        clearInterval(interval)
+        finishProgress()
+
         toast.update(toastId, {
           render: err.message,
           type: 'error',
@@ -143,88 +158,74 @@ export default function ImportStudent({ mutate, classCode }: { mutate: KeyedMuta
           transition: Flip,
           closeButton: true
         })
+
+        setTimeout(resetProgress, 500)
       }
     )
   })
 
   return (
-    <Dialog open={openImportStudent} onClose={handleClose} fullWidth maxWidth='sm'>
-      {/* đưa file mẫu cho người dùng */}
-      <DialogTitle>
-        <IconButton
-          sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8
-          }}
-          onClick={handleClose}
-        >
-          <Iconify icon='mdi:close' />
-        </IconButton>
-        <Typography variant='h4'>Import sinh viên vào lớp {classCode}</Typography>
-      </DialogTitle>
-      <DialogContent>
-        <div className='flex flex-col items-center gap-2'>
-          <Typography variant='body2'>Tải file mẫu tại đây</Typography>
-          <Button
-            variant='outlined'
-            color='primary'
-            onClick={() => {
-              window.open('/files/DSSV_CVHT.xlsx')
-            }}
-          >
-            Tải file mẫu
-          </Button>
-          <Typography variant='body2'>Chỉ hỗ trợ tệp Excel (.xls, .xlsx)</Typography>
-        </div>
-        <section
-          style={{
-            border: '1px dashed #ccc',
-            borderRadius: '4px',
-            padding: '20px',
-            textAlign: 'center',
-            cursor: 'pointer'
+    <>
+      <div className='flex flex-col items-center gap-2'>
+        <Typography variant='body2'>Tải file mẫu tại đây</Typography>
+        <Button
+          variant='outlined'
+          color='primary'
+          onClick={() => {
+            window.open('/files/DSSV_CVHT.xlsx')
           }}
         >
-          <div {...getRootProps({ className: 'dropzone' })}>
-            <input {...getInputProps()} />
-            <div className='flex items-center flex-col gap-2 text-center'>
-              <Typography variant='h5'>Kéo và thả files của bạn vào đây.</Typography>
-              <Typography color='text.disabled'>hoặc</Typography>
-              <Button variant='tonal' size='small'>
-                Chọn file
-              </Button>
-            </div>
+          Tải file mẫu
+        </Button>
+        <Typography variant='body2'>Chỉ hỗ trợ tệp Excel (.xls, .xlsx)</Typography>
+      </div>
+      <section
+        style={{
+          border: '1px dashed #ccc',
+          borderRadius: '4px',
+          padding: '20px',
+          textAlign: 'center',
+          cursor: 'pointer'
+        }}
+      >
+        <div {...getRootProps({ className: 'dropzone' })}>
+          <input {...getInputProps()} />
+          <div className='flex items-center flex-col gap-2 text-center'>
+            <Typography variant='h5'>Kéo và thả files của bạn vào đây.</Typography>
+            <Typography color='text.disabled'>hoặc</Typography>
+            <Button variant='tonal' size='small'>
+              Chọn file
+            </Button>
           </div>
-        </section>
-        {errors.file?.message && (
-          <Typography color='error' variant='body2'>
-            {errors.file.message}
-          </Typography>
-        )}
-        {files.length > 0 && (
-          <Box mt={2}>
-            <List>
-              {files.map(file => (
-                <ListItem key={file.name} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Box>{renderFilePreview(file)}</Box>
-                  <IconButton onClick={() => handleRemoveFile(file)}>
-                    <Iconify icon='tabler:x' />
-                  </IconButton>
-                </ListItem>
-              ))}
-            </List>
-            <Box mt={2} display='flex' justifyContent='flex-end' gap={2}>
-              <Button variant='outlined' color='primary' onClick={handleClose}>
-                Hủy
-              </Button>
-              <LoadingButton loading={loading} variant='contained' color='primary' onClick={handleUpload}>
-                Thêm
-              </LoadingButton>
-            </Box>
+        </div>
+      </section>
+      {errors.file?.message && (
+        <Typography color='error' variant='body2'>
+          {errors.file.message}
+        </Typography>
+      )}
+      {files.length > 0 && (
+        <Box mt={2}>
+          <List>
+            {files.map(file => (
+              <ListItem key={file.name} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Box>{renderFilePreview(file)}</Box>
+                <IconButton onClick={() => handleRemoveFile(file)}>
+                  <Iconify icon='tabler:x' />
+                </IconButton>
+              </ListItem>
+            ))}
+          </List>
+          <Box mt={2} display='flex' justifyContent='flex-end' gap={2}>
+            <Button variant='outlined' color='primary' onClick={handleClose}>
+              Hủy
+            </Button>
+            <LoadingButton loading={loading} variant='contained' color='primary' onClick={handleUpload}>
+              Thêm
+            </LoadingButton>
           </Box>
-        )}
-      </DialogContent>
-    </Dialog>
+        </Box>
+      )}
+    </>
   )
 }

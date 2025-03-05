@@ -25,6 +25,29 @@ const classStudentService = {
     }
   },
 
+  add: async (
+    classCode: string,
+    data: any,
+    successCallback?: (res: any) => void,
+    errorCallback?: (res: any) => void
+  ) => {
+    try {
+      return await axiosClient.post(`/api/student/add-student-for-CVHT/?classCode=${classCode}`, data).then(res => {
+        if (successCallback) {
+          successCallback(res)
+        }
+
+        return res
+      })
+    } catch (error) {
+      if (errorCallback) {
+        errorCallback(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+
   getListByClassCode: async (
     classCode: string,
     page?: number,

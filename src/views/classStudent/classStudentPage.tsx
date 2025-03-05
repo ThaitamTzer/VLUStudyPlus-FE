@@ -6,6 +6,8 @@ import { Button, Card, CardContent, Grid, MenuItem, TablePagination } from '@mui
 
 import useSWR from 'swr'
 
+import { TabPanel } from '@mui/lab'
+
 import classStudentService from '@/services/classStudent.service'
 
 import PageHeader from '@/components/page-header'
@@ -16,11 +18,15 @@ import classLecturerService from '@/services/classLecturer.service'
 import DebouncedInput from '@/components/debouncedInput'
 import ImportStudent from './importAdd'
 import { useClassStudentStore } from '@/stores/classStudent/classStudent.store'
-import ImportAddStudent from './updateStudent'
 import PreviewImport from './importResult'
+import AddModal from './addModal'
+import ManualAddStudent from './manualAddStudent'
+import UpdateAddStudent from './updateStudent'
+import ProgressModal from '../learnProcess/progressModal'
 
 export default function ClassStudentPage() {
-  const { toogletImportAdd } = useClassStudentStore()
+  const { setOpenAddModal, openProgress } = useClassStudentStore()
+
   const router = useRouter()
 
   const searchParams = useSearchParams()
@@ -155,7 +161,7 @@ export default function ClassStudentPage() {
               className='max-sm:is-full sm:is-[300px]'
             />
             <Button
-              onClick={toogletImportAdd}
+              onClick={() => setOpenAddModal(true)}
               variant='contained'
               startIcon={<i className='tabler-plus' />}
               className='max-sm:is-full'
@@ -210,8 +216,16 @@ export default function ClassStudentPage() {
           }}
         />
       </Card>
-      <ImportStudent mutate={mutate} classCode={classOption || []} />
-      <ImportAddStudent mutate={mutate} />
+      <ProgressModal open={openProgress} />
+      <AddModal>
+        <TabPanel value='1'>
+          <ManualAddStudent mutate={mutate} />
+        </TabPanel>
+        <TabPanel value='2'>
+          <ImportStudent mutate={mutate} classCode={classOption || []} />
+        </TabPanel>
+      </AddModal>
+      <UpdateAddStudent mutate={mutate} />
       <PreviewImport />
     </>
   )

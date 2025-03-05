@@ -5,16 +5,22 @@ import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 import useSWR from 'swr'
 
+import { TabPanel } from '@mui/lab'
+
 import PageHeader from '@/components/page-header'
 import classLecturerService from '@/services/classLecturer.service'
 import Iconify from '@/components/iconify'
 import type { ClassLecturer } from '@/types/management/classLecturerType'
 import ImportStudent from '../classStudent/importAddStudent'
-import { useClassStudentStore } from '@/stores/classStudent/classStudent.store'
+import { useClassStudentStore, useUploadStore } from '@/stores/classStudent/classStudent.store'
 import PreviewImport from '../classStudent/importResult'
+import AddModal from '../classStudent/addModal'
+import ManualAddStudent from '../classStudent/manualAddStudent'
+import ProgressModal from '../learnProcess/progressModal'
 
 const ClassCard = ({ item }: { item: ClassLecturer }) => {
   const router = useRouter()
+  const { setOpenAddModal, setClassCode } = useClassStudentStore()
 
   return (
     <Grid item xs={12} sm={6} md={4} key={item._id}>
@@ -41,19 +47,17 @@ const ClassCard = ({ item }: { item: ClassLecturer }) => {
                     <Iconify icon='solar:eye-outline' className='text-black' />
                   </IconButton>
                 </Tooltip>
-                {!item.statusImport && (
-                  <Tooltip title='Import sinh viên'>
-                    <IconButton
-                      size='small'
-                      onClick={() => {
-                        useClassStudentStore.getState().toogleImportStudent()
-                        useClassStudentStore.getState().setClassCode(item.classId)
-                      }}
-                    >
-                      <Iconify icon='mynaui:plus-solid' className='text-black' />
-                    </IconButton>
-                  </Tooltip>
-                )}
+                <Tooltip title='Thêm sinh viên'>
+                  <IconButton
+                    size='small'
+                    onClick={() => {
+                      setOpenAddModal(true)
+                      setClassCode(item.classId)
+                    }}
+                  >
+                    <Iconify icon='mynaui:plus-solid' className='text-black' />
+                  </IconButton>
+                </Tooltip>
               </Stack>
             </>
           }
@@ -85,6 +89,7 @@ const ClassCard = ({ item }: { item: ClassLecturer }) => {
 export default function ClassLecturerPage() {
   const { data, mutate } = useSWR('/api/class/view-list-class-of-CVHT', classLecturerService.getList)
   const { classCode } = useClassStudentStore()
+  const { loading } = useUploadStore()
 
   return (
     <>
@@ -103,8 +108,16 @@ export default function ClassLecturerPage() {
           </Grid>
         )}
       </Grid>
-      <ImportStudent mutate={mutate} classCode={classCode} />
+      <AddModal>
+        <TabPanel value={'1'}>
+          <ManualAddStudent mutate={mutate} />
+        </TabPanel>
+        <TabPanel value={'2'}>
+          <ImportStudent mutate={mutate} classCode={classCode} />
+        </TabPanel>
+      </AddModal>
       <PreviewImport />
+      <ProgressModal open={loading} />
     </>
   )
 }

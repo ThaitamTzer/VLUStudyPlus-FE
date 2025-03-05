@@ -1,6 +1,8 @@
 'use client'
 import { useMemo, useState } from 'react'
 
+import dynamic from 'next/dynamic'
+
 import useSWR from 'swr'
 
 import type { ColumnDef, SortingState, Table } from '@tanstack/react-table'
@@ -30,14 +32,16 @@ import PageHeader from '@/components/page-header'
 import CustomTextField from '@/@core/components/mui/TextField'
 import DebouncedInput from '@/components/debouncedInput'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
-import TableTypeProcess from '../type-process/list'
-import AddAcedemicProcess from './addAcedemicProcess'
-import UpdateAcedemicProcess from './updateAcedemicProcess'
-import AlertDelete from '@/components/alertModal'
-import ImportModal from './importModal'
-import ImportResult from './importResult'
-import ManualAddAcedemicProcess from './manualAddAcedemicProcess'
-import ViewAcedemicProcess from './viewAcedemicProcess'
+import ProgressModal from './progressModal'
+
+const TableTypeProcess = dynamic(() => import('../type-process/list'), { ssr: false })
+const AddAcedemicProcess = dynamic(() => import('./addAcedemicProcess'), { ssr: false })
+const UpdateAcedemicProcess = dynamic(() => import('./updateAcedemicProcess'), { ssr: false })
+const AlertDelete = dynamic(() => import('@/components/alertModal'), { ssr: false })
+const ImportModal = dynamic(() => import('./importModal'), { ssr: false })
+const ImportResult = dynamic(() => import('./importResult'), { ssr: false })
+const ManualAddAcedemicProcess = dynamic(() => import('./manualAddAcedemicProcess'), { ssr: false })
+const ViewAcedemicProcess = dynamic(() => import('./viewAcedemicProcess/viewAcedemicProcess'), { ssr: false })
 
 type AcedemicProcessWithAction = LearnProcessType & {
   stt?: number
@@ -59,7 +63,8 @@ export default function LearnProcessPage() {
     toogleImportModal,
     toogleManualAdd,
     toogleViewByCategory,
-    openManualAdd
+    openManualAdd,
+    openProgress
   } = useAcedemicProcessStore()
 
   const [sorting, setSorting] = useState<SortingState>([])
@@ -258,6 +263,7 @@ export default function LearnProcessPage() {
       <ImportModal mutate={mutate} />
       <ImportResult />
       <ViewAcedemicProcess />
+      <ProgressModal open={openProgress} />
       <AlertDelete
         open={openDeleteAcedemicProcess}
         onClose={toogleDeleteAcedemicProcess}

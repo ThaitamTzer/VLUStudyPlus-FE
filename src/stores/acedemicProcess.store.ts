@@ -16,6 +16,7 @@ type States = {
   openViewByCategory: boolean
   openViewDetail: boolean
   openManualAddFromViewByCate: boolean
+  openProgress: boolean
 }
 
 type Actions = {
@@ -32,6 +33,7 @@ type Actions = {
   toogleViewByCategory: () => void
   toogleViewDetail: () => void
   toogleManualAddFromViewByCate: () => void
+  toogleProgress: () => void
 }
 
 export const useAcedemicProcessStore = create<States & Actions>(set => ({
@@ -48,6 +50,7 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
   openViewByCategory: false,
   openViewDetail: false,
   openManualAddFromViewByCate: false,
+  openProgress: false,
   setInserted: inserted => set({ inserted }),
   setMissingInfoRows: missingInfoRows => set({ missingInfoRows }),
   setDuplicateRows: duplicateRows => set({ duplicateRows }),
@@ -62,5 +65,6 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
   toogleViewByCategory: () => set(state => ({ openViewByCategory: !state.openViewByCategory })),
   toogleViewDetail: () => set(state => ({ openViewDetail: !state.openViewDetail })),
   toogleManualAddFromViewByCate: () =>
-    set(state => ({ openManualAddFromViewByCate: !state.openManualAddFromViewByCate }))
+    set(state => ({ openManualAddFromViewByCate: !state.openManualAddFromViewByCate })),
+  toogleProgress: () => set(state => ({ openProgress: !state.openProgress }))
 }))

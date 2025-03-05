@@ -1,0 +1,188 @@
+'use client'
+import { useState } from 'react'
+
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+  Typography,
+  Card,
+  MenuItem,
+  TablePagination,
+  Button
+} from '@mui/material'
+import useSWR from 'swr'
+
+import { useAcedemicProcessStore } from '@/stores/acedemicProcess.store'
+import learnProcessService from '@/services/learnProcess.service'
+import Iconify from '@/components/iconify'
+import CustomTextField from '@/@core/components/mui/TextField'
+import DebouncedInput from '@/components/debouncedInput'
+import TablePaginationCustomNoURL from '@/components/table/TablePaginationNoURL'
+import { useShare } from '@/hooks/useShare'
+import ManualAddAcedemicProcess from '../manualAddAcedemicProcess'
+import TableAcedemicProcess from './tableAcedemicProcess'
+import TableFilter from './tableFilter'
+
+export default function ViewAcedemicProcess() {
+  const {
+    openViewByCategory,
+    toogleViewByCategory,
+    acedemicProcess,
+    setAcedemicProcess,
+    toogleManualAddFromViewByCate,
+    openManualAddFromViewByCate
+  } = useAcedemicProcessStore()
+
+  const { cohorOptions } = useShare()
+
+  const id = acedemicProcess?._id
+
+  const [page, setPage] = useState(1)
+  const [limit, setLimit] = useState(10)
+  const [filterField, setFilterField] = useState('')
+  const [filterValue, setFilterValue] = useState('')
+  const [sortField, setSortField] = useState('')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [searchKey, setSearchKey] = useState('')
+
+  const fetcher = [`/api/acedemicProcess/${id}`, page, limit, filterField, filterValue, sortField, sortOrder, searchKey]
+
+  const { data, isLoading, mutate } = useSWR(id ? fetcher : null, () =>
+    learnProcessService.viewProcessByCategory(
+      id as string,
+      page,
+      limit,
+      filterField,
+      filterValue,
+      sortField,
+      sortOrder,
+      searchKey
+    )
+  )
+
+  const handleSort = (field: string) => {
+    const isAsc = sortField === field && sortOrder === 'asc'
+    const newSortOrder = isAsc ? 'desc' : 'asc'
+
+    setSortField(field)
+    setSortOrder(newSortOrder)
+    setPage(1)
+  }
+
+  const handleClose = () => {
+    toogleViewByCategory()
+    setPage(1)
+    setLimit(10)
+    setFilterField('')
+    setFilterValue('')
+    setSortField('')
+    setSortOrder('asc')
+    setSearchKey('')
+    setAcedemicProcess({} as any)
+  }
+
+  return (
+    <>
+      <Dialog open={openViewByCategory} maxWidth='xl' onClose={handleClose} fullScreen>
+        <DialogTitle>
+          <IconButton
+            onClick={handleClose}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8
+            }}
+          >
+            <Iconify icon='mdi:close' color='black' />
+          </IconButton>
+          <Typography
+            variant='h4'
+            sx={{
+              textTransform: 'uppercase'
+            }}
+          >
+            Danh sách {acedemicProcess?.title}
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Card>
+            <TableFilter
+              cohorOptions={cohorOptions}
+              setPage={setPage}
+              setFilterField={setFilterField}
+              setFilterValue={setFilterValue}
+            />
+            <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
+              <CustomTextField
+                select
+                className='max-sm:is-full sm:is-[80px]'
+                value={limit}
+                onChange={e => {
+                  setLimit(Number(e.target.value))
+                  setPage(1)
+                }}
+              >
+                <MenuItem value='10'>10</MenuItem>
+                <MenuItem value='25'>25</MenuItem>
+                <MenuItem value='50'>50</MenuItem>
+              </CustomTextField>
+              <div className='flex flex-col sm:flex-row max-sm:is-full items-start sm:items-center gap-4'>
+                <DebouncedInput
+                  value={searchKey}
+                  onChange={value => {
+                    setSearchKey(value as string)
+                    setPage(1)
+                  }}
+                  placeholder='Tìm kiếm'
+                  className='max-sm:is-full sm:is-[300px]'
+                />
+                <Button
+                  onClick={toogleManualAddFromViewByCate}
+                  variant='contained'
+                  startIcon={<i className='tabler-plus' />}
+                  className='max-sm:is-full'
+                >
+                  Thêm sinh viên bị xử lý học vụ
+                </Button>
+              </div>
+            </div>
+            <TableAcedemicProcess
+              data={data}
+              isLoading={isLoading}
+              page={page}
+              limit={limit}
+              sortField={sortField}
+              sortOrder={sortOrder}
+              handleSort={handleSort}
+            />
+            <TablePagination
+              component={() => (
+                <TablePaginationCustomNoURL
+                  data={data?.data || []}
+                  page={page}
+                  limit={limit}
+                  total={data?.pagination.totalItems || 0}
+                  setPage={setPage}
+                />
+              )}
+              count={data?.pagination.totalItems || 0}
+              page={page - 1}
+              rowsPerPage={limit}
+              rowsPerPageOptions={[10, 25, 50]}
+              onPageChange={(_, newPage) => {
+                setPage(newPage + 1)
+              }}
+            />
+          </Card>
+        </DialogContent>
+      </Dialog>
+      <ManualAddAcedemicProcess
+        mutate={mutate}
+        onClose={toogleManualAddFromViewByCate}
+        open={openManualAddFromViewByCate}
+      />
+    </>
+  )
+}

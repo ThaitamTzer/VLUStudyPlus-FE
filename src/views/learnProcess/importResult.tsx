@@ -57,7 +57,7 @@ export default function ImportResult() {
                   Dữ liệu thiếu thông tin <Badge>{missingInfoRows.length}</Badge>
                 </>
               }
-              sx={{ color: 'red', '&.Mui-selected': { color: 'red' } }}
+              sx={{ color: 'orange', '&.Mui-selected': { color: 'orange' } }}
             />
             <Tab
               value='3'

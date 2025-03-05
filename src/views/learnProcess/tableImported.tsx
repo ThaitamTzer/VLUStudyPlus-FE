@@ -1,25 +1,27 @@
 'use client'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
-import type { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef, Table } from '@tanstack/react-table'
 import {
   createColumnHelper,
   getCoreRowModel,
   getFacetedMinMaxValues,
   getFilteredRowModel,
-  getPaginationRowModel,
   useReactTable,
   getFacetedRowModel,
   getFacetedUniqueValues,
-  getSortedRowModel
+  getSortedRowModel,
+  getPaginationRowModel
 } from '@tanstack/react-table'
 
-import { Card } from '@mui/material'
+import { Card, CardContent, Grid, TablePagination } from '@mui/material'
 
 import { fuzzyFilter } from '../apps/invoice/list/InvoiceListTable'
 
 import TanstackTable from '@/components/TanstackTable'
 import type { Inserted } from '@/types/management/learnProcessType'
+import DebouncedInput from '@/components/debouncedInput'
+import TablePaginationComponent from '@/components/TablePaginationComponent'
 
 type ImportedTypeWithStt = Inserted & {
   stt?: number
@@ -33,6 +35,7 @@ type TableImportedProps = {
 
 export default function TableImported(prop: TableImportedProps) {
   const { data } = prop
+  const [globalFilter, setGlobalFilter] = useState('')
 
   const columns = useMemo<ColumnDef<ImportedTypeWithStt, any>[]>(
     () => [
@@ -110,6 +113,12 @@ export default function TableImported(prop: TableImportedProps) {
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    state: { globalFilter },
+    initialState: {
+      pagination: {
+        pageSize: 10
+      }
+    },
     filterFns: {
       fuzzy: fuzzyFilter
     },
@@ -117,12 +126,35 @@ export default function TableImported(prop: TableImportedProps) {
     getFilteredRowModel: getFilteredRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues()
+    getFacetedMinMaxValues: getFacetedMinMaxValues(),
+    onGlobalFilterChange: setGlobalFilter
   })
 
   return (
-    <Card sx={{ position: 'relative', overflowX: 'auto', maxHeight: 'calc(100vh - 300px)' }}>
-      <TanstackTable table={table} title='Danh sách xử lý học tập đã thêm' />
-    </Card>
+    <>
+      <Card>
+        <CardContent>
+          <Grid container>
+            <Grid item xs={12} sm={4}>
+              <DebouncedInput
+                value={globalFilter ?? ''}
+                onChange={value => setGlobalFilter(String(value))}
+                placeholder='Tìm kiếm'
+                className='max-sm:is-full'
+                fullWidth
+              />
+            </Grid>
+          </Grid>
+        </CardContent>
+        <TanstackTable table={table} title='Danh sách xử lý học tập đã thêm' />
+        <TablePagination
+          component={() => <TablePaginationComponent table={table as Table<unknown>} />}
+          count={table.getFilteredRowModel().rows.length}
+          rowsPerPage={table.getState().pagination.pageSize}
+          page={table.getState().pagination.pageIndex + 1}
+          onPageChange={(_, page) => table.setPageIndex(page - 1)}
+        />
+      </Card>
+    </>
   )
 }

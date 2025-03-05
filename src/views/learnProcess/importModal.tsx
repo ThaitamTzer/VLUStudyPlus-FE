@@ -40,7 +40,8 @@ export default function ImportModal(props: ImportModalProps) {
     toogleImportResultModal,
     setInserted,
     setDuplicateRows,
-    setMissingInfoRows
+    setMissingInfoRows,
+    toogleProgress
   } = useAcedemicProcessStore()
 
   const {
@@ -64,6 +65,12 @@ export default function ImportModal(props: ImportModalProps) {
     }
   }
 
+  const onClose = () => {
+    reset()
+    toogleImportModal()
+    setValue('file', [])
+  }
+
   const onSubmit = handleSubmit(async data => {
     if (!acedemicProcess) return
     const formData = new FormData()
@@ -72,6 +79,8 @@ export default function ImportModal(props: ImportModalProps) {
     formData.append('academicCategoryId', acedemicProcess._id)
     const toastID = toast.loading('Hệ thống đang xử lý...')
 
+    onClose()
+    toogleProgress()
     setLoading(true)
 
     await learnProcessService.import(
@@ -87,6 +96,7 @@ export default function ImportModal(props: ImportModalProps) {
           closeButton: true
         })
         mutate()
+        toogleProgress()
         toogleImportResultModal()
       },
       err => {

@@ -1,13 +1,12 @@
 'use client'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
 import useSWR from 'swr'
 
-import type { ColumnDef, SortingState, Table } from '@tanstack/react-table'
+import type { SortingState, Table } from '@tanstack/react-table'
 import {
-  createColumnHelper,
   getCoreRowModel,
   getFacetedMinMaxValues,
   getFacetedRowModel,
@@ -18,14 +17,11 @@ import {
   useReactTable
 } from '@tanstack/react-table'
 
-import { Button, Card, IconButton, MenuItem, TablePagination, Tooltip } from '@mui/material'
+import { Button, Card, MenuItem, TablePagination } from '@mui/material'
 
 import { toast } from 'react-toastify'
 
 import learnProcessService from '@/services/learnProcess.service'
-import type { LearnProcessType } from '@/types/management/learnProcessType'
-import RowAction from '@/components/rowAction'
-import Iconify from '@/components/iconify'
 import { useAcedemicProcessStore } from '@/stores/acedemicProcess.store'
 import { fuzzyFilter } from '../apps/invoice/list/InvoiceListTable'
 import PageHeader from '@/components/page-header'
@@ -33,6 +29,7 @@ import CustomTextField from '@/@core/components/mui/TextField'
 import DebouncedInput from '@/components/debouncedInput'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
 import ProgressModal from './progressModal'
+import { useColumns } from './viewAcedemicProcess/columns'
 
 const TableTypeProcess = dynamic(() => import('../type-process/list'), { ssr: false })
 const AddAcedemicProcess = dynamic(() => import('./addAcedemicProcess'), { ssr: false })
@@ -43,120 +40,32 @@ const ImportResult = dynamic(() => import('./importResult'), { ssr: false })
 const ManualAddAcedemicProcess = dynamic(() => import('./manualAddAcedemicProcess'), { ssr: false })
 const ViewAcedemicProcess = dynamic(() => import('./viewAcedemicProcess/viewAcedemicProcess'), { ssr: false })
 
-type AcedemicProcessWithAction = LearnProcessType & {
-  stt?: number
-  action?: string
-}
-
-const columnHelper = createColumnHelper<AcedemicProcessWithAction>()
-
 export default function LearnProcessPage() {
-  const { data, mutate, isLoading } = useSWR('/api/learnProcess', learnProcessService.getAll)
+  const columns = useColumns()
 
   const {
     toogleAddAcedemicProcess,
-    setAcedemicProcess,
-    toogleUpdateAcedemicProcess,
     toogleDeleteAcedemicProcess,
     acedemicProcess,
     openDeleteAcedemicProcess,
-    toogleImportModal,
     toogleManualAdd,
-    toogleViewByCategory,
     openManualAdd,
-    openProgress
+    openProgress,
+    setListAcedemicProcess
   } = useAcedemicProcessStore()
+
+  const { data, mutate, isLoading } = useSWR('/api/learnProcess', learnProcessService.getAll, {
+    onSuccess: data => {
+      if (data) {
+        setListAcedemicProcess(data)
+      }
+    },
+    revalidateOnFocus: false
+  })
 
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [loading, setLoading] = useState<boolean>(false)
-
-  const columns = useMemo<ColumnDef<AcedemicProcessWithAction, any>[]>(
-    () => [
-      columnHelper.accessor('stt', {
-        header: 'STT',
-        cell: infor => infor.row.index + 1,
-        meta: {
-          width: 1
-        },
-        enableSorting: false
-      }),
-      columnHelper.accessor('title', {
-        header: 'Tiêu đề',
-        cell: infor => infor.getValue(),
-        sortingFn: 'alphanumeric'
-      }),
-      columnHelper.accessor('action', {
-        header: '',
-        meta: {
-          algin: 'right'
-        },
-        cell: infor => (
-          <>
-            <Tooltip title='Xem danh sách xử lý học tập' arrow>
-              <IconButton
-                onClick={() => {
-                  toogleViewByCategory()
-                  setAcedemicProcess(infor.row.original)
-                }}
-              >
-                <Iconify icon='mdi:eye' color='#2092ec' />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title='Thêm xử lý học tập' arrow>
-              <IconButton
-                onClick={() => {
-                  toogleManualAdd()
-                  setAcedemicProcess(infor.row.original)
-                }}
-              >
-                <Iconify icon='ic:twotone-add' color='green' />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title='Import danh sách xử lý học tập' arrow>
-              <IconButton
-                onClick={() => {
-                  toogleImportModal()
-                  setAcedemicProcess(infor.row.original)
-                }}
-              >
-                <Iconify icon='bx:import' color='green' />
-              </IconButton>
-            </Tooltip>
-            <RowAction>
-              <MenuItem
-                onClick={() => {
-                  setAcedemicProcess(infor.row.original)
-                  toogleUpdateAcedemicProcess()
-                }}
-              >
-                <Iconify icon='solar:pen-2-linear' />
-                Sửa
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setAcedemicProcess(infor.row.original)
-                  toogleDeleteAcedemicProcess()
-                }}
-              >
-                <Iconify icon='solar:trash-bin-2-linear' />
-                Xóa
-              </MenuItem>
-            </RowAction>
-          </>
-        ),
-        enableSorting: false
-      })
-    ],
-    [
-      setAcedemicProcess,
-      toogleUpdateAcedemicProcess,
-      toogleDeleteAcedemicProcess,
-      toogleImportModal,
-      toogleManualAdd,
-      toogleViewByCategory
-    ]
-  )
 
   const table = useReactTable({
     data: data || [],

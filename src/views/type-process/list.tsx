@@ -28,7 +28,6 @@ export default function TableTypeProcess({
                       active={!!header.column.getIsSorted()}
                       direction={header.column.getIsSorted() === 'desc' ? 'desc' : 'asc'}
                       onClick={() => header.column.toggleSorting()}
-                      sx={{}}
                     >
                       {flexRender(header.column.columnDef.header, header.getContext())}
                     </TableSortLabel>

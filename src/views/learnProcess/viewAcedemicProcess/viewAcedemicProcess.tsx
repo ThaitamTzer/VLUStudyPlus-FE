@@ -14,6 +14,8 @@ import {
 } from '@mui/material'
 import useSWR from 'swr'
 
+import { toast } from 'react-toastify'
+
 import { useAcedemicProcessStore } from '@/stores/acedemicProcess.store'
 import learnProcessService from '@/services/learnProcess.service'
 import Iconify from '@/components/iconify'
@@ -24,6 +26,8 @@ import { useShare } from '@/hooks/useShare'
 import ManualAddAcedemicProcess from '../manualAddAcedemicProcess'
 import TableAcedemicProcess from './tableAcedemicProcess'
 import TableFilter from './tableFilter'
+import ManualEditAcedemicProcess from './editAcedemicProcess'
+import AlertDelete from '@/components/alertModal'
 
 export default function ViewAcedemicProcess() {
   const {
@@ -32,7 +36,13 @@ export default function ViewAcedemicProcess() {
     acedemicProcess,
     setAcedemicProcess,
     toogleManualAddFromViewByCate,
-    openManualAddFromViewByCate
+    openManualAddFromViewByCate,
+    toogleEditViewAcedemicProcess,
+    openEditViewAcedemicProcess,
+    setProcessing,
+    toogleDeleteViewAcedemicProcess,
+    openDeleteViewAcedemicProcess,
+    processing
   } = useAcedemicProcessStore()
 
   const { cohorOptions } = useShare()
@@ -46,6 +56,7 @@ export default function ViewAcedemicProcess() {
   const [sortField, setSortField] = useState('')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
   const [searchKey, setSearchKey] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const fetcher = [`/api/acedemicProcess/${id}`, page, limit, filterField, filterValue, sortField, sortOrder, searchKey]
 
@@ -69,6 +80,36 @@ export default function ViewAcedemicProcess() {
     setSortField(field)
     setSortOrder(newSortOrder)
     setPage(1)
+  }
+
+  const onDelete = async () => {
+    if (!processing) return toast.error('Không có dữ liệu để xóa')
+    const toastId = toast.loading('Đang xóa dữ liệu')
+
+    setLoading(true)
+    await learnProcessService.deleteProcess(
+      processing._id,
+      () => {
+        setLoading(false)
+        mutate()
+        toogleDeleteViewAcedemicProcess()
+        toast.update(toastId, {
+          render: 'Xóa dữ liệu thành công',
+          type: 'success',
+          isLoading: false,
+          autoClose: 3000
+        })
+      },
+      err => {
+        setLoading(false)
+        toast.update(toastId, {
+          render: err.message,
+          type: 'error',
+          isLoading: false,
+          autoClose: 3000
+        })
+      }
+    )
   }
 
   const handleClose = () => {
@@ -156,6 +197,9 @@ export default function ViewAcedemicProcess() {
               sortField={sortField}
               sortOrder={sortOrder}
               handleSort={handleSort}
+              setProcessing={setProcessing}
+              toogleEditViewAcedemicProcess={toogleEditViewAcedemicProcess}
+              toogleDeleteViewAcedemicProcess={toogleDeleteViewAcedemicProcess}
             />
             <TablePagination
               component={() => (
@@ -178,10 +222,24 @@ export default function ViewAcedemicProcess() {
           </Card>
         </DialogContent>
       </Dialog>
+      <ManualEditAcedemicProcess
+        mutate={mutate}
+        onClose={toogleEditViewAcedemicProcess}
+        open={openEditViewAcedemicProcess}
+      />
       <ManualAddAcedemicProcess
         mutate={mutate}
         onClose={toogleManualAddFromViewByCate}
         open={openManualAddFromViewByCate}
+      />
+      <AlertDelete
+        open={openDeleteViewAcedemicProcess}
+        onClose={toogleDeleteViewAcedemicProcess}
+        content={`Bạn có chắc chắn muốn xóa xữ lý học tập của sinh viên ${processing?.firstName} ${processing?.lastName} không?`}
+        onSubmit={onDelete}
+        title='Xóa xữ lý học tập'
+        submitColor='error'
+        loading={loading}
       />
     </>
   )

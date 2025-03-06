@@ -6,9 +6,10 @@ import Iconify from './iconify'
 
 type RowActionProps = {
   children: React.ReactNode
+  size?: 'small' | 'medium' | 'large'
 }
 
-export default function RowAction({ children }: RowActionProps) {
+export default function RowAction({ children, size }: RowActionProps) {
   const [isOpen, setOpen] = useState<null | HTMLElement>(null)
 
   const handleOpen = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
@@ -21,7 +22,7 @@ export default function RowAction({ children }: RowActionProps) {
 
   return (
     <>
-      <IconButton onClick={handleOpen}>
+      <IconButton onClick={handleOpen} size={size || 'medium'}>
         <Iconify icon='eva:more-vertical-fill' />
       </IconButton>
       <Menu

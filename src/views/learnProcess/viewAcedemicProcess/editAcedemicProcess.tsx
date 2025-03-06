@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
   Dialog,
@@ -28,17 +28,17 @@ import type { KeyedMutator } from 'swr'
 
 import { useShare } from '@/hooks/useShare'
 import Iconify from '@/components/iconify'
-import { addAcedemicProcessSchema } from '@/schema/addAcedemicProcessSchema'
+import { editAcedemicProcessSchema } from '@/schema/editAcedemicProcessSchema'
 import { useAcedemicProcessStore } from '@/stores/acedemicProcess.store'
 import CustomTextField from '@/@core/components/mui/TextField'
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
-import { getAcademicYear } from '../term/helper'
+import { getAcademicYear } from '@/views/term/helper'
 
 import learnProcessService from '@/services/learnProcess.service'
 
-type FormData = InferInput<typeof addAcedemicProcessSchema>
+type FormData = InferInput<typeof editAcedemicProcessSchema>
 
-export default function ManualAddAcedemicProcess({
+export default function ManualEditAcedemicProcess({
   mutate,
   open,
   onClose
@@ -52,7 +52,11 @@ export default function ManualAddAcedemicProcess({
   const [anchorElCourse, setAnchorElCourse] = useState<null | HTMLElement>(null)
 
   const { typeProcess } = useShare()
-  const { acedemicProcess } = useAcedemicProcessStore()
+
+  const { toogleEditViewAcedemicProcess, acedemicProcess, processing, setProcessing, listAcedemicProcess } =
+    useAcedemicProcessStore()
+
+  console.log(processing)
 
   const {
     control,
@@ -62,28 +66,55 @@ export default function ManualAddAcedemicProcess({
     formState: { errors }
   } = useForm<FormData>({
     mode: 'all',
-    resolver: valibotResolver(addAcedemicProcessSchema),
+    resolver: valibotResolver(editAcedemicProcessSchema),
     defaultValues: {
-      classId: '',
-      cohortName: '',
-      firstName: '',
-      lastName: '',
-      studentId: '',
-      processing: [],
-      handlingStatusByAAO: '',
-      courseRegistration: [],
-      DTBC: 0,
-      STC: 0,
-      DTBCTL: 0,
-      STCTL: 0,
-      reasonHandling: '',
-      yearLevel: '',
-      faculty: '',
-      year: '',
-      termName: '',
-      note: ''
+      academicCategory: processing?.academicCategory._id || '',
+      classId: processing?.classId || '',
+      cohortName: processing?.cohortName || '',
+      firstName: processing?.firstName || '',
+      lastName: processing?.lastName || '',
+      studentId: processing?.studentId || '',
+      processing: processing?.processing || [],
+      handlingStatusByAAO: processing?.handlingStatusByAAO || '',
+      courseRegistration: processing?.courseRegistration || [],
+      DTBC: processing?.DTBC || 0,
+      STC: processing?.STC || 0,
+      DTBCTL: processing?.DTBCTL || 0,
+      STCTL: processing?.STCTL || 0,
+      reasonHandling: processing?.reasonHandling || '',
+      yearLevel: processing?.yearLevel || '',
+      faculty: processing?.faculty || '',
+      year: processing?.year || '',
+      termName: processing?.termName || '',
+      note: processing?.note || ''
     }
   })
+
+  useEffect(() => {
+    if (!processing) return
+
+    reset({
+      academicCategory: processing.academicCategory._id,
+      classId: processing.classId,
+      cohortName: processing.cohortName,
+      firstName: processing.firstName,
+      lastName: processing.lastName,
+      studentId: processing.studentId,
+      processing: processing.processing,
+      handlingStatusByAAO: processing.handlingStatusByAAO,
+      courseRegistration: processing.courseRegistration,
+      DTBC: processing.DTBC,
+      STC: processing.STC,
+      DTBCTL: processing.DTBCTL,
+      STCTL: processing.STCTL,
+      reasonHandling: processing.reasonHandling,
+      yearLevel: processing.yearLevel,
+      faculty: processing.faculty,
+      year: processing.year,
+      termName: processing.termName,
+      note: processing.note
+    })
+  }, [reset, processing])
 
   const processingValues = watch('processing') // Theo dõi giá trị của processing
   const courseRegistrationValues = watch('courseRegistration')
@@ -101,6 +132,7 @@ export default function ManualAddAcedemicProcess({
 
   const handleClose = () => {
     onClose()
+    setProcessing(null)
     reset({
       classId: '',
       cohortName: '',
@@ -141,27 +173,28 @@ export default function ManualAddAcedemicProcess({
 
   const onSubmit = handleSubmit(async data => {
     if (!acedemicProcess) return toast.error('Không tìm thấy thông tin xử lý học tập')
+    if (!processing) return
 
-    const toastId = toast.loading('Đang thêm xử lý học tập...')
+    const toastId = toast.loading('Đang cập nhật xử lý học tập...')
 
     const newData = {
       ...data,
-      academicCategory: acedemicProcess._id
+      academicCategory: acedemicProcess?._id
     }
 
-    console.log(newData)
-
     setLoading(true)
-    await learnProcessService.addProcess(
+    await learnProcessService.updateProcess(
+      processing?._id,
       newData,
       () => {
         toast.update(toastId, {
-          render: 'Thêm xử lý học tập thành công!',
+          render: 'Cập nhật xử lý học tập thành công!',
           type: 'success',
           isLoading: false,
           autoClose: 3000
         })
         mutate()
+        toogleEditViewAcedemicProcess()
         setLoading(false)
       },
       err => {
@@ -190,11 +223,44 @@ export default function ManualAddAcedemicProcess({
               textTransform: 'capitalize'
             }}
           >
-            Thêm sinh viên vào {acedemicProcess?.title?.toLowerCase()}
+            Cập nhật sinh viên vào {acedemicProcess?.title?.toLowerCase()}
           </Typography>
         </DialogTitle>
         <DialogContent>
           <Grid container spacing={3}>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                control={control}
+                name='academicCategory'
+                render={({ field }) => (
+                  <CustomTextField
+                    {...field}
+                    fullWidth
+                    select
+                    SelectProps={{
+                      displayEmpty: true,
+                      MenuProps: {
+                        sx: {
+                          maxHeight: 400
+                        }
+                      }
+                    }}
+                    label='Kỳ xử lý học vụ'
+                    {...(errors.academicCategory && {
+                      error: true,
+                      helperText: errors.academicCategory.message?.toString()
+                    })}
+                  >
+                    {listAcedemicProcess.map(item => (
+                      <MenuItem key={item._id} value={item._id}>
+                        {item.title}
+                      </MenuItem>
+                    ))}
+                  </CustomTextField>
+                )}
+              />
+            </Grid>
+            <Grid item xs={12}></Grid>
             <Grid item xs={12} sm={4}>
               <Controller
                 control={control}

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { Inserted, LearnProcessType, MissingInfoRows } from '@/types/management/learnProcessType'
+import type { Inserted, LearnProcessType, MissingInfoRows, ProcessingType } from '@/types/management/learnProcessType'
 
 type States = {
   openAddAcedemicProcess: boolean
@@ -17,6 +17,10 @@ type States = {
   openViewDetail: boolean
   openManualAddFromViewByCate: boolean
   openProgress: boolean
+  openEditViewAcedemicProcess: boolean
+  processing: ProcessingType | null
+  listAcedemicProcess: LearnProcessType[]
+  openDeleteViewAcedemicProcess: boolean
 }
 
 type Actions = {
@@ -34,6 +38,10 @@ type Actions = {
   toogleViewDetail: () => void
   toogleManualAddFromViewByCate: () => void
   toogleProgress: () => void
+  toogleEditViewAcedemicProcess: () => void
+  setProcessing: (processing: ProcessingType | null) => void
+  setListAcedemicProcess: (listAcedemicProcess: LearnProcessType[]) => void
+  toogleDeleteViewAcedemicProcess: () => void
 }
 
 export const useAcedemicProcessStore = create<States & Actions>(set => ({
@@ -51,6 +59,11 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
   openViewDetail: false,
   openManualAddFromViewByCate: false,
   openProgress: false,
+  openEditViewAcedemicProcess: false,
+  processing: null,
+  listAcedemicProcess: [],
+  openDeleteViewAcedemicProcess: false,
+  setListAcedemicProcess: listAcedemicProcess => set({ listAcedemicProcess }),
   setInserted: inserted => set({ inserted }),
   setMissingInfoRows: missingInfoRows => set({ missingInfoRows }),
   setDuplicateRows: duplicateRows => set({ duplicateRows }),
@@ -66,5 +79,10 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
   toogleViewDetail: () => set(state => ({ openViewDetail: !state.openViewDetail })),
   toogleManualAddFromViewByCate: () =>
     set(state => ({ openManualAddFromViewByCate: !state.openManualAddFromViewByCate })),
-  toogleProgress: () => set(state => ({ openProgress: !state.openProgress }))
+  toogleProgress: () => set(state => ({ openProgress: !state.openProgress })),
+  toogleEditViewAcedemicProcess: () =>
+    set(state => ({ openEditViewAcedemicProcess: !state.openEditViewAcedemicProcess })),
+  setProcessing: processing => set({ processing }),
+  toogleDeleteViewAcedemicProcess: () =>
+    set(state => ({ openDeleteViewAcedemicProcess: !state.openDeleteViewAcedemicProcess }))
 }))

@@ -10,6 +10,7 @@ import { valibotResolver } from '@hookform/resolvers/valibot'
 import { toast } from 'react-toastify'
 
 import { LoadingButton } from '@mui/lab'
+import { mutate as fetcher } from 'swr'
 
 import Iconify from '@/components/iconify'
 import { useTypeProcessStore } from '@/stores/typeprocess/typeProcess.store'
@@ -77,6 +78,7 @@ export default function AddTypeProcess(props: AddTypeProcessProps) {
         setLoading(false)
         handleClose()
         mutate()
+        fetcher('/type-process')
       },
       err => {
         toast.update(toastID, {

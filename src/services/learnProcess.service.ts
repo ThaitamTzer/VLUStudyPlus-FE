@@ -114,6 +114,47 @@ const learnProcessService = {
     }
   },
 
+  updateProcess: async (
+    id: string,
+    data: any,
+    sucessCallback?: (res: any) => void,
+    errorCallback?: (res: any) => void
+  ) => {
+    try {
+      return await axiosClient.put(`/api/academic-processing/update-academicProcessing/${id}`, data).then(res => {
+        if (sucessCallback) {
+          sucessCallback(res.data)
+        }
+
+        return res
+      })
+    } catch (error) {
+      if (errorCallback) {
+        errorCallback(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+
+  deleteProcess: async (id: string, sucessCallback?: (res: any) => void, errorCallback?: (res: any) => void) => {
+    try {
+      return await axiosClient.delete(`/api/academic-processing/delete-academicProcessing/${id}`).then(res => {
+        if (sucessCallback) {
+          sucessCallback(res.data)
+        }
+
+        return res
+      })
+    } catch (error) {
+      if (errorCallback) {
+        errorCallback(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+
   viewProcessByCategory: async (
     id: string,
     page?: number,

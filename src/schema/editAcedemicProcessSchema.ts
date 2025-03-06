@@ -1,6 +1,7 @@
 import * as v from 'valibot'
 
 const schema = v.object({
+  academicCategory: v.pipe(v.string(), v.nonEmpty('Kỳ xử lý học vụ không được để trống')),
   studentId: v.pipe(
     v.string(),
     v.nonEmpty('Mã sinh viên không được để trống'),
@@ -34,11 +35,7 @@ const schema = v.object({
   processing: v.pipe(
     v.array(
       v.object({
-        statusHandling: v.pipe(
-          v.string(),
-          v.nonEmpty('Trạng thái xử lý không được để trống'),
-          v.maxLength(255, 'Trạng thái xử lý không được quá 255 ký tự')
-        ),
+        statusHandling: v.pipe(v.string(), v.maxLength(255, 'Trạng thái xử lý không được quá 255 ký tự')),
         termName: v.pipe(
           v.string(),
           v.nonEmpty('Tên học kỳ không được để trống'),
@@ -104,4 +101,4 @@ const schema = v.object({
   )
 })
 
-export { schema as addAcedemicProcessSchema }
+export { schema as editAcedemicProcessSchema }

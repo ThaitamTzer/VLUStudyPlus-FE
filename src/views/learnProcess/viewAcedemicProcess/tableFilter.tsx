@@ -17,7 +17,7 @@ export default function TableFilter(props: TableFilterProps) {
   return (
     <CardContent>
       <Grid container spacing={6}>
-        <Grid item xs={3}>
+        <Grid item xs={12} sm={6} md={3}>
           <CustomTextField
             select
             fullWidth
@@ -45,7 +45,7 @@ export default function TableFilter(props: TableFilterProps) {
             ))}
           </CustomTextField>
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={12} sm={6} md={3}>
           <CustomTextField
             select
             fullWidth

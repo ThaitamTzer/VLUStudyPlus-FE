@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+import Cookies from 'js-cookie'
+
 // ----------------------------------------------------------------------
 
 const axiosUpload = axios.create({ baseURL: process.env.NEXT_PUBLIC_API_URL })
@@ -25,6 +27,7 @@ axiosUpload.interceptors.response.use(
       const currentPath = window.location.pathname
 
       localStorage.clear()
+      Cookies.remove('userData')
 
       // Store current path and redirect to login
       if (currentPath !== '/login') {

@@ -37,7 +37,7 @@ const Providers = (props: Props) => {
     <VerticalNavProvider>
       <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
         <ThemeProvider direction={direction} systemMode={systemMode}>
-          <AppReactToastify direction={direction} position='top-center' limit={4} transition={Flip} />
+          <AppReactToastify direction={direction} position='top-center' limit={4} autoClose={3} transition={Flip} />
           <ReduxProvider>{children}</ReduxProvider>
         </ThemeProvider>
       </SettingsProvider>

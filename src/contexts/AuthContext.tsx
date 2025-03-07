@@ -78,14 +78,15 @@ const AuthProvider = ({ children }: Props) => {
       await axiosClient
         .get('/api/auth/get-user-profile')
         .then(async response => {
-          console.log(response)
           setUser({ ...response.data })
           setLoading(false)
+          Cookies.set('userData', response.data)
         })
         .catch(() => {
           setUser(null)
           localStorage.clear()
           setLoading(false)
+          Cookies.remove('userData')
 
           if (authConfig.onTokenExpiration === 'logout' && !pathName.includes('login')) {
             router.replace('/login')
@@ -100,7 +101,6 @@ const AuthProvider = ({ children }: Props) => {
     await axiosClient
       .get('/api/auth/get-user-profile')
       .then(async response => {
-        console.log(response)
         setUser({ ...response.data })
       })
       .catch(() => {
@@ -112,13 +112,13 @@ const AuthProvider = ({ children }: Props) => {
   const handleLogout = () => {
     try {
       axiosClient.patch(authConfig.logoutEndpoint).then(() => {
-        Cookies.remove('jwt')
+        Cookies.remove('userData')
         localStorage.clear()
         setAllNull()
         router.push('/')
       })
     } catch {
-      Cookies.remove('jwt')
+      Cookies.remove('userData')
       localStorage.clear()
       setUser(null)
       router.push('/')

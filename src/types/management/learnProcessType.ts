@@ -95,6 +95,8 @@ type major = {
 
 export type ProcessingType = {
   _id: string
+  commitment: boolean
+  status: boolean
   academicCategory: {
     _id: string
     title: string
@@ -131,6 +133,11 @@ export type ListProcessingType = {
   data: ProcessingType[]
 }
 
+type Missing = {
+  studentId: string
+  message: string
+}
+
 export type CheckAcademicProcessing = {
   checkAcademicProcessing: ProcessingType
   informationClass: {
@@ -143,4 +150,5 @@ export type CheckAcademicProcessing = {
     userName: string
   }
   student: any
+  missingInfoRows: Missing[]
 }

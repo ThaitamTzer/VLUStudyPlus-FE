@@ -56,8 +56,6 @@ export default function ManualEditAcedemicProcess({
   const { toogleEditViewAcedemicProcess, acedemicProcess, processing, setProcessing, listAcedemicProcess } =
     useAcedemicProcessStore()
 
-  console.log(processing)
-
   const {
     control,
     handleSubmit,

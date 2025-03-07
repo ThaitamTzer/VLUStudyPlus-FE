@@ -7,7 +7,8 @@ import {
   TableSortLabel,
   Stack,
   MenuItem,
-  IconButton
+  IconButton,
+  Tooltip
 } from '@mui/material'
 
 import StyledTableRow from '@/components/table/StyledTableRow'
@@ -28,6 +29,7 @@ type TableAcedemicProcessProps = {
   toogleEditViewAcedemicProcess: () => void
   toogleDeleteViewAcedemicProcess: () => void
   setProcessing: (processing: ProcessingType) => void
+  toogleViewDetailAcedemicProcess: () => void
 }
 
 export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
@@ -41,7 +43,8 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
     handleSort,
     toogleEditViewAcedemicProcess,
     toogleDeleteViewAcedemicProcess,
-    setProcessing
+    setProcessing,
+    toogleViewDetailAcedemicProcess
   } = props
 
   const termNames = Array.from(new Set(data?.data.flatMap(d => d.processing.map(p => p.termName)) || []))
@@ -210,6 +213,24 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
             </TableCell>
             <TableCell>
               <TableSortLabel
+                active={sortField === 'status'}
+                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
+                onClick={() => handleSort('status')}
+              >
+                CVHT Xử lý
+              </TableSortLabel>
+            </TableCell>
+            <TableCell>
+              <TableSortLabel
+                active={sortField === 'commitment'}
+                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
+                onClick={() => handleSort('commitment')}
+              >
+                Đơn cam kết
+              </TableSortLabel>
+            </TableCell>
+            <TableCell>
+              <TableSortLabel
                 active={sortField === 'yearLevel'}
                 direction={sortOrder === 'desc' ? 'desc' : 'asc'}
                 onClick={() => handleSort('yearLevel')}
@@ -245,6 +266,7 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
               </TableSortLabel>
             </TableCell>
             <TableCell
+              align='right'
               width={120}
               sx={{
                 position: {
@@ -334,11 +356,14 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                 <TableCell>{d.DTBCTL}</TableCell>
                 <TableCell>{d.STCTL}</TableCell>
                 <TableCell>{d.reasonHandling}</TableCell>
+                <TableCell>{d.status ? 'Đã xử lý' : 'Chưa xử lý'}</TableCell>
+                <TableCell>{d.commitment ? 'Đã làm đơn' : 'Chưa làm đơn'}</TableCell>
                 <TableCell>{d.yearLevel}</TableCell>
                 <TableCell>{d.faculty}</TableCell>
                 <TableCell>{d.year}</TableCell>
                 <TableCell>{d.termName}</TableCell>
                 <TableCell
+                  align='right'
                   sx={{
                     position: {
                       xs: 'none',
@@ -350,9 +375,17 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                     borderLeft: { xs: 'none', sm: '1px solid rgba(224, 224, 224, 1)' }
                   }}
                 >
-                  <IconButton size='small' onClick={() => {}}>
-                    <Iconify icon='bi:eye' />
-                  </IconButton>
+                  <Tooltip arrow title='Xem chi tiết xử lý học tập'>
+                    <IconButton
+                      size='small'
+                      onClick={() => {
+                        setProcessing(d)
+                        toogleViewDetailAcedemicProcess()
+                      }}
+                    >
+                      <Iconify icon='bi:eye' />
+                    </IconButton>
+                  </Tooltip>
                   <RowAction size='small'>
                     <MenuItem
                       onClick={() => {

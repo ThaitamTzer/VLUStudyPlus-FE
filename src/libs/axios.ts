@@ -1,4 +1,5 @@
 import axios from 'axios'
+import Cookies from 'js-cookie'
 
 // ----------------------------------------------------------------------
 
@@ -25,6 +26,7 @@ axiosClient.interceptors.response.use(
       const currentPath = window.location.pathname
 
       localStorage.clear()
+      Cookies.remove('userData')
 
       // Store current path and redirect to login
       if (currentPath !== '/login') {

@@ -17,7 +17,7 @@ import {
   useReactTable
 } from '@tanstack/react-table'
 
-import { Button, Card, MenuItem, TablePagination } from '@mui/material'
+import { Button, Card, MenuItem, TablePagination, Typography } from '@mui/material'
 
 import { toast } from 'react-toastify'
 
@@ -99,7 +99,7 @@ export default function LearnProcessPage() {
 
     setLoading(true)
 
-    await learnProcessService.delete(
+    await learnProcessService.deleteAll(
       acedemicProcess?._id,
       () => {
         toast.update(toastID, {
@@ -174,12 +174,21 @@ export default function LearnProcessPage() {
       <ViewAcedemicProcess />
       <ProgressModal open={openProgress} />
       <AlertDelete
+        countdown
         open={openDeleteAcedemicProcess}
         onClose={toogleDeleteAcedemicProcess}
         loading={loading}
         title='Xóa xử lý học tập'
         onSubmit={onDelete}
-        content={`Bạn có chắc chắn muốn xóa xử lý học tập "${acedemicProcess?.title}" không?`}
+        content={
+          <Typography variant='h6'>
+            Bạn có chắc chắn muốn xóa xử lý học tập {acedemicProcess?.title} không?.
+            <br />
+            <strong className='text-red-600'>
+              Khi xóa, tất cả dữ liệu liên quan đến kỳ xử lý học tập này sẽ bị xóa.
+            </strong>
+          </Typography>
+        }
         cancelText='Hủy'
         submitColor='error'
         submitText='Xóa'

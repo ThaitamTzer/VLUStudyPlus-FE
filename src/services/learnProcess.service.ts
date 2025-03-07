@@ -74,9 +74,9 @@ const learnProcessService = {
     }
   },
 
-  delete: async (id: string, sucessCallback?: (res: any) => void, errorCallback?: (res: any) => void) => {
+  deleteAll: async (id: string, sucessCallback?: (res: any) => void, errorCallback?: (res: any) => void) => {
     try {
-      return await axiosClient.delete(`/api/academic-processing/${id}`).then(res => {
+      return await axiosClient.delete(`/api/academic-processing/delete-academic-session/${id}`).then(res => {
         if (sucessCallback) {
           sucessCallback(res.data)
         }

@@ -214,11 +214,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           </MenuItem>
         </SubMenu>
         <SubMenu label='XỬ LÝ HỌC TẬP' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
-          <MenuItem href='/type-process' icon={<Iconify icon='ic:twotone-list' />}>
+          <MenuItem href='/type-process' icon={<Iconify icon='material-symbols:problem-outline-rounded' />}>
             Loại xử lý
           </MenuItem>
           <MenuItem href='/learning-processing' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
             Xử lý học tập
+          </MenuItem>
+          <MenuItem href='/process-result' icon={<Iconify icon='carbon:result' />}>
+            Kết quả xử lý
           </MenuItem>
         </SubMenu>
         {/* <SubMenu

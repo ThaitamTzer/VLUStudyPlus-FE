@@ -1,0 +1,146 @@
+'use client'
+import { useEffect, useState } from 'react'
+
+import * as v from 'valibot'
+import type { InferInput } from 'valibot'
+import { useForm, Controller } from 'react-hook-form'
+import { valibotResolver } from '@hookform/resolvers/valibot'
+
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, Typography } from '@mui/material'
+
+import { LoadingButton } from '@mui/lab'
+
+import { toast } from 'react-toastify'
+
+import type { KeyedMutator } from 'swr'
+
+import resultProcessService from '@/services/resultProcess.service'
+import { useResultProcessStore } from '@/stores/resultProcess.store'
+import Iconify from '@/components/iconify'
+import CustomTextField from '@/@core/components/mui/TextField'
+
+const schema = v.object({
+  processingResultName: v.pipe(
+    v.string(),
+    v.nonEmpty('Tên kết quả xử lý không được để trống'),
+    v.maxLength(255, 'Tên kết quả không được quá 255 ký tự')
+  )
+})
+
+type FormData = InferInput<typeof schema>
+
+export default function UpdateProcessResult({ mutate }: { mutate: KeyedMutator<any> }) {
+  const { toolEditResultProcess, openEditResultProcess, resultProcessData, setResultProcessData } =
+    useResultProcessStore()
+
+  const [loading, setLoading] = useState(false)
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors }
+  } = useForm<FormData>({
+    resolver: valibotResolver(schema),
+    defaultValues: {
+      processingResultName: resultProcessData?.processingResultName || ''
+    }
+  })
+
+  useEffect(() => {
+    if (!resultProcessData) return
+
+    reset({
+      processingResultName: resultProcessData.processingResultName
+    })
+  }, [resultProcessData, reset])
+
+  const onClose = () => {
+    reset()
+    setResultProcessData(null)
+    toolEditResultProcess()
+  }
+
+  const onSubmit = handleSubmit(async data => {
+    if (!resultProcessData) return toast.error('Không tìm thấy kết quả xử lý')
+
+    const toastId = toast.loading('Đang cập nhật kết quả xử lý')
+
+    setLoading(true)
+
+    await resultProcessService.update(
+      resultProcessData?._id,
+      data,
+      () => {
+        onClose()
+        mutate()
+        setLoading(false)
+        toast.update(toastId, {
+          render: 'Cập nhật kết quả xử lý thành công',
+          type: 'success',
+          isLoading: false,
+          autoClose: 3000
+        })
+      },
+      err => {
+        toast.update(toastId, {
+          render: err.message,
+          type: 'error',
+          isLoading: false,
+          autoClose: 3000
+        })
+        setLoading(false)
+      }
+    )
+  })
+
+  return (
+    <Dialog open={openEditResultProcess} onClose={onClose} maxWidth='sm' fullWidth>
+      <form onSubmit={onSubmit}>
+        <DialogTitle>
+          <IconButton
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8
+            }}
+            onClick={onClose}
+          >
+            <Iconify icon='mdi:close' />
+          </IconButton>
+          <Typography variant='h4'>Thêm kết quả xử lý</Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Grid container>
+            <Grid item xs={12}>
+              <Controller
+                control={control}
+                name='processingResultName'
+                render={({ field }) => (
+                  <CustomTextField
+                    {...field}
+                    label='Tên kết quả xử lý'
+                    fullWidth
+                    {...(errors.processingResultName && {
+                      error: true,
+                      helperText: errors.processingResultName.message
+                    })}
+                  />
+                )}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button variant='outlined' onClick={onClose}>
+            Hủy
+          </Button>
+
+          <LoadingButton loading={loading} type='submit' variant='contained'>
+            Lưu
+          </LoadingButton>
+        </DialogActions>
+      </form>
+    </Dialog>
+  )
+}

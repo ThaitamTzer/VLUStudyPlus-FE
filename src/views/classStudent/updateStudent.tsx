@@ -28,9 +28,9 @@ import Iconify from '@/components/iconify'
 import { useClassStudentStore } from '@/stores/classStudent/classStudent.store'
 import CustomTextField from '@/@core/components/mui/TextField'
 import classLecturerService from '@/services/classLecturer.service'
-import cohortService from '@/services/cohort.service'
 import classStudentService from '@/services/classStudent.service'
 import { fDate } from '@/utils/format-time'
+import { useShare } from '@/hooks/useShare'
 
 const schema = v.object({
   userName: v.pipe(v.string(), v.nonEmpty('Tên không được để trống'), v.maxLength(255, 'Tên không được quá 255 ký tự')),
@@ -51,7 +51,7 @@ export default function UpdateAddStudent({ mutate }: { mutate: KeyedMutator<any>
   const [loading, setLoading] = useState<boolean>(false)
 
   const { data: classOption } = useSWR('optionClass', classLecturerService.getList)
-  const { data: cohortOption } = useSWR('cohortOption', cohortService.getAll)
+  const { cohorOptions } = useShare()
 
   const {
     control,
@@ -209,7 +209,7 @@ export default function UpdateAddStudent({ mutate }: { mutate: KeyedMutator<any>
                     helperText={errors.cohortId?.message}
                   >
                     <MenuItem value=''>Chọn khóa</MenuItem>
-                    {cohortOption?.map(option => (
+                    {cohorOptions?.map(option => (
                       <MenuItem key={option._id} value={option.cohortId}>
                         {option.cohortId}
                       </MenuItem>

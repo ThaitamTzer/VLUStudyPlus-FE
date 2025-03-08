@@ -12,16 +12,17 @@ import { useForm, Controller } from 'react-hook-form'
 
 import { valibotResolver } from '@hookform/resolvers/valibot'
 
-import useSWR, { mutate } from 'swr'
+import { mutate } from 'swr'
 
 import { LoadingButton } from '@mui/lab'
 
 import { toast } from 'react-toastify'
 
+import { useShare } from '@/hooks/useShare'
+
 import CustomTextField from '@/@core/components/mui/TextField'
 import type { ClassData } from '@/types/management/classType'
 import { useAuth } from '@/hooks/useAuth'
-import cohortService from '@/services/cohort.service'
 import classService from '@/services/class.service'
 import { useClassStore } from '@/stores/class/class'
 
@@ -61,9 +62,7 @@ export default function EditContent({
   const { lecturerData } = useAuth()
   const { setClassID } = useClassStore()
 
-  const { data: cohortsData } = useSWR('cohortOptions', () => cohortService.getAll(), {
-    revalidateOnFocus: false
-  })
+  const { cohorOptions } = useShare()
 
   const {
     control,
@@ -190,9 +189,9 @@ export default function EditContent({
               <Autocomplete
                 {...field}
                 id='cohortId'
-                value={cohortsData?.find(cohort => cohort._id === value) || null}
+                value={cohorOptions?.find(cohort => cohort._id === value) || null}
                 onChange={(_, newValue) => onChange(newValue ? newValue._id : '')}
-                options={cohortsData || []}
+                options={cohorOptions || []}
                 getOptionLabel={option => option.cohortId}
                 renderInput={params => (
                   <CustomTextField

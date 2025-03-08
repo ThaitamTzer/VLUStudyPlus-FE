@@ -13,11 +13,12 @@ import useSWR from 'swr'
 
 import { toast } from 'react-toastify'
 
+import { useShare } from '@/hooks/useShare'
+
 import { useClassStore } from '@/stores/class/class'
 
 import lecturerService from '@/services/lecturer.service'
 import CustomTextField from '@/@core/components/mui/TextField'
-import cohortService from '@/services/cohort.service'
 import classService from '@/services/class.service'
 
 type ManualAddClassProps = {
@@ -59,9 +60,7 @@ export default function ManualAddClass({ mutate }: ManualAddClassProps) {
     }
   )
 
-  const { data: cohortsData } = useSWR('cohortOptions', () => cohortService.getAll(), {
-    revalidateOnFocus: false
-  })
+  const { cohorOptions } = useShare()
 
   useEffect(() => {
     if (lecturersData?.lecturers) {
@@ -227,9 +226,9 @@ export default function ManualAddClass({ mutate }: ManualAddClassProps) {
               <Autocomplete
                 {...field}
                 id='cohortId'
-                value={cohortsData?.find(cohort => cohort._id === value) || null}
+                value={cohorOptions?.find(cohort => cohort._id === value) || null}
                 onChange={(_, newValue) => onChange(newValue ? newValue._id : '')}
-                options={cohortsData || []}
+                options={cohorOptions || []}
                 getOptionLabel={option => option.cohortId}
                 renderInput={params => (
                   <CustomTextField

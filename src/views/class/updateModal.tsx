@@ -19,7 +19,6 @@ import {
 } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
 import type { KeyedMutator } from 'swr'
-import useSWR from 'swr'
 
 import { toast } from 'react-toastify'
 
@@ -28,9 +27,9 @@ import { useAuth } from '@/hooks/useAuth'
 import { useClassStore } from '@/stores/class/class'
 
 import CustomTextField from '@/@core/components/mui/TextField'
-import cohortService from '@/services/cohort.service'
 import classService from '@/services/class.service'
 import Iconify from '@/components/iconify'
+import { useShare } from '@/hooks/useShare'
 
 type ManualUpdateClassProps = {
   mutate: KeyedMutator<any>
@@ -54,9 +53,7 @@ export default function UpdateModal({ mutate }: ManualUpdateClassProps) {
   const [loading, setLoading] = useState<boolean>(false)
   const { lecturerData } = useAuth()
 
-  const { data: cohortsData } = useSWR('cohortOptions', () => cohortService.getAll(), {
-    revalidateOnFocus: false
-  })
+  const { cohorOptions } = useShare()
 
   const {
     control,
@@ -187,9 +184,9 @@ export default function UpdateModal({ mutate }: ManualUpdateClassProps) {
                   <Autocomplete
                     {...field}
                     id='cohortId'
-                    value={cohortsData?.find(cohort => cohort._id === value) || null}
+                    value={cohorOptions?.find(cohort => cohort._id === value) || null}
                     onChange={(_, newValue) => onChange(newValue ? newValue._id : '')}
-                    options={cohortsData || []}
+                    options={cohorOptions || []}
                     getOptionLabel={option => option.cohortId}
                     renderInput={params => (
                       <CustomTextField

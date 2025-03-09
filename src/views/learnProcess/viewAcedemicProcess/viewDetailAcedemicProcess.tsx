@@ -7,6 +7,7 @@ import useSWR from 'swr'
 import { useAcedemicProcessStore } from '@/stores/acedemicProcess.store'
 import learnProcessService from '@/services/learnProcess.service'
 import Iconify from '@/components/iconify'
+import { fDate } from '@/utils/format-time'
 
 type ViewDetailAcedecmicProcessProps = {
   id: string
@@ -42,6 +43,10 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
                 <Typography variant='h6'>Mã sinh viên: {data.checkAcademicProcessing.studentId}</Typography>
                 <Typography variant='h6'>
                   Họ và tên: {data.checkAcademicProcessing.lastName} {data.checkAcademicProcessing.firstName}
+                </Typography>
+                <Typography variant='h6'>Mail: {data.student.mail || 'không tìm thấy trong hệ thống'}</Typography>
+                <Typography variant='h6'>
+                  Ngày sinh: {fDate(data.student.dateOfBirth, 'dd/MM/yyyy') || 'không tìm thấy trong hệ thống'}
                 </Typography>
                 <Typography variant='h6'>Lớp: {data.checkAcademicProcessing.classId}</Typography>
                 <Typography variant='h6'>Niên khóa: {data.checkAcademicProcessing.cohortName}</Typography>

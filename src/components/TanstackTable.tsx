@@ -6,7 +6,15 @@ import StyledTableRow from '@/components/table/StyledTableRow'
 import TableLoading from '@/components/table/TableLoading'
 import TableNoData from '@/components/table/TableNotFound'
 
-export default function TanstackTable({ table, title }: { table: Table<any>; title?: string }) {
+export default function TanstackTable({
+  table,
+  title,
+  loading
+}: {
+  table: Table<any>
+  title?: string
+  loading?: boolean
+}) {
   return (
     <TableContainer sx={{ position: 'relative', overflowX: 'auto', maxHeight: 'calc(100vh - 300px)' }}>
       <MuiTable stickyHeader sx={{ minWidth: 1000 }}>
@@ -49,7 +57,7 @@ export default function TanstackTable({ table, title }: { table: Table<any>; tit
               </StyledTableRow>
             )
           })}
-          {table.getRowModel().rows.length === 0 ? (
+          {loading ? (
             <TableLoading colSpan={20} />
           ) : (
             <TableNoData notFound={table.getRowModel().rows.length === 0} title={title || 'Không tìm thấy dữ liệu'} />

@@ -41,7 +41,7 @@ type ProcessResultWithAction = ProcessResultType & {
 const columnHelper = createColumnHelper<ProcessResultWithAction>()
 
 export default function ProcessResultPage() {
-  const { data, mutate } = useSWR('/api/processing-result', resultProcessService.getAll)
+  const { data, mutate, isLoading } = useSWR('/api/processing-result', resultProcessService.getAll)
 
   const {
     toogleAddResultProcess,
@@ -194,7 +194,7 @@ export default function ProcessResultPage() {
             </Button>
           </div>
         </div>
-        <TanstackTable table={table} />
+        <TanstackTable table={table} loading={isLoading} />
         <TablePagination
           component={() => <TablePaginationComponent table={table as Table<unknown>} />}
           count={table.getFilteredRowModel().rows.length}

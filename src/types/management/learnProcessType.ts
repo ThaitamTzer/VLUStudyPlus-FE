@@ -149,6 +149,12 @@ export type CheckAcademicProcessing = {
     userId: string
     userName: string
   }
-  student: any
+  student: {
+    _id: string
+    mail: string
+    role: string
+    isBlock: boolean
+    dateOfBirth: string | Date
+  }
   missingInfoRows: Missing[]
 }

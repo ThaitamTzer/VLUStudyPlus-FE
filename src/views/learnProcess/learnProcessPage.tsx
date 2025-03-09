@@ -127,7 +127,7 @@ export default function LearnProcessPage() {
 
   return (
     <>
-      <PageHeader title='Danh sách xử lý học tập' />
+      <PageHeader title='Danh sách kỳ xử lý học tập' />
       <Card sx={{ mt: 4 }}>
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <CustomTextField

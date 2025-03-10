@@ -15,6 +15,8 @@ export default function UserProfileHeader({ user }: UserProfileHeaderProps) {
   const { toogleViewAvatar, toogleUpdateAvatar } = useStudentStore()
   const { user: currentUser } = useAuth()
 
+  console.log(user)
+
   return (
     <Card>
       <CardMedia image='/images/background/cover_bg.jpg' className='bs-[250px]' />

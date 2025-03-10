@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 
-import { Card, Divider, IconButton, MenuItem, TablePagination, Tooltip } from '@mui/material'
+import { Card, CardContent, IconButton, MenuItem, TablePagination, Tooltip } from '@mui/material'
 
 import useSWR from 'swr'
 
@@ -19,6 +19,8 @@ import {
   useReactTable
 } from '@tanstack/react-table'
 
+import { useAuth } from '@/hooks/useAuth'
+
 import PageHeader from '@/components/page-header'
 import learnProcessService from '@/services/learnProcess.service'
 import type { LearnProcessType } from '@/types/management/learnProcessType'
@@ -30,6 +32,7 @@ import { useCommitmentStore } from '@/stores/commitment.store'
 import ViewCommitmentForms from './viewCommitmentForm'
 import CustomTextField from '@/@core/components/mui/TextField'
 import DebouncedInput from '@/components/debouncedInput'
+import ViewCommitmentFormsOfCVHT from './viewCommitmentFormOfCVHT'
 
 type AcedemicProcessWithAction = LearnProcessType & {
   stt?: number
@@ -39,7 +42,9 @@ type AcedemicProcessWithAction = LearnProcessType & {
 const columnHelper = createColumnHelper<AcedemicProcessWithAction>()
 
 export default function CommitmentFormsPage() {
-  const { toogleViewByCategory, setAcedemicProcess } = useCommitmentStore()
+  const { user } = useAuth()
+
+  const { toogleViewByCategory, setAcedemicProcess, toogleViewByCategoryOfCVHT } = useCommitmentStore()
 
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
@@ -67,21 +72,34 @@ export default function CommitmentFormsPage() {
         },
         cell: infor => (
           <>
-            <Tooltip title='Xem danh sách đơn cam kết của kỳ này' arrow>
-              <IconButton
-                onClick={() => {
-                  setAcedemicProcess(infor.row.original)
-                  toogleViewByCategory()
-                }}
-              >
-                <Iconify icon='mdi:eye' color='#2092ec' />
-              </IconButton>
-            </Tooltip>
+            {user?.role.name === 'CVHT' ? (
+              <Tooltip title='Xem danh sách đơn cam kết của kỳ này' arrow>
+                <IconButton
+                  onClick={() => {
+                    setAcedemicProcess(infor.row.original)
+                    toogleViewByCategoryOfCVHT()
+                  }}
+                >
+                  <Iconify icon='mdi:eye' color='#2092ec' />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title='Xem danh sách đơn cam kết của kỳ này' arrow>
+                <IconButton
+                  onClick={() => {
+                    setAcedemicProcess(infor.row.original)
+                    toogleViewByCategory()
+                  }}
+                >
+                  <Iconify icon='mdi:eye' color='#2092ec' />
+                </IconButton>
+              </Tooltip>
+            )}
           </>
         )
       })
     ],
-    [setAcedemicProcess, toogleViewByCategory]
+    [setAcedemicProcess, toogleViewByCategory, toogleViewByCategoryOfCVHT, user]
   )
 
   const table = useReactTable({
@@ -110,11 +128,17 @@ export default function CommitmentFormsPage() {
   return (
     <>
       <PageHeader title='Danh sách đơn cam kết' />
-      <Divider
-        sx={{
-          margin: '10px 0px'
-        }}
-      />
+      <Card>
+        <CardContent>
+          <p>
+            <Iconify icon='noto-v1:light-bulb' />
+            <strong className='text-yellow-600'>Hướng dẫn: </strong>Để xem danh sách đơn cam kết của từng kỳ bằng cách
+            nhấn vào nút <Iconify icon='mdi:eye' color='#2092ec' /> hoặc &quot;Xem danh sách đơn cam kết của kỳ
+            này&quot; ở cột cuối cùng.
+          </p>
+        </CardContent>
+      </Card>
+
       <Card sx={{ mt: 4 }}>
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <CustomTextField
@@ -146,6 +170,7 @@ export default function CommitmentFormsPage() {
         />
       </Card>
       <ViewCommitmentForms />
+      <ViewCommitmentFormsOfCVHT />
     </>
   )
 }

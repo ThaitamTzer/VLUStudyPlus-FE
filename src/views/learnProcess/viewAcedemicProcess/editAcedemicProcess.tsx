@@ -221,7 +221,7 @@ export default function ManualEditAcedemicProcess({
               textTransform: 'capitalize'
             }}
           >
-            Cập nhật sinh viên vào {acedemicProcess?.title?.toLowerCase()}
+            Cập nhật sinh viên {acedemicProcess?.title?.toLowerCase()}
           </Typography>
         </DialogTitle>
         <DialogContent>

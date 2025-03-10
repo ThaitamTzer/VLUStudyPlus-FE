@@ -25,7 +25,7 @@ export default function UserProfileContent({ user }: { user: any }) {
                     <Iconify icon='solar:user-id-linear' width={27} />
                     <div className='flex items-center flex-wrap gap-2'>
                       <Typography className='font-medium'>
-                        {user?.role.name === 'Sinh viên' ? 'MSSV:' : 'Mã giảng viên:'}
+                        {user?.role?.name === 'Sinh viên' ? 'MSSV:' : 'Mã giảng viên:'}
                       </Typography>
                       <Typography> {user?.userId}</Typography>
                     </div>

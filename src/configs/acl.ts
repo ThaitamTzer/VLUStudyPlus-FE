@@ -1,43 +1,20 @@
 import { AbilityBuilder, Ability } from '@casl/ability'
 
+import type { UserType } from '../types/userType'
 import permissions from '@/libs/permission.json'
 
-export type Subjects = string
-export type Actions = 'manage' | 'create' | 'read' | 'update' | 'delete'
+export function defineAbilityFor(user: UserType) {
+  const { can, build } = new AbilityBuilder(Ability)
 
-export type AppAbility = Ability<[Actions, Subjects]> | undefined
+  if (user?.role?.permissionID) {
+    user.role.permissionID.forEach(id => {
+      const permission = permissions.find(p => p.id === id)
 
-export const AppAbility = Ability as any
+      if (permission) {
+        can(permission.action, permission.subject)
+      }
+    })
+  }
 
-export type ACLObj = {
-  action: Actions
-  subject: string
+  return build()
 }
-
-const defineRulesFor = (role: number[]) => {
-  const { can, rules } = new AbilityBuilder(AppAbility)
-
-  permissions.forEach(item => {
-    if (role?.includes(item.id)) {
-      can('read', 'homepage')
-      can(item.action, item.subject)
-    }
-  })
-
-  return rules
-}
-
-export const buildAbilityFor = (role: number[]): AppAbility => {
-  return new AppAbility(defineRulesFor(role), {
-    // https://casl.js.org/v5/en/guide/subject-type-detection
-    // @ts-ignore
-    detectSubjectType: object => object!.type
-  })
-}
-
-export const defaultACLObj: ACLObj = {
-  action: 'manage',
-  subject: 'all'
-}
-
-export default defineRulesFor

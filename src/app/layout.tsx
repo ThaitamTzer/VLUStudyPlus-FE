@@ -23,7 +23,13 @@ const RootLayout = ({ children }: ChildrenType) => {
 
   return (
     <html id='__next' lang='vi' dir={direction}>
-      <body className='flex is-full min-bs-full flex-auto flex-col'>{children}</body>
+      <body className='flex is-full min-bs-full flex-auto flex-col'>
+        {children}
+        <noscript>
+          <h1>JavaScript is required to use this website</h1>
+          <p>Please enable JavaScript in your browser settings and reload the page.</p>
+        </noscript>
+      </body>
     </html>
   )
 }

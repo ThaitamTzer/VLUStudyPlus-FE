@@ -41,6 +41,7 @@
     "@mui/system": "5.16.7",
     "@mui/x-data-grid": "5.17.26",
     "@prisma/client": "5.17.0",
+    "@react-pdf/renderer": "^4.3.0",
     "@reduxjs/toolkit": "2.2.6",
     "@tanstack/match-sorter-utils": "8.15.1",
     "@tanstack/react-table": "8.19.3",

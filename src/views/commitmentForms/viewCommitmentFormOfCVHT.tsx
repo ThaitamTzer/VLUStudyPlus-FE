@@ -33,8 +33,9 @@ const approveStatus = [
   { label: 'Từ chối', value: 'reject' }
 ]
 
-export default function ViewCommitmentForms() {
-  const { openViewByCategory, acedemicProcess, setAcedemicProcess, toogleViewByCategory } = useCommitmentStore()
+export default function ViewCommitmentFormsOfCVHT() {
+  const { openViewByCategoryOfCVHT, acedemicProcess, setAcedemicProcess, toogleViewByCategoryOfCVHT } =
+    useCommitmentStore()
 
   const id = acedemicProcess?._id
 
@@ -47,7 +48,7 @@ export default function ViewCommitmentForms() {
   const [searchKey, setSearchKey] = useState('')
 
   const fetcher = [
-    id ? `/commitment-forms/${id}` : null,
+    id ? `/commitment-forms-of-CVHT/${id}` : null,
     page,
     limit,
     filterField,
@@ -58,13 +59,22 @@ export default function ViewCommitmentForms() {
   ]
 
   const { data, isLoading, mutate } = useSWR(fetcher, () =>
-    commitmentFormService.getByCategory(id, page, limit, filterField, filterValue, sortField, sortOrder, searchKey)
+    commitmentFormService.getByCategoryOfCVHT(
+      id,
+      page,
+      limit,
+      filterField,
+      filterValue,
+      sortField,
+      sortOrder,
+      searchKey
+    )
   )
 
   const tableData = useMemo(() => data?.data || [], [data])
 
   const onClose = () => {
-    toogleViewByCategory()
+    toogleViewByCategoryOfCVHT()
     setAcedemicProcess({} as any)
   }
 
@@ -79,7 +89,7 @@ export default function ViewCommitmentForms() {
 
   return (
     <>
-      {openViewByCategory && (
+      {openViewByCategoryOfCVHT && (
         <Dialog open onClose={onClose} maxWidth='xl' fullWidth>
           <DialogTitle>
             <IconButton sx={{ position: 'absolute', right: 8, top: 8 }} onClick={onClose}>

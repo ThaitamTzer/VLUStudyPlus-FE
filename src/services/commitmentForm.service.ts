@@ -26,6 +26,32 @@ const commitmentFormService = {
 
     return res.data as CommitmentFormListType
   },
+  getByCategoryOfCVHT: async (
+    category: string | undefined,
+    page?: number,
+    limit?: number,
+    filterField?: string,
+    filterValue?: string,
+    sortField?: string,
+    sortOrder?: string,
+    searchKey?: string
+  ) => {
+    const params = {
+      ...(page && { page: page }),
+      ...(limit && { limit: limit }),
+      ...(filterField && { filterField: filterField }),
+      ...(filterValue && { filterValue: filterValue }),
+      ...(sortField && { sortField: sortField }),
+      ...(sortOrder && { sortOrder: sortOrder }),
+      ...(searchKey && { searchKey: searchKey })
+    }
+
+    const res = await axiosClient.get(`/api/commitment-form/get-all-commitment-form-of-CVHT?category=${category}`, {
+      params
+    })
+
+    return res.data as CommitmentFormListType
+  },
 
   getDetail: async (id: string) => {
     const res = await axiosClient.get(`/api/commitment-form/get-commitment-form/${id}`)

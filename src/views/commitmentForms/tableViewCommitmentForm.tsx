@@ -1,6 +1,5 @@
 'use client'
-
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import {
   TableContainer,
@@ -18,12 +17,18 @@ import type { KeyedMutator } from 'swr'
 
 import { toast } from 'react-toastify'
 
+import { pdf } from '@react-pdf/renderer'
+
+import { useAuth } from '@/hooks/useAuth'
+
 import StyledTableRow from '@/components/table/StyledTableRow'
 import TableLoading from '@/components/table/TableLoading'
 import TableNoData from '@/components/table/TableNotFound'
 import type { CommitmentFormType } from '@/types/management/comimentFormType'
 import Iconify from '@/components/iconify'
 import commitmentFormService from '@/services/commitmentForm.service'
+import { useCommitmentStore } from '@/stores/commitment.store'
+import { CommitmentFormPDF } from './commitmentPDF'
 
 const renderStatus = (status: string) => {
   switch (status) {
@@ -85,6 +90,16 @@ type TableViewCommitmentFormProps = {
 export default function TableViewCommitmentForm(props: TableViewCommitmentFormProps) {
   const { tableData, isLoading, page, limit, sortField, sortOrder, handleSort, mutate } = props
   const [loading, setLoading] = useState(false)
+  const { setCommitmentForms, toogleViewDetailCommitmentForm } = useCommitmentStore()
+  const { user } = useAuth()
+
+  const handleViewDetailCommitmentForm = useCallback(
+    (row: CommitmentFormType) => {
+      setCommitmentForms(row)
+      toogleViewDetailCommitmentForm()
+    },
+    [setCommitmentForms, toogleViewDetailCommitmentForm]
+  )
 
   const handleApprove = async (id: string, status: string) => {
     const toastId = toast.loading('Đang cập nhật trạng thái')
@@ -114,6 +129,37 @@ export default function TableViewCommitmentForm(props: TableViewCommitmentFormPr
         setLoading(false)
       }
     )
+  }
+
+  const handleExportPDF = async (id: string) => {
+    const toastId = toast.loading('Đang tải đơn cam kết')
+
+    await commitmentFormService
+      .getDetail(id)
+      .then(async data => {
+        const blob = await pdf(<CommitmentFormPDF data={data} />).toBlob()
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+
+        a.href = url
+        a.download = `Đơn cam kết học tập ${data.commitmentForm.name}.pdf`
+        a.click()
+        URL.revokeObjectURL(url)
+        toast.update(toastId, {
+          render: 'Tải đơn cam kết thành công',
+          type: 'success',
+          isLoading: false,
+          autoClose: 2000
+        })
+      })
+      .catch(() => {
+        toast.update(toastId, {
+          render: 'Không thể tải đơn vui lòng thử lại sau',
+          type: 'error',
+          isLoading: false,
+          autoClose: 2000
+        })
+      })
   }
 
   return (
@@ -173,11 +219,11 @@ export default function TableViewCommitmentForm(props: TableViewCommitmentFormPr
                 <TableCell>{renderStatus(row.approveStatus)}</TableCell>
                 <TableCell>
                   <Tooltip title='Xem chi tiết đơn cam kết'>
-                    <IconButton sx={{ color: 'primary.main' }}>
+                    <IconButton sx={{ color: 'primary.main' }} onClick={() => handleViewDetailCommitmentForm(row)}>
                       <Iconify icon='eva:eye-outline' />
                     </IconButton>
                   </Tooltip>
-                  {row.approveStatus === 'pending' && (
+                  {row.approveStatus === 'pending' && user?.role.name === 'CVHT' && (
                     <>
                       <Tooltip title='Duyệt đơn cam kết'>
                         <IconButton
@@ -199,13 +245,13 @@ export default function TableViewCommitmentForm(props: TableViewCommitmentFormPr
                       </Tooltip>
                     </>
                   )}
-                  {/* {row.approveStatus === 'approve' && (
-                    <Tooltip title='Cập nhật kết quả xử lý'>
-                      <IconButton sx={{ color: 'info.main' }}>
-                        <Iconify icon='eva:edit-2-outline' />
+                  {row.approveStatus === 'approve' && (
+                    <Tooltip title='Tải đơn cam kết'>
+                      <IconButton sx={{ color: 'info.main' }} onClick={() => handleExportPDF(row._id)}>
+                        <Iconify icon='eva:download-outline' />
                       </IconButton>
                     </Tooltip>
-                  )} */}
+                  )}
                 </TableCell>
               </StyledTableRow>
             )

@@ -212,7 +212,7 @@ export default function ManualAddAcedemicProcess({
             <Grid item xs={12} sm={4}>
               <Controller
                 control={control}
-                name='lastName'
+                name='firstName'
                 render={({ field }) => (
                   <CustomTextField
                     {...field}
@@ -227,7 +227,7 @@ export default function ManualAddAcedemicProcess({
             <Grid item xs={12} sm={4}>
               <Controller
                 control={control}
-                name='firstName'
+                name='lastName'
                 render={({ field }) => (
                   <CustomTextField
                     {...field}

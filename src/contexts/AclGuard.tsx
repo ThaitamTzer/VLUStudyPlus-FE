@@ -1,60 +1,60 @@
-'use client'
+// 'use client'
 
-import { useEffect } from 'react'
+// import { useEffect } from 'react'
 
-import { useRouter, usePathname } from 'next/navigation'
+// import { useRouter, usePathname } from 'next/navigation'
 
-import type { ACLObj, AppAbility } from '@/configs/acl'
+// import type { ACLObj, AppAbility } from '@/configs/acl'
 
-import { AbilityContext } from './AbilityContext'
+// import { AbilityContext } from './AbilityContext'
 
-import { buildAbilityFor } from '@/configs/acl'
+// import { buildAbilityFor } from '@/configs/acl'
 
-import NotAuthorized from '@/views/NotAuthorized'
-import { useAuth } from '@/hooks/useAuth'
-import { SplashScreen } from '@/components/loading-screen'
+// import NotAuthorized from '@/views/NotAuthorized'
+// import { useAuth } from '@/hooks/useAuth'
+// import { SplashScreen } from '@/components/loading-screen'
 
-interface AclGuardProps {
-  children: React.ReactNode
-  aclAbilities: ACLObj
-}
+// interface AclGuardProps {
+//   children: React.ReactNode
+//   aclAbilities: ACLObj
+// }
 
-const AclGuard = (props: AclGuardProps) => {
-  const { children, aclAbilities } = props
+// const AclGuard = (props: AclGuardProps) => {
+//   const { children, aclAbilities } = props
 
-  const { user } = useAuth()
-  const router = useRouter()
-  const pathname = usePathname()
+//   const { user } = useAuth()
+//   const router = useRouter()
+//   const pathname = usePathname()
 
-  let ability: AppAbility
+//   let ability: AppAbility
 
-  useEffect(() => {
-    if (user && user.role.permissionID && pathname === '/') {
-      router && router.push('/homepage')
-    }
-  }, [pathname, user, router])
+//   useEffect(() => {
+//     if (user && user.role.permissionID && pathname === '/') {
+//       router && router.push('/homepage')
+//     }
+//   }, [pathname, user, router])
 
-  if (user && !ability) {
-    ability = buildAbilityFor(user.role.permissionID)
+//   if (user && !ability) {
+//     ability = buildAbilityFor(user.role.permissionID)
 
-    if (pathname === '/') {
-      return <SplashScreen />
-    }
-  }
+//     if (pathname === '/') {
+//       return <SplashScreen />
+//     }
+//   }
 
-  if (ability && user && ability.can(aclAbilities.action, aclAbilities.subject)) {
-    if (pathname === '/') {
-      return <SplashScreen />
-    }
+//   if (ability && user && ability.can(aclAbilities.action, aclAbilities.subject)) {
+//     if (pathname === '/') {
+//       return <SplashScreen />
+//     }
 
-    return <AbilityContext.Provider value={ability}>{children}</AbilityContext.Provider>
-  }
+//     return <AbilityContext.Provider value={ability}>{children}</AbilityContext.Provider>
+//   }
 
-  if (!user || !ability) {
-    router.push('/login')
-  }
+//   if (!user || !ability) {
+//     router.push('/login')
+//   }
 
-  return <NotAuthorized mode='dark' />
-}
+//   return <NotAuthorized mode='dark' />
+// }
 
-export default AclGuard
+// export default AclGuard

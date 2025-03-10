@@ -107,7 +107,7 @@ export type ProcessingType = {
   classId: string
   cohortName: string
   processing: processing[]
-  handlingStatusByAAO: 'Buộc thôi học chuyển cảnh báo'
+  handlingStatusByAAO: string
   note: string
   courseRegistration: courseRegistration[]
   DTBC: number

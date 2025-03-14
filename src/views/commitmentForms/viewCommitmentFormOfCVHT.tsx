@@ -62,17 +62,24 @@ export default function ViewCommitmentFormsOfCVHT() {
     searchKey
   ]
 
-  const { data, isLoading, mutate } = useSWR(fetcher, () =>
-    commitmentFormService.getByCategoryOfCVHT(
-      id,
-      page,
-      limit,
-      filterField,
-      filterValue,
-      sortField,
-      sortOrder,
-      searchKey
-    )
+  const { data, isLoading, mutate } = useSWR(
+    id ? fetcher : null,
+    () =>
+      commitmentFormService.getByCategoryOfCVHT(
+        id,
+        page,
+        limit,
+        filterField,
+        filterValue,
+        sortField,
+        sortOrder,
+        searchKey
+      ),
+    {
+      revalidateOnFocus: false,
+      errorRetryCount: 3,
+      errorRetryInterval: 3000
+    }
   )
 
   const tableData = useMemo(() => data?.data || [], [data])

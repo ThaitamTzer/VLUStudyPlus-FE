@@ -16,8 +16,12 @@ type ViewDetailAcedecmicProcessProps = {
 export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicProcessProps) {
   const { id } = props
 
-  const { data } = useSWR(`/api/academic-processing/view-academicProcessing/${id}`, () =>
-    learnProcessService.viewDetailProcess(id)
+  const { data } = useSWR(
+    id ? `/api/academic-processing/view-academicProcessing/${id}` : null,
+    () => learnProcessService.viewDetailProcess(id),
+    {
+      revalidateOnFocus: false
+    }
   )
 
   const { toogleViewDetailAcademicProcess, openViewDetailAcademicProcess } = useAcedemicProcessStore()

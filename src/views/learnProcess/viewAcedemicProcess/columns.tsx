@@ -26,7 +26,6 @@ export const useColumns = () => {
     toogleUpdateAcedemicProcess,
     toogleDeleteAcedemicProcess,
     toogleImportModal,
-    toogleManualAdd,
     toogleViewByCategory
   } = useAcedemicProcessStore()
 
@@ -130,7 +129,6 @@ export const useColumns = () => {
       toogleUpdateAcedemicProcess,
       toogleDeleteAcedemicProcess,
       toogleImportModal,
-      toogleManualAdd,
       toogleViewByCategory,
       toogleViewCommnitmentByCategory,
       setAcedemicProcessCommiment,

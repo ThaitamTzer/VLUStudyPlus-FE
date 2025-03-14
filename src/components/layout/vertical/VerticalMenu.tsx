@@ -185,11 +185,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           >
             Ngành
           </MenuItem>
-          <MenuItem href='/process-result' icon={<Iconify icon='carbon:result' />}>
-            Kết quả xử lý
-          </MenuItem>
           <MenuItem href='/type-process' icon={<Iconify icon='material-symbols:problem-outline-rounded' />}>
             Loại xử lý
+          </MenuItem>
+          <MenuItem href='/process-result' icon={<Iconify icon='carbon:result' />}>
+            Kết quả xử lý
           </MenuItem>
         </SubMenu>
         <SubMenu label='NGƯỜI DÙNG' icon={<Iconify icon='solar:users-group-rounded-linear' />}>
@@ -223,7 +223,6 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           <MenuItem href='/learning-processing' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
             Kỳ XLHV
           </MenuItem>
-
           <MenuItem href='/commitment-forms' icon={<Iconify icon='icon-park-outline:doc-detail' />}>
             Đơn cam kết
           </MenuItem>

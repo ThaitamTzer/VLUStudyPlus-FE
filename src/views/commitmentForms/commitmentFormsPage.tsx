@@ -44,7 +44,8 @@ const columnHelper = createColumnHelper<AcedemicProcessWithAction>()
 export default function CommitmentFormsPage() {
   const { user } = useAuth()
 
-  const { toogleViewByCategory, setAcedemicProcess, toogleViewByCategoryOfCVHT } = useCommitmentStore()
+  const { toogleViewCommnitmentByCategory, setAcedemicProcessCommiment, toogleViewCommnitmentByCategoryOfCVHT } =
+    useCommitmentStore()
 
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
@@ -76,8 +77,8 @@ export default function CommitmentFormsPage() {
               <Tooltip title='Xem danh sách đơn cam kết của kỳ này' arrow>
                 <IconButton
                   onClick={() => {
-                    setAcedemicProcess(infor.row.original)
-                    toogleViewByCategoryOfCVHT()
+                    setAcedemicProcessCommiment(infor.row.original)
+                    toogleViewCommnitmentByCategoryOfCVHT()
                   }}
                 >
                   <Iconify icon='mdi:eye' color='#2092ec' />
@@ -87,8 +88,8 @@ export default function CommitmentFormsPage() {
               <Tooltip title='Xem danh sách đơn cam kết của kỳ này' arrow>
                 <IconButton
                   onClick={() => {
-                    setAcedemicProcess(infor.row.original)
-                    toogleViewByCategory()
+                    setAcedemicProcessCommiment(infor.row.original)
+                    toogleViewCommnitmentByCategory()
                   }}
                 >
                   <Iconify icon='mdi:eye' color='#2092ec' />
@@ -99,7 +100,7 @@ export default function CommitmentFormsPage() {
         )
       })
     ],
-    [setAcedemicProcess, toogleViewByCategory, toogleViewByCategoryOfCVHT, user]
+    [setAcedemicProcessCommiment, toogleViewCommnitmentByCategory, toogleViewCommnitmentByCategoryOfCVHT, user]
   )
 
   const table = useReactTable({

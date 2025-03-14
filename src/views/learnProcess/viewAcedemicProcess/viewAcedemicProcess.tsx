@@ -189,7 +189,7 @@ export default function ViewAcedemicProcess() {
                   startIcon={<i className='tabler-plus' />}
                   className='max-sm:is-full'
                 >
-                  Thêm sinh viên bị xử lý học vụ
+                  Thêm XLHV
                 </Button>
               </div>
             </div>

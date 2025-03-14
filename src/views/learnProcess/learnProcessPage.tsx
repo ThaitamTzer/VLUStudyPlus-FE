@@ -17,7 +17,7 @@ import {
   useReactTable
 } from '@tanstack/react-table'
 
-import { Button, Card, MenuItem, TablePagination, Typography } from '@mui/material'
+import { Box, Button, Card, CardContent, MenuItem, TablePagination, Typography } from '@mui/material'
 
 import { toast } from 'react-toastify'
 
@@ -30,6 +30,9 @@ import DebouncedInput from '@/components/debouncedInput'
 import TablePaginationComponent from '@/components/TablePaginationComponent'
 import ProgressModal from './progressModal'
 import { useColumns } from './viewAcedemicProcess/columns'
+import ViewCommitmentForms from '../commitmentForms/viewCommitmentForm'
+import ViewCommitmentFormsOfCVHT from '../commitmentForms/viewCommitmentFormOfCVHT'
+import Iconify from '@/components/iconify'
 
 const TableTypeProcess = dynamic(() => import('../type-process/list'), { ssr: false })
 const AddAcedemicProcess = dynamic(() => import('./addAcedemicProcess'), { ssr: false })
@@ -128,7 +131,51 @@ export default function LearnProcessPage() {
   return (
     <>
       <PageHeader title='Danh sách kỳ xử lý học tập' />
-      <Card sx={{ mt: 4 }}>
+
+      <Card sx={{ p: 2, boxShadow: 3, mt: 4 }}>
+        <CardContent>
+          <Typography variant='h6' fontWeight='bold' gutterBottom>
+            Hướng dẫn thao tác
+          </Typography>
+          <Box display='grid' gridTemplateColumns='repeat(auto-fit, minmax(150px, 1fr))' gap={2}>
+            {[
+              { icon: 'gg:list', color: '#2092ec', label: 'Xem danh sách xử lý học tập' },
+              { icon: 'hugeicons:files-01', color: '#2092ec', label: 'Xem danh sách đơn cam kết' },
+              { icon: 'bx:import', color: 'green', label: 'Import danh sách xử lý học tập' },
+              { icon: 'solar:pen-2-linear', color: 'orange', label: 'Cập nhật kỳ xử lý' },
+              { icon: 'solar:trash-bin-2-linear', color: 'red', label: 'Xóa kỳ xử lý' }
+            ].map((item, index) => (
+              <Box
+                key={index}
+                display='flex'
+                alignItems='center'
+                gap={1}
+                sx={{
+                  p: 2,
+                  borderRadius: '8px',
+                  backgroundColor: '#f9f9f9',
+                  boxShadow: 1,
+                  transition: 'all 0.3s',
+                  '&:hover': { boxShadow: 3, backgroundColor: '#f1f1f1' }
+                }}
+              >
+                <Iconify icon={item.icon} color={item.color} width={24} height={24} />
+                <Typography variant='body2' fontWeight='500'>
+                  {item.label}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+          <Typography variant='h6' fontWeight='bold' gutterBottom sx={{ mt: 4 }}>
+            Thêm xử lý học vụ
+          </Typography>
+          <Typography variant='body1' gutterBottom>
+            Bạn có thể thêm xử lý học tập bằng cách xem danh sách xử lý học tập và chọn Thêm XLHV.
+          </Typography>
+        </CardContent>
+      </Card>
+
+      <Card sx={{ mt: 4, boxShadow: 5 }}>
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <CustomTextField
             select
@@ -153,7 +200,7 @@ export default function LearnProcessPage() {
               className='max-sm:is-full'
               onClick={toogleAddAcedemicProcess}
             >
-              Thêm kỳ xử lý học tập
+              Thêm kỳ XLHT
             </Button>
           </div>
         </div>
@@ -172,6 +219,8 @@ export default function LearnProcessPage() {
       <ImportModal mutate={mutate} />
       <ImportResult />
       <ViewAcedemicProcess />
+      <ViewCommitmentForms />
+      <ViewCommitmentFormsOfCVHT />
       <ProgressModal open={openProgress} />
       <AlertDelete
         countdown

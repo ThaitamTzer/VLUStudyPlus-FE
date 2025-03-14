@@ -122,7 +122,7 @@ export default function UpdateAcedemicProcessStatus({ mutate }: { mutate: KeyedM
                       <CustomTextField
                         {...params}
                         fullWidth
-                        label='Trạng thái xử lý'
+                        label='Kết quả xử lý'
                         {...(errors.processingResultId && {
                           error: true,
                           helperText: errors.processingResultId.message

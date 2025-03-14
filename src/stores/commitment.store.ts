@@ -4,39 +4,41 @@ import type { LearnProcessType } from '@/types/management/learnProcessType'
 import type { CommitmentFormType } from '@/types/management/comimentFormType'
 
 type States = {
-  openViewByCategory: boolean
-  openViewByCategoryOfCVHT: boolean
+  openViewCommitmentByCategory: boolean
+  openViewCommimentByCategoryOfCVHT: boolean
   openUpdateStatus: boolean
   cateId: string
-  acedemicProcess: LearnProcessType | null
+  acedemicProcessCommitment: LearnProcessType | null
   commitmentForms: CommitmentFormType
   openViewDetailCommitmentForm: boolean
 }
 
 type Actions = {
-  toogleViewByCategory: () => void
-  toogleViewByCategoryOfCVHT: () => void
+  toogleViewCommnitmentByCategory: () => void
+  toogleViewCommnitmentByCategoryOfCVHT: () => void
   toogleUpdateStatus: () => void
   setCateId: (cateId: string) => void
-  setAcedemicProcess: (acedemicProcess: LearnProcessType | null) => void
+  setAcedemicProcessCommiment: (acedemicProcessCommitment: LearnProcessType | null) => void
   toogleViewDetailCommitmentForm: () => void
   setCommitmentForms: (commitmentForms: CommitmentFormType) => void
 }
 
 export const useCommitmentStore = create<States & Actions>(set => ({
-  openViewByCategory: false,
+  openViewCommitmentByCategory: false,
   openUpdateStatus: false,
   cateId: '',
-  acedemicProcess: null,
+  acedemicProcessCommitment: null,
   commitmentForms: {} as CommitmentFormType,
   openViewDetailCommitmentForm: false,
-  openViewByCategoryOfCVHT: false,
-  toogleViewByCategoryOfCVHT: () => set(state => ({ openViewByCategoryOfCVHT: !state.openViewByCategoryOfCVHT })),
+  openViewCommimentByCategoryOfCVHT: false,
+  toogleViewCommnitmentByCategoryOfCVHT: () =>
+    set(state => ({ openViewCommimentByCategoryOfCVHT: !state.openViewCommimentByCategoryOfCVHT })),
   setCommitmentForms: commitmentForms => set({ commitmentForms }),
   toogleViewDetailCommitmentForm: () =>
     set(state => ({ openViewDetailCommitmentForm: !state.openViewDetailCommitmentForm })),
-  setAcedemicProcess: acedemicProcess => set({ acedemicProcess }),
+  setAcedemicProcessCommiment: acedemicProcessCommitment => set({ acedemicProcessCommitment }),
   setCateId: cateId => set({ cateId }),
-  toogleViewByCategory: () => set(state => ({ openViewByCategory: !state.openViewByCategory })),
+  toogleViewCommnitmentByCategory: () =>
+    set(state => ({ openViewCommitmentByCategory: !state.openViewCommitmentByCategory })),
   toogleUpdateStatus: () => set(state => ({ openUpdateStatus: !state.openUpdateStatus }))
 }))

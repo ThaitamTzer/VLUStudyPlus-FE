@@ -8,7 +8,8 @@ import {
   Stack,
   MenuItem,
   IconButton,
-  Tooltip
+  Tooltip,
+  Badge
 } from '@mui/material'
 
 import StyledTableRow from '@/components/table/StyledTableRow'
@@ -132,15 +133,7 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
             {termNames.map(term => (
               <TableCell key={term}>XLHV ({term})</TableCell>
             ))}
-            {/* <TableCell>
-              <TableSortLabel
-                active={sortField === 'processing'}
-                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
-                onClick={() => handleSort('processing')}
-              >
-                XLHV
-              </TableSortLabel>
-            </TableCell> */}
+
             <TableCell>
               <TableSortLabel
                 active={sortField === 'handlingStatusByAAO'}
@@ -150,15 +143,33 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                 Diện XLHV (PĐT đề nghị)
               </TableSortLabel>
             </TableCell>
-            {/* <TableCell> */}
-            {/* <TableSortLabel
-                active={sortField === 'courseRegistration'}
+            <TableCell>
+              <TableSortLabel
+                active={sortField === 'status'}
                 direction={sortOrder === 'desc' ? 'desc' : 'asc'}
-                onClick={() => handleSort('courseRegistration')}
+                onClick={() => handleSort('status')}
               >
-                ĐKMH
-              </TableSortLabel> */}
-            {/* </TableCell> */}
+                CVHT Xử lý
+              </TableSortLabel>
+            </TableCell>
+            <TableCell>
+              <TableSortLabel
+                active={sortField === 'commitment'}
+                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
+                onClick={() => handleSort('commitment')}
+              >
+                Đơn cam kết
+              </TableSortLabel>
+            </TableCell>
+            <TableCell>
+              <TableSortLabel
+                active={sortField === 'processingResult'}
+                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
+                onClick={() => handleSort('processingResult')}
+              >
+                Kết quả xử lý
+              </TableSortLabel>
+            </TableCell>
             {termNamesCouseRegistration.map(term => (
               <TableCell key={term}>ĐKMH ({term})</TableCell>
             ))}
@@ -205,24 +216,6 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                 onClick={() => handleSort('reasonHandling')}
               >
                 Lý do XLHV (UIS)
-              </TableSortLabel>
-            </TableCell>
-            <TableCell>
-              <TableSortLabel
-                active={sortField === 'status'}
-                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
-                onClick={() => handleSort('status')}
-              >
-                CVHT Xử lý
-              </TableSortLabel>
-            </TableCell>
-            <TableCell>
-              <TableSortLabel
-                active={sortField === 'commitment'}
-                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
-                onClick={() => handleSort('commitment')}
-              >
-                Đơn cam kết
               </TableSortLabel>
             </TableCell>
             <TableCell>
@@ -301,6 +294,10 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                       sm: 'sticky'
                     },
                     left: 0,
+                    zIndex: {
+                      xs: 0,
+                      sm: 9
+                    },
                     overflow: 'hidden',
                     backgroundColor: { xs: 'action.hover.light', sm: 'background.paper' }
                   }}
@@ -314,6 +311,10 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                       sm: 'sticky'
                     },
                     left: 55,
+                    zIndex: {
+                      xs: 0,
+                      sm: 9
+                    },
                     overflow: 'hidden',
                     backgroundColor: { xs: 'action.hover.light', sm: 'background.paper' },
                     borderRight: { xs: 'none', sm: '1px solid rgba(224, 224, 224, 1)' }
@@ -321,7 +322,6 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                 >
                   {renderStudent(d)}
                 </TableCell>
-                {/* <TableCell>{renderprocessing(d.processing)}</TableCell> */}
                 {termNames.map(term => {
                   const processingData = d.processing.find(p => p.termName === term)
 
@@ -332,7 +332,57 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                   )
                 })}
                 <TableCell>{d.handlingStatusByAAO}</TableCell>
-                {/* <TableCell>{rendercourseRegistration(d.courseRegistration)}</TableCell> */}
+                <TableCell>
+                  {d.status ? (
+                    <Badge
+                      sx={{
+                        backgroundColor: 'success.main',
+                        color: 'white',
+                        padding: '5px 10px',
+                        borderRadius: '5px'
+                      }}
+                    >
+                      Đã xử lý
+                    </Badge>
+                  ) : (
+                    <Badge
+                      sx={{
+                        backgroundColor: 'error.main',
+                        color: 'white',
+                        padding: '5px 10px',
+                        borderRadius: '5px'
+                      }}
+                    >
+                      Chưa xử lý
+                    </Badge>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {d.commitment ? (
+                    <Badge
+                      sx={{
+                        backgroundColor: 'success.main',
+                        color: 'white',
+                        padding: '5px 10px',
+                        borderRadius: '5px'
+                      }}
+                    >
+                      Đã làm đơn
+                    </Badge>
+                  ) : (
+                    <Badge
+                      sx={{
+                        backgroundColor: 'warning.main',
+                        color: 'white',
+                        padding: '5px 10px',
+                        borderRadius: '5px'
+                      }}
+                    >
+                      Chưa làm đơn
+                    </Badge>
+                  )}
+                </TableCell>
+                <TableCell>{d.processingResult || ''}</TableCell>
                 {termNamesCouseRegistration.map(term => {
                   const courseRegistrationData = d.courseRegistration.find(p => p.termName === term)
 
@@ -347,14 +397,12 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                     </TableCell>
                   )
                 })}
-                <TableCell>{d.DTBC}</TableCell>
-                <TableCell>{d.STC}</TableCell>
-                <TableCell>{d.DTBCTL}</TableCell>
-                <TableCell>{d.STCTL}</TableCell>
-                <TableCell>{d.reasonHandling}</TableCell>
-                <TableCell>{d.status ? 'Đã xử lý' : 'Chưa xử lý'}</TableCell>
-                <TableCell>{d.commitment ? 'Đã làm đơn' : 'Chưa làm đơn'}</TableCell>
-                <TableCell>{d.yearLevel}</TableCell>
+                <TableCell width={10}>{d.DTBC}</TableCell>
+                <TableCell width={10}>{d.STC}</TableCell>
+                <TableCell width={10}>{d.DTBCTL}</TableCell>
+                <TableCell width={10}>{d.STCTL}</TableCell>
+                <TableCell width={200}>{d.reasonHandling}</TableCell>
+                <TableCell>{d.yearLevel || '-'}</TableCell>
                 <TableCell>{d.faculty}</TableCell>
                 <TableCell>{d.year}</TableCell>
                 <TableCell>{d.termName}</TableCell>
@@ -371,18 +419,6 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                     borderLeft: { xs: 'none', sm: '1px solid rgba(224, 224, 224, 1)' }
                   }}
                 >
-                  {/* <Tooltip arrow title='Cập nhật kết quả xử lý'>
-                    <IconButton
-                      size='small'
-                      color='primary'
-                      onClick={() => {
-                        setProcessing(d)
-                        toogleOpenUpdateAcedemicProcessStatus()
-                      }}
-                    >
-                      <Iconify icon='fluent:edit-32-regular' />
-                    </IconButton>
-                  </Tooltip> */}
                   <Tooltip arrow title='Xem chi tiết xử lý học tập'>
                     <IconButton
                       size='small'

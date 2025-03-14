@@ -34,9 +34,14 @@ const approveStatus = [
 ]
 
 export default function ViewCommitmentForms() {
-  const { openViewByCategory, acedemicProcess, setAcedemicProcess, toogleViewByCategory } = useCommitmentStore()
+  const {
+    openViewCommitmentByCategory,
+    acedemicProcessCommitment,
+    setAcedemicProcessCommiment,
+    toogleViewCommnitmentByCategory
+  } = useCommitmentStore()
 
-  const id = acedemicProcess?._id
+  const id = acedemicProcessCommitment?._id
 
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
@@ -64,8 +69,8 @@ export default function ViewCommitmentForms() {
   const tableData = useMemo(() => data?.data || [], [data])
 
   const onClose = () => {
-    toogleViewByCategory()
-    setAcedemicProcess({} as any)
+    toogleViewCommnitmentByCategory()
+    setAcedemicProcessCommiment({} as any)
   }
 
   const handleSort = (field: string) => {
@@ -79,13 +84,13 @@ export default function ViewCommitmentForms() {
 
   return (
     <>
-      {openViewByCategory && (
+      {openViewCommitmentByCategory && (
         <Dialog open onClose={onClose} maxWidth='xl' fullWidth>
           <DialogTitle>
             <IconButton sx={{ position: 'absolute', right: 8, top: 8 }} onClick={onClose}>
               <Iconify icon='eva:close-outline' />
             </IconButton>
-            <Typography variant='h4'>Danh sách đơn cam kết - {acedemicProcess?.title}</Typography>
+            <Typography variant='h4'>Danh sách đơn cam kết - {acedemicProcessCommitment?.title}</Typography>
           </DialogTitle>
           <DialogContent>
             <Card>

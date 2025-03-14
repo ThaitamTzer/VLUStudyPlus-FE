@@ -30,6 +30,7 @@ type TableAcedemicProcessProps = {
   toogleDeleteViewAcedemicProcess: () => void
   setProcessing: (processing: ProcessingType) => void
   toogleViewDetailAcedemicProcess: () => void
+  toogleOpenUpdateAcedemicProcessStatus: () => void
 }
 
 export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
@@ -44,8 +45,11 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
     toogleEditViewAcedemicProcess,
     toogleDeleteViewAcedemicProcess,
     setProcessing,
-    toogleViewDetailAcedemicProcess
+    toogleViewDetailAcedemicProcess,
+    toogleOpenUpdateAcedemicProcessStatus
   } = props
+
+  console.log(data)
 
   const termNames = Array.from(new Set(data?.data.flatMap(d => d.processing.map(p => p.termName)) || []))
 
@@ -67,14 +71,6 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
       </Stack>
     )
   }
-
-  // const renderprocessing = (data: processing[]) => {
-  //   return data.map(p => `${p.statusHandling} (${p.termName})`).join('; ')
-  // }
-
-  // const rendercourseRegistration = (data: courseRegistration[]) => {
-  //   return data.map(p => `${p.isRegister ? 'Có' : 'Không'} => (${p.termName})`).join(', ')
-  // }
 
   return (
     <TableContainer sx={{ position: 'relative', overflowX: 'auto', maxHeight: 'calc(100vh - 300px)' }}>
@@ -375,9 +371,22 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                     borderLeft: { xs: 'none', sm: '1px solid rgba(224, 224, 224, 1)' }
                   }}
                 >
+                  {/* <Tooltip arrow title='Cập nhật kết quả xử lý'>
+                    <IconButton
+                      size='small'
+                      color='primary'
+                      onClick={() => {
+                        setProcessing(d)
+                        toogleOpenUpdateAcedemicProcessStatus()
+                      }}
+                    >
+                      <Iconify icon='fluent:edit-32-regular' />
+                    </IconButton>
+                  </Tooltip> */}
                   <Tooltip arrow title='Xem chi tiết xử lý học tập'>
                     <IconButton
                       size='small'
+                      color='info'
                       onClick={() => {
                         setProcessing(d)
                         toogleViewDetailAcedemicProcess()
@@ -390,10 +399,19 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                     <MenuItem
                       onClick={() => {
                         setProcessing(d)
+                        toogleOpenUpdateAcedemicProcessStatus()
+                      }}
+                    >
+                      <Iconify icon='fluent:edit-32-regular' />
+                      Cập nhật kết quả xử lý
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        setProcessing(d)
                         toogleEditViewAcedemicProcess()
                       }}
                     >
-                      <Iconify icon='solar:pen-2-linear' />
+                      <Iconify icon='fluent:edit-32-regular' />
                       Sửa
                     </MenuItem>
                     <MenuItem

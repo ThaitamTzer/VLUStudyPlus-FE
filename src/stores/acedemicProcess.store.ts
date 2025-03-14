@@ -23,6 +23,7 @@ type States = {
   openDeleteViewAcedemicProcess: boolean
 
   openViewDetailAcademicProcess: boolean
+  openUpdateAcedemicProcessStatus: boolean
 }
 
 type Actions = {
@@ -45,6 +46,7 @@ type Actions = {
   setListAcedemicProcess: (listAcedemicProcess: LearnProcessType[]) => void
   toogleDeleteViewAcedemicProcess: () => void
   toogleViewDetailAcademicProcess: () => void
+  toogleUpdateAcedemicProcessStatus: () => void
 }
 
 export const useAcedemicProcessStore = create<States & Actions>(set => ({
@@ -67,6 +69,9 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
   listAcedemicProcess: [],
   openDeleteViewAcedemicProcess: false,
   openViewDetailAcademicProcess: false,
+  openUpdateAcedemicProcessStatus: false,
+  toogleUpdateAcedemicProcessStatus: () =>
+    set(state => ({ openUpdateAcedemicProcessStatus: !state.openUpdateAcedemicProcessStatus })),
   toogleViewDetailAcademicProcess: () =>
     set(state => ({ openViewDetailAcademicProcess: !state.openViewDetailAcademicProcess })),
   setListAcedemicProcess: listAcedemicProcess => set({ listAcedemicProcess }),

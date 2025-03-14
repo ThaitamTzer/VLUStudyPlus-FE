@@ -155,6 +155,31 @@ const learnProcessService = {
     }
   },
 
+  updateStatusProcess: async (
+    id: string,
+    data: any,
+    sucessCallback?: (res: any) => void,
+    errorCallback?: (res: any) => void
+  ) => {
+    try {
+      return await axiosClient
+        .put(`/api/academic-processing/update-academicProcessing-status/${id}`, data)
+        .then(res => {
+          if (sucessCallback) {
+            sucessCallback(res.data)
+          }
+
+          return res
+        })
+    } catch (error) {
+      if (errorCallback) {
+        errorCallback(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+
   viewProcessByCategory: async (
     id: string,
     page?: number,

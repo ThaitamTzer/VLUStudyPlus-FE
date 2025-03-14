@@ -29,6 +29,7 @@ import TableFilter from './tableFilter'
 import ManualEditAcedemicProcess from './editAcedemicProcess'
 import AlertDelete from '@/components/alertModal'
 import ViewDetailAcedecmicProcess from './viewDetailAcedemicProcess'
+import UpdateAcedemicProcessStatus from '../updateAcedemicProcessStatus'
 
 export default function ViewAcedemicProcess() {
   const {
@@ -44,7 +45,8 @@ export default function ViewAcedemicProcess() {
     toogleDeleteViewAcedemicProcess,
     openDeleteViewAcedemicProcess,
     processing,
-    toogleViewDetailAcademicProcess
+    toogleViewDetailAcademicProcess,
+    toogleUpdateAcedemicProcessStatus
   } = useAcedemicProcessStore()
 
   const { cohorOptions } = useShare()
@@ -203,6 +205,7 @@ export default function ViewAcedemicProcess() {
               toogleEditViewAcedemicProcess={toogleEditViewAcedemicProcess}
               toogleDeleteViewAcedemicProcess={toogleDeleteViewAcedemicProcess}
               toogleViewDetailAcedemicProcess={toogleViewDetailAcademicProcess}
+              toogleOpenUpdateAcedemicProcessStatus={toogleUpdateAcedemicProcessStatus}
             />
             <TablePagination
               component={() => (
@@ -226,6 +229,7 @@ export default function ViewAcedemicProcess() {
         </DialogContent>
       </Dialog>
       <ViewDetailAcedecmicProcess id={processing?._id || ''} />
+      <UpdateAcedemicProcessStatus mutate={mutate} />
       <ManualEditAcedemicProcess
         mutate={mutate}
         onClose={toogleEditViewAcedemicProcess}

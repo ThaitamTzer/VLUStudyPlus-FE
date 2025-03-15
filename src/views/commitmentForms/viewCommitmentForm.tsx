@@ -62,7 +62,7 @@ export default function ViewCommitmentForms() {
     searchKey
   ]
 
-  const { data, isLoading, mutate } = useSWR(fetcher, () =>
+  const { data, isLoading, mutate } = useSWR(id ? fetcher : null, () =>
     commitmentFormService.getByCategory(id, page, limit, filterField, filterValue, sortField, sortOrder, searchKey)
   )
 

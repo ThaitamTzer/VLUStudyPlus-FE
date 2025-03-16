@@ -48,7 +48,7 @@ export default function StudentAcedemicProcessPage() {
               <CardHeader
                 action={
                   <Stack direction='row' spacing={1}>
-                    {!student.commitment ? (
+                    {!student.commitment && (
                       <Button
                         variant='contained'
                         color='primary'
@@ -59,9 +59,10 @@ export default function StudentAcedemicProcessPage() {
                       >
                         ✏️ Tạo đơn
                       </Button>
-                    ) : (
+                    )}
+                    {!student.status && student.commitment && (
                       <Button variant='contained' color='primary' size='small'>
-                        📜 Xem đơn cam kết
+                        ✏️
                       </Button>
                     )}
                   </Stack>

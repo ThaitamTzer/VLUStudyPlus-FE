@@ -8,7 +8,7 @@ const resultProcessService = {
   },
 
   create: async (
-    data: { processingResultName: string },
+    data: { processingResultName: string; commitment: boolean },
     sucessCallback?: (res: any) => void,
     errorCallback?: (res: any) => void
   ) => {

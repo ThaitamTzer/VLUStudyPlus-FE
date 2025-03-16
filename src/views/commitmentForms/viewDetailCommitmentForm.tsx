@@ -78,7 +78,7 @@ export default function ViewDetailCommitmentForm() {
       </DialogContent>
       <DialogActions>
         <Button variant='contained' onClick={handleExportPDF}>
-          Export PDF
+          Xuất file PDF
         </Button>
       </DialogActions>
     </Dialog>

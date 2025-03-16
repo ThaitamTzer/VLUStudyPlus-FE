@@ -71,6 +71,11 @@ export default function ProcessResultPage() {
         cell: infor => infor.getValue(),
         sortingFn: 'alphanumeric'
       }),
+      columnHelper.accessor('commitment', {
+        header: 'Làm cam kết',
+        cell: infor => (infor.getValue() ? 'Có' : 'Không'),
+        sortingFn: 'alphanumeric'
+      }),
       columnHelper.accessor('action', {
         header: '',
         meta: {

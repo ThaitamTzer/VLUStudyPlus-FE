@@ -332,11 +332,13 @@ export default function AddCommitmentForm({ mutate }: { mutate: KeyedMutator<any
                       )}
                     />
                   </Grid>
-                  <Grid item xs={2}>
-                    <Button onClick={() => removeProcessing(index)} color='error'>
-                      Xóa
-                    </Button>
-                  </Grid>
+                  {processingFields.length > 1 && (
+                    <Grid item xs={2}>
+                      <Button onClick={() => removeProcessing(index)} color='error'>
+                        Xóa
+                      </Button>
+                    </Grid>
+                  )}
                 </Grid>
               ))}
               <Button onClick={() => addProcessing({ term: '', typeProcessing: '' })}>Thêm trạng thái xử lý</Button>
@@ -432,11 +434,13 @@ export default function AddCommitmentForm({ mutate }: { mutate: KeyedMutator<any
                       )}
                     />
                   </Grid>
-                  <Grid item xs={2}>
-                    <Button onClick={() => removeDebt(index)} color='error'>
-                      Xóa
-                    </Button>
-                  </Grid>
+                  {debtFields.length > 1 && (
+                    <Grid item xs={2}>
+                      <Button onClick={() => removeDebt(index)} color='error'>
+                        Xóa
+                      </Button>
+                    </Grid>
+                  )}
                 </Grid>
               ))}
               <Button onClick={() => addDebt({ term: '', subject: '' })}>Thêm môn nợ</Button>

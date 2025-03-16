@@ -6,7 +6,18 @@ import type { InferInput } from 'valibot'
 import { useForm, Controller } from 'react-hook-form'
 import { valibotResolver } from '@hookform/resolvers/valibot'
 
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, Typography } from '@mui/material'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  Switch,
+  Typography
+} from '@mui/material'
 
 import { LoadingButton } from '@mui/lab'
 
@@ -24,7 +35,8 @@ const schema = v.object({
     v.string(),
     v.nonEmpty('Tên kết quả xử lý không được để trống'),
     v.maxLength(255, 'Tên kết quả không được quá 255 ký tự')
-  )
+  ),
+  commitment: v.boolean()
 })
 
 type FormData = InferInput<typeof schema>
@@ -43,7 +55,8 @@ export default function UpdateProcessResult({ mutate }: { mutate: KeyedMutator<a
   } = useForm<FormData>({
     resolver: valibotResolver(schema),
     defaultValues: {
-      processingResultName: resultProcessData?.processingResultName || ''
+      processingResultName: resultProcessData?.processingResultName || '',
+      commitment: resultProcessData?.commitment || false
     }
   })
 
@@ -51,7 +64,8 @@ export default function UpdateProcessResult({ mutate }: { mutate: KeyedMutator<a
     if (!resultProcessData) return
 
     reset({
-      processingResultName: resultProcessData.processingResultName
+      processingResultName: resultProcessData.processingResultName,
+      commitment: resultProcessData.commitment
     })
   }, [resultProcessData, reset])
 
@@ -125,6 +139,28 @@ export default function UpdateProcessResult({ mutate }: { mutate: KeyedMutator<a
                       error: true,
                       helperText: errors.processingResultName.message
                     })}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Controller
+                control={control}
+                name='commitment'
+                render={({ field }) => (
+                  <FormControlLabel
+                    label='Làm cam kết'
+                    control={
+                      <Switch
+                        {...field}
+                        checked={field.value}
+                        onChange={e => field.onChange(e.target.checked)}
+                        {...(errors.commitment && {
+                          error: true,
+                          helperText: errors.commitment.message?.toString()
+                        })}
+                      />
+                    }
                   />
                 )}
               />

@@ -219,7 +219,7 @@ export default function ManualAddAcedemicProcess({
                     fullWidth
                     label='Họ'
                     placeholder='VD: Nguyễn'
-                    {...(errors.lastName && { error: true, helperText: errors.lastName.message?.toString() })}
+                    {...(errors.firstName && { error: true, helperText: errors.firstName.message?.toString() })}
                   />
                 )}
               />
@@ -234,7 +234,7 @@ export default function ManualAddAcedemicProcess({
                     fullWidth
                     label='Tên'
                     placeholder='VD: Văn A'
-                    {...(errors.firstName && { error: true, helperText: errors.firstName.message?.toString() })}
+                    {...(errors.lastName && { error: true, helperText: errors.lastName.message?.toString() })}
                   />
                 )}
               />

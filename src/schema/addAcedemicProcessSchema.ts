@@ -83,7 +83,7 @@ const schema = v.object({
     v.minLength(1, 'Lý do xử lý phải có ít nhất 1 ký tự'),
     v.maxLength(255, 'Lý do xử lý không được quá 255 ký tự')
   ),
-  yearLevel: v.pipe(v.string(), v.maxLength(50, 'Năm học không được quá 50 ký tự')),
+  yearLevel: v.pipe(v.nonNullable(v.string(), ''), v.maxLength(50, 'Không được quá 50 ký tự')),
   faculty: v.pipe(
     v.string(),
     v.nonEmpty('Khoa không được để trống'),

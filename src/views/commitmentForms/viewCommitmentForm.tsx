@@ -62,11 +62,19 @@ export default function ViewCommitmentForms() {
     searchKey
   ]
 
-  const { data, isLoading, mutate } = useSWR(id ? fetcher : null, () =>
-    commitmentFormService.getByCategory(id, page, limit, filterField, filterValue, sortField, sortOrder, searchKey)
+  const { data, isLoading, mutate } = useSWR(
+    id ? fetcher : null,
+    () =>
+      commitmentFormService.getByCategory(id, page, limit, filterField, filterValue, sortField, sortOrder, searchKey),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false
+    }
   )
 
   const tableData = useMemo(() => data?.data || [], [data])
+
+  console.log('tableData', tableData)
 
   const onClose = () => {
     toogleViewCommnitmentByCategory()

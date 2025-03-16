@@ -78,7 +78,8 @@ export default function ViewCommitmentFormsOfCVHT() {
     {
       revalidateOnFocus: false,
       errorRetryCount: 3,
-      errorRetryInterval: 3000
+      errorRetryInterval: 3000,
+      revalidateOnReconnect: false
     }
   )
 

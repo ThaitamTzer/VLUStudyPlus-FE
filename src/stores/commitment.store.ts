@@ -9,6 +9,7 @@ type States = {
   openUpdateStatus: boolean
   cateId: string
   acedemicProcessCommitment: LearnProcessType | null
+  acedemicProcessCommitmentOfCVHT: LearnProcessType | null
   commitmentForms: CommitmentFormType
   openViewDetailCommitmentForm: boolean
 }
@@ -19,6 +20,7 @@ type Actions = {
   toogleUpdateStatus: () => void
   setCateId: (cateId: string) => void
   setAcedemicProcessCommiment: (acedemicProcessCommitment: LearnProcessType | null) => void
+  setAcedemicProcessCommimentOfCVHT: (acedemicProcessCommitmentOfCVHT: LearnProcessType | null) => void
   toogleViewDetailCommitmentForm: () => void
   setCommitmentForms: (commitmentForms: CommitmentFormType) => void
 }
@@ -37,6 +39,8 @@ export const useCommitmentStore = create<States & Actions>(set => ({
   toogleViewDetailCommitmentForm: () =>
     set(state => ({ openViewDetailCommitmentForm: !state.openViewDetailCommitmentForm })),
   setAcedemicProcessCommiment: acedemicProcessCommitment => set({ acedemicProcessCommitment }),
+  acedemicProcessCommitmentOfCVHT: null,
+  setAcedemicProcessCommimentOfCVHT: acedemicProcessCommitmentOfCVHT => set({ acedemicProcessCommitmentOfCVHT }),
   setCateId: cateId => set({ cateId }),
   toogleViewCommnitmentByCategory: () =>
     set(state => ({ openViewCommitmentByCategory: !state.openViewCommitmentByCategory })),

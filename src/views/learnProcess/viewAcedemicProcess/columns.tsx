@@ -29,8 +29,12 @@ export const useColumns = () => {
     toogleViewByCategory
   } = useAcedemicProcessStore()
 
-  const { toogleViewCommnitmentByCategory, setAcedemicProcessCommiment, toogleViewCommnitmentByCategoryOfCVHT } =
-    useCommitmentStore()
+  const {
+    toogleViewCommnitmentByCategory,
+    setAcedemicProcessCommiment,
+    toogleViewCommnitmentByCategoryOfCVHT,
+    setAcedemicProcessCommimentOfCVHT
+  } = useCommitmentStore()
 
   return useMemo<ColumnDef<AcedemicProcessWithAction, any>[]>(
     () => [
@@ -69,7 +73,7 @@ export const useColumns = () => {
                 <IconButton
                   onClick={() => {
                     toogleViewCommnitmentByCategoryOfCVHT()
-                    setAcedemicProcessCommiment(infor.row.original)
+                    setAcedemicProcessCommimentOfCVHT(infor.row.original)
                   }}
                 >
                   <Iconify icon='hugeicons:files-01' color='#2092ec' />
@@ -133,7 +137,8 @@ export const useColumns = () => {
       toogleViewCommnitmentByCategory,
       setAcedemicProcessCommiment,
       toogleViewCommnitmentByCategoryOfCVHT,
-      user?.role.name
+      user?.role.name,
+      setAcedemicProcessCommimentOfCVHT
     ]
   )
 }

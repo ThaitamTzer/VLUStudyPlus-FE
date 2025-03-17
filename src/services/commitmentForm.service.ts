@@ -61,7 +61,7 @@ const commitmentFormService = {
 
   updateStatus: async (
     id: string,
-    data: { approveStatus: string },
+    data: { approveStatus: string; description: string },
     sucessCallback?: (res: any) => void,
     errorCallback?: (res: any) => void
   ) => {

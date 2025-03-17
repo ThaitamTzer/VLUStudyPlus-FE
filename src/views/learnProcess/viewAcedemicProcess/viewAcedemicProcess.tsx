@@ -30,8 +30,9 @@ import ManualEditAcedemicProcess from './editAcedemicProcess'
 import AlertDelete from '@/components/alertModal'
 import ViewDetailAcedecmicProcess from './viewDetailAcedemicProcess'
 import UpdateAcedemicProcessStatus from '../updateAcedemicProcessStatus'
+import type { LearnProcessType } from '@/types/management/learnProcessType'
 
-export default function ViewAcedemicProcess() {
+export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcedemicProcess: LearnProcessType[] }) {
   const {
     openViewByCategory,
     toogleViewByCategory,
@@ -232,6 +233,7 @@ export default function ViewAcedemicProcess() {
       <UpdateAcedemicProcessStatus mutate={mutate} />
       <ManualEditAcedemicProcess
         mutate={mutate}
+        listAcedemicProcess={listAcedemicProcess}
         onClose={toogleEditViewAcedemicProcess}
         open={openEditViewAcedemicProcess}
       />

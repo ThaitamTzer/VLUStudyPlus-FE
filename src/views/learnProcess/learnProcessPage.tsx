@@ -53,16 +53,10 @@ export default function LearnProcessPage() {
     openDeleteAcedemicProcess,
     toogleManualAdd,
     openManualAdd,
-    openProgress,
-    setListAcedemicProcess
+    openProgress
   } = useAcedemicProcessStore()
 
   const { data, mutate, isLoading } = useSWR('/api/learnProcess', learnProcessService.getAll, {
-    onSuccess: data => {
-      if (data) {
-        setListAcedemicProcess(data)
-      }
-    },
     revalidateOnFocus: false
   })
 
@@ -218,7 +212,7 @@ export default function LearnProcessPage() {
       <UpdateAcedemicProcess mutate={mutate} />
       <ImportModal mutate={mutate} />
       <ImportResult />
-      <ViewAcedemicProcess />
+      <ViewAcedemicProcess listAcedemicProcess={data || []} />
       <ViewCommitmentForms />
       <ViewCommitmentFormsOfCVHT />
       <ProgressModal open={openProgress} />

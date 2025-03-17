@@ -12,6 +12,8 @@ type States = {
   acedemicProcessCommitmentOfCVHT: LearnProcessType | null
   commitmentForms: CommitmentFormType
   openViewDetailCommitmentForm: boolean
+  openApproveCommitment: boolean
+  openRejectCommitment: boolean
 }
 
 type Actions = {
@@ -23,6 +25,8 @@ type Actions = {
   setAcedemicProcessCommimentOfCVHT: (acedemicProcessCommitmentOfCVHT: LearnProcessType | null) => void
   toogleViewDetailCommitmentForm: () => void
   setCommitmentForms: (commitmentForms: CommitmentFormType) => void
+  toogleOpenApproveCommitment: () => void
+  toogleOpenRejectCommitment: () => void
 }
 
 export const useCommitmentStore = create<States & Actions>(set => ({
@@ -33,6 +37,10 @@ export const useCommitmentStore = create<States & Actions>(set => ({
   commitmentForms: {} as CommitmentFormType,
   openViewDetailCommitmentForm: false,
   openViewCommimentByCategoryOfCVHT: false,
+  openApproveCommitment: false,
+  toogleOpenApproveCommitment: () => set(state => ({ openApproveCommitment: !state.openApproveCommitment })),
+  openRejectCommitment: false,
+  toogleOpenRejectCommitment: () => set(state => ({ openRejectCommitment: !state.openRejectCommitment })),
   toogleViewCommnitmentByCategoryOfCVHT: () =>
     set(state => ({ openViewCommimentByCategoryOfCVHT: !state.openViewCommimentByCategoryOfCVHT })),
   setCommitmentForms: commitmentForms => set({ commitmentForms }),

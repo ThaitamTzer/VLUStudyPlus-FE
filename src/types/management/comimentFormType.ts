@@ -6,7 +6,12 @@ export type CommitmentFormType = {
     classId: string
   }
   idOfStudent: string
-  approveStatus: 'approve' | 'pending' | 'reject'
+  approved: {
+    approveStatus: 'approved' | 'pending' | 'rejected'
+    date: string | Date
+    decisionBy: string
+    description: string
+  }
 }
 
 export type CommitmentFormListType = {
@@ -65,7 +70,7 @@ export type CommitmentForm = {
     }
   ]
   approved: {
-    approveStatus: 'approve' | 'pending' | 'reject'
+    approveStatus: 'approved' | 'pending' | 'rejected'
     date: string | Date
     decisionBy: string
     description: string

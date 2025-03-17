@@ -123,6 +123,7 @@ export type ProcessingType = {
   processingResult?: {
     _id: string
     processingResultName: string
+    commitment: boolean
   }
   reason?: string
   createdAt: string | Date

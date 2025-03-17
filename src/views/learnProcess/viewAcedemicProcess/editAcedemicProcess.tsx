@@ -35,14 +35,17 @@ import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
 import { getAcademicYear } from '@/views/term/helper'
 
 import learnProcessService from '@/services/learnProcess.service'
+import type { LearnProcessType } from '@/types/management/learnProcessType'
 
 type FormData = InferInput<typeof editAcedemicProcessSchema>
 
 export default function ManualEditAcedemicProcess({
+  listAcedemicProcess,
   mutate,
   open,
   onClose
 }: {
+  listAcedemicProcess: LearnProcessType[] | undefined
   mutate: KeyedMutator<any>
   open: boolean
   onClose: () => void
@@ -53,8 +56,7 @@ export default function ManualEditAcedemicProcess({
 
   const { typeProcess } = useShare()
 
-  const { toogleEditViewAcedemicProcess, acedemicProcess, processing, setProcessing, listAcedemicProcess } =
-    useAcedemicProcessStore()
+  const { toogleEditViewAcedemicProcess, acedemicProcess, processing, setProcessing } = useAcedemicProcessStore()
 
   const {
     control,
@@ -249,7 +251,7 @@ export default function ManualEditAcedemicProcess({
                       helperText: errors.academicCategory.message?.toString()
                     })}
                   >
-                    {listAcedemicProcess.map(item => (
+                    {listAcedemicProcess?.map(item => (
                       <MenuItem key={item._id} value={item._id}>
                         {item.title}
                       </MenuItem>

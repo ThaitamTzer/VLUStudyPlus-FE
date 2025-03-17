@@ -107,7 +107,7 @@ export default function StudentViewDetailCommitmentForm() {
               </Button>
             </>
           )}
-          {data?.approved?.approveStatus === 'approve' && (
+          {data?.approved?.approveStatus === 'approved' && (
             <Button variant='contained' onClick={handleExportPDF}>
               Xuất file PDF
             </Button>

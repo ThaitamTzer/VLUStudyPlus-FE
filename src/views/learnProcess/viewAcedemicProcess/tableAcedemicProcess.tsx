@@ -75,7 +75,7 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
 
   return (
     <TableContainer sx={{ position: 'relative', overflowX: 'auto', maxHeight: 'calc(100vh - 300px)' }}>
-      <Table stickyHeader sx={{ minWidth: 2800 }}>
+      <Table stickyHeader sx={{ minWidth: 3100 }}>
         <TableHead>
           <StyledTableRow
             sx={{
@@ -370,7 +370,18 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                     >
                       Đã làm đơn
                     </Badge>
-                  ) : (
+                  ) : d?.processingResult?.commitment === undefined ? (
+                    <Badge
+                      sx={{
+                        backgroundColor: 'info.main',
+                        color: 'white',
+                        padding: '5px 10px',
+                        borderRadius: '5px'
+                      }}
+                    >
+                      Chờ CVHT xử lý
+                    </Badge>
+                  ) : d?.processingResult?.commitment ? (
                     <Badge
                       sx={{
                         backgroundColor: 'warning.main',
@@ -379,7 +390,18 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                         borderRadius: '5px'
                       }}
                     >
-                      Chưa làm đơn
+                      Sinh viên chưa làm đơn
+                    </Badge>
+                  ) : (
+                    <Badge
+                      sx={{
+                        backgroundColor: 'secondary.main',
+                        color: 'white',
+                        padding: '5px 10px',
+                        borderRadius: '5px'
+                      }}
+                    >
+                      Sinh viên không cần làm đơn
                     </Badge>
                   )}
                 </TableCell>

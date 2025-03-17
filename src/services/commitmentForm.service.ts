@@ -1,4 +1,5 @@
 import axiosClient from '@/libs/axios'
+import axiosUpload from '@/libs/axiosUpload'
 import type { ComimentFormDetailType, CommitmentFormListType } from '@/types/management/comimentFormType'
 
 const commitmentFormService = {
@@ -117,6 +118,29 @@ const commitmentFormService = {
     } catch (error) {
       if (errorCallback) {
         errorCallback(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+
+  addSignature: async (
+    id: string,
+    data: FormData,
+    successCallBack?: (res: any) => void,
+    errorCallBack?: (error: any) => void
+  ) => {
+    try {
+      return await axiosUpload.patch(`/api/commitment-form/instert-signature-for-lecturer/${id}`, data).then(res => {
+        if (successCallBack) {
+          successCallBack(res.data)
+        }
+
+        return res
+      })
+    } catch (error) {
+      if (errorCallBack) {
+        errorCallBack(error)
       }
 
       return Promise.reject(error)

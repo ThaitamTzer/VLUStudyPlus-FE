@@ -33,6 +33,8 @@ export default function StudentAcedemicProcessPage() {
     studentAcedemicProcessService.getStudentAcedemicProcess
   )
 
+  console.log('studentData', studentData)
+
   const { toogleAddCommitmentForm, setIdProcess, setProcessObj, toogleStudentViewDetailCommitmentForm } =
     useStudentAcedemicProcessStore()
 
@@ -52,6 +54,22 @@ export default function StudentAcedemicProcessPage() {
     [setProcessObj, toogleStudentViewDetailCommitmentForm]
   )
 
+  const renderCommitmentStatus = (student: any) => {
+    if (student.commitment) {
+      return <p className='text-success'>Đã làm đơn</p>
+    }
+
+    if (student.processingResult?.commitment === undefined) {
+      return <p className='text-info'>Chờ CVHT xử lý</p>
+    }
+
+    if (student.processingResult?.commitment) {
+      return <p className='text-warning'>Sinh viên chưa làm đơn</p>
+    }
+
+    return <p>Sinh viên không cần làm đơn</p>
+  }
+
   return (
     <>
       <PageHeader title='Xử lý học tập của sinh viên' />
@@ -63,7 +81,7 @@ export default function StudentAcedemicProcessPage() {
                 title={`📖 ${student.academicCategory.title}`}
                 action={
                   <Stack direction='row' spacing={1}>
-                    {!student.commitment && (
+                    {student?.processingResult?.commitment && !student.commitment && (
                       <Tooltip title='Tạo đơn cam kết' arrow>
                         <CustomIconButton
                           variant='contained'
@@ -107,8 +125,16 @@ export default function StudentAcedemicProcessPage() {
                     {student.status ? '✅' : '❌'} <strong>Kết quả XLHV:</strong>{' '}
                     {student.status ? 'CVHT đã xử lý' : 'CVHT chưa xử lý'}
                   </Typography>
-                  <Typography variant='body2' color='black'>
-                    <strong>📜 Đơn cam kết:</strong> {student.commitment ? 'Đã làm ✅' : 'Chưa làm ❌'}
+                  <Typography
+                    variant='body2'
+                    color='black'
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1
+                    }}
+                  >
+                    <strong>📜 Đơn cam kết:</strong> {renderCommitmentStatus(student)}
                   </Typography>
                   <Accordion>
                     <AccordionSummary>
@@ -135,6 +161,7 @@ export default function StudentAcedemicProcessPage() {
                             margin: '10px 0'
                           }}
                         />
+                        {student?.processingResult?.commitment && student.commitment}
                         {student.processing.map((process, index) => (
                           <Stack key={index} spacing={1}>
                             <Typography variant='subtitle2' sx={{ color: 'black !important' }}>

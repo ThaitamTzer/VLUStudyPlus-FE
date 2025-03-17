@@ -1,11 +1,13 @@
 'use client'
 
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Button, CircularProgress } from '@mui/material'
 import { PDFViewer, pdf } from '@react-pdf/renderer'
 
-import useSWR from 'swr'
+import useSWR, { mutate as fetchData } from 'swr'
+
+import { toast } from 'react-toastify'
 
 import Iconify from '@/components/iconify'
 
@@ -14,6 +16,8 @@ import studentAcedemicProcessService from '@/services/studentAcedemicProcess.ser
 import { CommitmentFormPDF } from '../commitmentForms/commitmentPDF'
 import type { CommitmentForm } from '@/types/management/comimentFormType'
 import UpdateCommitmentForm from './updateCommitmentForm'
+import AlertDelete from '@/components/alertModal'
+import SignatureSignModal from './signatureSignModal'
 
 export default function StudentViewDetailCommitmentForm() {
   const {
@@ -22,16 +26,19 @@ export default function StudentViewDetailCommitmentForm() {
     setProcessObj,
     openStudentViewDetailCommitmentForm,
     toogleUpdateCommitmentForm,
-    setCommitmentFormObj
+    setCommitmentFormObj,
+    openDeleteCommitmentForm,
+    tooogleDeleteCommitmentForm,
+    toogleSignSignatureForm
   } = useStudentAcedemicProcessStore()
+
+  const [loading, setLoading] = useState(false)
 
   const id = processObj?._id || ''
 
   const { data, isLoading, mutate } = useSWR(id ? `/detail-commitment-forms-of-student/${id}` : null, () =>
     studentAcedemicProcessService.getCommitmentForm(id)
   )
-
-  console.log('data in', data)
 
   const handleClose = useCallback(() => {
     toogleStudentViewDetailCommitmentForm()
@@ -57,6 +64,41 @@ export default function StudentViewDetailCommitmentForm() {
       toogleUpdateCommitmentForm()
     },
     [setCommitmentFormObj, toogleUpdateCommitmentForm]
+  )
+
+  const handleDeleteCommitmentForm = useCallback(
+    async (id: string) => {
+      const toastId = toast.loading('Đang xóa đơn cam kết học tập...')
+
+      setLoading(true)
+
+      await studentAcedemicProcessService.deleteCommitmentForm(
+        id,
+        () => {
+          setLoading(false)
+          toast.update(toastId, {
+            render: 'Xóa đơn cam kết học tập thành công!',
+            type: 'success',
+            isLoading: false,
+            autoClose: 3000
+          })
+          tooogleDeleteCommitmentForm()
+          toogleStudentViewDetailCommitmentForm()
+          mutate()
+          fetchData('/api/academic-processing/view-list-academicProcessing-of-student')
+        },
+        err => {
+          setLoading(false)
+          toast.update(toastId, {
+            render: err.message,
+            type: 'error',
+            isLoading: false,
+            autoClose: 3000
+          })
+        }
+      )
+    },
+    [tooogleDeleteCommitmentForm, toogleStudentViewDetailCommitmentForm, mutate]
   )
 
   return (
@@ -87,13 +129,13 @@ export default function StudentViewDetailCommitmentForm() {
         </DialogContent>
         <DialogActions>
           {!data?.insertSignature && (
-            <Button variant='contained' color='success'>
+            <Button variant='contained' color='success' onClick={toogleSignSignatureForm}>
               Ký đơn
             </Button>
           )}
           {data?.approved?.approveStatus === 'pending' && (
             <>
-              <Button variant='contained' color='error'>
+              <Button variant='contained' color='error' onClick={tooogleDeleteCommitmentForm}>
                 Xóa đơn
               </Button>
               <Button
@@ -115,6 +157,19 @@ export default function StudentViewDetailCommitmentForm() {
         </DialogActions>
       </Dialog>
       <UpdateCommitmentForm mutate={mutate} />
+      <SignatureSignModal id={data?._id || ''} mutate={mutate} />
+      <AlertDelete
+        open={openDeleteCommitmentForm}
+        onClose={tooogleDeleteCommitmentForm}
+        title='Xóa đơn cam kết'
+        content='Bạn có đồng ý xóa đơn cam kết này không ?'
+        loading={loading}
+        submitColor='error'
+        submitText='Xóa'
+        onSubmit={() => {
+          handleDeleteCommitmentForm(data?._id || '')
+        }}
+      />
     </>
   )
 }

@@ -1,4 +1,5 @@
 import axiosClient from '@/libs/axios'
+import axiosUpload from '@/libs/axiosUpload'
 import type { CommitmentForm } from '@/types/management/comimentFormType'
 import type { ProcessingType } from '@/types/management/learnProcessType'
 
@@ -68,6 +69,29 @@ const studentAcedemicProcessService = {
   ) => {
     try {
       return await axiosClient.delete(`/api/commitment-form/delete-commitment-form/${id}`).then(res => {
+        if (successCallBack) {
+          successCallBack(res.data)
+        }
+
+        return res
+      })
+    } catch (error) {
+      if (errorCallBack) {
+        errorCallBack(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+
+  addSignature: async (
+    id: string,
+    data: FormData,
+    successCallBack?: (res: any) => void,
+    errorCallBack?: (error: any) => void
+  ) => {
+    try {
+      return await axiosUpload.patch(`/api/commitment-form/instert-signature-for-student/${id}`, data).then(res => {
         if (successCallBack) {
           successCallBack(res.data)
         }

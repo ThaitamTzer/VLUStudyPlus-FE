@@ -11,7 +11,8 @@ import {
   Typography,
   Button,
   CircularProgress,
-  Grid
+  Grid,
+  Divider
 } from '@mui/material'
 import { PDFViewer, pdf } from '@react-pdf/renderer'
 
@@ -30,6 +31,7 @@ import commitmentFormService from '@/services/commitmentForm.service'
 import { CommitmentFormPDF } from './commitmentPDF'
 import { CustomDialog } from '@/components/CustomDialog'
 import CustomTextField from '@/@core/components/mui/TextField'
+import SignatureSignModalLecturer from './signatureSignModal'
 
 export default function ViewDetailCommitmentForm() {
   const {
@@ -40,7 +42,8 @@ export default function ViewDetailCommitmentForm() {
     toogleOpenApproveCommitment,
     toogleOpenRejectCommitment,
     openApproveCommitment,
-    openRejectCommitment
+    openRejectCommitment,
+    toogleOpenSignSignatureForm
   } = useCommitmentStore()
 
   const [commitmentId, setCommitmentId] = useState<string>('')
@@ -96,7 +99,7 @@ export default function ViewDetailCommitmentForm() {
     setCommitmentId('')
   }, [setCommitmentId, toogleOpenRejectCommitment])
 
-  const handleApprove = async (id: string, status: string, description: string) => {
+  const handleApprove = async (id: string, status: string, description: string, onClose: () => void) => {
     const toastId = toast.loading('Đang cập nhật trạng thái')
 
     setLoading(true)
@@ -113,6 +116,7 @@ export default function ViewDetailCommitmentForm() {
         })
         setLoading(false)
         mutate()
+        onClose()
       },
       err => {
         toast.update(toastId, {
@@ -139,7 +143,7 @@ export default function ViewDetailCommitmentForm() {
     })
 
     const onSubmit = handleSubmit(({ description }) => {
-      handleApprove(commitmentId, status, description)
+      handleApprove(commitmentId, status, description, onClose)
     })
 
     return (
@@ -204,6 +208,18 @@ export default function ViewDetailCommitmentForm() {
           )}
         </DialogContent>
         <DialogActions>
+          <Button variant='contained' color='success' onClick={toogleOpenSignSignatureForm}>
+            Ký đơn
+          </Button>
+          <Divider
+            orientation='vertical'
+            flexItem
+            sx={{
+              height: '100%',
+              backgroundColor: 'rgba(0, 0, 0, 0.12)'
+            }}
+          />
+
           {data?.commitmentForm.approved.approveStatus === 'approved' && (
             <Button variant='contained' onClick={handleExportPDF}>
               Xuất file PDF
@@ -221,6 +237,7 @@ export default function ViewDetailCommitmentForm() {
           )}
         </DialogActions>
       </Dialog>
+      <SignatureSignModalLecturer mutate={mutate} id={id} />
       {RenderModal(openApproveCommitment, handleApproveCloseModal, 'approved', 'success', 'Duyệt', 'Duyệt đơn cam kết')}
       {RenderModal(
         openRejectCommitment,

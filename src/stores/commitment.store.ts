@@ -14,6 +14,7 @@ type States = {
   openViewDetailCommitmentForm: boolean
   openApproveCommitment: boolean
   openRejectCommitment: boolean
+  openSignSignatureForm: boolean
 }
 
 type Actions = {
@@ -27,6 +28,7 @@ type Actions = {
   setCommitmentForms: (commitmentForms: CommitmentFormType) => void
   toogleOpenApproveCommitment: () => void
   toogleOpenRejectCommitment: () => void
+  toogleOpenSignSignatureForm: () => void
 }
 
 export const useCommitmentStore = create<States & Actions>(set => ({
@@ -38,6 +40,8 @@ export const useCommitmentStore = create<States & Actions>(set => ({
   openViewDetailCommitmentForm: false,
   openViewCommimentByCategoryOfCVHT: false,
   openApproveCommitment: false,
+  openSignSignatureForm: false,
+  toogleOpenSignSignatureForm: () => set(state => ({ openSignSignatureForm: !state.openSignSignatureForm })),
   toogleOpenApproveCommitment: () => set(state => ({ openApproveCommitment: !state.openApproveCommitment })),
   openRejectCommitment: false,
   toogleOpenRejectCommitment: () => set(state => ({ openRejectCommitment: !state.openRejectCommitment })),

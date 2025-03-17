@@ -1,7 +1,7 @@
 'use client'
 import { useMemo } from 'react'
 
-import { Document, Font, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
+import { Document, Font, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 
 import type { CommitmentForm } from '@/types/management/comimentFormType'
 
@@ -342,7 +342,17 @@ export const CommitmentFormPDF = ({ data }: { data: CommitmentForm }) => {
               }}
             >
               <Text style={{ textAlign: 'right', marginTop: 10 }}>Cố vấn học tập</Text>
-              <Text style={{ textAlign: 'right', marginTop: 50 }}>{dataForm.lectureId?.userName}</Text>
+              {dataForm?.insertSignatureLecturer && (
+                <Image
+                  src={dataForm.insertSignatureLecturer}
+                  style={{
+                    width: '40%'
+                  }}
+                />
+              )}
+              <Text style={{ textAlign: 'right', marginTop: `${dataForm.insertSignatureLecturer ? 10 : 50}` }}>
+                {dataForm.lectureId?.userName}
+              </Text>
             </View>
             <View
               style={{
@@ -354,7 +364,15 @@ export const CommitmentFormPDF = ({ data }: { data: CommitmentForm }) => {
               }}
             >
               <Text style={{ marginTop: 10 }}>Người làm đơn</Text>
-              <Text style={{ marginTop: 50 }}>{dataForm.name}</Text>
+              {dataForm?.insertSignatureStudent && (
+                <Image
+                  src={dataForm.insertSignatureStudent}
+                  style={{
+                    width: '40%'
+                  }}
+                />
+              )}
+              <Text style={{ marginTop: `${dataForm.insertSignatureStudent ? 10 : 50}` }}>{dataForm.name}</Text>
             </View>
           </View>
         </View>

@@ -179,7 +179,7 @@ export default function ManualEditAcedemicProcess({
 
     const newData = {
       ...data,
-      academicCategory: acedemicProcess?._id
+      academicCategory: data?.academicCategory
     }
 
     setLoading(true)

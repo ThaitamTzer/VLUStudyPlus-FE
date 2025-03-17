@@ -69,11 +69,18 @@ export type CommitmentForm = {
       _id: string
     }
   ]
+  insertSignatureStudent: string
+  insertSignatureLecturer: string
   approved: {
     approveStatus: 'approved' | 'pending' | 'rejected'
     date: string | Date
     decisionBy: string
     description: string
+  }
+  processingResult: {
+    _id: string
+    processingResultName: string
+    commitment: boolean
   }
   commitment: true
   processId: string

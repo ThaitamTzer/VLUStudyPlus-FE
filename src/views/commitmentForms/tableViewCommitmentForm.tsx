@@ -137,7 +137,7 @@ export default function TableViewCommitmentForm(props: TableViewCommitmentFormPr
     await commitmentFormService
       .getDetail(id)
       .then(async data => {
-        const blob = await pdf(<CommitmentFormPDF data={data} />).toBlob()
+        const blob = await pdf(<CommitmentFormPDF data={data.commitmentForm} />).toBlob()
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
 

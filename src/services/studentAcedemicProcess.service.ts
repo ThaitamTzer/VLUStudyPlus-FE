@@ -1,4 +1,5 @@
 import axiosClient from '@/libs/axios'
+import type { CommitmentForm } from '@/types/management/comimentFormType'
 import type { ProcessingType } from '@/types/management/learnProcessType'
 
 const studentAcedemicProcessService = {
@@ -11,7 +12,7 @@ const studentAcedemicProcessService = {
   getCommitmentForm: async (id: string) => {
     const res = await axiosClient.get(`/api/commitment-form/get-commitment-form-of-student/${id}`)
 
-    return res.data
+    return res.data as CommitmentForm
   },
 
   addCommitmentForm: async (

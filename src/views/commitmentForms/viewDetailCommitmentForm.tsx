@@ -32,12 +32,14 @@ export default function ViewDetailCommitmentForm() {
     commitmentFormService.getDetail(id)
   )
 
+  console.log('data in viewDetailCommitmentForm', data)
+
   const handleClose = useCallback(() => {
     toogleViewDetailCommitmentForm()
     setCommitmentForms({} as any)
   }, [toogleViewDetailCommitmentForm, setCommitmentForms])
 
-  const memoizedPDF = useMemo(() => <CommitmentFormPDF data={data || ({} as any)} />, [data])
+  const memoizedPDF = useMemo(() => <CommitmentFormPDF data={data?.commitmentForm || ({} as any)} />, [data])
 
   const handleExportPDF = async () => {
     const blob = await pdf(memoizedPDF).toBlob()
@@ -77,9 +79,21 @@ export default function ViewDetailCommitmentForm() {
         )}
       </DialogContent>
       <DialogActions>
-        <Button variant='contained' onClick={handleExportPDF}>
-          Xuất file PDF
-        </Button>
+        {data?.commitmentForm.approved.approveStatus === 'approve' && (
+          <Button variant='contained' onClick={handleExportPDF}>
+            Xuất file PDF
+          </Button>
+        )}
+        {data?.commitmentForm.approved.approveStatus === 'pending' && (
+          <>
+            <Button variant='contained' color='error'>
+              Từ chối
+            </Button>
+            <Button variant='contained' color='success'>
+              Duyệt
+            </Button>
+          </>
+        )}
       </DialogActions>
     </Dialog>
   )

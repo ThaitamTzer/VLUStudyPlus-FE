@@ -12,7 +12,8 @@ import {
   AccordionDetails,
   Stack,
   CardHeader,
-  Button
+  Tooltip,
+  Divider
 } from '@mui/material'
 
 import useSWR from 'swr'
@@ -21,6 +22,10 @@ import studentAcedemicProcessService from '@/services/studentAcedemicProcess.ser
 import PageHeader from '@/components/page-header'
 import { useStudentAcedemicProcessStore } from '@/stores/studentAcedemicProcess.store'
 import AddCommitmentForm from './addCommitmentForm'
+import CustomIconButton from '@/@core/components/mui/IconButton'
+import Iconify from '@/components/iconify'
+import type { ProcessingType } from '@/types/management/learnProcessType'
+import StudentViewDetailCommitmentForm from './studentViewDetailCommitmentForm'
 
 export default function StudentAcedemicProcessPage() {
   const { data: studentData, mutate } = useSWR(
@@ -28,7 +33,10 @@ export default function StudentAcedemicProcessPage() {
     studentAcedemicProcessService.getStudentAcedemicProcess
   )
 
-  const { toogleAddCommitmentForm, setIdProcess } = useStudentAcedemicProcessStore()
+  console.log('studentData', studentData)
+
+  const { toogleAddCommitmentForm, setIdProcess, setProcessObj, toogleStudentViewDetailCommitmentForm } =
+    useStudentAcedemicProcessStore()
 
   const handleAddCommitment = useCallback(
     (id: string) => {
@@ -38,56 +46,71 @@ export default function StudentAcedemicProcessPage() {
     [setIdProcess, toogleAddCommitmentForm]
   )
 
+  const handleOpenViewDetailCommitmentForm = useCallback(
+    (processObj: ProcessingType) => {
+      setProcessObj(processObj)
+      toogleStudentViewDetailCommitmentForm()
+    },
+    [setProcessObj, toogleStudentViewDetailCommitmentForm]
+  )
+
   return (
     <>
       <PageHeader title='Xử lý học tập của sinh viên' />
       <Grid container spacing={3} mt={4}>
         {studentData?.map(student => (
-          <Grid item xs={12} sm={6} md={4} key={student._id}>
+          <Grid item xs={12} sm={6} md={6} key={student._id}>
             <Card sx={{ minWidth: 275, boxShadow: 3 }}>
               <CardHeader
+                title={`📖 ${student.academicCategory.title}`}
                 action={
                   <Stack direction='row' spacing={1}>
                     {!student.commitment && (
-                      <Button
-                        variant='contained'
-                        color='primary'
-                        size='small'
-                        onClick={() => {
-                          handleAddCommitment(student._id)
-                        }}
-                      >
-                        ✏️ Tạo đơn
-                      </Button>
+                      <Tooltip title='Tạo đơn cam kết' arrow>
+                        <CustomIconButton
+                          variant='contained'
+                          onClick={() => {
+                            handleAddCommitment(student._id)
+                          }}
+                        >
+                          <Iconify icon='icon-park:add-one' />
+                        </CustomIconButton>
+                      </Tooltip>
                     )}
                     {!student.status && student.commitment && (
-                      <Button variant='contained' color='primary' size='small'>
-                        ✏️
-                      </Button>
+                      <>
+                        <Tooltip title='Xem đơn cam kết' arrow>
+                          <CustomIconButton
+                            variant='contained'
+                            onClick={() => {
+                              handleOpenViewDetailCommitmentForm(student)
+                            }}
+                          >
+                            <Iconify icon='twemoji:eye' />
+                          </CustomIconButton>
+                        </Tooltip>
+                      </>
                     )}
                   </Stack>
                 }
               />
-
               <CardContent>
                 <Stack spacing={1}>
-                  <Typography variant='h6' fontWeight='bold'>
-                    📖 {student.academicCategory.title}
+                  <Typography variant='body2' color='black'>
+                    <strong>📅 Học kỳ:</strong> {student.termName}
                   </Typography>
                   <Typography variant='body2' color='black'>
-                    📅 Học kỳ: {student.termName}
+                    <strong>🎓 Năm học:</strong> {student.year}
                   </Typography>
                   <Typography variant='body2' color='black'>
-                    🎓 Năm học: {student.year}
+                    <strong>⚠️ Diện XLHV (PĐT đề nghị):</strong> {student.handlingStatusByAAO}
                   </Typography>
                   <Typography variant='body2' color='black'>
-                    ⚠️ Diện XLHV (PĐT đề nghị): {student.handlingStatusByAAO}
+                    {student.status ? '✅' : '❌'} <strong>Kết quả XLHV:</strong>{' '}
+                    {student.status ? 'CVHT đã xử lý' : 'CVHT chưa xử lý'}
                   </Typography>
                   <Typography variant='body2' color='black'>
-                    {student.status ? '✅' : '❌'} Kết quả XLHV: {student.status ? 'CVHT đã xử lý' : 'CVHT chưa xử lý'}
-                  </Typography>
-                  <Typography variant='body2' color='black'>
-                    📜 Đơn cam kết: {student.commitment ? 'Đã làm ✅' : 'Chưa làm ❌'}
+                    <strong>📜 Đơn cam kết:</strong> {student.commitment ? 'Đã làm ✅' : 'Chưa làm ❌'}
                   </Typography>
                   <Accordion>
                     <AccordionSummary>
@@ -96,21 +119,28 @@ export default function StudentAcedemicProcessPage() {
                     <AccordionDetails sx={{ color: 'black' }}>
                       <Stack spacing={1}>
                         <Typography variant='body2' sx={{ color: 'black !important' }}>
-                          📝 Lý do xử lý: {student.reasonHandling}
+                          <strong>📝 Lý do xử lý:</strong> {student.reasonHandling}
                         </Typography>
                         {student.courseRegistration.map((course, index) => (
                           <Stack key={index} spacing={1}>
                             <Typography variant='subtitle2' sx={{ color: 'black !important' }}>
-                              {course.isRegister ? '✅' : '❌'} ĐKMH {course.termName}:{' '}
+                              {course.isRegister ? '✅' : '❌'} <strong>ĐKMH {course.termName}:</strong>{' '}
                               {course.isRegister ? 'Đã đăng ký' : 'Chưa đăng ký'}
                               {course.note ? `; ghi chú: ${course.note}` : ''}
                             </Typography>
                           </Stack>
                         ))}
+                        <Divider
+                          sx={{
+                            backgroundColor: 'black',
+                            height: 1,
+                            margin: '10px 0'
+                          }}
+                        />
                         {student.processing.map((process, index) => (
                           <Stack key={index} spacing={1}>
                             <Typography variant='subtitle2' sx={{ color: 'black !important' }}>
-                              ⏳ Học kỳ {process.termName}: {process.statusHandling}
+                              <strong>⏳ Học kỳ XLHV</strong> {process.termName}: {process.statusHandling}
                             </Typography>
                           </Stack>
                         ))}
@@ -123,6 +153,7 @@ export default function StudentAcedemicProcessPage() {
           </Grid>
         ))}
       </Grid>
+      <StudentViewDetailCommitmentForm />
       <AddCommitmentForm mutate={mutate} />
     </>
   )

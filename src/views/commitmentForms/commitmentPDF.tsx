@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 
 import { Document, Font, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 
-import type { ComimentFormDetailType } from '@/types/management/comimentFormType'
+import type { CommitmentForm } from '@/types/management/comimentFormType'
 
 Font.register({
   family: 'Times_new_roman',
@@ -51,9 +51,9 @@ const styles = StyleSheet.create({
   }
 })
 
-export const CommitmentFormPDF = ({ data }: { data: ComimentFormDetailType }) => {
+export const CommitmentFormPDF = ({ data }: { data: CommitmentForm }) => {
   const dataForm = useMemo(() => {
-    return data.commitmentForm
+    return data
   }, [data])
 
   return (
@@ -71,7 +71,7 @@ export const CommitmentFormPDF = ({ data }: { data: ComimentFormDetailType }) =>
               flexDirection: 'row',
               alignItems: 'flex-start',
               justifyContent: 'center',
-              gap: '4px'
+              gap: '2px'
             }}
           >
             <Text style={{ fontWeight: 'bold' }}>Kính gửi:</Text>
@@ -83,7 +83,8 @@ export const CommitmentFormPDF = ({ data }: { data: ComimentFormDetailType }) =>
             >
               <Text style={{ ...styles.text, fontWeight: 'light' }}>Ban chủ nhiệm Khoa Công nghệ Thông tin</Text>
               <Text style={{ ...styles.text, textAlign: 'center' }}>
-                Thầy/Cô CVHT: {dataForm?.lectureId?.userName || '.............................'}
+                <Text style={{ fontWeight: 'bold' }}>Thầy/Cô CVHT:</Text>{' '}
+                {dataForm?.lectureId?.userName || '.............................'}
               </Text>
             </View>
           </View>
@@ -102,9 +103,36 @@ export const CommitmentFormPDF = ({ data }: { data: ComimentFormDetailType }) =>
                 gap: '20px'
               }}
             >
-              <Text>Em tên: {dataForm?.name || '.............................'} </Text>
-              <Text>Lớp: {dataForm?.classId?.classId || '.............................'} </Text>
-              <Text>MSSV: {dataForm?.idOfStudent || '.............................'} </Text>
+              <Text>
+                <Text
+                  style={{
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Em tên:
+                </Text>{' '}
+                {dataForm?.name || '.............................'}{' '}
+              </Text>
+              <Text>
+                <Text
+                  style={{
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Lớp:{' '}
+                </Text>
+                {dataForm?.classId?.classId || '.............................'}{' '}
+              </Text>
+              <Text>
+                <Text
+                  style={{
+                    fontWeight: 'bold'
+                  }}
+                >
+                  MSSV:{' '}
+                </Text>
+                {dataForm?.idOfStudent || '.............................'}{' '}
+              </Text>
             </View>
             <View
               style={{
@@ -114,8 +142,20 @@ export const CommitmentFormPDF = ({ data }: { data: ComimentFormDetailType }) =>
                 gap: '20px'
               }}
             >
-              <Text>Số điện thoại cá nhân: {dataForm?.phoneNumber}</Text>
-              <Text>Số điện thoại phụ huynh: {dataForm?.phoneNumberParent}</Text>
+              <Text>
+                <Text
+                  style={{
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Số điện thoại cá nhân:{' '}
+                </Text>
+                {dataForm?.phoneNumber || '.......................'}
+              </Text>
+              <Text>
+                <Text style={{ fontWeight: 'bold' }}>Số điện thoại phụ huynh:</Text>
+                {dataForm?.phoneNumberParent || '.......................'}
+              </Text>
             </View>
             <View
               style={{
@@ -125,8 +165,26 @@ export const CommitmentFormPDF = ({ data }: { data: ComimentFormDetailType }) =>
                 gap: '20px'
               }}
             >
-              <Text>Điểm trung bình tích lũy: {dataForm?.averageScore}</Text>
-              <Text>Số tín chỉ tích lũy: {dataForm?.credit}</Text>s
+              <Text>
+                <Text
+                  style={{
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Điểm trung bình tích lũy:{' '}
+                </Text>
+                {dataForm?.averageScore}
+              </Text>
+              <Text>
+                <Text
+                  style={{
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Số tín chỉ tích lũy:{' '}
+                </Text>
+                {dataForm?.credit}
+              </Text>
             </View>
 
             <Text style={{ fontSize: 12, fontWeight: 'bold', paddingTop: '-2px' }}>
@@ -171,18 +229,33 @@ export const CommitmentFormPDF = ({ data }: { data: ComimentFormDetailType }) =>
                 fontSize: '12px'
               }}
             >
-              Em bị xử lý học vụ lần thứ: {dataForm?.numberOfViolations}
+              <Text
+                style={{
+                  fontWeight: 'bold'
+                }}
+              >
+                Em bị xử lý học vụ lần thứ:{' '}
+              </Text>
+              {dataForm?.numberOfViolations}
             </Text>
             <Text
               style={{
                 fontSize: '12px'
               }}
             >
-              Lý do học tập sa sút: {dataForm?.reason}
+              <Text
+                style={{
+                  fontWeight: 'bold'
+                }}
+              >
+                Lý do học tập sa sút:{' '}
+              </Text>
+              {dataForm?.reason}
             </Text>
             <Text
               style={{
-                fontSize: '12px'
+                fontSize: '12px',
+                fontWeight: 'bold'
               }}
             >
               Nguyện vọng và những khó khăn:
@@ -196,7 +269,8 @@ export const CommitmentFormPDF = ({ data }: { data: ComimentFormDetailType }) =>
             </Text>
             <Text
               style={{
-                fontSize: '12px'
+                fontSize: '12px',
+                fontWeight: 'bold'
               }}
             >
               Danh sách các học phần đang nợ:
@@ -243,6 +317,17 @@ export const CommitmentFormPDF = ({ data }: { data: ComimentFormDetailType }) =>
             style={{
               display: 'flex',
               flexDirection: 'row',
+              justifyContent: 'flex-end',
+              fontSize: '12px'
+            }}
+          >
+            <Text style={{ marginTop: 20 }}>TP. Hồ Chí Minh, ngày .... tháng .... năm 20...</Text>
+          </View>
+
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
               justifyContent: 'space-between',
               fontSize: '12px'
             }}
@@ -251,12 +336,13 @@ export const CommitmentFormPDF = ({ data }: { data: ComimentFormDetailType }) =>
               style={{
                 minWidth: '50%',
                 display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'flex-end'
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
+                alignItems: 'center'
               }}
             >
               <Text style={{ textAlign: 'right', marginTop: 10 }}>Cố vấn học tập</Text>
+              <Text style={{ textAlign: 'right', marginTop: 50 }}>{dataForm.lectureId?.userName}</Text>
             </View>
             <View
               style={{
@@ -267,8 +353,8 @@ export const CommitmentFormPDF = ({ data }: { data: ComimentFormDetailType }) =>
                 alignItems: 'center'
               }}
             >
-              <Text style={{ marginTop: 20 }}>TP. Hồ Chí Minh, ngày .... tháng .... năm 2024</Text>
               <Text style={{ marginTop: 10 }}>Người làm đơn</Text>
+              <Text style={{ marginTop: 50 }}>{dataForm.name}</Text>
             </View>
           </View>
         </View>

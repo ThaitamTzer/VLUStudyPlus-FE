@@ -30,7 +30,10 @@ import StudentViewDetailCommitmentForm from './studentViewDetailCommitmentForm'
 export default function StudentAcedemicProcessPage() {
   const { data: studentData, mutate } = useSWR(
     '/api/academic-processing/view-list-academicProcessing-of-student',
-    studentAcedemicProcessService.getStudentAcedemicProcess
+    studentAcedemicProcessService.getStudentAcedemicProcess,
+    {
+      revalidateOnMount: true
+    }
   )
 
   console.log('studentData', studentData)

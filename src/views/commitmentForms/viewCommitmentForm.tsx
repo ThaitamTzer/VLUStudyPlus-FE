@@ -74,8 +74,6 @@ export default function ViewCommitmentForms() {
 
   const tableData = useMemo(() => data?.data || [], [data])
 
-  console.log('tableData', tableData)
-
   const onClose = () => {
     toogleViewCommnitmentByCategory()
     setAcedemicProcessCommiment({} as any)
@@ -177,7 +175,7 @@ export default function ViewCommitmentForms() {
           </DialogContent>
         </Dialog>
       )}
-      <ViewDetailCommitmentForm />
+      <ViewDetailCommitmentForm fetcher={mutate} />
     </>
   )
 }

@@ -34,7 +34,7 @@ import ViewCommitmentForms from '../commitmentForms/viewCommitmentForm'
 import ViewCommitmentFormsOfCVHT from '../commitmentForms/viewCommitmentFormOfCVHT'
 import Iconify from '@/components/iconify'
 
-const TableTypeProcess = dynamic(() => import('../type-process/list'), { ssr: false })
+const TableTypeProcess = dynamic(() => import('../type-process/list'))
 const AddAcedemicProcess = dynamic(() => import('./addAcedemicProcess'), { ssr: false })
 const UpdateAcedemicProcess = dynamic(() => import('./updateAcedemicProcess'), { ssr: false })
 const AlertDelete = dynamic(() => import('@/components/alertModal'), { ssr: false })
@@ -125,7 +125,6 @@ export default function LearnProcessPage() {
   return (
     <>
       <PageHeader title='Danh sách kỳ xử lý học tập' />
-
       <Card sx={{ p: 2, boxShadow: 3, mt: 4 }}>
         <CardContent>
           <Typography variant='h6' fontWeight='bold' gutterBottom>

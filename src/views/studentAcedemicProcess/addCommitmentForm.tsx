@@ -93,7 +93,7 @@ const schema = v.object({
     v.object({
       term: v.pipe(
         v.string(),
-        v.nonEmpty('Học kỳ bị XLHV không được để trống'),
+        v.nonEmpty('Học kỳ đăng ký môn học không được để trống'),
         v.includes('HK', 'Học kỳ bắt đầu bằng HK'),
         v.minLength(5, 'Học kỳ phải có ít nhất 5 ký tự'),
         v.maxLength(5, 'Trạng thái xử lý không được quá 5 ký tự')
@@ -371,7 +371,7 @@ export default function AddCommitmentForm({ mutate }: { mutate: KeyedMutator<any
                   render={({ field }) => (
                     <CustomTextField
                       {...field}
-                      label='Lý do'
+                      label='Lý do học tập sa sút và bị xử lý học vụ'
                       fullWidth
                       multiline
                       rows={3}
@@ -388,7 +388,7 @@ export default function AddCommitmentForm({ mutate }: { mutate: KeyedMutator<any
                   render={({ field }) => (
                     <CustomTextField
                       {...field}
-                      label='Nguyện vọng'
+                      label='Nguyện vọng và hướng khắc phục khó khăn của bản thân:'
                       fullWidth
                       multiline
                       rows={3}
@@ -398,6 +398,7 @@ export default function AddCommitmentForm({ mutate }: { mutate: KeyedMutator<any
                   )}
                 />
               </Grid>
+              <Grid item>Danh sách các học phần đang nợ và dự kiến kế hoạch trả nợ:</Grid>
               {debtFields.map((item, index) => (
                 <Grid container item xs={12} spacing={2} key={item.id}>
                   <Grid item xs={3}>
@@ -424,8 +425,10 @@ export default function AddCommitmentForm({ mutate }: { mutate: KeyedMutator<any
                       render={({ field }) => (
                         <CustomTextField
                           {...field}
-                          label='Môn học'
+                          label='Môn học (mỗi môn cách nhau bởi dấu ,)'
                           fullWidth
+                          multiline
+                          rows={4}
                           {...(errors.debt?.[index]?.subject && {
                             error: true,
                             helperText: errors.debt?.[index]?.subject.message
@@ -451,7 +454,16 @@ export default function AddCommitmentForm({ mutate }: { mutate: KeyedMutator<any
                   render={({ field }) => (
                     <FormControlLabel
                       control={<Checkbox {...field} checked={field.value} />}
-                      label='Cam kết cải thiện'
+                      label={
+                        <>
+                          Cam kết cải thiện (
+                          <strong className='text-primary'>
+                            với việc cam kết cải thiện tình hình học tập và học vụ sinh viên hứa sẽ thực hiện đúng những
+                            điều đã cam kết
+                          </strong>
+                          )
+                        </>
+                      }
                     />
                   )}
                 />

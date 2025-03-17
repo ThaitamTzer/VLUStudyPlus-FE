@@ -16,6 +16,7 @@ import {
 } from '@mui/material'
 import { PDFViewer, pdf } from '@react-pdf/renderer'
 
+import type { KeyedMutator } from 'swr'
 import useSWR from 'swr'
 
 import { toast } from 'react-toastify'
@@ -33,7 +34,7 @@ import { CustomDialog } from '@/components/CustomDialog'
 import CustomTextField from '@/@core/components/mui/TextField'
 import SignatureSignModalLecturer from './signatureSignModal'
 
-export default function ViewDetailCommitmentForm() {
+export default function ViewDetailCommitmentForm({ fetcher }: { fetcher: KeyedMutator<any> }) {
   const {
     toogleViewDetailCommitmentForm,
     commitmentForms,
@@ -100,7 +101,7 @@ export default function ViewDetailCommitmentForm() {
   }, [setCommitmentId, toogleOpenRejectCommitment])
 
   const handleApprove = async (id: string, status: string, description: string, onClose: () => void) => {
-    const toastId = toast.loading('Đang cập nhật trạng thái')
+    const toastId = toast.loading('Đang cập nhật...')
 
     setLoading(true)
 
@@ -109,13 +110,14 @@ export default function ViewDetailCommitmentForm() {
       { approveStatus: status, description: description },
       () => {
         toast.update(toastId, {
-          render: 'Cập nhật trạng thái thành công',
+          render: 'Cập nhật thành công',
           type: 'success',
           isLoading: false,
           autoClose: 2000
         })
         setLoading(false)
         mutate()
+        fetcher()
         onClose()
       },
       err => {

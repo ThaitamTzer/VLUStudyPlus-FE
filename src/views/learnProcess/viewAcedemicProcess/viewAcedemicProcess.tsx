@@ -31,6 +31,7 @@ import AlertDelete from '@/components/alertModal'
 import ViewDetailAcedecmicProcess from './viewDetailAcedemicProcess'
 import UpdateAcedemicProcessStatus from '../updateAcedemicProcessStatus'
 import type { LearnProcessType } from '@/types/management/learnProcessType'
+import SendMailModal from './sendMailModal'
 
 export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcedemicProcess: LearnProcessType[] }) {
   const {
@@ -47,7 +48,8 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
     openDeleteViewAcedemicProcess,
     processing,
     toogleViewDetailAcademicProcess,
-    toogleUpdateAcedemicProcessStatus
+    toogleUpdateAcedemicProcessStatus,
+    tooogleSendEmail
   } = useAcedemicProcessStore()
 
   const { cohorOptions } = useShare()
@@ -177,6 +179,7 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
               <div className='flex flex-col sm:flex-row max-sm:is-full items-start sm:items-center gap-4'>
                 <DebouncedInput
                   value={searchKey}
+                  fullWidth
                   onChange={value => {
                     setSearchKey(value as string)
                     setPage(1)
@@ -184,6 +187,15 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
                   placeholder='Tìm kiếm'
                   className='max-sm:is-full sm:is-[300px]'
                 />
+                <Button
+                  disabled={data?.pagination.totalItems === 0}
+                  onClick={tooogleSendEmail}
+                  variant='contained'
+                  startIcon={<Iconify icon='fluent-emoji-flat:bell' />}
+                  className='max-sm:is-full'
+                >
+                  Nhắc nhở XLHV GV-SV
+                </Button>
                 <Button
                   onClick={toogleManualAddFromViewByCate}
                   variant='contained'
@@ -242,6 +254,7 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
         onClose={toogleManualAddFromViewByCate}
         open={openManualAddFromViewByCate}
       />
+      <SendMailModal id={acedemicProcess?._id || ''} />
       <AlertDelete
         open={openDeleteViewAcedemicProcess}
         onClose={toogleDeleteViewAcedemicProcess}

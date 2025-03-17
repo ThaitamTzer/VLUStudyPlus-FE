@@ -120,7 +120,10 @@ export type ProcessingType = {
   year: string
   termName: string
   major: major[]
-  processingResult?: string
+  processingResult?: {
+    _id: string
+    processingResultName: string
+  }
   reason?: string
   createdAt: string | Date
   updatedAt: string | Date

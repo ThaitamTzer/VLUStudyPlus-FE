@@ -170,6 +170,7 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                 Kết quả xử lý
               </TableSortLabel>
             </TableCell>
+            <TableCell>Ghi chú</TableCell>
             {termNamesCouseRegistration.map(term => (
               <TableCell key={term}>ĐKMH ({term})</TableCell>
             ))}
@@ -382,7 +383,8 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                     </Badge>
                   )}
                 </TableCell>
-                <TableCell>{d.processingResult || ''}</TableCell>
+                <TableCell>{d.processingResult?.processingResultName || ''}</TableCell>
+                <TableCell>{d.reason || ''}</TableCell>
                 {termNamesCouseRegistration.map(term => {
                   const courseRegistrationData = d.courseRegistration.find(p => p.termName === term)
 

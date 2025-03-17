@@ -12,8 +12,8 @@ import {
   Button,
   DialogActions,
   Paper,
-  Switch,
-  FormControlLabel
+  FormControlLabel,
+  Checkbox
 } from '@mui/material'
 import * as v from 'valibot'
 import type { InferInput } from 'valibot'
@@ -181,9 +181,9 @@ export default function AddCommitmentForm({ mutate }: { mutate: KeyedMutator<any
         mutate()
         onClose()
       },
-      () => {
+      err => {
         toast.update(toastId, {
-          render: 'Tạo đơn cam kết thất bại!',
+          render: err.message,
           type: 'error',
           isLoading: false,
           autoClose: 2000
@@ -449,7 +449,10 @@ export default function AddCommitmentForm({ mutate }: { mutate: KeyedMutator<any
                   name='commitment'
                   control={control}
                   render={({ field }) => (
-                    <FormControlLabel control={<Switch {...field} checked={field.value} />} label='Cam kết cải thiện' />
+                    <FormControlLabel
+                      control={<Checkbox {...field} checked={field.value} />}
+                      label='Cam kết cải thiện'
+                    />
                   )}
                 />
               </Grid>

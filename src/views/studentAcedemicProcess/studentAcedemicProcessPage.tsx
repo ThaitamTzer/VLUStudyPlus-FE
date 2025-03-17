@@ -33,8 +33,6 @@ export default function StudentAcedemicProcessPage() {
     studentAcedemicProcessService.getStudentAcedemicProcess
   )
 
-  console.log('studentData', studentData)
-
   const { toogleAddCommitmentForm, setIdProcess, setProcessObj, toogleStudentViewDetailCommitmentForm } =
     useStudentAcedemicProcessStore()
 
@@ -77,7 +75,7 @@ export default function StudentAcedemicProcessPage() {
                         </CustomIconButton>
                       </Tooltip>
                     )}
-                    {!student.status && student.commitment && (
+                    {student.commitment && (
                       <>
                         <Tooltip title='Xem đơn cam kết' arrow>
                           <CustomIconButton

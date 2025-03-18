@@ -27,6 +27,7 @@ import Iconify from '@/components/iconify'
 import commitmentFormService from '@/services/commitmentForm.service'
 import { useCommitmentStore } from '@/stores/commitment.store'
 import { CommitmentFormPDF } from './commitmentPDF'
+import { fDate } from '@/utils/format-time'
 
 const renderStatus = (status: string) => {
   switch (status) {
@@ -88,6 +89,8 @@ type TableViewCommitmentFormProps = {
 export default function TableViewCommitmentForm(props: TableViewCommitmentFormProps) {
   const { tableData, isLoading, page, limit, sortField, sortOrder, handleSort } = props
   const { setCommitmentForms, toogleViewDetailCommitmentForm } = useCommitmentStore()
+
+  console.log('tableData', tableData)
 
   const handleViewDetailCommitmentForm = useCallback(
     (row: CommitmentFormType) => {
@@ -161,7 +164,7 @@ export default function TableViewCommitmentForm(props: TableViewCommitmentFormPr
                 Lớp niên chế
               </TableSortLabel>
             </TableCell>
-            <TableCell colSpan={2}>
+            <TableCell>
               <TableSortLabel
                 active={sortField === 'approveStatus'}
                 direction={sortField === 'approveStatus' ? sortOrder : 'asc'}
@@ -170,6 +173,8 @@ export default function TableViewCommitmentForm(props: TableViewCommitmentFormPr
                 Trạng thái duyệt
               </TableSortLabel>
             </TableCell>
+            <TableCell>Ngày duyệt</TableCell>
+            <TableCell colSpan={2}>Được duyệt bởi</TableCell>
           </StyledTableRow>
         </TableHead>
         <TableBody>
@@ -183,6 +188,8 @@ export default function TableViewCommitmentForm(props: TableViewCommitmentFormPr
                 <TableCell>{row.name}</TableCell>
                 <TableCell>{row.classId.classId}</TableCell>
                 <TableCell>{renderStatus(row?.approved?.approveStatus)}</TableCell>
+                <TableCell>{fDate(row?.approved?.date, 'dd/MM/yyyy') || '-'}</TableCell>
+                <TableCell>{row?.approved?.decisionBy?.userName || '-'}</TableCell>
                 <TableCell>
                   <Tooltip title='Xem chi tiết đơn cam kết'>
                     <IconButton sx={{ color: 'primary.main' }} onClick={() => handleViewDetailCommitmentForm(row)}>

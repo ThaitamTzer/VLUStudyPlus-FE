@@ -9,7 +9,10 @@ export type CommitmentFormType = {
   approved: {
     approveStatus: 'approved' | 'pending' | 'rejected'
     date: string | Date
-    decisionBy: string
+    decisionBy: {
+      mail: string
+      userName: string
+    }
     description: string
   }
 }

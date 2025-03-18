@@ -6,8 +6,8 @@ interface ACLConfig {
 }
 
 export const aclConfig: ACLConfig = {
-  '/role-management': {
-    action: 'read',
-    subject: 'role'
-  }
+  // '/role-management': {
+  //   action: 'read',
+  //   subject: 'role'
+  // }
 }

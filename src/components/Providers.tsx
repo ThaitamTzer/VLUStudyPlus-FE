@@ -16,6 +16,9 @@ import AppReactToastify from '@/libs/styles/AppReactToastify'
 
 // Util Imports
 import { getMode, getSettingsFromCookie, getSystemMode } from '@core/utils/serverHelpers'
+import SocketProvider from '@/contexts/SocketProvider'
+
+// import SocketProvider from '@/contexts/SocketProvider'
 
 type Props = {
   direction: Direction
@@ -38,6 +41,7 @@ const Providers = (props: Props) => {
       <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
         <ThemeProvider direction={direction} systemMode={systemMode}>
           <AppReactToastify direction={direction} position='top-center' limit={4} autoClose={3} transition={Flip} />
+          <SocketProvider />
           <ReduxProvider>{children}</ReduxProvider>
         </ThemeProvider>
       </SettingsProvider>

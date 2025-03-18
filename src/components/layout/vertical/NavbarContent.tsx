@@ -1,5 +1,11 @@
+'use client'
+
 // Third-party Imports
 import classnames from 'classnames'
+
+import useSWR from 'swr'
+
+import notificationService from '@/services/notification.service'
 
 // Type Imports
 // import type { ShortcutsType } from '@components/layout/shared/ShortcutsDropdown'
@@ -13,51 +19,12 @@ import NavToggle from './NavToggle'
 import ModeDropdown from '@components/layout/shared/ModeDropdown'
 
 // import ShortcutsDropdown from '@components/layout/shared/ShortcutsDropdown'
-// import NotificationsDropdown from '@components/layout/shared/NotificationsDropdown'
+// import type { NotificationsType } from '@components/layout/shared/NotificationsDropdown'
+import NotificationsDropdown from '@components/layout/shared/NotificationsDropdown'
 import UserDropdown from '@components/layout/shared/UserDropdown'
 
 // Util Imports
 import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
-
-// Vars
-// const shortcuts: ShortcutsType[] = [
-//   {
-//     url: '/apps/calendar',
-//     icon: 'tabler-calendar',
-//     title: 'Calendar',
-//     subtitle: 'Appointments'
-//   },
-//   {
-//     url: '/apps/invoice/list',
-//     icon: 'tabler-file-dollar',
-//     title: 'Invoice App',
-//     subtitle: 'Manage Accounts'
-//   },
-//   {
-//     url: '/apps/user/list',
-//     icon: 'tabler-user',
-//     title: 'Users',
-//     subtitle: 'Manage Users'
-//   },
-//   {
-//     url: '/apps/roles',
-//     icon: 'tabler-users-group',
-//     title: 'Role Management',
-//     subtitle: 'Permissions'
-//   },
-//   {
-//     url: '/',
-//     icon: 'tabler-device-desktop-analytics',
-//     title: 'Dashboard',
-//     subtitle: 'User Dashboard'
-//   },
-//   {
-//     url: '/pages/account-settings',
-//     icon: 'tabler-settings',
-//     title: 'Settings',
-//     subtitle: 'Account Settings'
-//   }
-// ]
 
 // const notifications: NotificationsType[] = [
 //   {
@@ -108,6 +75,11 @@ import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
 // ]
 
 const NavbarContent = () => {
+  const { data: notifications, mutate } = useSWR('/api/notification/get-notification', notificationService.getAll, {
+    revalidateOnFocus: false,
+    revalidateOnMount: true
+  })
+
   return (
     <div
       className={classnames(
@@ -124,7 +96,7 @@ const NavbarContent = () => {
           <ModeDropdown />
         </div>
         {/* <ShortcutsDropdown shortcuts={shortcuts} /> */}
-        {/* <NotificationsDropdown notifications={notifications} /> */}
+        <NotificationsDropdown notifications={notifications} mutate={mutate} />
         <UserDropdown />
       </div>
     </div>

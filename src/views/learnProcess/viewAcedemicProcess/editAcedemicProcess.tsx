@@ -19,11 +19,8 @@ import {
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import { valibotResolver } from '@hookform/resolvers/valibot'
 import { LoadingButton } from '@mui/lab'
-
 import type { InferInput } from 'valibot'
-
 import { toast } from 'react-toastify'
-
 import type { KeyedMutator } from 'swr'
 
 import { useShare } from '@/hooks/useShare'
@@ -33,7 +30,6 @@ import { useAcedemicProcessStore } from '@/stores/acedemicProcess.store'
 import CustomTextField from '@/@core/components/mui/TextField'
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
 import { getAcademicYear } from '@/views/term/helper'
-
 import learnProcessService from '@/services/learnProcess.service'
 import type { LearnProcessType } from '@/types/management/learnProcessType'
 

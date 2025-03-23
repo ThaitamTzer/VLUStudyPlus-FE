@@ -24,6 +24,7 @@ type States = {
   openViewDetailAcademicProcess: boolean
   openUpdateAcedemicProcessStatus: boolean
   openSendEmail: boolean
+  openSendEmailAgain: boolean
 }
 
 type Actions = {
@@ -48,6 +49,7 @@ type Actions = {
   toogleViewDetailAcademicProcess: () => void
   toogleUpdateAcedemicProcessStatus: () => void
   tooogleSendEmail: () => void
+  toogleSendEmailAgain: () => void
 }
 
 export const useAcedemicProcessStore = create<States & Actions>(set => ({
@@ -72,6 +74,8 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
   openViewDetailAcademicProcess: false,
   openUpdateAcedemicProcessStatus: false,
   openSendEmail: false,
+  openSendEmailAgain: false,
+  toogleSendEmailAgain: () => set(state => ({ openSendEmailAgain: !state.openSendEmailAgain })),
   tooogleSendEmail: () => set(state => ({ openSendEmail: !state.openSendEmail })),
   toogleUpdateAcedemicProcessStatus: () =>
     set(state => ({ openUpdateAcedemicProcessStatus: !state.openUpdateAcedemicProcessStatus })),

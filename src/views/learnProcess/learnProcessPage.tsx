@@ -146,10 +146,9 @@ export default function LearnProcessPage() {
                 sx={{
                   p: 2,
                   borderRadius: '8px',
-                  backgroundColor: '#f9f9f9',
                   boxShadow: 1,
                   transition: 'all 0.3s',
-                  '&:hover': { boxShadow: 3, backgroundColor: '#f1f1f1' }
+                  '&:hover': { boxShadow: 3 }
                 }}
               >
                 <Iconify icon={item.icon} color={item.color} width={24} height={24} />

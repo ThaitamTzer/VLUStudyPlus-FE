@@ -34,6 +34,7 @@ export default function SendMailModal({ id }: { id: string }) {
           isLoading: false,
           autoClose: 2000
         })
+        setLoading(false)
       },
       err => {
         setLoading(false)

@@ -17,7 +17,7 @@ export default function TableTypeProcess({
 }) {
   return (
     <TableContainer sx={{ position: 'relative', overflowX: 'auto', maxHeight: 'calc(100vh - 300px)' }}>
-      <MuiTable stickyHeader sx={{ minWidth: 1000 }}>
+      <MuiTable stickyHeader sx={{ minWidth: 800 }}>
         <TableHead>
           <StyledTableRow sx={{ textTransform: 'uppercase' }}>
             {table.getHeaderGroups().map(headerGroup =>

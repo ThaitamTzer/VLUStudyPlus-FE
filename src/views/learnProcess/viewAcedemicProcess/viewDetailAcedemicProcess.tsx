@@ -58,18 +58,10 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
             </Section>
 
             {/* Thông tin xử lý học vụ */}
-            <Section title='⚖️ Thông tin xử lý học vụ'>
+            <Section title='⚖️ Diện XLHV (PĐT đề nghị)'>
               <Info label='📌 Trạng thái' value={data.checkAcademicProcessing.handlingStatusByAAO} />
               <Info label='❗ Lý do' value={data.checkAcademicProcessing.reasonHandling} />
-              <Info label='📝 Ghi chú' value={data.checkAcademicProcessing.note || 'Không có'} />
-            </Section>
-
-            {/* Quá trình học tập */}
-            <Section title='📈 Quá trình học tập'>
-              <Info label='📊 Điểm trung bình chung' value={String(data.checkAcademicProcessing.DTBC)} />
-              <Info label='📚 Số tín chỉ' value={String(data.checkAcademicProcessing.STC)} />
-              <Info label='🔢 Điểm trung bình tích lũy' value={String(data.checkAcademicProcessing.DTBCTL)} />
-              <Info label='🎓 Số tín chỉ tích lũy' value={String(data.checkAcademicProcessing.STCTL)} />
+              <Info label='📝 Lưu ý' value={data.checkAcademicProcessing.note || 'Không có'} />
             </Section>
 
             {/* Đăng ký học phần */}
@@ -81,6 +73,14 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
                   value={`Đăng ký: ${course.isRegister ? 'Có' : 'Không'}`}
                 />
               ))}
+            </Section>
+
+            {/* Quá trình học tập */}
+            <Section title='📈 Quá trình học tập'>
+              <Info label='📊 Điểm trung bình chung' value={String(data.checkAcademicProcessing.DTBC)} />
+              <Info label='📚 Số tín chỉ' value={String(data.checkAcademicProcessing.STC)} />
+              <Info label='🔢 Điểm trung bình tích lũy' value={String(data.checkAcademicProcessing.DTBCTL)} />
+              <Info label='🎓 Số tín chỉ tích lũy' value={String(data.checkAcademicProcessing.STCTL)} />
             </Section>
 
             {/* Thông tin lớp học */}
@@ -123,8 +123,18 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function Info({ label, value }: { label: string; value: string }) {
   return (
-    <Typography variant='body1' sx={{ display: 'flex', gap: 1 }}>
-      <span style={{ fontWeight: 'bold', color: '#555' }}>{label}:</span> {value}
+    <Typography
+      variant='body1'
+      sx={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 1,
+        flexWrap: 'wrap',
+        wordBreak: 'break-word'
+      }}
+    >
+      <span style={{ fontWeight: 'bold', color: '#555', whiteSpace: 'nowrap' }}>{label}:</span>
+      <span style={{ flex: 1, minWidth: 0 }}>{value}</span>
     </Typography>
   )
 }

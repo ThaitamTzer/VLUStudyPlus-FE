@@ -67,12 +67,12 @@ export default function ProcessResultPage() {
         enableSorting: false
       }),
       columnHelper.accessor('processingResultName', {
-        header: 'Kết quả xử lý',
+        header: 'Tên danh mục',
         cell: infor => infor.getValue(),
         sortingFn: 'alphanumeric'
       }),
       columnHelper.accessor('commitment', {
-        header: 'Làm cam kết',
+        header: 'Có làm đơn cam kết ?',
         cell: infor => (infor.getValue() ? 'Có' : 'Không'),
         sortingFn: 'alphanumeric'
       }),
@@ -83,7 +83,7 @@ export default function ProcessResultPage() {
         },
         cell: infor => (
           <>
-            <Tooltip title='Sửa'>
+            <Tooltip title='Sửa danh mục'>
               <IconButton
                 onClick={() => {
                   toolEditResultProcess()
@@ -93,7 +93,7 @@ export default function ProcessResultPage() {
                 <Iconify icon='solar:pen-2-linear' color='#2092ec' />
               </IconButton>
             </Tooltip>
-            <Tooltip title='Xóa'>
+            <Tooltip title='Xóa danh mục'>
               <IconButton
                 onClick={() => {
                   toogleDeleteResultProcess()
@@ -169,7 +169,7 @@ export default function ProcessResultPage() {
 
   return (
     <>
-      <PageHeader title='Danh sách kết quả xử lý học tập' />
+      <PageHeader title='Danh sách danh mục kết quả xử lý học tập' />
       <Card sx={{ mt: 4 }}>
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <CustomTextField
@@ -195,7 +195,7 @@ export default function ProcessResultPage() {
               className='max-sm:is-full'
               onClick={toogleAddResultProcess}
             >
-              Thêm kết quả xử lý học tập
+              Thêm danh mục
             </Button>
           </div>
         </div>
@@ -215,10 +215,10 @@ export default function ProcessResultPage() {
         onClose={toogleDeleteResultProcess}
         onSubmit={onDelete}
         loading={loading}
-        title='Xóa kết quả xử lý'
+        title='Xóa danh mục kết quả xử lý'
         content={
           <>
-            Bạn có chắc chắn muốn xóa kết quả xử lý <strong>{resultProcessData?.processingResultName}</strong>?
+            Bạn có chắc chắn muốn xóa danh mục kết quả xử lý <strong>{resultProcessData?.processingResultName}</strong>?
           </>
         }
       />

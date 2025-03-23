@@ -1,4 +1,4 @@
-import { CardContent, Grid, MenuItem } from '@mui/material'
+import { CardContent, Checkbox, FormControlLabel, Grid, MenuItem } from '@mui/material'
 
 import CustomTextField from '@/@core/components/mui/TextField'
 import { getAcademicYear } from '@/views/term/helper'
@@ -72,6 +72,36 @@ export default function TableFilter(props: TableFilterProps) {
               </MenuItem>
             ))}
           </CustomTextField>
+        </Grid>
+        <Grid item container xs={12}>
+          <Grid item xs={12} sm={6} md={3}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={e => {
+                    setFilterField('status')
+                    setFilterValue(e.target.checked)
+                    setPage(1)
+                  }}
+                />
+              }
+              label='Chỉ hiển thị XLHV đã xử lý'
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={e => {
+                    setFilterField('status')
+                    setFilterValue(e.target.checked)
+                    setPage(1)
+                  }}
+                />
+              }
+              label='Chỉ hiển thị sinh viên đã làm đơn'
+            />
+          </Grid>
         </Grid>
       </Grid>
     </CardContent>

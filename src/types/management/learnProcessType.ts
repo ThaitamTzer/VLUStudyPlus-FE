@@ -4,6 +4,7 @@ export type LearnProcessType = {
   processId: string
   createdAt: string | Date
   updatedAt: string | Date
+  isNotification: boolean
 }
 
 type Major = {

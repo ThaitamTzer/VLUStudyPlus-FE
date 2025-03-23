@@ -8,6 +8,7 @@ import { valibotResolver } from '@hookform/resolvers/valibot'
 
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
@@ -15,7 +16,6 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
-  Switch,
   Typography
 } from '@mui/material'
 
@@ -122,7 +122,7 @@ export default function UpdateProcessResult({ mutate }: { mutate: KeyedMutator<a
           >
             <Iconify icon='mdi:close' />
           </IconButton>
-          <Typography variant='h4'>Thêm kết quả xử lý</Typography>
+          <Typography variant='h4'>Cập nhật danh mục kết quả xử lý</Typography>
         </DialogTitle>
         <DialogContent>
           <Grid container>
@@ -133,7 +133,7 @@ export default function UpdateProcessResult({ mutate }: { mutate: KeyedMutator<a
                 render={({ field }) => (
                   <CustomTextField
                     {...field}
-                    label='Tên kết quả xử lý'
+                    label='Tên danh mục kết quả xử lý'
                     fullWidth
                     {...(errors.processingResultName && {
                       error: true,
@@ -149,9 +149,9 @@ export default function UpdateProcessResult({ mutate }: { mutate: KeyedMutator<a
                 name='commitment'
                 render={({ field }) => (
                   <FormControlLabel
-                    label='Làm cam kết'
+                    label='Có làm đơn cam kết ?'
                     control={
-                      <Switch
+                      <Checkbox
                         {...field}
                         checked={field.value}
                         onChange={e => field.onChange(e.target.checked)}

@@ -2,9 +2,11 @@
 
 import { useEffect } from 'react'
 
+import type { ToastContentProps } from 'react-toastify'
 import { toast } from 'react-toastify'
 
 import { io } from 'socket.io-client'
+import cx from 'clsx'
 
 export default function SocketProvider() {
   useEffect(() => {
@@ -28,8 +30,12 @@ export default function SocketProvider() {
 
     socket.on('authenticatedNotification', data => {
       console.log('🔔 Nhận thông báo:', data)
-      toast.info('Bạn có thông báo mới', {
-        autoClose: 3000,
+      toast(CustomNotification, {
+        data: {
+          title: data.title,
+          content: data.message
+        },
+        autoClose: 5000,
         position: 'top-right'
       })
     })
@@ -45,4 +51,24 @@ export default function SocketProvider() {
   }, [])
 
   return null // Không cần UI, chỉ cần giữ kết nối WebSocket
+}
+
+type CustomNotificationProps = ToastContentProps & {
+  data: {
+    title: string
+    content: string
+  }
+}
+
+function CustomNotification({ data, toastProps }: CustomNotificationProps) {
+  const isColored = toastProps.theme === 'colored'
+
+  return (
+    <div className='flex flex-col w-full'>
+      <h3 className={cx('text-sm font-semibold', isColored ? 'text-white' : 'text-zinc-800')}>{data.title}</h3>
+      <div className='flex items-center justify-between'>
+        <p className='text-sm'>{data.content}</p>
+      </div>
+    </div>
+  )
 }

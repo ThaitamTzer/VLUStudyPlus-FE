@@ -1,87 +1,79 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import type { RefObject } from 'react'
+
+// import { useRef } from 'react'
 
 import SignatureCanvas from 'react-signature-canvas'
-import { Button } from '@mui/material'
-import { toast } from 'react-toastify'
+import { Button, Typography } from '@mui/material'
 
-import type { KeyedMutator } from 'swr'
+// import { toast } from 'react-toastify'
 
-import { LoadingButton } from '@mui/lab'
+// import type { KeyedMutator } from 'swr'
 
-import { CustomDialog } from '@/components/CustomDialog'
-import { useStudentAcedemicProcessStore } from '@/stores/studentAcedemicProcess.store'
-import studentAcedemicProcessService from '@/services/studentAcedemicProcess.service'
+// import { LoadingButton } from '@mui/lab'
 
-export default function SignatureSignModal({ id, mutate }: { id: string; mutate: KeyedMutator<any> }) {
-  const { openSignSignatureForm, toogleSignSignatureForm } = useStudentAcedemicProcessStore()
-  const sigCanvas = useRef<SignatureCanvas>(null)
-  const [loading, setLoading] = useState(false)
+// import { CustomDialog } from '@/components/CustomDialog'
+// import { useStudentAcedemicProcessStore } from '@/stores/studentAcedemicProcess.store'
+// import studentAcedemicProcessService from '@/services/studentAcedemicProcess.service'
+
+export default function SignatureSignModal({
+  sigCanvas,
+  loading
+}: {
+  sigCanvas: RefObject<SignatureCanvas>
+  loading: boolean
+}) {
+  // const { openSignSignatureForm, toogleSignSignatureForm } = useStudentAcedemicProcessStore()
+
+  // const [loading, setLoading] = useState(false)
 
   const handleClear = () => {
     sigCanvas.current?.clear()
   }
 
-  const handleClose = () => {
-    toogleSignSignatureForm()
-    sigCanvas.current?.clear()
-  }
+  // const handleClose = () => {
+  //   toogleSignSignatureForm()
+  //   sigCanvas.current?.clear()
+  // }
 
-  const handleSave = async () => {
-    if (!sigCanvas.current || sigCanvas.current.isEmpty()) {
-      return toast.error('Chữ ký không được để trống', { autoClose: 3000 })
-    }
+  // const handleSave = async () => {
+  //   if (!sigCanvas.current || sigCanvas.current.isEmpty()) {
+  //     return toast.error('Chữ ký không được để trống', { autoClose: 3000 })
+  //   }
 
-    // Chuyển dataURL thành file
-    const dataUrl = sigCanvas.current.toDataURL('image/png')
-    const blob = await (await fetch(dataUrl)).blob()
-    const file = new File([blob], 'signature.png', { type: 'image/png' })
+  //   // Chuyển dataURL thành file
+  //   const dataUrl = sigCanvas.current.toDataURL('image/png')
+  //   const blob = await (await fetch(dataUrl)).blob()
+  //   const file = new File([blob], 'signature.png', { type: 'image/png' })
 
-    const formData = new FormData()
+  //   const formData = new FormData()
 
-    formData.append('insertSignature', file)
+  //   formData.append('insertSignature', file)
 
-    const toastId = toast.loading('Đang xử lý...')
+  //   const toastId = toast.loading('Đang xử lý...')
 
-    setLoading(true)
+  //   setLoading(true)
 
-    await studentAcedemicProcessService.addSignature(
-      id,
-      formData,
-      () => {
-        handleClose()
-        mutate()
-        setLoading(false)
-        toast.update(toastId, { render: 'Ký tên thành công', type: 'success', autoClose: 3000, isLoading: false })
-      },
-      err => {
-        setLoading(false)
-        toast.update(toastId, { render: err.message, type: 'error', autoClose: 3000, isLoading: false })
-      }
-    )
-  }
+  //   await studentAcedemicProcessService.addSignature(
+  //     id,
+  //     formData,
+  //     () => {
+  //       handleClose()
+  //       mutate()
+  //       setLoading(false)
+  //       toast.update(toastId, { render: 'Ký tên thành công', type: 'success', autoClose: 3000, isLoading: false })
+  //     },
+  //     err => {
+  //       setLoading(false)
+  //       toast.update(toastId, { render: err.message, type: 'error', autoClose: 3000, isLoading: false })
+  //     }
+  //   )
+  // }
 
   return (
-    <CustomDialog
-      title='Ký tên'
-      open={openSignSignatureForm}
-      onClose={handleClose}
-      maxWidth='sm'
-      actions={
-        <>
-          <Button disabled={loading} variant='outlined' color='secondary' onClick={handleClear}>
-            Xóa chữ ký
-          </Button>
-          <Button disabled={loading} variant='outlined' color='secondary' onClick={handleClose}>
-            Hủy
-          </Button>
-          <LoadingButton loading={loading} variant='contained' onClick={handleSave}>
-            Lưu
-          </LoadingButton>
-        </>
-      }
-    >
+    <div className='w-full h-full flex flex-col justify-center items-center'>
+      <Typography>Vui lòng ký tên vào ô bên dưới</Typography>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <SignatureCanvas
           ref={sigCanvas}
@@ -94,6 +86,33 @@ export default function SignatureSignModal({ id, mutate }: { id: string; mutate:
           }}
         />
       </div>
-    </CustomDialog>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Button variant='outlined' color='error' sx={{ margin: '10px' }} onClick={handleClear} disabled={loading}>
+          Xóa chữ ký
+        </Button>
+      </div>
+    </div>
+
+    // <CustomDialog
+    //   title='Ký tên'
+    //   open={openSignSignatureForm}
+    //   onClose={handleClose}
+    //   maxWidth='sm'
+    //   actions={
+    //     <>
+    //       <Button disabled={loading} variant='outlined' color='secondary' onClick={handleClear}>
+    //         Xóa chữ ký
+    //       </Button>
+    //       <Button disabled={loading} variant='outlined' color='secondary' onClick={handleClose}>
+    //         Hủy
+    //       </Button>
+    //       <LoadingButton loading={loading} variant='contained' onClick={handleSave}>
+    //         Lưu
+    //       </LoadingButton>
+    //     </>
+    //   }
+    // >
+
+    // </CustomDialog>
   )
 }

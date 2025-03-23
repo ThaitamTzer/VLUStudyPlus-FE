@@ -1,13 +1,25 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 
-import { Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Button, CircularProgress } from '@mui/material'
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  Button,
+  CircularProgress,
+  Typography
+} from '@mui/material'
 import { PDFViewer, pdf } from '@react-pdf/renderer'
 
+import type { KeyedMutator } from 'swr'
 import useSWR, { mutate as fetchData } from 'swr'
 
 import { toast } from 'react-toastify'
+
+import type ReactSignatureCanvas from 'react-signature-canvas'
 
 import Iconify from '@/components/iconify'
 
@@ -17,6 +29,7 @@ import { CommitmentFormPDF } from '../commitmentForms/commitmentPDF'
 import type { CommitmentForm } from '@/types/management/comimentFormType'
 import UpdateCommitmentForm from './updateCommitmentForm'
 import AlertDelete from '@/components/alertModal'
+import { CustomDialog } from '@/components/CustomDialog'
 import SignatureSignModal from './signatureSignModal'
 
 export default function StudentViewDetailCommitmentForm() {
@@ -39,6 +52,8 @@ export default function StudentViewDetailCommitmentForm() {
   const { data, isLoading, mutate } = useSWR(id ? `/detail-commitment-forms-of-student/${id}` : null, () =>
     studentAcedemicProcessService.getCommitmentForm(id)
   )
+
+  console.log('data', data)
 
   const handleClose = useCallback(() => {
     toogleStudentViewDetailCommitmentForm()
@@ -115,6 +130,16 @@ export default function StudentViewDetailCommitmentForm() {
           >
             <Iconify icon='eva:close-outline' />
           </IconButton>
+          {data?.approved?.approveStatus === 'rejected' && (
+            <>
+              <Typography variant='h5' color='error'>
+                Đơn đã bị từ chối
+              </Typography>
+              <Typography variant='h5' color='error'>
+                <strong>Ghi chú: </strong> {data?.approved?.description}
+              </Typography>
+            </>
+          )}
         </DialogTitle>
         <DialogContent>
           {isLoading ? (
@@ -128,19 +153,19 @@ export default function StudentViewDetailCommitmentForm() {
           )}
         </DialogContent>
         <DialogActions>
-          {!data?.insertSignature && (
+          {!data?.insertSignatureStudent && (
             <Button variant='contained' color='success' onClick={toogleSignSignatureForm}>
               Ký đơn
             </Button>
           )}
-          {data?.approved?.approveStatus === 'pending' && (
+          {data?.approved?.approveStatus !== 'approved' && (
             <>
               <Button variant='contained' color='error' onClick={tooogleDeleteCommitmentForm}>
                 Xóa đơn
               </Button>
               <Button
                 onClick={() => {
-                  handleOpenUpdateCommitmentForm(data)
+                  handleOpenUpdateCommitmentForm(data as CommitmentForm)
                 }}
                 variant='contained'
                 color='warning'
@@ -157,7 +182,6 @@ export default function StudentViewDetailCommitmentForm() {
         </DialogActions>
       </Dialog>
       <UpdateCommitmentForm mutate={mutate} />
-      <SignatureSignModal id={data?._id || ''} mutate={mutate} />
       <AlertDelete
         open={openDeleteCommitmentForm}
         onClose={tooogleDeleteCommitmentForm}
@@ -170,6 +194,75 @@ export default function StudentViewDetailCommitmentForm() {
           handleDeleteCommitmentForm(data?._id || '')
         }}
       />
+      <RenderSignatureModal data={data} mutate={mutate} />
     </>
+  )
+}
+
+const RenderSignatureModal = ({ data, mutate }: { data: CommitmentForm | undefined; mutate: KeyedMutator<any> }) => {
+  const sigCanvas = useRef<ReactSignatureCanvas>(null)
+  const { openSignSignatureForm, toogleSignSignatureForm } = useStudentAcedemicProcessStore()
+  const [loading, setLoading] = useState(false)
+
+  const handleClose = useCallback(() => {
+    toogleSignSignatureForm()
+    sigCanvas.current?.clear()
+    setLoading(false)
+  }, [toogleSignSignatureForm])
+
+  const handleSave = async () => {
+    if (!data) return toast.error('Chưa có dữ liệu')
+
+    if (!sigCanvas.current || sigCanvas.current.isEmpty()) {
+      return toast.error('Chữ ký không được để trống', { autoClose: 3000 })
+    }
+
+    // Chuyển dataURL thành file
+    const dataUrl = sigCanvas.current.toDataURL('image/png')
+    const blob = await (await fetch(dataUrl)).blob()
+    const file = new File([blob], 'signature.png', { type: 'image/png' })
+
+    const formData = new FormData()
+
+    formData.append('insertSignature', file)
+
+    const toastId = toast.loading('Đang xử lý...')
+
+    setLoading(true)
+
+    await studentAcedemicProcessService.addSignature(
+      data._id,
+      formData,
+      () => {
+        handleClose()
+        mutate()
+        setLoading(false)
+        toast.update(toastId, { render: 'Ký tên thành công', type: 'success', autoClose: 3000, isLoading: false })
+      },
+      err => {
+        setLoading(false)
+        toast.update(toastId, { render: err.message, type: 'error', autoClose: 3000, isLoading: false })
+      }
+    )
+  }
+
+  return (
+    <CustomDialog
+      open={openSignSignatureForm}
+      onClose={toogleSignSignatureForm}
+      title='Ký tên'
+      actions={
+        <>
+          <Button variant='outlined' color='secondary' onClick={toogleSignSignatureForm} disabled={loading}>
+            Hủy
+          </Button>
+          <Button variant='contained' color='success' onClick={handleSave}>
+            Ký tên
+          </Button>
+        </>
+      }
+    >
+      <SignatureSignModal sigCanvas={sigCanvas} loading={false} />
+    </CustomDialog>
   )
 }

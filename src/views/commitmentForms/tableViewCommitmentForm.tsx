@@ -174,7 +174,8 @@ export default function TableViewCommitmentForm(props: TableViewCommitmentFormPr
               </TableSortLabel>
             </TableCell>
             <TableCell>Ngày duyệt</TableCell>
-            <TableCell colSpan={2}>Được duyệt bởi</TableCell>
+            <TableCell>Được duyệt bởi</TableCell>
+            <TableCell colSpan={2}>Ghi chú</TableCell>
           </StyledTableRow>
         </TableHead>
         <TableBody>
@@ -190,6 +191,7 @@ export default function TableViewCommitmentForm(props: TableViewCommitmentFormPr
                 <TableCell>{renderStatus(row?.approved?.approveStatus)}</TableCell>
                 <TableCell>{fDate(row?.approved?.date, 'dd/MM/yyyy') || '-'}</TableCell>
                 <TableCell>{row?.approved?.decisionBy?.userName || '-'}</TableCell>
+                <TableCell>{row?.approved?.description || '-'}</TableCell>
                 <TableCell>
                   <Tooltip title='Xem chi tiết đơn cam kết'>
                     <IconButton sx={{ color: 'primary.main' }} onClick={() => handleViewDetailCommitmentForm(row)}>

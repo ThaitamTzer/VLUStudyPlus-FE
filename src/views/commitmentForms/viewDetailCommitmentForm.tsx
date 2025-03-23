@@ -11,8 +11,9 @@ import {
   Typography,
   Button,
   CircularProgress,
-  Grid,
-  Divider
+  Grid
+
+  // Divider
 } from '@mui/material'
 import { PDFViewer, pdf } from '@react-pdf/renderer'
 
@@ -33,8 +34,15 @@ import { CommitmentFormPDF } from './commitmentPDF'
 import { CustomDialog } from '@/components/CustomDialog'
 import CustomTextField from '@/@core/components/mui/TextField'
 import SignatureSignModalLecturer from './signatureSignModal'
+import type { CommitmentFormListType } from '@/types/management/comimentFormType'
 
-export default function ViewDetailCommitmentForm({ fetcher }: { fetcher: KeyedMutator<any> }) {
+export default function ViewDetailCommitmentForm({
+  fetcherCVHT,
+  fetcher
+}: {
+  fetcherCVHT?: KeyedMutator<CommitmentFormListType>
+  fetcher?: KeyedMutator<CommitmentFormListType>
+}) {
   const {
     toogleViewDetailCommitmentForm,
     commitmentForms,
@@ -76,10 +84,25 @@ export default function ViewDetailCommitmentForm({ fetcher }: { fetcher: KeyedMu
 
   const handleOpenApprove = useCallback(
     (id: string) => {
+      if (!data?.commitmentForm.insertSignatureLecturer) {
+        return toast.error('Bạn cần ký đơn cam kết trước khi duyệt', {
+          autoClose: 4000,
+          position: 'top-center',
+          style: {
+            background: '#fff',
+            color: '#000',
+            fontWeight: 'bold',
+            border: '1px solid #ff0000',
+            padding: '10px',
+            borderRadius: '5px'
+          }
+        })
+      }
+
       toogleOpenApproveCommitment()
       setCommitmentId(id)
     },
-    [toogleOpenApproveCommitment, setCommitmentId]
+    [toogleOpenApproveCommitment, setCommitmentId, data]
   )
 
   const handleOpenReject = useCallback(
@@ -117,7 +140,8 @@ export default function ViewDetailCommitmentForm({ fetcher }: { fetcher: KeyedMu
         })
         setLoading(false)
         mutate()
-        fetcher()
+        fetcherCVHT?.()
+        fetcher?.()
         onClose()
       },
       err => {
@@ -197,6 +221,16 @@ export default function ViewDetailCommitmentForm({ fetcher }: { fetcher: KeyedMu
             <Iconify icon='eva:close-outline' />
           </IconButton>
           <Typography variant='h4'>Chi tiết đơn cam kết của {commitmentForms.name}</Typography>
+          {data?.commitmentForm?.approved?.approveStatus === 'rejected' && (
+            <>
+              <Typography variant='h5' color='error'>
+                Đơn đã bị từ chối
+              </Typography>
+              <Typography variant='h5' color='error'>
+                <strong>Ghi chú: </strong> {data?.commitmentForm?.approved?.description}
+              </Typography>
+            </>
+          )}
         </DialogTitle>
         <DialogContent>
           {isLoading ? (
@@ -210,29 +244,32 @@ export default function ViewDetailCommitmentForm({ fetcher }: { fetcher: KeyedMu
           )}
         </DialogContent>
         <DialogActions>
-          <Button variant='contained' color='success' onClick={toogleOpenSignSignatureForm}>
-            Ký đơn
-          </Button>
-          <Divider
-            orientation='vertical'
-            flexItem
-            sx={{
-              height: '100%',
-              backgroundColor: 'rgba(0, 0, 0, 0.12)'
-            }}
-          />
-
+          {data?.commitmentForm.approved.approveStatus !== 'approved' && (
+            <Button variant='contained' color='success' onClick={toogleOpenSignSignatureForm}>
+              Ký đơn
+            </Button>
+          )}
           {data?.commitmentForm.approved.approveStatus === 'approved' && (
             <Button variant='contained' onClick={handleExportPDF}>
               Xuất file PDF
             </Button>
           )}
-          {data?.commitmentForm.approved.approveStatus === 'pending' && (
+          {data?.commitmentForm.approved.approveStatus !== 'approved' && (
             <>
-              <Button variant='contained' color='error' onClick={() => handleOpenReject(data?.commitmentForm?._id)}>
-                Từ chối
-              </Button>
-              <Button variant='contained' color='success' onClick={() => handleOpenApprove(data?.commitmentForm?._id)}>
+              {!data?.commitmentForm.insertSignatureLecturer && (
+                <Button
+                  variant='contained'
+                  color='error'
+                  onClick={() => handleOpenReject(data?.commitmentForm?._id || '')}
+                >
+                  Từ chối
+                </Button>
+              )}
+              <Button
+                variant='contained'
+                color='info'
+                onClick={() => handleOpenApprove(data?.commitmentForm?._id || '')}
+              >
                 Duyệt
               </Button>
             </>

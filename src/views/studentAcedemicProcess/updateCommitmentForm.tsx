@@ -13,9 +13,9 @@ import {
   DialogActions,
   Paper,
   Switch,
-  FormControlLabel
+  FormControlLabel,
+  Stack
 } from '@mui/material'
-import * as v from 'valibot'
 import type { InferInput } from 'valibot'
 import { valibotResolver } from '@hookform/resolvers/valibot'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
@@ -30,83 +30,7 @@ import studentAcedemicProcessService from '@/services/studentAcedemicProcess.ser
 import { useStudentAcedemicProcessStore } from '@/stores/studentAcedemicProcess.store'
 import Iconify from '@/components/iconify'
 import CustomTextField from '@/@core/components/mui/TextField'
-
-const schema = v.object({
-  title: v.pipe(v.string(), v.trim(), v.minLength(5), v.maxLength(100)),
-  phoneNumber: v.pipe(
-    v.string(),
-    v.trim(),
-    v.nonEmpty('Số điện thoại không được để trống'),
-    v.minLength(10, 'Số điện thoại không hợp lệ'),
-    v.maxLength(10, 'Số điện thoại không hợp lệ')
-  ),
-  phoneNumberParent: v.pipe(
-    v.string(),
-    v.trim(),
-    v.nonEmpty('Số điện thoại phụ huynh không được để trống'),
-    v.minLength(10, 'Số điện thoại không hợp lệ'),
-    v.maxLength(10, 'Số điện thoại không hợp lệ')
-  ),
-  averageScore: v.pipe(
-    v.nonNullable(v.number(), 'Điểm trung bình tích lũy không được để trống'),
-    v.maxValue(4, 'Điểm trung bình không được lớn hơn 4')
-  ),
-  credit: v.pipe(v.nonNullable(v.number(), 'Số tín chỉ không được để trống'), v.maxValue(200, 'Số tín chỉ quá nhiều')),
-  processing: v.pipe(
-    v.array(
-      v.object({
-        term: v.pipe(
-          v.string(),
-          v.nonEmpty('Học kỳ bị XLHV không được để trống'),
-          v.includes('HK', 'Học kỳ bắt đầu bằng HK'),
-          v.minLength(5, 'Học kỳ phải có ít nhất 5 ký tự'),
-          v.maxLength(5, 'Trạng thái xử lý không được quá 5 ký tự')
-        ),
-        typeProcessing: v.pipe(
-          v.string(),
-          v.nonEmpty('Loại xử lý không được để trống'),
-          v.maxLength(255, 'Loại xử lý không được quá 255 ký tự')
-        )
-      })
-    ),
-    v.minLength(1, 'Trạng thái xử lý không được để trống')
-  ),
-  numberOfViolations: v.pipe(
-    v.nonNullable(v.number(), 'Số lần xử lý không được để trống'),
-    v.maxValue(100, 'Số lần xử lý quá nhiều')
-  ),
-  reason: v.pipe(
-    v.string(),
-    v.trim(),
-    v.nonEmpty('Lý do không được để trống'),
-    v.minLength(10, 'Lý do phải có ít nhất 10 ký tự'),
-    v.maxLength(255, 'Lý do không được quá 255 ký tự')
-  ),
-  aspiration: v.pipe(
-    v.string(),
-    v.trim(),
-    v.nonEmpty('Nguyện vọng không được để trống'),
-    v.minLength(10, 'Nguyện vọng phải có ít nhất 10 ký tự'),
-    v.maxLength(255, 'Nguyện vọng không được quá 255 ký tự')
-  ),
-  debt: v.array(
-    v.object({
-      term: v.pipe(
-        v.string(),
-        v.nonEmpty('Học kỳ bị XLHV không được để trống'),
-        v.includes('HK', 'Học kỳ bắt đầu bằng HK'),
-        v.minLength(5, 'Học kỳ phải có ít nhất 5 ký tự'),
-        v.maxLength(5, 'Trạng thái xử lý không được quá 5 ký tự')
-      ),
-      subject: v.pipe(
-        v.string(),
-        v.nonEmpty('Môn học không được để trống'),
-        v.maxLength(255, 'Môn học không được quá 255 ký tự')
-      )
-    })
-  ),
-  commitment: v.boolean()
-})
+import { schema } from './schema/validate'
 
 type FormData = InferInput<typeof schema>
 
@@ -120,27 +44,28 @@ export default function UpdateCommitmentForm({ mutate }: { mutate: KeyedMutator<
     control,
     handleSubmit,
     reset,
+    getValues,
     formState: { errors }
   } = useForm<FormData>({
     resolver: valibotResolver(schema),
     mode: 'all',
     defaultValues: {
       title: 'ĐƠN CAM KẾT CẢI THIỆN TÌNH HÌNH HỌC TẬP',
-      phoneNumber: commitmentFormObj?.phoneNumber ?? '',
-      phoneNumberParent: commitmentFormObj?.phoneNumberParent ?? '',
-      averageScore: commitmentFormObj?.averageScore ?? 0,
-      credit: commitmentFormObj?.credit ?? 0,
-      numberOfViolations: commitmentFormObj?.numberOfViolations ?? 0,
-      reason: commitmentFormObj?.reason || '',
-      aspiration: commitmentFormObj?.aspiration || '',
-      commitment: commitmentFormObj?.commitment || false,
-      debt: commitmentFormObj?.debt || [
+      phoneNumber: '',
+      phoneNumberParent: '',
+      averageScore: 0,
+      credit: 0,
+      numberOfViolations: 0,
+      reason: '',
+      aspiration: '',
+      commitment: false,
+      debt: [
         {
           term: '',
-          subject: ''
+          subjects: ['']
         }
       ],
-      processing: commitmentFormObj?.processing || [
+      processing: [
         {
           term: '',
           typeProcessing: ''
@@ -162,7 +87,10 @@ export default function UpdateCommitmentForm({ mutate }: { mutate: KeyedMutator<
       reason: commitmentFormObj.reason,
       aspiration: commitmentFormObj.aspiration,
       commitment: commitmentFormObj.commitment,
-      debt: commitmentFormObj.debt,
+      debt: commitmentFormObj.debt.map(item => ({
+        term: item.term,
+        subjects: item?.subject?.split(', ')?.map((subject: string) => subject.trim())
+      })),
       processing: commitmentFormObj.processing
     })
   }, [commitmentFormObj, reset])
@@ -179,17 +107,46 @@ export default function UpdateCommitmentForm({ mutate }: { mutate: KeyedMutator<
     remove: removeProcessing
   } = useFieldArray({ control, name: 'processing' })
 
-  const { fields: debtFields, prepend: addDebt, remove: removeDebt } = useFieldArray({ control, name: 'debt' })
+  const {
+    fields: debtFields,
+    append: addDebt,
+    remove: removeDebt,
+    update: updateDebt
+  } = useFieldArray({ control, name: 'debt' })
+
+  const handleAddDebt = () => {
+    addDebt({ term: '', subjects: [''] })
+  }
+
+  const handleAddSubject = (index: number) => {
+    // Lấy giá trị hiện tại của `term` và `subjects` từ form
+    const currentTerm = getValues(`debt.${index}.term`)
+    const currentSubjects = getValues(`debt.${index}.subjects`)
+
+    // Thêm một môn học mới vào mảng subjects
+    const newSubjects = [...currentSubjects, '']
+
+    // Cập nhật lại debt với giá trị mới
+    updateDebt(index, { term: currentTerm, subjects: newSubjects })
+  }
 
   const onSubmit = handleSubmit(async data => {
     if (!commitmentFormObj) return toast.error('Có lỗi xảy ra, vui lòng thử lại sau')
+
+    const newData = {
+      ...data,
+      debt: data.debt.map(item => ({
+        term: item.term,
+        subject: item.subjects.filter(subject => subject.trim() !== '').join(', ')
+      }))
+    }
 
     setLoading(true)
     const toastId = toast.loading('Đang cập nhật đơn cam kết...')
 
     await studentAcedemicProcessService.updateCommitmentForm(
       commitmentFormObj._id,
-      data,
+      newData,
       () => {
         toast.update(toastId, {
           render: 'Cập nhật đơn cam kết thành công!',
@@ -418,8 +375,10 @@ export default function UpdateCommitmentForm({ mutate }: { mutate: KeyedMutator<
                   )}
                 />
               </Grid>
+              <Grid item>Danh sách các học phần đang nợ và dự kiến kế hoạch trả nợ:</Grid>
               {debtFields.map((item, index) => (
                 <Grid container item xs={12} spacing={2} key={item.id}>
+                  {/* Trường học kỳ */}
                   <Grid item xs={3}>
                     <Controller
                       name={`debt.${index}.term`}
@@ -429,41 +388,63 @@ export default function UpdateCommitmentForm({ mutate }: { mutate: KeyedMutator<
                           {...field}
                           label='Học kỳ'
                           fullWidth
-                          {...(errors.debt?.[index]?.term && {
-                            error: true,
-                            helperText: errors.debt?.[index]?.term.message
-                          })}
+                          value={field.value || ''}
+                          error={!!errors.debt?.[index]?.term}
+                          helperText={errors.debt?.[index]?.term?.message}
                         />
                       )}
                     />
                   </Grid>
+
+                  {/* Các trường môn học */}
                   <Grid item xs={5}>
-                    <Controller
-                      name={`debt.${index}.subject`}
-                      control={control}
-                      render={({ field }) => (
-                        <CustomTextField
-                          {...field}
-                          label='Môn học'
-                          fullWidth
-                          {...(errors.debt?.[index]?.subject && {
-                            error: true,
-                            helperText: errors.debt?.[index]?.subject.message
-                          })}
+                    {item?.subjects?.map((_, subjectIndex) => (
+                      <Stack key={subjectIndex} spacing={2} direction='row' alignItems='flex-start'>
+                        <Controller
+                          name={`debt.${index}.subjects.${subjectIndex}`}
+                          control={control}
+                          render={({ field }) => (
+                            <CustomTextField
+                              {...field}
+                              label={`Môn học ${subjectIndex + 1}`}
+                              fullWidth
+                              value={field.value || ''} // Đảm bảo giá trị không bị undefined
+                              error={!!errors.debt?.[index]?.subjects?.[subjectIndex]}
+                              helperText={errors.debt?.[index]?.subjects?.[subjectIndex]?.message}
+                            />
+                          )}
                         />
-                      )}
-                    />
+                        {item.subjects.length > 1 && (
+                          <Button
+                            variant='outlined'
+                            color='error'
+                            sx={{ marginTop: '18px !important' }}
+                            onClick={() => {
+                              const currentSubjects = getValues(`debt.${index}.subjects`)
+                              const newSubjects = currentSubjects.filter((_: any, i: any) => i !== subjectIndex)
+
+                              updateDebt(index, { ...item, subjects: newSubjects })
+                            }}
+                          >
+                            Xóa
+                          </Button>
+                        )}
+                      </Stack>
+                    ))}
+                    <Button onClick={() => handleAddSubject(index)}>Thêm môn học</Button>
                   </Grid>
+
+                  {/* Nút xóa kỳ */}
                   {debtFields.length > 1 && (
-                    <Grid item xs={2}>
-                      <Button onClick={() => removeDebt(index)} color='error'>
-                        Xóa
+                    <Grid item xs={1.5} alignSelf='flex-start' sx={{ marginTop: '18px !important' }}>
+                      <Button variant='outlined' onClick={() => removeDebt(index)} color='error'>
+                        Xóa kỳ
                       </Button>
                     </Grid>
                   )}
                 </Grid>
               ))}
-              <Button onClick={() => addDebt({ term: '', subject: '' })}>Thêm môn nợ</Button>
+              <Button onClick={handleAddDebt}>Thêm học kỳ nợ</Button>
               <Grid item xs={12}>
                 <Controller
                   name='commitment'

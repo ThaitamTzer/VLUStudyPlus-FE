@@ -76,7 +76,7 @@ export const useColumns = () => {
                     setAcedemicProcessCommimentOfCVHT(infor.row.original)
                   }}
                 >
-                  <Iconify icon='hugeicons:files-01' color='#2092ec' />
+                  <Iconify icon='hugeicons:files-01' color='#8e44ad' />
                 </IconButton>
               </Tooltip>
             ) : (
@@ -87,7 +87,7 @@ export const useColumns = () => {
                     setAcedemicProcessCommiment(infor.row.original)
                   }}
                 >
-                  <Iconify icon='hugeicons:files-01' color='#2092ec' />
+                  <Iconify icon='hugeicons:files-01' color='#8e44ad' />
                 </IconButton>
               </Tooltip>
             )}
@@ -98,7 +98,7 @@ export const useColumns = () => {
                   setAcedemicProcess(infor.row.original)
                 }}
               >
-                <Iconify icon='bx:import' color='green' />
+                <Iconify icon='bx:import' color='#f39c12' />
               </IconButton>
             </Tooltip>
             <RowAction>

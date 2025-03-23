@@ -9,13 +9,14 @@ type CustomDialogProps = {
   onClose: () => void
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false
   actions?: React.ReactNode
+  closeOutside?: boolean
 }
 
 export const CustomDialog = (props: CustomDialogProps) => {
-  const { onClose, open, title, maxWidth, children, actions } = props
+  const { onClose, open, title, maxWidth, children, actions, closeOutside } = props
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth={maxWidth} fullWidth>
+    <Dialog open={open} onClose={closeOutside ? onClose : undefined} maxWidth={maxWidth} fullWidth>
       <DialogTitle>
         <IconButton
           sx={{

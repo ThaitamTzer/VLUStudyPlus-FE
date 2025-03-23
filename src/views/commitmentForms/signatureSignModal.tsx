@@ -70,7 +70,7 @@ export default function SignatureSignModalLecturer({ id, mutate }: { id: string;
       maxWidth='sm'
       actions={
         <>
-          <Button disabled={loading} variant='outlined' color='secondary' onClick={handleClear}>
+          <Button disabled={loading} variant='outlined' color='error' onClick={handleClear}>
             Xóa chữ ký
           </Button>
           <Button disabled={loading} variant='outlined' color='secondary' onClick={handleClose}>

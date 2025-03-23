@@ -12,7 +12,8 @@ import {
   Card,
   Grid,
   MenuItem,
-  CardContent
+  CardContent,
+  Tooltip
 } from '@mui/material'
 import useSWR from 'swr'
 
@@ -141,6 +142,15 @@ export default function ViewCommitmentForms() {
                     placeholder='Tìm kiếm'
                     className='max-sm:is-full sm:is-[300px]'
                   />
+                  <Tooltip title='Cập nhật bảng'>
+                    <IconButton
+                      onClick={() => {
+                        mutate()
+                      }}
+                    >
+                      <Iconify icon='solar:refresh-linear' color='blue' />
+                    </IconButton>
+                  </Tooltip>
                 </div>
               </div>
               <TableViewCommitmentForm

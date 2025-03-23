@@ -56,6 +56,15 @@ export const CommitmentFormPDF = ({ data }: { data: CommitmentForm }) => {
     return data
   }, [data])
 
+  const getDate = (date: string | Date) => {
+    const dateObj = new Date(date)
+    const day = dateObj.getDate()
+    const month = dateObj.getMonth() + 1
+    const year = dateObj.getFullYear()
+
+    return `${day} tháng ${month} năm ${year}`
+  }
+
   return (
     <Document title={`Đơn cam kết học tập của ${dataForm?.name}`}>
       <Page size='A4' style={{ paddingTop: 35, paddingBottom: 65, paddingLeft: '60px', paddingRight: '60px' }}>
@@ -321,7 +330,7 @@ export const CommitmentFormPDF = ({ data }: { data: CommitmentForm }) => {
               fontSize: '12px'
             }}
           >
-            <Text style={{ marginTop: 20 }}>TP. Hồ Chí Minh, ngày .... tháng .... năm 20...</Text>
+            <Text style={{ marginTop: 20 }}>TP. Hồ Chí Minh, ngày {getDate(dataForm.createdAt)}</Text>
           </View>
 
           <View

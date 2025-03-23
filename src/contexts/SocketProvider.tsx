@@ -7,6 +7,7 @@ import { toast } from 'react-toastify'
 
 import { io } from 'socket.io-client'
 import cx from 'clsx'
+import { mutate } from 'swr'
 
 export default function SocketProvider() {
   useEffect(() => {
@@ -29,7 +30,7 @@ export default function SocketProvider() {
     })
 
     socket.on('authenticatedNotification', data => {
-      console.log('🔔 Nhận thông báo:', data)
+      mutate('/api/notification/get-notification')
       toast(CustomNotification, {
         data: {
           title: data.title,

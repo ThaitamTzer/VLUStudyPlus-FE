@@ -125,7 +125,7 @@ export default function LearnProcessPage() {
   return (
     <>
       <PageHeader title='Danh sách kỳ xử lý học tập' />
-      <Card sx={{ p: 2, boxShadow: 3, mt: 4 }}>
+      <Card sx={{ mt: 4, boxShadow: 5 }}>
         <CardContent>
           <Typography variant='h6' fontWeight='bold' gutterBottom>
             Hướng dẫn thao tác
@@ -133,7 +133,7 @@ export default function LearnProcessPage() {
           <Box display='grid' gridTemplateColumns='repeat(auto-fit, minmax(150px, 1fr))' gap={2}>
             {[
               { icon: 'gg:list', color: '#2092ec', label: 'Xem danh sách xử lý học tập' },
-              { icon: 'hugeicons:files-01', color: '#2092ec', label: 'Xem danh sách đơn cam kết' },
+              { icon: 'hugeicons:files-01', color: '#8e44ad', label: 'Xem danh sách đơn cam kết' },
               { icon: 'bx:import', color: 'green', label: 'Import danh sách xử lý học tập' },
               { icon: 'solar:pen-2-linear', color: 'orange', label: 'Cập nhật kỳ xử lý' },
               { icon: 'solar:trash-bin-2-linear', color: 'red', label: 'Xóa kỳ xử lý' }
@@ -165,9 +165,6 @@ export default function LearnProcessPage() {
             Bạn có thể thêm xử lý học tập bằng cách xem danh sách xử lý học tập và chọn Thêm XLHV.
           </Typography>
         </CardContent>
-      </Card>
-
-      <Card sx={{ mt: 4, boxShadow: 5 }}>
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <CustomTextField
             select

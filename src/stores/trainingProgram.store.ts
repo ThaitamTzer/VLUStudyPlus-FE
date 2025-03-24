@@ -8,6 +8,7 @@ type States = {
   openDeleteTrainingProgram: boolean
   openImportTrainingProgramSession: boolean
   trainingProgram: TrainingProgramType | null
+  openImportProgramLoading: boolean
 }
 
 type Actions = {
@@ -16,6 +17,7 @@ type Actions = {
   toogleDeleteTrainingProgram: () => void
   toogleImportTrainingProgramSession: () => void
   setTrainingProgram: (trainingProgram: TrainingProgramType) => void
+  toogleImportProgramLoading: () => void
 }
 
 export const useTrainingProgramStore = create<States & Actions>(set => ({
@@ -24,7 +26,8 @@ export const useTrainingProgramStore = create<States & Actions>(set => ({
   openDeleteTrainingProgram: false,
   openImportTrainingProgramSession: false,
   trainingProgram: null,
-
+  openImportProgramLoading: false,
+  toogleImportProgramLoading: () => set(state => ({ openImportProgramLoading: !state.openImportProgramLoading })),
   toogleCreateTrainingProgram: () => set(state => ({ openCreateTrainingProgram: !state.openCreateTrainingProgram })),
   toogleUpdateTrainingProgram: () => set(state => ({ openUpdateTrainingProgram: !state.openUpdateTrainingProgram })),
   toogleDeleteTrainingProgram: () => set(state => ({ openDeleteTrainingProgram: !state.openDeleteTrainingProgram })),

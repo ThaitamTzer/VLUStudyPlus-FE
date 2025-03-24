@@ -3,22 +3,16 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import type { KeyedMutator } from 'swr'
-
 import { Button, Grid, MenuItem } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
-
 import * as v from 'valibot'
 import type { InferInput } from 'valibot'
 import { useForm, Controller } from 'react-hook-form'
-
 import { valibotResolver } from '@hookform/resolvers/valibot'
-
 import { toast } from 'react-toastify'
 
 import trainingProgramService from '@/services/trainingprogram.service'
-
 import { useShare } from '@/hooks/useShare'
-
 import { CustomDialog } from '@/components/CustomDialog'
 import { useTrainingProgramStore } from '@/stores/trainingProgram.store'
 import CustomTextField from '@/@core/components/mui/TextField'
@@ -35,8 +29,7 @@ type UpdateTrainingProgramProps = {
   mutate: KeyedMutator<any>
 }
 
-export default function UpdateTrainingProgram(props: UpdateTrainingProgramProps) {
-  const { mutate } = props
+export default function UpdateTrainingProgram({ mutate }: UpdateTrainingProgramProps) {
   const { cohorOptions } = useShare()
   const [loading, setLoading] = useState(false)
 
@@ -47,16 +40,15 @@ export default function UpdateTrainingProgram(props: UpdateTrainingProgramProps)
     control,
     handleSubmit,
     reset,
+    watch, // Theo dõi dữ liệu thay đổi
     formState: { errors }
   } = useForm<FormData>({
     mode: 'all',
     resolver: valibotResolver(schema),
-    defaultValues: {
-      title: '',
-      credit: 0,
-      cohortId: ''
-    }
+    defaultValues: { title: '', credit: 0, cohortId: '' }
   })
+
+  const watchedValues = watch() // Lấy dữ liệu đang nhập vào
 
   useEffect(() => {
     if (trainingProgram) {
@@ -68,27 +60,45 @@ export default function UpdateTrainingProgram(props: UpdateTrainingProgramProps)
     }
   }, [trainingProgram, reset])
 
+  const getUpdatedFields = () => {
+    if (!trainingProgram) return {}
+
+    return Object.fromEntries(
+      Object.entries(watchedValues).filter(
+        ([key, value]) => trainingProgram[key as keyof typeof trainingProgram] !== value
+      )
+    )
+  }
+
   const onClose = useCallback(() => {
     toogleUpdateTrainingProgram()
     setTrainingProgram({} as any)
     reset()
   }, [toogleUpdateTrainingProgram, reset, setTrainingProgram])
 
-  const onSubmit = handleSubmit(async data => {
+  const onSubmit = handleSubmit(async () => {
     if (!trainingProgram) return toast.error('Khung chương trình không tồn tại')
+
+    const updatedFields = getUpdatedFields()
+
+    if (Object.keys(updatedFields).length === 0) {
+      toast.info('Không có thay đổi nào để cập nhật.')
+
+      return onClose()
+    }
 
     const toastId = toast.loading('Đang cập nhật khung chương trình đào tạo...')
 
     setLoading(true)
 
     await trainingProgramService.update(
-      trainingProgram?._id,
-      data,
+      trainingProgram._id,
+      updatedFields,
       () => {
         setLoading(false)
         mutate()
         toast.update(toastId, {
-          render: 'Cập nhật khung chương trình đào tạo thành công',
+          render: 'Cập nhật thành công',
           type: 'success',
           isLoading: false,
           autoClose: 2000
@@ -116,24 +126,10 @@ export default function UpdateTrainingProgram(props: UpdateTrainingProgramProps)
       maxWidth='sm'
       actions={
         <>
-          <Button
-            variant='outlined'
-            color='inherit'
-            onClick={() => {
-              onClose()
-            }}
-          >
+          <Button variant='outlined' color='inherit' onClick={onClose}>
             Hủy
           </Button>
-          <LoadingButton
-            variant='contained'
-            type='submit'
-            loading={loading}
-            onClick={onSubmit}
-            sx={{
-              marginLeft: 1
-            }}
-          >
+          <LoadingButton variant='contained' type='submit' loading={loading} onClick={onSubmit} sx={{ marginLeft: 1 }}>
             Lưu
           </LoadingButton>
         </>
@@ -167,14 +163,8 @@ export default function UpdateTrainingProgram(props: UpdateTrainingProgramProps)
                 helperText={errors.credit?.message}
                 type='number'
                 fullWidth
-                onFocus={e => {
-                  e.target.select()
-                }}
-                onChange={e => {
-                  const value = e.target.value
-
-                  onChange(value === '' ? 0 : Number(value))
-                }}
+                onFocus={e => e.target.select()}
+                onChange={e => onChange(e.target.value === '' ? 0 : Number(e.target.value))}
               />
             )}
           />
@@ -192,13 +182,11 @@ export default function UpdateTrainingProgram(props: UpdateTrainingProgramProps)
                 fullWidth
                 select
               >
-                {cohorOptions.map(option => {
-                  return (
-                    <MenuItem key={option._id} value={option._id}>
-                      {option.cohortId}
-                    </MenuItem>
-                  )
-                })}
+                {cohorOptions.map(option => (
+                  <MenuItem key={option._id} value={option._id}>
+                    {option.cohortId}
+                  </MenuItem>
+                ))}
               </CustomTextField>
             )}
           />

@@ -22,7 +22,7 @@ import PreviewImport from './importResult'
 import AddModal from './addModal'
 import ManualAddStudent from './manualAddStudent'
 import UpdateAddStudent from './updateStudent'
-import ProgressModal from '../learnProcess/progressModal'
+import ProgressModal from '../../components/dialogs/progressModal'
 
 export default function ClassStudentPage() {
   const { setOpenAddModal, openProgress } = useClassStudentStore()

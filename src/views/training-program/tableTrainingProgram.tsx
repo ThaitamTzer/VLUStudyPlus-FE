@@ -23,7 +23,12 @@ type TableTrainingProgramProps = {
 export default function TableTrainingProgram(props: TableTrainingProgramProps) {
   const { data, limit, loading, page, total } = props
 
-  const { toogleDeleteTrainingProgram, toogleUpdateTrainingProgram, setTrainingProgram } = useTrainingProgramStore()
+  const {
+    toogleDeleteTrainingProgram,
+    toogleImportTrainingProgramSession,
+    toogleUpdateTrainingProgram,
+    setTrainingProgram
+  } = useTrainingProgramStore()
 
   const handleOpenUpdateTrainingProgram = useCallback(
     (trainingProgram: TrainingProgramType) => {
@@ -39,6 +44,14 @@ export default function TableTrainingProgram(props: TableTrainingProgramProps) {
       setTrainingProgram(trainingProgram)
     },
     [setTrainingProgram, toogleDeleteTrainingProgram]
+  )
+
+  const handleOpenImportTrainingProgram = useCallback(
+    (trainingProgram: TrainingProgramType) => {
+      toogleImportTrainingProgramSession()
+      setTrainingProgram(trainingProgram)
+    },
+    [setTrainingProgram, toogleImportTrainingProgramSession]
   )
 
   return (
@@ -77,6 +90,15 @@ export default function TableTrainingProgram(props: TableTrainingProgramProps) {
                   <Tooltip arrow title='Xem chương trình đào tạo'>
                     <IconButton>
                       <Iconify icon='icon-park-outline:list-view' color='#6f42c1' />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title='Nhập chương trình đào tạo' arrow>
+                    <IconButton
+                      onClick={() => {
+                        handleOpenImportTrainingProgram(item)
+                      }}
+                    >
+                      <Iconify icon='iconoir:import' color='#198754' />
                     </IconButton>
                   </Tooltip>
                   <RowAction>

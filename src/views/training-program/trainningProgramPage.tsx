@@ -30,6 +30,8 @@ import CreateTrainingProgram from './createTrainingProgram'
 import Iconify from '@/components/iconify'
 import UpdateTrainingProgram from './updateTrainingProgram'
 import DeleteTrainingProgram from './deleteTrainingProgram'
+import ImportTrainingProgram from './importTrainingProgram'
+import ProgressModal from '@/components/dialogs/progressModal'
 
 export default function TrainingProgramPage() {
   const router = useRouter()
@@ -41,7 +43,7 @@ export default function TrainingProgramPage() {
   const filterValue = searchParams.get('filterValue') || ''
   const searchKey = searchParams.get('searchKey') || ''
 
-  const { toogleCreateTrainingProgram } = useTrainingProgramStore()
+  const { toogleCreateTrainingProgram, openImportProgramLoading } = useTrainingProgramStore()
 
   const fetcher = ['/training-program', page, limit, filterField, filterValue, searchKey]
 
@@ -66,8 +68,12 @@ export default function TrainingProgramPage() {
             <Typography variant='h6'>Chú thích:</Typography>
             <List dense>
               <ListItem>
-                <Iconify icon='icon-park-outline:list-view' color='#6f42c1' />
+                <Iconify width={18} icon='icon-park-outline:list-view' color='#6f42c1' />
                 <ListItemText primary='Xem chương trình đào tạo' />
+              </ListItem>
+              <ListItem>
+                <Iconify width={18} icon='iconoir:import' color='#198754' />
+                <ListItemText primary='Nhập chương trình đào tạo' />
               </ListItem>
             </List>
           </div>
@@ -172,6 +178,8 @@ export default function TrainingProgramPage() {
       <CreateTrainingProgram mutate={mutate} />
       <UpdateTrainingProgram mutate={mutate} />
       <DeleteTrainingProgram mutate={mutate} />
+      <ImportTrainingProgram mutate={mutate} />
+      <ProgressModal open={openImportProgramLoading} />
     </>
   )
 }

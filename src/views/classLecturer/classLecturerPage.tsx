@@ -16,7 +16,7 @@ import { useClassStudentStore, useUploadStore } from '@/stores/classStudent/clas
 import PreviewImport from '../classStudent/importResult'
 import AddModal from '../classStudent/addModal'
 import ManualAddStudent from '../classStudent/manualAddStudent'
-import ProgressModal from '../learnProcess/progressModal'
+import ProgressModal from '../../components/dialogs/progressModal'
 
 const ClassCard = ({ item }: { item: ClassLecturer }) => {
   const router = useRouter()

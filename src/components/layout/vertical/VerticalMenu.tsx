@@ -232,6 +232,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             Xử lý học vụ
           </MenuItem>
         </SubMenu>
+        <SubMenu label='CTĐT' icon={<Iconify icon='solar:book-bookmark-linear' />}>
+          <MenuItem href='/training-program' icon={<Iconify icon='solar:book-bookmark-linear' />}>
+            Khung CTĐT
+          </MenuItem>
+        </SubMenu>
         {/* <SubMenu
           label='dashboards'
           icon={<i className='tabler-smart-home' />}

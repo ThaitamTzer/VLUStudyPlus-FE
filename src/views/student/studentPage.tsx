@@ -16,7 +16,6 @@ import TablePaginationCustom from '@/components/table/TablePagination'
 import CustomTextField from '@/@core/components/mui/TextField'
 import DebouncedInput from '@/components/debouncedInput'
 import StudentFiller from './fillter'
-import { fDate } from '@/utils/format-time'
 
 const StudentList = dynamic(() => import('./studentList'), { ssr: true })
 const AddStudent = dynamic(() => import('./addStudent'), { ssr: false })
@@ -27,8 +26,6 @@ const PreviewStudentImport = dynamic(() => import('./previewStudentImport'), { s
 export default function StudentPage() {
   const { toogleAddStudent, student, toogleBlockStudent, toogleUnBlockStudent, openUnBlockStudent, openBlockStudent } =
     useStudentStore()
-
-  console.log(fDate(null, 'dd/MM/yyyy'))
 
   const [loading, setLoading] = useState<boolean>(false)
 

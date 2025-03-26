@@ -32,6 +32,7 @@ import UpdateTrainingProgram from './updateTrainingProgram'
 import DeleteTrainingProgram from './deleteTrainingProgram'
 import ImportTrainingProgram from './importTrainingProgram'
 import ProgressModal from '@/components/dialogs/progressModal'
+import ViewTrainingProgramByFrame from './viewTrainingProgramByFrame/viewTrainingProgramByFrame'
 
 export default function TrainingProgramPage() {
   const router = useRouter()
@@ -179,6 +180,7 @@ export default function TrainingProgramPage() {
       <UpdateTrainingProgram mutate={mutate} />
       <DeleteTrainingProgram mutate={mutate} />
       <ImportTrainingProgram mutate={mutate} />
+      <ViewTrainingProgramByFrame />
       <ProgressModal open={openImportProgramLoading} />
     </>
   )

@@ -53,7 +53,7 @@ export type Categories = {
   titleV: string
   credits: number
   subjects: Subjects[]
-  categoriesC3: CategoriesC3[]
+  categoriesC3?: CategoriesC3[]
 }
 
 export type TrainingProgramByFrame = {

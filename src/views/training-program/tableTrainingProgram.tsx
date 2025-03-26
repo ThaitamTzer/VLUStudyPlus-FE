@@ -24,6 +24,7 @@ export default function TableTrainingProgram(props: TableTrainingProgramProps) {
   const { data, limit, loading, page, total } = props
 
   const {
+    toogleViewTrainingProgramByFrame,
     toogleDeleteTrainingProgram,
     toogleImportTrainingProgramSession,
     toogleUpdateTrainingProgram,
@@ -88,7 +89,12 @@ export default function TableTrainingProgram(props: TableTrainingProgramProps) {
                 <TableCell>{item.cohortId.cohortId}</TableCell>
                 <TableCell align='right' size='small'>
                   <Tooltip arrow title='Xem chương trình đào tạo'>
-                    <IconButton>
+                    <IconButton
+                      onClick={() => {
+                        toogleViewTrainingProgramByFrame()
+                        setTrainingProgram(item)
+                      }}
+                    >
                       <Iconify icon='icon-park-outline:list-view' color='#6f42c1' />
                     </IconButton>
                   </Tooltip>

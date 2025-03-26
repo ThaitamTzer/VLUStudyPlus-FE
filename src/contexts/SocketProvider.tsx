@@ -16,7 +16,7 @@ export default function SocketProvider() {
     if (!token) return
 
     // Kết nối tới WebSocket server
-    const socket = io('https://vlustudy-production.up.railway.app', {
+    const socket = io(process.env.NEXT_PUBLIC_API_URL, {
       transports: ['websocket'],
       auth: {
         token: `Bearer ${token}` // Gửi token vào auth header

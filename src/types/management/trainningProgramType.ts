@@ -18,3 +18,50 @@ export type TrainingProgramListType = {
   }
   data: TrainingProgramType[]
 }
+
+export type Subjects = {
+  _id: string
+  categoryTrainingProgramIds: string[]
+  courseCode: string
+  courseName: string
+  credits: number
+  LT: number
+  TH: number
+  TT: number
+  isRequire: string
+  prerequisites: string
+  preConditions: string
+  subjectCode: string
+  inCharge: string
+  implementationSemester: string
+  note: string
+  createdAt: string | Date
+  updatedAt: string | Date
+}
+
+export type CategoriesC3 = {
+  _id: string
+  titleN: string
+  titleV: string
+  credits: number
+  subjects: Subjects[]
+}
+
+export type Categories = {
+  _id: string
+  titleN: string
+  titleV: string
+  credits: number
+  subjects: Subjects[]
+  categoriesC3: CategoriesC3[]
+}
+
+export type TrainingProgramByFrame = {
+  _id: string
+  trainingProgramSessionId: string
+  titleN: string
+  titleV: string
+  credits: number
+  subjects: Subjects[]
+  categories: Categories[]
+}

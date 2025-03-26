@@ -7,11 +7,14 @@ import { toast } from 'react-toastify'
 
 import { LoadingButton } from '@mui/lab'
 
+import type { KeyedMutator } from 'swr'
+import { mutate as fetcher } from 'swr'
+
 import { useAcedemicProcessStore } from '@/stores/acedemicProcess.store'
 import { CustomDialog } from '@/components/CustomDialog'
 import mailService from '@/services/mail.service'
 
-export default function SendMailModal({ id }: { id: string }) {
+export default function SendMailModal({ id, mutate }: { id: string; mutate: KeyedMutator<any> }) {
   const { openSendEmail, tooogleSendEmail } = useAcedemicProcessStore()
   const [loading, setLoading] = useState(false)
 
@@ -34,6 +37,8 @@ export default function SendMailModal({ id }: { id: string }) {
           isLoading: false,
           autoClose: 2000
         })
+        mutate()
+        fetcher('/api/learnProcess')
         setLoading(false)
       },
       err => {

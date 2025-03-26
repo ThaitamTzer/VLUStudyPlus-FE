@@ -53,11 +53,21 @@ export default function LearnProcessPage() {
     openDeleteAcedemicProcess,
     toogleManualAdd,
     openManualAdd,
-    openProgress
+    openProgress,
+    setAcedemicProcess
   } = useAcedemicProcessStore()
 
   const { data, mutate, isLoading } = useSWR('/api/learnProcess', learnProcessService.getAll, {
-    revalidateOnFocus: false
+    revalidateOnFocus: false,
+    onSuccess: data => {
+      if (data) {
+        const found = data.find(item => item._id === acedemicProcess?._id)
+
+        if (found) {
+          setAcedemicProcess(found)
+        }
+      }
+    }
   })
 
   const [sorting, setSorting] = useState<SortingState>([])

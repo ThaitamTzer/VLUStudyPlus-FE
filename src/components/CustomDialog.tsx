@@ -1,8 +1,9 @@
+import type { DialogProps } from '@mui/material'
 import { Dialog, DialogActions, DialogContent, DialogTitle, Typography, IconButton } from '@mui/material'
 
 import Iconify from './iconify'
 
-type CustomDialogProps = {
+type CustomDialogProps = DialogProps & {
   open: boolean
   title: string
   children: React.ReactNode
@@ -14,10 +15,10 @@ type CustomDialogProps = {
 }
 
 export const CustomDialog = (props: CustomDialogProps) => {
-  const { onClose, open, title, maxWidth, children, actions, closeOutside, onSubmit } = props
+  const { onClose, open, title, maxWidth, children, actions, closeOutside, onSubmit, ...rest } = props
 
   return (
-    <Dialog open={open} onClose={closeOutside ? onClose : undefined} maxWidth={maxWidth} fullWidth>
+    <Dialog open={open} onClose={closeOutside ? onClose : undefined} maxWidth={maxWidth} {...rest}>
       <form onSubmit={onSubmit}>
         <DialogTitle>
           <IconButton

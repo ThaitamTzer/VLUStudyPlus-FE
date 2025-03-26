@@ -5,6 +5,7 @@ import type {
   CheckAcademicProcessing,
   ImportResult,
   LearnProcessType,
+  ListClassInProcess,
   ListProcessingType
 } from '@/types/management/learnProcessType'
 
@@ -43,6 +44,12 @@ const learnProcessService = {
 
       return Promise.reject(error)
     }
+  },
+
+  getListClassInProcess: async (academicCategoryId: string) => {
+    const res = await axiosClient.get(`/api/academic-processing/get-list-class-in-process/${academicCategoryId}`)
+
+    return res.data as ListClassInProcess[]
   },
 
   getAll: async () => {

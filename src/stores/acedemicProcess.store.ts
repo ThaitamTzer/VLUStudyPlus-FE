@@ -24,7 +24,7 @@ type States = {
   openViewDetailAcademicProcess: boolean
   openUpdateAcedemicProcessStatus: boolean
   openSendEmail: boolean
-  openSendEmailAgain: boolean
+  openSendEmailRemind: boolean
 }
 
 type Actions = {
@@ -49,7 +49,7 @@ type Actions = {
   toogleViewDetailAcademicProcess: () => void
   toogleUpdateAcedemicProcessStatus: () => void
   tooogleSendEmail: () => void
-  toogleSendEmailAgain: () => void
+  toogleSendEmailRemind: () => void
 }
 
 export const useAcedemicProcessStore = create<States & Actions>(set => ({
@@ -74,8 +74,8 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
   openViewDetailAcademicProcess: false,
   openUpdateAcedemicProcessStatus: false,
   openSendEmail: false,
-  openSendEmailAgain: false,
-  toogleSendEmailAgain: () => set(state => ({ openSendEmailAgain: !state.openSendEmailAgain })),
+  openSendEmailRemind: false,
+  toogleSendEmailRemind: () => set(state => ({ openSendEmailRemind: !state.openSendEmailRemind })),
   tooogleSendEmail: () => set(state => ({ openSendEmail: !state.openSendEmail })),
   toogleUpdateAcedemicProcessStatus: () =>
     set(state => ({ openUpdateAcedemicProcessStatus: !state.openUpdateAcedemicProcessStatus })),
@@ -92,7 +92,6 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
   toogleImportModal: () => set(state => ({ openImportModal: !state.openImportModal })),
   toogleImportResultModal: () => set(state => ({ openImportResultModal: !state.openImportResultModal })),
   toogleManualAdd: () => set(state => ({ openManualAdd: !state.openManualAdd })),
-
   toogleViewByCategory: () => set(state => ({ openViewByCategory: !state.openViewByCategory })),
   toogleViewDetail: () => set(state => ({ openViewDetail: !state.openViewDetail })),
   toogleManualAddFromViewByCate: () =>

@@ -1,6 +1,6 @@
 import axiosClient from '@/libs/axios'
 import axiosUpload from '@/libs/axiosUpload'
-import type { TrainingProgramListType } from '@/types/management/trainningProgramType'
+import type { TrainingProgramByFrame, TrainingProgramListType } from '@/types/management/trainningProgramType'
 
 const trainingProgramService = {
   getAll: async (page?: number, limit?: number, filterField?: string, filterValue?: string, searchKey?: string) => {
@@ -90,6 +90,12 @@ const trainingProgramService = {
 
       return Promise.reject(error)
     }
+  },
+
+  getTrainingProgramByFrame: async (id: string) => {
+    const res = await axiosClient.get(`/api/training-program/view-training-program/${id}`)
+
+    return res.data as TrainingProgramByFrame[]
   }
 }
 

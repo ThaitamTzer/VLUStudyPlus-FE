@@ -71,6 +71,7 @@ export default function ImportTrainingProgram(props: ImportTrainingProgramProps)
     const formData = new FormData()
 
     formData.append('file', data.file[0])
+    onClose()
 
     await trainingProgramService.import(
       trainingProgram._id,
@@ -84,7 +85,6 @@ export default function ImportTrainingProgram(props: ImportTrainingProgramProps)
         })
         toogleImportProgramLoading()
         setLoading(false)
-        onClose()
         mutate()
       },
       err => {

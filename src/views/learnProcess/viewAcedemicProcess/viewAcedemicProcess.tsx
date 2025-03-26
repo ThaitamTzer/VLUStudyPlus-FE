@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import {
   Dialog,
@@ -32,6 +32,7 @@ import ViewDetailAcedecmicProcess from './viewDetailAcedemicProcess'
 import UpdateAcedemicProcessStatus from '../updateAcedemicProcessStatus'
 import type { LearnProcessType } from '@/types/management/learnProcessType'
 import SendMailModal from './sendMailModal'
+import SendMailModalRemind from './sendMailModalRemind'
 
 export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcedemicProcess: LearnProcessType[] }) {
   const {
@@ -49,7 +50,8 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
     processing,
     toogleViewDetailAcademicProcess,
     toogleUpdateAcedemicProcessStatus,
-    tooogleSendEmail
+    tooogleSendEmail,
+    toogleSendEmailRemind
   } = useAcedemicProcessStore()
 
   const { cohorOptions } = useShare()
@@ -80,6 +82,10 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
     )
   )
 
+  const { data: classList } = useSWR(id ? 'classListInProcess' : null, () =>
+    learnProcessService.getListClassInProcess(id as string)
+  )
+
   const handleSort = (field: string) => {
     const isAsc = sortField === field && sortOrder === 'asc'
     const newSortOrder = isAsc ? 'desc' : 'asc'
@@ -89,7 +95,7 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
     setPage(1)
   }
 
-  const onDelete = async () => {
+  const onDelete = useCallback(async () => {
     if (!processing) return toast.error('Không có dữ liệu để xóa')
     const toastId = toast.loading('Đang xóa dữ liệu')
 
@@ -117,7 +123,7 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
         })
       }
     )
-  }
+  }, [processing, mutate, toogleDeleteViewAcedemicProcess])
 
   const handleClose = () => {
     toogleViewByCategory()
@@ -187,15 +193,27 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
                   placeholder='Tìm kiếm'
                   className='max-sm:is-full sm:is-[300px]'
                 />
-                <Button
-                  disabled={data?.pagination.totalItems === 0}
-                  onClick={tooogleSendEmail}
-                  variant='contained'
-                  startIcon={<Iconify icon='fluent-emoji-flat:bell' />}
-                  className='max-sm:is-full'
-                >
-                  Nhắc nhở XLHV GV-SV
-                </Button>
+                {!acedemicProcess?.isNotification ? (
+                  <Button
+                    disabled={data?.pagination.totalItems === 0}
+                    onClick={tooogleSendEmail}
+                    variant='contained'
+                    startIcon={<Iconify icon='fluent-emoji-flat:bell' />}
+                    className='max-sm:is-full'
+                  >
+                    Thông báo XLHV GV-SV
+                  </Button>
+                ) : (
+                  <Button
+                    disabled={data?.pagination.totalItems === 0}
+                    variant='contained'
+                    onClick={toogleSendEmailRemind}
+                    startIcon={<Iconify icon='fluent-emoji-flat:bell' />}
+                    className='max-sm:is-full'
+                  >
+                    Gửi email nhắc nhở
+                  </Button>
+                )}
                 <Button
                   onClick={toogleManualAddFromViewByCate}
                   variant='contained'
@@ -254,7 +272,8 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
         onClose={toogleManualAddFromViewByCate}
         open={openManualAddFromViewByCate}
       />
-      <SendMailModal id={acedemicProcess?._id || ''} />
+      <SendMailModal id={acedemicProcess?._id || ''} mutate={mutate} />
+      <SendMailModalRemind classList={classList || ({} as any)} id={acedemicProcess?._id || ''} />
       <AlertDelete
         open={openDeleteViewAcedemicProcess}
         onClose={toogleDeleteViewAcedemicProcess}

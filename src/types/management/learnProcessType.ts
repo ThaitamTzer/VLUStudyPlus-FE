@@ -140,6 +140,11 @@ export type ListProcessingType = {
   data: ProcessingType[]
 }
 
+export type ListClassInProcess = {
+  userName: string
+  classId: string
+}
+
 type Missing = {
   studentId: string
   message: string

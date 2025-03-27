@@ -25,7 +25,6 @@ const RootLayout = ({ children }: ChildrenType) => {
     <html id='__next' lang='vi' dir={direction}>
       <body className='flex is-full min-bs-full flex-auto flex-col'>
         {children}
-        <script defer src='https://app.fastbots.ai/embed.js' data-bot-id='cm8prgizj09ccn8lu716aihym'></script>
         <noscript>
           <h1>JavaScript is required to use this website</h1>
           <p>Please enable JavaScript in your browser settings and reload the page.</p>

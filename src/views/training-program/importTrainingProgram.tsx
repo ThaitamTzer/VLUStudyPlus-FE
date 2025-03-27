@@ -57,7 +57,9 @@ export default function ImportTrainingProgram(props: ImportTrainingProgramProps)
   const onClose = useCallback(() => {
     toogleImportTrainingProgramSession()
     setValue('file', [])
-    reset()
+    reset({
+      file: []
+    })
     setTrainingProgram({} as any)
   }, [toogleImportTrainingProgramSession, setValue, reset, setTrainingProgram])
 

@@ -149,8 +149,6 @@ export default function ManualAddAcedemicProcess({
       academicCategory: acedemicProcess._id
     }
 
-    console.log(newData)
-
     setLoading(true)
     await learnProcessService.addProcess(
       newData,
@@ -263,7 +261,7 @@ export default function ManualAddAcedemicProcess({
                     {...field}
                     fullWidth
                     label='Khóa'
-                    placeholder='VD: 2019'
+                    placeholder='VD: K27'
                     {...(errors.cohortName && { error: true, helperText: errors.cohortName.message?.toString() })}
                   />
                 )}

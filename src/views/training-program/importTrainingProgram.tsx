@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import type { KeyedMutator } from 'swr'
 import * as v from 'valibot'
@@ -37,7 +37,6 @@ export default function ImportTrainingProgram(props: ImportTrainingProgramProps)
     openImportTrainingProgramSession,
     toogleImportProgramLoading,
     toogleImportTrainingProgramSession,
-    setTrainingProgram,
     trainingProgram
   } = useTrainingProgramStore()
 
@@ -60,8 +59,7 @@ export default function ImportTrainingProgram(props: ImportTrainingProgramProps)
     reset({
       file: []
     })
-    setTrainingProgram({} as any)
-  }, [toogleImportTrainingProgramSession, setValue, reset, setTrainingProgram])
+  }, [toogleImportTrainingProgramSession, setValue, reset])
 
   const onSubmit = handleSubmit(async data => {
     if (!trainingProgram) return toast.error('Chưa có khung chương trình nào được chọn')
@@ -104,17 +102,22 @@ export default function ImportTrainingProgram(props: ImportTrainingProgramProps)
 
   const handleImport = useCallback(onSubmit, [onSubmit])
 
-  return (
-    <ImportAdd
-      onOpen={openImportTrainingProgramSession}
-      onClose={onClose}
-      title={`Import chương trình đào tạo vào ${trainingProgram?.title}`}
-      onSubmit={handleImport}
-      errors={errors}
-      loading={loading}
-      setValue={setValue}
-      pathToFile='/files/chuongtrinhdaotao.xlsx'
-      reset={reset}
-    />
+  const renderImport = useMemo(
+    () => (
+      <ImportAdd
+        onOpen={openImportTrainingProgramSession}
+        onClose={onClose}
+        title={`Import chương trình đào tạo vào ${trainingProgram?.title}`}
+        onSubmit={handleImport}
+        errors={errors}
+        loading={loading}
+        setValue={setValue}
+        pathToFile='/files/chuongtrinhdaotao.xlsx'
+        reset={reset}
+      />
+    ),
+    [openImportTrainingProgramSession, onClose, handleImport, errors, loading, setValue, reset, trainingProgram?.title]
   )
+
+  return <>{renderImport}</>
 }

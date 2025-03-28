@@ -23,14 +23,13 @@ type States = {
   openEditClassfilterModal: boolean
   openDeleteClassfilterModal: boolean
   openViewDetailfilterModal: boolean
-
   openImportResultModal: boolean
-
   importResultData: ImportSuccess[]
   lecturerDataImported: ImportLecturer[]
   missingErrorData: MissingError[]
   updateSuccessData: UpdateSuccess[]
   duplicateClassData: DuplicateClass[]
+  openViewListStudentModal: boolean
 }
 
 type Actions = {
@@ -45,13 +44,13 @@ type Actions = {
   toogleOpenEditClassfilterModal: () => void
   toogleOpenDeleteClassfilterModal: () => void
   toogleOpenViewDetailfilterModal: () => void
-
   toogleOpenImportResultModal: () => void
   setImportResultData: (data: ImportSuccess[]) => void
   setLecturerDataImported: (data: ImportLecturer[]) => void
   setMissingErrorData: (data: MissingError[]) => void
   setUpdateSuccessData: (data: UpdateSuccess[]) => void
   setDuplicateClassData: (data: DuplicateClass[]) => void
+  toogleOpenViewListStudentModal: () => void
 }
 
 export const useClassStore = create<States & Actions>(set => ({
@@ -66,6 +65,8 @@ export const useClassStore = create<States & Actions>(set => ({
   openEditClassfilterModal: false,
   openDeleteClassfilterModal: false,
   openViewDetailfilterModal: false,
+  openViewListStudentModal: false,
+  toogleOpenViewListStudentModal: () => set(state => ({ openViewListStudentModal: !state.openViewListStudentModal })),
   setClass: classData => set({ classRoom: classData }),
   toogleOpenAddClassModal: () => set(state => ({ openAddClassModal: !state.openAddClassModal })),
   toogleOpenEditClassModal: () => set(state => ({ openEditClassModal: !state.openEditClassModal })),

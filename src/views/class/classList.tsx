@@ -31,7 +31,13 @@ export default function ClassList({
   sortOrder,
   handleSort
 }: ClassListProps) {
-  const { toogleOpenEditClassModal, toogleOpenDeleteClassModal, toogleOpenViewDetailModal, setClass } = useClassStore()
+  const {
+    toogleOpenEditClassModal,
+    toogleOpenDeleteClassModal,
+    toogleOpenViewDetailModal,
+    setClass,
+    toogleOpenViewListStudentModal
+  } = useClassStore()
 
   return (
     <TableContainer sx={{ position: 'relative', overflowX: 'auto', maxHeight: 'calc(100vh - 300px)' }}>
@@ -100,6 +106,15 @@ export default function ClassList({
                     >
                       <Iconify icon='solar:eye-linear' className='mr-2' />
                       Xem chi tiết
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        setClass(c)
+                        toogleOpenViewListStudentModal()
+                      }}
+                    >
+                      <Iconify icon='garden:user-list-stroke-16' className='mr-2' />
+                      Danh sách sinh viên
                     </MenuItem>
                     <MenuItem
                       onClick={() => {

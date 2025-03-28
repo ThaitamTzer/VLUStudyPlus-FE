@@ -93,7 +93,7 @@ export default function TableFilter(props: TableFilterProps) {
               control={
                 <Checkbox
                   onChange={e => {
-                    setFilterField('status')
+                    setFilterField('commitment')
                     setFilterValue(e.target.checked)
                     setPage(1)
                   }}

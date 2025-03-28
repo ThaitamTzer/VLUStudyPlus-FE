@@ -19,15 +19,16 @@ import TablePaginationCustom from '@/components/table/TablePagination'
 import DebouncedInput from '@/components/debouncedInput'
 import CustomTextField from '@/@core/components/mui/TextField'
 import { useClassStore } from '@/stores/class/class'
-import UpdateModal from './updateModal'
 import AlertDelete from '@/components/alertModal'
 import ClassListFilter from './classListFilter'
-import EditClassModal from './editClassModal'
-import DeleteModal from './deleteModal'
+import DeleteModal from './modal/deleteModal'
 import type { ClassGroupByLecturer } from '@/types/management/classType'
 import PreviewImport from './previewImport'
 
-const AddModal = dynamic(() => import('./addModal'))
+const AddModal = dynamic(() => import('./modal/addModal'), { ssr: false })
+const UpdateModal = dynamic(() => import('./modal/updateModal'), { ssr: false })
+const EditClassModal = dynamic(() => import('./modal/editClassModal'), { ssr: false })
+const ViewListStudentByClass = dynamic(() => import('@/views/class/modal/viewListStudentByClassModal'))
 
 export default function ClassPage() {
   const {
@@ -295,6 +296,7 @@ export default function ClassPage() {
       <UpdateModal mutate={mutate} />
       <EditClassModal />
       <DeleteModal mutate={mutate} />
+      <ViewListStudentByClass />
       <PreviewImport />
       <AlertDelete
         content={

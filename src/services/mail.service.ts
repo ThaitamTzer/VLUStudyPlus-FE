@@ -1,4 +1,5 @@
 import axiosClient from '@/libs/axios'
+import axiosUpload from '@/libs/axiosUpload'
 
 const mailService = {
   async sendMail(academicCategoryId: string, successCallback?: (res: any) => void, errorCallback?: (err: any) => void) {
@@ -21,12 +22,12 @@ const mailService = {
 
   async remindMail(
     academicCategoryId: string,
-    data: any,
+    data: FormData,
     successCallback?: (res: any) => void,
     errorCallback?: (err: any) => void
   ) {
     try {
-      return await axiosClient.post(`/api/notification/sendMailRemind/${academicCategoryId}`, data).then(res => {
+      return await axiosUpload.post(`/api/notification/sendMailRemind/${academicCategoryId}`, data).then(res => {
         if (successCallback) {
           successCallback(res)
 

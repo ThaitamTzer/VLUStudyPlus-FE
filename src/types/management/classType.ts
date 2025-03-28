@@ -1,3 +1,18 @@
+export type ListStudentByClass = {
+  _id: string
+  userId: string
+  classCode: string
+  cohortId: string
+  userName: string
+  mail: string
+  dateOfBirth: string
+  role: string
+  avatar: string
+  isBlock: boolean
+  createdAt: string | Date
+  updatedAt: string | Date
+}
+
 export type Class = {
   _id: string
   lectureId: string

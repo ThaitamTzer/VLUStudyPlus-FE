@@ -77,10 +77,10 @@ export default function UpdateModal({ mutate }: ManualUpdateClassProps) {
     }
 
     reset({
-      lectureId: classRoom.lectureId,
-      classId: classRoom.classId,
-      cohortId: classRoom.cohortId._id,
-      numberStudent: classRoom.numberStudent
+      lectureId: classRoom?.lectureId,
+      classId: classRoom?.classId,
+      cohortId: classRoom?.cohortId?._id,
+      numberStudent: classRoom?.numberStudent
     })
   }, [reset, classRoom])
 
@@ -228,7 +228,7 @@ export default function UpdateModal({ mutate }: ManualUpdateClassProps) {
         <DialogActions>
           <Button onClick={onClose}>Hủy</Button>
           <LoadingButton loading={loading} variant='contained' type='submit' color='primary' disableElevation>
-            Cập nhật
+            Lưu
           </LoadingButton>
         </DialogActions>
       </form>

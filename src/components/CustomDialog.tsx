@@ -15,10 +15,10 @@ type CustomDialogProps = DialogProps & {
 }
 
 export const CustomDialog = (props: CustomDialogProps) => {
-  const { onClose, open, title, maxWidth, children, actions, closeOutside, onSubmit, ...rest } = props
+  const { onClose, open, title, children, actions, closeOutside, onSubmit, ...rest } = props
 
   return (
-    <Dialog open={open} onClose={closeOutside ? onClose : undefined} maxWidth={maxWidth} {...rest}>
+    <Dialog open={open} onClose={closeOutside ? onClose : undefined} {...rest}>
       <form onSubmit={onSubmit}>
         <DialogTitle>
           <IconButton

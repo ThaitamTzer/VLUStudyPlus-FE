@@ -51,8 +51,7 @@ export default function SendMailModalRemind({ id, classList }: { id: string; cla
   })
 
   const onSendMail = handleSubmit(async data => {
-    // send mail
-
+    // Kiểm tra nếu không có `id`
     if (!id) return toast.error('Đã có lỗi xảy ra, vui lòng thử lại sau!')
 
     const newData = {
@@ -60,13 +59,22 @@ export default function SendMailModalRemind({ id, classList }: { id: string; cla
       classId: data.classId === 'Tất cả' ? '' : data.classId
     }
 
+    const formData = new FormData()
+
+    // Chỉ thêm `classId` nếu nó không rỗng
+    if (newData.classId) {
+      formData.append('classId', newData.classId)
+    }
+
+    formData.append('processed', newData.processed ? 'true' : 'false')
+
     setLoading(true)
 
     const toastId = toast.loading('Đang gửi mail nhắc nhở...')
 
     await mailService.remindMail(
       id,
-      newData,
+      formData,
       () => {
         toogleSendEmailRemind()
         toast.update(toastId, {

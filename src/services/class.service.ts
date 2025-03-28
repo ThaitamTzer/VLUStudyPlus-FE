@@ -1,6 +1,6 @@
 import axiosClient from '@/libs/axios'
 import axiosUpload from '@/libs/axiosUpload'
-import type { Class, ClassType, FormClass, ViewImport } from '@/types/management/classType'
+import type { Class, ClassType, FormClass, ListStudentByClass, ViewImport } from '@/types/management/classType'
 
 const classService = {
   getAll: async (
@@ -33,6 +33,12 @@ const classService = {
     const response = await axiosClient.get(`/api/class/${id}`)
 
     return response.data as Class
+  },
+
+  getListStudentByClass: async (classCode: string) => {
+    const res = await axiosClient.get(`/api/student/view-list-student-for-class/${classCode}`)
+
+    return res.data as ListStudentByClass[]
   },
 
   add: async (data: FormClass, sucessCallBack?: (res: any) => any, errorCallBack?: (res: any) => void) => {

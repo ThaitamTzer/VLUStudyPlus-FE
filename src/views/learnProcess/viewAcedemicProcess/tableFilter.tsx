@@ -1,4 +1,4 @@
-import { CardContent, Checkbox, FormControlLabel, Grid, MenuItem } from '@mui/material'
+import { CardContent, Grid, MenuItem } from '@mui/material'
 
 import CustomTextField from '@/@core/components/mui/TextField'
 import { getAcademicYear } from '@/views/term/helper'
@@ -73,35 +73,55 @@ export default function TableFilter(props: TableFilterProps) {
             ))}
           </CustomTextField>
         </Grid>
-        <Grid item container xs={12}>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  onChange={e => {
-                    setFilterField('status')
-                    setFilterValue(e.target.checked)
-                    setPage(1)
-                  }}
-                />
+        <Grid item xs={12} sm={6} md={3}>
+          <CustomTextField
+            select
+            fullWidth
+            defaultValue=''
+            label='Lọc theo CVHT đã xử lý'
+            onChange={e => {
+              setFilterField('status')
+              setFilterValue(e.target.value)
+              setPage(1)
+            }}
+            SelectProps={{
+              displayEmpty: true,
+              MenuProps: {
+                sx: {
+                  maxHeight: 300
+                }
               }
-              label='Chỉ hiển thị XLHV đã xử lý'
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  onChange={e => {
-                    setFilterField('commitment')
-                    setFilterValue(e.target.checked)
-                    setPage(1)
-                  }}
-                />
+            }}
+          >
+            <MenuItem value=''>Tất cả</MenuItem>
+            <MenuItem value='true'>Đã xử lý</MenuItem>
+            <MenuItem value='false'>Chưa xử lý</MenuItem>
+          </CustomTextField>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <CustomTextField
+            select
+            fullWidth
+            defaultValue=''
+            label='Lọc theo trạng thái làm đơn'
+            onChange={e => {
+              setFilterField('commitment')
+              setFilterValue(e.target.value)
+              setPage(1)
+            }}
+            SelectProps={{
+              displayEmpty: true,
+              MenuProps: {
+                sx: {
+                  maxHeight: 300
+                }
               }
-              label='Chỉ hiển thị sinh viên đã làm đơn'
-            />
-          </Grid>
+            }}
+          >
+            <MenuItem value=''>Tất cả</MenuItem>
+            <MenuItem value='true'>Đã làm đơn</MenuItem>
+            <MenuItem value='false'>Chưa làm đơn</MenuItem>
+          </CustomTextField>
         </Grid>
       </Grid>
     </CardContent>

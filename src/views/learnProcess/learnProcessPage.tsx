@@ -159,7 +159,7 @@ export default function LearnProcessPage() {
           </Typography>
           <Box display='grid' gridTemplateColumns='repeat(auto-fit, minmax(150px, 1fr))' gap={2}>
             {[
-              { icon: 'gg:list', color: '#2092ec', label: 'Xem danh sách xử lý học tập' },
+              { icon: 'mingcute:information-fill', color: '#2092ec', label: 'Xem danh sách xử lý học tập' },
               { icon: 'hugeicons:files-01', color: '#8e44ad', label: 'Xem danh sách đơn cam kết' },
               { icon: 'bx:import', color: 'green', label: 'Import danh sách xử lý học tập' },
               { icon: 'solar:pen-2-linear', color: 'orange', label: 'Cập nhật kỳ xử lý' },

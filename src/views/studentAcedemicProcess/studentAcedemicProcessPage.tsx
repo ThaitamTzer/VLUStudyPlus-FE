@@ -73,8 +73,6 @@ export default function StudentAcedemicProcessPage() {
 
   return (
     <>
-      <AddCommitmentFormProcess mutate={mutate} />
-
       <PageHeader title='Xử lý học tập của sinh viên' />
       <Grid container spacing={3} mt={4}>
         {studentData?.length === 0 && (
@@ -187,6 +185,7 @@ export default function StudentAcedemicProcessPage() {
           </Grid>
         ))}
       </Grid>
+      <AddCommitmentFormProcess mutate={mutate} />
       <StudentViewDetailCommitmentForm />
     </>
   )

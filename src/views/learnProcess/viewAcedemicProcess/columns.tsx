@@ -65,7 +65,7 @@ export const useColumns = () => {
                   setAcedemicProcess(infor.row.original)
                 }}
               >
-                <Iconify icon='gg:list' color='#2092ec' />
+                <Iconify icon='mingcute:information-fill' color='#2092ec' />
               </IconButton>
             </Tooltip>
             {user?.role.name === 'CVHT' ? (
@@ -98,7 +98,7 @@ export const useColumns = () => {
                   setAcedemicProcess(infor.row.original)
                 }}
               >
-                <Iconify icon='bx:import' color='#f39c12' />
+                <Iconify icon='fluent:table-add-24-filled' className='text-success' />
               </IconButton>
             </Tooltip>
             <RowAction>

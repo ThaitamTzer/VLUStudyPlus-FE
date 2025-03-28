@@ -69,11 +69,11 @@ export default function TrainingProgramPage() {
             <Typography variant='h6'>Chú thích:</Typography>
             <List dense>
               <ListItem>
-                <Iconify width={18} icon='hugeicons:property-view' color='#6f42c1' />
+                <Iconify icon='mingcute:information-fill' className='text-primary' />
                 <ListItemText primary='Xem chương trình đào tạo' />
               </ListItem>
               <ListItem>
-                <Iconify width={18} icon='clarity:import-line' color='#198754' />
+                <Iconify icon='fluent:table-add-20-regular' color='#198754' />
                 <ListItemText primary='Nhập chương trình đào tạo' />
               </ListItem>
             </List>

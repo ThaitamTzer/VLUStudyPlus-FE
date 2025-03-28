@@ -1,7 +1,17 @@
 'use client'
 
-import { Dialog, DialogContent, DialogTitle, IconButton, Typography, Grid, Paper } from '@mui/material'
-
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Typography,
+  Grid,
+  Card,
+  Divider,
+  Chip,
+  Box
+} from '@mui/material'
 import useSWR from 'swr'
 
 import { useAcedemicProcessStore } from '@/stores/acedemicProcess.store'
@@ -32,109 +42,388 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
 
   return (
     <Dialog open={openViewDetailAcademicProcess} onClose={onClose} maxWidth='md' fullWidth>
-      <DialogTitle>
-        <IconButton sx={{ position: 'absolute', right: 8, top: 8 }} onClick={onClose}>
-          <Iconify icon='eva:close-outline' />
-        </IconButton>
-        <Typography variant='h4'>📚 Chi tiết xử lý học vụ</Typography>
+      <DialogTitle
+        sx={{
+          backgroundColor: theme => theme.palette.primary.main,
+          color: '#fff',
+          py: 2,
+          borderBottom: '1px solid rgba(255,255,255,0.2)'
+        }}
+      >
+        <Box display='flex' alignItems='center' justifyContent='space-between'>
+          <Box display='flex' alignItems='center' gap={1.5}>
+            <span style={{ fontSize: '1.8rem' }}>📋</span>
+            <Typography variant='h5' fontWeight='bold'>
+              Chi tiết xử lý học vụ
+            </Typography>
+          </Box>
+          <IconButton onClick={onClose} sx={{ color: '#fff' }}>
+            <Iconify icon='mdi:close' />
+          </IconButton>
+        </Box>
       </DialogTitle>
-      <DialogContent>
+
+      <DialogContent sx={{ py: 3, backgroundColor: '#f8fafc', mt: 2 }}>
         {data ? (
-          <Grid container spacing={2}>
-            {/* Thông tin sinh viên */}
-            <Section title='👨‍🎓 Thông tin sinh viên'>
-              <Info label='Mã sinh viên' value={data.checkAcademicProcessing.studentId} />
-              <Info
-                label='Họ và tên'
-                value={`${data.checkAcademicProcessing.lastName} ${data.checkAcademicProcessing.firstName}`}
-              />
-              <Info label='📧 Email' value={data?.student?.mail || 'Không tìm thấy'} />
-              <Info label='🎂 Ngày sinh' value={fDate(data?.student?.dateOfBirth, 'dd/MM/yyyy') || 'Không tìm thấy'} />
-              <Info label='📌 Lớp' value={data.checkAcademicProcessing.classId} />
-              <Info label='📅 Niên khóa' value={data.checkAcademicProcessing.cohortName} />
-              <Info label='🏢 Khoa' value={data.checkAcademicProcessing.faculty} />
-              <Info label='📖 Năm học' value={data.checkAcademicProcessing.year} />
-              <Info label='📆 Học kỳ' value={data.checkAcademicProcessing.termName} />
-            </Section>
+          <Grid container spacing={3}>
+            {/* Student Information Section */}
+            <Grid item xs={12} md={6}>
+              <Card
+                sx={{
+                  p: 3,
+                  height: '100%',
+                  borderLeft: '4px solid #3b82f6',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                }}
+              >
+                <SectionHeader emoji='👨‍🎓' title='Thông tin sinh viên' />
+                <Divider sx={{ my: 2, borderColor: 'rgba(0,0,0,0.08)' }} />
 
-            {/* Thông tin xử lý học vụ */}
-            <Section title='⚖️ Diện XLHV (PĐT đề nghị)'>
-              <Info label='📌 Trạng thái' value={data.checkAcademicProcessing.handlingStatusByAAO} />
-              <Info label='❗ Lý do' value={data.checkAcademicProcessing.reasonHandling} />
-              <Info label='📝 Lưu ý' value={data.checkAcademicProcessing.note || 'Không có'} />
-            </Section>
+                <InfoGrid>
+                  <InfoItemSmall emoji='🆔' label='Mã sinh viên' value={data.checkAcademicProcessing.studentId} />
+                  <InfoItemSmall
+                    emoji='👤'
+                    label='Họ và tên'
+                    value={`${data.checkAcademicProcessing.lastName} ${data.checkAcademicProcessing.firstName}`}
+                  />
+                  <InfoItemSmall emoji='📧' label='Email' value={data?.student?.mail || 'N/A'} />
+                  <InfoItemSmall
+                    emoji='🎂'
+                    label='Ngày sinh'
+                    value={fDate(data?.student?.dateOfBirth, 'dd/MM/yyyy') || 'N/A'}
+                  />
+                  <InfoItemSmall emoji='👥' label='Lớp' value={data.checkAcademicProcessing.classId} />
+                  <InfoItemSmall emoji='📅' label='Niên khóa' value={data.checkAcademicProcessing.cohortName} />
+                  <InfoItemSmall emoji='🏛️' label='Khoa' value={data.checkAcademicProcessing.faculty} />
+                </InfoGrid>
+              </Card>
+            </Grid>
 
-            {/* Đăng ký học phần */}
-            <Section title='📝 Đăng ký học phần'>
-              {data.checkAcademicProcessing.courseRegistration.map((course, index) => (
-                <Info
-                  key={index}
-                  label={`📌 Học kỳ ${course.termName}`}
-                  value={`Đăng ký: ${course.isRegister ? 'Có' : 'Không'}`}
-                />
-              ))}
-            </Section>
+            {/* Academic Information Section */}
+            <Grid item xs={12} md={6}>
+              <Card
+                sx={{
+                  p: 3,
+                  height: '100%',
+                  borderLeft: '4px solid #8b5cf6',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                }}
+              >
+                <SectionHeader emoji='📚' title='Thông tin học tập' />
+                <Divider sx={{ my: 2, borderColor: 'rgba(0,0,0,0.08)' }} />
 
-            {/* Quá trình học tập */}
-            <Section title='📈 Quá trình học tập'>
-              <Info label='📊 Điểm trung bình chung' value={String(data.checkAcademicProcessing.DTBC)} />
-              <Info label='📚 Số tín chỉ' value={String(data.checkAcademicProcessing.STC)} />
-              <Info label='🔢 Điểm trung bình tích lũy' value={String(data.checkAcademicProcessing.DTBCTL)} />
-              <Info label='🎓 Số tín chỉ tích lũy' value={String(data.checkAcademicProcessing.STCTL)} />
-            </Section>
+                <InfoGrid>
+                  <InfoItemSmall emoji='🎓' label='Năm học' value={data.checkAcademicProcessing.year} />
+                  <InfoItemSmall emoji='🗓️' label='Học kỳ' value={data.checkAcademicProcessing.termName} />
+                  <InfoItemSmall
+                    emoji='📊'
+                    label='Điểm TB chung'
+                    value={
+                      <Box component='span' fontWeight='bold' color='#3b82f6'>
+                        {data.checkAcademicProcessing.DTBC}
+                      </Box>
+                    }
+                  />
+                  <InfoItemSmall emoji='🪙' label='Số tín chỉ' value={data.checkAcademicProcessing.STC} />
+                  <InfoItemSmall
+                    emoji='📈'
+                    label='Điểm TB tích lũy'
+                    value={
+                      <Box component='span' fontWeight='bold' color='#3b82f6'>
+                        {data.checkAcademicProcessing.DTBCTL}
+                      </Box>
+                    }
+                  />
+                  <InfoItemSmall emoji='🪙' label='Số TC tích lũy' value={data.checkAcademicProcessing.STCTL} />
+                </InfoGrid>
+              </Card>
+            </Grid>
 
-            {/* Thông tin lớp học */}
-            <Section title='🏫 Thông tin lớp học'>
-              <Info label='📎 Mã lớp' value={data.checkAcademicProcessing.classId} />
-              <Info label='👨‍🏫 Giảng viên' value={data.informationClass?.userName || 'Không có'} />
-              <Info label='📩 Email giảng viên' value={data.informationClass?.lectureId.mail || 'Không có'} />
-            </Section>
+            {/* Academic Processing Section */}
+            <Grid item xs={12}>
+              <Card
+                sx={{
+                  p: 3,
+                  borderLeft: '4px solid #ef4444',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                }}
+              >
+                <SectionHeader emoji='⚖️' title='Diện XLHV (PĐT đề nghị)' />
+                <Divider sx={{ my: 2, borderColor: 'rgba(0,0,0,0.08)' }} />
 
-            {/* Thông tin thiếu */}
-            <Section title='⚠️ Thông tin thiếu'>
-              {data.missingInfoRows.map((info, index) => (
-                <Typography key={index} variant='body2' fontWeight='bold'>
-                  ❗ {info.message}
-                </Typography>
-              ))}
-            </Section>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <InfoItem
+                      emoji='🏷️'
+                      label='Diện XLHV'
+                      value={
+                        <Chip
+                          label={data.checkAcademicProcessing.handlingStatusByAAO}
+                          color={
+                            data.checkAcademicProcessing.handlingStatusByAAO === 'Đạt'
+                              ? 'success'
+                              : data.checkAcademicProcessing.handlingStatusByAAO === 'Không đạt'
+                                ? 'error'
+                                : 'error'
+                          }
+                          size='small'
+                          sx={{
+                            fontWeight: 'bold',
+                            '& .MuiChip-label': { px: 1 }
+                          }}
+                        />
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <InfoItem emoji='❗' label='Lưu ý' value={data.checkAcademicProcessing.reasonHandling} />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <InfoItem
+                      emoji='📝'
+                      label='Ghi chú'
+                      value={data.checkAcademicProcessing.note || 'Không có ghi chú'}
+                    />
+                  </Grid>
+                </Grid>
+              </Card>
+            </Grid>
+
+            {/* Course Registration Section */}
+            {data.checkAcademicProcessing.courseRegistration.length > 0 && (
+              <Grid item xs={12}>
+                <Card
+                  sx={{
+                    p: 3,
+                    borderLeft: '4px solid #10b981',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  }}
+                >
+                  <SectionHeader emoji='📝' title='Đăng ký học phần' />
+                  <Divider sx={{ my: 2, borderColor: 'rgba(0,0,0,0.08)' }} />
+
+                  <Grid container spacing={2}>
+                    {data.checkAcademicProcessing.courseRegistration.map((course, index) => (
+                      <Grid item xs={12} sm={6} md={4} key={index}>
+                        <Card
+                          variant='outlined'
+                          sx={{
+                            p: 2,
+                            height: '100%',
+                            borderRadius: '8px',
+                            borderColor: course.isRegister ? '#d1fae5' : '#fee2e2',
+                            backgroundColor: course.isRegister ? '#ecfdf5' : '#fef2f2'
+                          }}
+                        >
+                          <Box display='flex' alignItems='center' gap={1} mb={1}>
+                            <span style={{ fontSize: '1.2rem' }}>{course.isRegister ? '✅' : '❌'}</span>
+                            <Typography variant='subtitle2' fontWeight='bold'>
+                              Học kỳ {course.termName}
+                            </Typography>
+                          </Box>
+                          <Chip
+                            label={course.isRegister ? 'Đã đăng ký' : 'Chưa đăng ký'}
+                            color={course.isRegister ? 'success' : 'error'}
+                            size='small'
+                            sx={{
+                              fontWeight: 'medium',
+                              px: 0.5,
+                              fontSize: '0.75rem'
+                            }}
+                          />
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Card>
+              </Grid>
+            )}
+
+            {/* Class Information Section */}
+            <Grid item xs={12} md={6}>
+              <Card
+                sx={{
+                  p: 3,
+                  borderLeft: '4px solid #f59e0b',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                }}
+              >
+                <SectionHeader emoji='🏫' title='Thông tin lớp học' />
+                <Divider sx={{ my: 2, borderColor: 'rgba(0,0,0,0.08)' }} />
+
+                <InfoGrid>
+                  <InfoItem emoji='🆔' label='Mã lớp' value={data.checkAcademicProcessing.classId} />
+                  <InfoItem emoji='👨‍🏫' label='Giảng viên' value={data.informationClass?.userName || 'N/A'} />
+                  <InfoItem emoji='✉️' label='Email GV' value={data.informationClass?.lectureId.mail || 'N/A'} />
+                </InfoGrid>
+              </Card>
+            </Grid>
+
+            {/* Missing Information Section */}
+            {data.missingInfoRows.length > 0 && (
+              <Grid item xs={12} md={6}>
+                <Card
+                  sx={{
+                    p: 3,
+                    borderLeft: '4px solid #f59e0b',
+                    backgroundColor: '#fffbeb',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  }}
+                >
+                  <SectionHeader emoji='⚠️' title='Thông tin thiếu' />
+                  <Divider sx={{ my: 2, borderColor: 'rgba(0,0,0,0.08)' }} />
+
+                  <Box
+                    component='ul'
+                    sx={{
+                      pl: 3,
+                      m: 0,
+                      '& li': {
+                        mb: 1,
+                        pl: 1,
+                        display: 'flex',
+                        alignItems: 'flex-start'
+                      }
+                    }}
+                  >
+                    {data.missingInfoRows.map((info, index) => (
+                      <li key={index}>
+                        <Box display='flex' alignItems='flex-start' gap={1}>
+                          <Typography variant='body2'>{info.message}</Typography>
+                        </Box>
+                      </li>
+                    ))}
+                  </Box>
+                </Card>
+              </Grid>
+            )}
           </Grid>
         ) : (
-          <Typography variant='h6'>🔄 Đang tải dữ liệu...</Typography>
+          <Grid container justifyContent='center' sx={{ py: 6 }}>
+            <Grid item>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  p: 3,
+                  backgroundColor: '#fff',
+                  borderRadius: '12px',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                  border: '1px solid rgba(0,0,0,0.05)'
+                }}
+              >
+                <Iconify icon='mdi:loading' width={24} height={24} className='animate-spin' />
+                <Typography variant='h6' fontWeight='medium'>
+                  Đang tải dữ liệu...
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
         )}
       </DialogContent>
     </Dialog>
   )
 }
 
-// Component phụ cho mỗi mục
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+// Reusable Components
+function SectionHeader({ emoji, title }: { emoji: string; title: string }) {
   return (
-    <Grid item xs={12}>
-      <Typography variant='h6' sx={{ mt: 2, mb: 1, fontWeight: 'bold', color: 'primary.main' }}>
+    <Box display='flex' alignItems='center' gap={1.5}>
+      <span style={{ fontSize: '1.8rem' }}>{emoji}</span>
+      <Typography variant='h6' fontWeight='bold'>
         {title}
       </Typography>
-      <Paper elevation={3} sx={{ padding: 2, borderRadius: 2, backgroundColor: '#f9f9f9' }}>
-        {children}
-      </Paper>
+    </Box>
+  )
+}
+
+function InfoGrid({ children }: { children: React.ReactNode }) {
+  return (
+    <Grid container spacing={2}>
+      {children}
     </Grid>
   )
 }
 
-function Info({ label, value }: { label: string; value: string }) {
+function InfoItem({ emoji, label, value }: { emoji: string; label: string; value: React.ReactNode }) {
   return (
-    <Typography
-      variant='body1'
-      sx={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: 1,
-        flexWrap: 'wrap',
-        wordBreak: 'break-word'
-      }}
-    >
-      <span style={{ fontWeight: 'bold', color: '#555', whiteSpace: 'nowrap' }}>{label}:</span>
-      <span style={{ flex: 1, minWidth: 0 }}>{value}</span>
-    </Typography>
+    <Grid item xs={12}>
+      <Box display='flex' gap={1.5}>
+        <span
+          style={{
+            fontSize: '1.2rem',
+            alignSelf: 'flex-start',
+            flexShrink: 0
+          }}
+        >
+          {emoji}
+        </span>
+        <Box>
+          <Typography
+            variant='body2'
+            fontWeight={700}
+            sx={{
+              display: 'block',
+              lineHeight: 1.2,
+              mb: 0.5
+            }}
+          >
+            {label}
+          </Typography>
+          <Typography
+            variant='body2'
+            sx={{
+              lineHeight: 1.3,
+              wordBreak: 'break-word',
+              fontSize: '0.8rem'
+            }}
+          >
+            {value}
+          </Typography>
+        </Box>
+      </Box>
+    </Grid>
+  )
+}
+
+function InfoItemSmall({ emoji, label, value }: { emoji: string; label: string; value: React.ReactNode }) {
+  return (
+    <Grid item xs={12} sm={6}>
+      <Box display='flex' gap={1.5}>
+        <span
+          style={{
+            fontSize: '1.2rem',
+            alignSelf: 'flex-start',
+            flexShrink: 0
+          }}
+        >
+          {emoji}
+        </span>
+        <Box>
+          <Typography
+            variant='body2'
+            fontWeight={700}
+            sx={{
+              display: 'block',
+              lineHeight: 1.2,
+              mb: 0.5
+            }}
+          >
+            {label}
+          </Typography>
+          <Typography
+            variant='body2'
+            sx={{
+              lineHeight: 1.3,
+              wordBreak: 'break-word',
+              fontSize: '0.8rem'
+            }}
+          >
+            {value}
+          </Typography>
+        </Box>
+      </Box>
+    </Grid>
   )
 }

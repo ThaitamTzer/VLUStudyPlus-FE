@@ -95,7 +95,7 @@ export default function TableTrainingProgram(props: TableTrainingProgramProps) {
                         setTrainingProgram(item)
                       }}
                     >
-                      <Iconify icon='icon-park-outline:list-view' color='#6f42c1' />
+                      <Iconify icon='hugeicons:property-view' color='#6f42c1' />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title='Nhập chương trình đào tạo' arrow>
@@ -104,7 +104,7 @@ export default function TableTrainingProgram(props: TableTrainingProgramProps) {
                         handleOpenImportTrainingProgram(item)
                       }}
                     >
-                      <Iconify icon='iconoir:import' color='#198754' />
+                      <Iconify icon='clarity:import-line' color='#198754' />
                     </IconButton>
                   </Tooltip>
                   <RowAction>

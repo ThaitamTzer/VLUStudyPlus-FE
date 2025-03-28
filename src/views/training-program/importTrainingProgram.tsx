@@ -32,6 +32,7 @@ type ImportForm = InferInput<typeof schema>
 export default function ImportTrainingProgram(props: ImportTrainingProgramProps) {
   const { mutate } = props
   const [loading, setLoading] = useState<boolean>(false)
+  const [files, setFiles] = useState<File[]>([])
 
   const {
     openImportTrainingProgramSession,
@@ -56,9 +57,8 @@ export default function ImportTrainingProgram(props: ImportTrainingProgramProps)
   const onClose = useCallback(() => {
     toogleImportTrainingProgramSession()
     setValue('file', [])
-    reset({
-      file: []
-    })
+    setFiles([])
+    reset()
   }, [toogleImportTrainingProgramSession, setValue, reset])
 
   const onSubmit = handleSubmit(async data => {
@@ -66,12 +66,12 @@ export default function ImportTrainingProgram(props: ImportTrainingProgramProps)
 
     const toastId = toast.loading('Đang tải lên tệp...')
 
+    onClose()
     setLoading(true)
     toogleImportProgramLoading()
     const formData = new FormData()
 
     formData.append('file', data.file[0])
-    onClose()
 
     await trainingProgramService.import(
       trainingProgram._id,
@@ -114,9 +114,22 @@ export default function ImportTrainingProgram(props: ImportTrainingProgramProps)
         setValue={setValue}
         pathToFile='/files/chuongtrinhdaotao.xlsx'
         reset={reset}
+        files={files}
+        setFiles={setFiles}
       />
     ),
-    [openImportTrainingProgramSession, onClose, handleImport, errors, loading, setValue, reset, trainingProgram?.title]
+    [
+      openImportTrainingProgramSession,
+      onClose,
+      handleImport,
+      errors,
+      loading,
+      setValue,
+      reset,
+      trainingProgram?.title,
+      setFiles,
+      files
+    ]
   )
 
   return <>{renderImport}</>

@@ -32,6 +32,7 @@ type ImportForm = InferInput<typeof schema>
 export default function ImportModal(props: ImportModalProps) {
   const { mutate } = props
   const [loading, setLoading] = useState<boolean>(false)
+  const [files, setFiles] = useState<File[]>([])
 
   const {
     openImportModal,
@@ -69,6 +70,7 @@ export default function ImportModal(props: ImportModalProps) {
     reset()
     toogleImportModal()
     setValue('file', [])
+    setFiles([])
   }
 
   const onSubmit = handleSubmit(async data => {
@@ -114,6 +116,8 @@ export default function ImportModal(props: ImportModalProps) {
 
   return (
     <ImportAdd
+      files={files}
+      setFiles={setFiles}
       onOpen={openImportModal}
       onClose={toogleImportModal}
       title='Import danh sách xử lý học tập'

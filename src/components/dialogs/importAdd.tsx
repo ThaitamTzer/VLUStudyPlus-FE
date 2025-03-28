@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-
 import { useDropzone } from 'react-dropzone'
 import {
   Box,
@@ -31,12 +29,13 @@ type ImportAddProps = {
   setValue: any
   reset: any
   errors: any
+  files: File[]
+  setFiles: (files: File[]) => void
 }
 
 export default function ImportAdd(props: ImportAddProps) {
-  const { title, onSubmit, onClose, onOpen, pathToFile, loading, children, reset, setValue, errors } = props
-
-  const [files, setFiles] = useState<File[]>([])
+  const { title, onSubmit, onClose, onOpen, pathToFile, loading, children, reset, setValue, errors, files, setFiles } =
+    props
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles: File[]) => {

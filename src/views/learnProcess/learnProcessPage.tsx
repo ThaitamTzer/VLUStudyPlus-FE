@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
@@ -132,6 +132,23 @@ export default function LearnProcessPage() {
     )
   }
 
+  const renderTable = useMemo(
+    () => (
+      <>
+        <TableTypeProcess table={table} loading={isLoading} />
+        <TablePagination
+          component={() => <TablePaginationComponent table={table as Table<unknown>} />}
+          count={table.getFilteredRowModel().rows.length}
+          rowsPerPage={table.getState().pagination.pageSize}
+          page={table.getState().pagination.pageIndex + 1}
+          onPageChange={(_, page) => table.setPageIndex(page - 1)}
+        />
+      </>
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [table, isLoading, data]
+  )
+
   return (
     <>
       <PageHeader title='Danh sách kỳ xử lý học tập' />
@@ -203,14 +220,7 @@ export default function LearnProcessPage() {
             </Button>
           </div>
         </div>
-        <TableTypeProcess table={table} loading={isLoading} />
-        <TablePagination
-          component={() => <TablePaginationComponent table={table as Table<unknown>} />}
-          count={table.getFilteredRowModel().rows.length}
-          rowsPerPage={table.getState().pagination.pageSize}
-          page={table.getState().pagination.pageIndex + 1}
-          onPageChange={(_, page) => table.setPageIndex(page - 1)}
-        />
+        {renderTable}
       </Card>
       <AddAcedemicProcess mutate={mutate} />
       <ManualAddAcedemicProcess mutate={mutate} open={openManualAdd} onClose={toogleManualAdd} />

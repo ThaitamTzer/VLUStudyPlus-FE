@@ -63,7 +63,7 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ py: 3, backgroundColor: '#f8fafc', mt: 2 }}>
+      <DialogContent sx={{ py: 3, mt: 2 }}>
         {data ? (
           <Grid container spacing={3}>
             {/* Student Information Section */}
@@ -73,7 +73,7 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
                   p: 3,
                   height: '100%',
                   borderLeft: '4px solid #3b82f6',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  boxShadow: 5
                 }}
               >
                 <SectionHeader emoji='👨‍🎓' title='Thông tin sinh viên' />
@@ -106,7 +106,7 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
                   p: 3,
                   height: '100%',
                   borderLeft: '4px solid #8b5cf6',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  boxShadow: 5
                 }}
               >
                 <SectionHeader emoji='📚' title='Thông tin học tập' />
@@ -145,7 +145,7 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
                 sx={{
                   p: 3,
                   borderLeft: '4px solid #ef4444',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  boxShadow: 5
                 }}
               >
                 <SectionHeader emoji='⚖️' title='Diện XLHV (PĐT đề nghị)' />
@@ -176,18 +176,76 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
-                    <InfoItem emoji='❗' label='Lưu ý' value={data.checkAcademicProcessing.reasonHandling} />
+                    <InfoItem emoji='❗' label='Lý do XLHV (UIS)' value={data.checkAcademicProcessing.reasonHandling} />
                   </Grid>
                   <Grid item xs={12}>
                     <InfoItem
                       emoji='📝'
-                      label='Ghi chú'
+                      label='Lưu ý'
                       value={data.checkAcademicProcessing.note || 'Không có ghi chú'}
                     />
                   </Grid>
                 </Grid>
               </Card>
             </Grid>
+
+            {/* Processing History Section */}
+            {data.checkAcademicProcessing.processing && data.checkAcademicProcessing.processing.length > 0 && (
+              <Grid item xs={12}>
+                <Card
+                  sx={{
+                    p: 3,
+                    borderLeft: '4px solid #6366f1',
+                    boxShadow: 5
+                  }}
+                >
+                  <SectionHeader emoji='🔄' title='Xử lý học vụ (UIS)' />
+                  <Divider sx={{ my: 2, borderColor: 'rgba(0,0,0,0.08)' }} />
+
+                  <Grid container spacing={2}>
+                    {data.checkAcademicProcessing.processing.map((process, index) => (
+                      <Grid item xs={12} sm={6} md={4} key={index}>
+                        <Card
+                          variant='outlined'
+                          sx={{
+                            p: 2,
+                            height: '100%',
+                            borderRadius: '8px',
+                            borderColor: '#d1d5db',
+                            borderLeft: '4px solid #6366f1'
+                          }}
+                        >
+                          <Box display='flex' alignItems='center' gap={1} mb={1}>
+                            <span style={{ fontSize: '1.2rem' }}>📝</span>
+                            <Typography variant='subtitle2' fontWeight='bold'>
+                              Học kỳ {process.termName}
+                            </Typography>
+                          </Box>
+                          <Chip
+                            label={process.statusHandling}
+                            color={
+                              process.statusHandling === 'Đạt'
+                                ? 'success'
+                                : process.statusHandling === 'Cảnh cáo học vụ'
+                                  ? 'warning'
+                                  : process.statusHandling === 'Buộc thôi học'
+                                    ? 'error'
+                                    : 'default'
+                            }
+                            size='small'
+                            sx={{
+                              fontWeight: 'medium',
+                              px: 0.5,
+                              fontSize: '0.75rem'
+                            }}
+                          />
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Card>
+              </Grid>
+            )}
 
             {/* Course Registration Section */}
             {data.checkAcademicProcessing.courseRegistration.length > 0 && (
@@ -196,7 +254,7 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
                   sx={{
                     p: 3,
                     borderLeft: '4px solid #10b981',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                    boxShadow: 5
                   }}
                 >
                   <SectionHeader emoji='📝' title='Đăng ký học phần' />
@@ -212,7 +270,7 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
                             height: '100%',
                             borderRadius: '8px',
                             borderColor: course.isRegister ? '#d1fae5' : '#fee2e2',
-                            backgroundColor: course.isRegister ? '#ecfdf5' : '#fef2f2'
+                            borderLeft: course.isRegister ? '4px solid #10b981' : '4px solid #ef4444'
                           }}
                         >
                           <Box display='flex' alignItems='center' gap={1} mb={1}>
@@ -245,7 +303,7 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
                 sx={{
                   p: 3,
                   borderLeft: '4px solid #f59e0b',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  boxShadow: 5
                 }}
               >
                 <SectionHeader emoji='🏫' title='Thông tin lớp học' />
@@ -266,8 +324,7 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
                   sx={{
                     p: 3,
                     borderLeft: '4px solid #f59e0b',
-                    backgroundColor: '#fffbeb',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                    boxShadow: 5
                   }}
                 >
                   <SectionHeader emoji='⚠️' title='Thông tin thiếu' />
@@ -309,7 +366,7 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
                   p: 3,
                   backgroundColor: '#fff',
                   borderRadius: '12px',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                  boxShadow: 5,
                   border: '1px solid rgba(0,0,0,0.05)'
                 }}
               >

@@ -274,14 +274,14 @@ export default function ManualEditAcedemicProcess({
             <Grid item xs={12} sm={4}>
               <Controller
                 control={control}
-                name='lastName'
+                name='firstName'
                 render={({ field }) => (
                   <CustomTextField
                     {...field}
                     fullWidth
                     label='Họ'
                     placeholder='VD: Nguyễn'
-                    {...(errors.lastName && { error: true, helperText: errors.lastName.message?.toString() })}
+                    {...(errors.firstName && { error: true, helperText: errors.firstName.message?.toString() })}
                   />
                 )}
               />
@@ -289,14 +289,14 @@ export default function ManualEditAcedemicProcess({
             <Grid item xs={12} sm={4}>
               <Controller
                 control={control}
-                name='firstName'
+                name='lastName'
                 render={({ field }) => (
                   <CustomTextField
                     {...field}
                     fullWidth
                     label='Tên'
                     placeholder='VD: Văn A'
-                    {...(errors.firstName && { error: true, helperText: errors.firstName.message?.toString() })}
+                    {...(errors.lastName && { error: true, helperText: errors.lastName.message?.toString() })}
                   />
                 )}
               />

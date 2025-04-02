@@ -20,7 +20,8 @@ import CustomTextField from '@/@core/components/mui/TextField'
 const schema = v.object({
   title: v.pipe(v.string(), v.nonEmpty('Tên không được để trống'), v.maxLength(100, 'Độ dài tối đa 100 ký tự')),
   credit: v.pipe(v.number(), v.minValue(1, 'Số tín chỉ phải lớn hơn 0')),
-  cohortId: v.pipe(v.string(), v.nonEmpty('Khóa không được để trống'))
+  cohortId: v.undefinedable(v.pipe(v.string(), v.nonEmpty('Khóa không được để trống')), ''),
+  major: v.undefinedable(v.pipe(v.string(), v.nonEmpty('Chuyên ngành không được để trống')), '')
 })
 
 type FormData = InferInput<typeof schema>
@@ -30,7 +31,7 @@ type UpdateTrainingProgramProps = {
 }
 
 export default function UpdateTrainingProgram({ mutate }: UpdateTrainingProgramProps) {
-  const { cohorOptions } = useShare()
+  const { cohorOptions, majorOptions } = useShare()
   const [loading, setLoading] = useState(false)
 
   const { openUpdateTrainingProgram, toogleUpdateTrainingProgram, setTrainingProgram, trainingProgram } =
@@ -45,7 +46,7 @@ export default function UpdateTrainingProgram({ mutate }: UpdateTrainingProgramP
   } = useForm<FormData>({
     mode: 'all',
     resolver: valibotResolver(schema),
-    defaultValues: { title: '', credit: 0, cohortId: '' }
+    defaultValues: { title: '', credit: 0, cohortId: '', major: '' }
   })
 
   const watchedValues = watch() // Lấy dữ liệu đang nhập vào
@@ -171,6 +172,37 @@ export default function UpdateTrainingProgram({ mutate }: UpdateTrainingProgramP
         </Grid>
         <Grid item xs={12}>
           <Controller
+            name='major'
+            control={control}
+            render={({ field }) => (
+              <CustomTextField
+                {...field}
+                label='Chuyên ngành'
+                error={!!errors.major}
+                helperText={errors.major?.message}
+                fullWidth
+                select
+                SelectProps={{
+                  MenuProps: {
+                    PaperProps: {
+                      sx: {
+                        maxHeight: 300
+                      }
+                    }
+                  }
+                }}
+              >
+                {majorOptions.map(option => (
+                  <MenuItem key={option._id} value={option._id}>
+                    {option.majorName}
+                  </MenuItem>
+                ))}
+              </CustomTextField>
+            )}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Controller
             name='cohortId'
             control={control}
             render={({ field }) => (
@@ -181,6 +213,15 @@ export default function UpdateTrainingProgram({ mutate }: UpdateTrainingProgramP
                 helperText={errors.cohortId?.message}
                 fullWidth
                 select
+                SelectProps={{
+                  MenuProps: {
+                    PaperProps: {
+                      sx: {
+                        maxHeight: 300
+                      }
+                    }
+                  }
+                }}
               >
                 {cohorOptions.map(option => (
                   <MenuItem key={option._id} value={option._id}>

@@ -98,7 +98,7 @@ export const useColumns = () => {
                   setAcedemicProcess(infor.row.original)
                 }}
               >
-                <Iconify icon='fluent:table-add-24-filled' className='text-success' />
+                <Iconify icon='tabler:file-import' className='text-success' />
               </IconButton>
             </Tooltip>
             <RowAction>

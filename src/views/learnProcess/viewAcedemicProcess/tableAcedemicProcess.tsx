@@ -90,7 +90,7 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                 },
                 zIndex: {
                   xs: 0,
-                  sm: 9
+                  sm: 20
                 },
                 left: 0,
                 overflow: 'hidden',
@@ -109,7 +109,7 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                 },
                 zIndex: {
                   xs: 0,
-                  sm: 9
+                  sm: 20
                 },
                 left: 55,
                 overflow: 'hidden',
@@ -170,7 +170,7 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                 Kết quả xử lý
               </TableSortLabel>
             </TableCell>
-            <TableCell>Ghi chú</TableCell>
+            <TableCell>Lưu ý</TableCell>
             {termNamesCouseRegistration.map(term => (
               <TableCell key={term}>ĐKMH ({term})</TableCell>
             ))}
@@ -406,7 +406,7 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                   )}
                 </TableCell>
                 <TableCell>{d.processingResult?.processingResultName || ''}</TableCell>
-                <TableCell>{d.reason || ''}</TableCell>
+                <TableCell>{d.note || ''}</TableCell>
                 {termNamesCouseRegistration.map(term => {
                   const courseRegistrationData = d.courseRegistration.find(p => p.termName === term)
 

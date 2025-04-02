@@ -26,13 +26,15 @@ import DebouncedInput from '@/components/debouncedInput'
 import TableTrainingProgram from './tableTrainingProgram'
 import TablePaginationCustom from '@/components/table/TablePagination'
 import { useTrainingProgramStore } from '@/stores/trainingProgram.store'
-import CreateTrainingProgram from './createTrainingProgram'
+
+// import CreateTrainingProgram from './createTrainingProgram'
 import Iconify from '@/components/iconify'
 import UpdateTrainingProgram from './updateTrainingProgram'
 import DeleteTrainingProgram from './deleteTrainingProgram'
 import ImportTrainingProgram from './importTrainingProgram'
 import ProgressModal from '@/components/dialogs/progressModal'
 import ViewTrainingProgramByFrame from './viewTrainingProgramByFrame/viewTrainingProgramByFrame'
+import AddTrainingProgramStepByStepModal from './addTrainingProgramStepByStepModal'
 
 export default function TrainingProgramPage() {
   const router = useRouter()
@@ -176,7 +178,8 @@ export default function TrainingProgramPage() {
           }}
         />
       </Card>
-      <CreateTrainingProgram mutate={mutate} />
+      {/* <CreateTrainingProgram mutate={mutate} /> */}
+      <AddTrainingProgramStepByStepModal mutate={mutate} />
       <UpdateTrainingProgram mutate={mutate} />
       <DeleteTrainingProgram mutate={mutate} />
       <ImportTrainingProgram mutate={mutate} />

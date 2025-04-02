@@ -34,7 +34,7 @@ import ViewCommitmentForms from '../commitmentForms/viewCommitmentForm'
 import ViewCommitmentFormsOfCVHT from '../commitmentForms/viewCommitmentFormOfCVHT'
 import Iconify from '@/components/iconify'
 
-const TableTypeProcess = dynamic(() => import('../type-process/list'))
+const TableTypeProcess = dynamic(() => import('../type-process/list'), { ssr: false })
 const AddAcedemicProcess = dynamic(() => import('./addAcedemicProcess'), { ssr: false })
 const UpdateAcedemicProcess = dynamic(() => import('./updateAcedemicProcess'), { ssr: false })
 const AlertDelete = dynamic(() => import('@/components/alertModal'), { ssr: false })
@@ -161,7 +161,7 @@ export default function LearnProcessPage() {
             {[
               { icon: 'mingcute:information-fill', color: '#2092ec', label: 'Xem danh sách xử lý học tập' },
               { icon: 'hugeicons:files-01', color: '#8e44ad', label: 'Xem danh sách đơn cam kết' },
-              { icon: 'bx:import', color: 'green', label: 'Import danh sách xử lý học tập' },
+              { icon: 'tabler:file-import', color: 'green', label: 'Import danh sách xử lý học tập' },
               { icon: 'solar:pen-2-linear', color: 'orange', label: 'Cập nhật kỳ xử lý' },
               { icon: 'solar:trash-bin-2-linear', color: 'red', label: 'Xóa kỳ xử lý' }
             ].map((item, index) => (
@@ -173,7 +173,7 @@ export default function LearnProcessPage() {
                 sx={{
                   p: 2,
                   borderRadius: '8px',
-                  boxShadow: 1,
+                  boxShadow: 5,
                   transition: 'all 0.3s',
                   '&:hover': { boxShadow: 3 }
                 }}

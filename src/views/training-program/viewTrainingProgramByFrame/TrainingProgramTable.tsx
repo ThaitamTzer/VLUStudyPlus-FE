@@ -1,73 +1,47 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Tooltip } from '@mui/material'
+import SubjectIcon from '@mui/icons-material/Book'
+import CategoryIcon from '@mui/icons-material/Folder'
 
 import StyledTableRow from '@/components/table/StyledTableRow'
-
 import type { Categories, Subjects, TrainingProgramByFrame } from '@/types/management/trainningProgramType'
-
 import { useSettings } from '@/@core/hooks/useSettings'
 import TableLoading from '@/components/table/TableLoading'
 import TableNoData from '@/components/table/TableNotFound'
+import CategoryRow from './CategoryRow'
+import SubjectRow from './SubjectRow'
+import CategorySection from './CategorySection'
 
-interface SubjectRowProps {
-  subject: Subjects
-  level: number
+// New empty category template
+const emptyCategory: Omit<Categories, '_id'> = {
+  titleN: '',
+  titleV: '',
+  credits: 0,
+  subjects: [],
+  categoriesC3: []
 }
 
-const SubjectRow: React.FC<SubjectRowProps> = ({ subject, level }) => {
-  return (
-    <StyledTableRow>
-      <TableCell sx={{ paddingLeft: `${level * 9}px` }}>
-        {subject.courseCode} - {subject.courseName}
-      </TableCell>
-      <TableCell align='right'>{subject.credits}</TableCell>
-      <TableCell align='right'>{subject.LT}</TableCell>
-      <TableCell align='right'>{subject.TH}</TableCell>
-      <TableCell align='right'>{subject.TT}</TableCell>
-      <TableCell>{subject.isRequire === 'true' ? 'Bắt buộc' : 'Tự chọn'}</TableCell>
-      <TableCell>{subject.prerequisites}</TableCell>
-      <TableCell>{subject.preConditions}</TableCell>
-      <TableCell>{subject.implementationSemester}</TableCell>
-    </StyledTableRow>
-  )
-}
-
-interface CategorySectionProps {
-  category: Categories
-  level: number
-}
-
-const CategorySection: React.FC<CategorySectionProps> = ({ category, level }) => {
-  const { settings } = useSettings()
-
-  return (
-    <>
-      {/* Header row for the category */}
-      <TableRow>
-        <TableCell
-          colSpan={9}
-          sx={{
-            paddingLeft: `${level * 9}px`,
-            fontWeight: 'bold',
-            backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
-          }}
-        >
-          {category.titleN} {category.titleV} ({category.credits} tín chỉ)
-        </TableCell>
-      </TableRow>
-
-      {/* Subjects in this category */}
-      {category.subjects?.map(subject => <SubjectRow key={subject._id} subject={subject} level={level + 1} />)}
-
-      {/* Sub-categories */}
-      {category.categoriesC3?.map(subCategory => (
-        <CategorySection key={subCategory._id} category={subCategory} level={level + 1} />
-      ))}
-    </>
-  )
+// New empty subject template
+const emptySubject: Omit<Subjects, '_id'> = {
+  courseCode: '',
+  courseName: '',
+  credits: 0,
+  LT: 0,
+  TH: 0,
+  TT: 0,
+  isRequire: 'true',
+  prerequisites: '',
+  preConditions: '',
+  implementationSemester: '',
+  categoryTrainingProgramIds: [],
+  subjectCode: '',
+  inCharge: '',
+  note: '',
+  createdAt: '',
+  updatedAt: ''
 }
 
 interface FlatTrainingProgramTableProps {
@@ -77,6 +51,256 @@ interface FlatTrainingProgramTableProps {
 
 const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ data, isLoading }) => {
   const { settings } = useSettings()
+  const [programData, setProgramData] = useState<TrainingProgramByFrame[]>(data || [])
+
+  // Track editing states
+  const [editingNewCategory, setEditingNewCategory] = useState<{
+    parentId: string | null
+    programId: string | null
+    category: Categories & { _id: string }
+  } | null>(null)
+
+  const [editingNewSubject, setEditingNewSubject] = useState<{
+    categoryId: string
+    subject: Subjects & { _id: string }
+  } | null>(null)
+
+  // Update local data when prop changes
+  React.useEffect(() => {
+    setProgramData(data || [])
+  }, [data])
+
+  // Add a new subcategory to a parent category
+  const handleAddCategory = (parentId: string) => {
+    // Create a temporary category with ID
+    const newCategory = {
+      ...emptyCategory,
+      _id: `temp-${Date.now()}`
+    } as Categories & { _id: string }
+
+    setEditingNewCategory({
+      parentId,
+      programId: null,
+      category: newCategory
+    })
+  }
+
+  // Add a new subject to a category
+  const handleAddSubject = (categoryId: string) => {
+    // Create a temporary subject with ID
+    const newSubject = {
+      ...emptySubject,
+      _id: `temp-${Date.now()}`
+    } as Subjects & { _id: string }
+
+    setEditingNewSubject({
+      categoryId,
+      subject: newSubject
+    })
+  }
+
+  // Add a new top-level category to a program
+  const handleAddTopLevelCategory = (programId: string) => {
+    // Create a temporary category with ID
+    const newCategory = {
+      ...emptyCategory,
+      _id: `temp-${Date.now()}`
+    } as Categories & { _id: string }
+
+    setEditingNewCategory({
+      parentId: null,
+      programId,
+      category: newCategory
+    })
+  }
+
+  //Add a new top-level subject to a program
+  const handleAddTopLevelSubject = (programId: string) => {
+    // Create a temporary subject with ID
+    const newSubject = {
+      ...emptySubject,
+      _id: `temp-${Date.now()}`
+    } as Subjects & { _id: string }
+
+    setEditingNewSubject({
+      categoryId: programId,
+      subject: newSubject
+    })
+  }
+
+  // Update fields of the new category
+  const handleCategoryChange = (field: keyof Categories, value: any) => {
+    if (!editingNewCategory) return
+
+    setEditingNewCategory({
+      ...editingNewCategory,
+      category: {
+        ...editingNewCategory.category,
+        [field]: value
+      }
+    })
+  }
+
+  // Update fields of the new subject
+  const handleSubjectChange = (field: keyof Subjects, value: any) => {
+    if (!editingNewSubject) return
+
+    setEditingNewSubject({
+      ...editingNewSubject,
+      subject: {
+        ...editingNewSubject.subject,
+        [field]: value
+      }
+    })
+  }
+
+  // Save the new category
+  const handleSaveCategory = () => {
+    if (!editingNewCategory) return
+
+    const updatedData = [...programData]
+    const { parentId, programId, category } = editingNewCategory
+
+    if (programId) {
+      // Adding to top level program
+      const programIndex = updatedData.findIndex(p => p._id === programId)
+
+      if (programIndex !== -1) {
+        if (!updatedData[programIndex].categories) {
+          updatedData[programIndex].categories = []
+        }
+
+        updatedData[programIndex].categories!.push(category)
+      }
+    } else if (parentId) {
+      // Adding to a subcategory - need to find it in the hierarchy
+      for (const program of updatedData) {
+        // Find the category in the program's categories tree
+        const updateCategory = (categories: Categories[]): boolean => {
+          for (let i = 0; i < categories.length; i++) {
+            if (categories[i]._id === parentId) {
+              if (!categories[i].categoriesC3) {
+                categories[i].categoriesC3 = []
+              }
+
+              categories[i].categoriesC3?.push(category)
+
+              return true
+            }
+
+            if (categories[i].categoriesC3?.length) {
+              if (categories[i].categoriesC3 && updateCategory(categories[i].categoriesC3 || [])) {
+                return true
+              }
+            }
+          }
+
+          return false
+        }
+
+        if (program.categories && updateCategory(program.categories)) {
+          break
+        }
+      }
+    }
+
+    setProgramData(updatedData)
+    setEditingNewCategory(null)
+  }
+
+  // Save the new subject
+  const handleSaveSubject = () => {
+    if (!editingNewSubject) return
+
+    const updatedData = [...programData]
+    const { categoryId, subject } = editingNewSubject
+
+    for (const program of updatedData) {
+      // Find the category in the program's categories tree
+      const updateCategory = (categories: Categories[]): boolean => {
+        for (let i = 0; i < categories.length; i++) {
+          if (categories[i]._id === categoryId) {
+            if (!categories[i].subjects) {
+              categories[i].subjects = []
+            }
+
+            categories[i].subjects.push(subject)
+
+            return true
+          }
+
+          if (categories[i].categoriesC3?.length) {
+            if (updateCategory(categories[i].categoriesC3 || [])) {
+              return true
+            }
+          }
+        }
+
+        return false
+      }
+
+      if (program.categories && updateCategory(program.categories)) {
+        break
+      }
+    }
+
+    setProgramData(updatedData)
+    setEditingNewSubject(null)
+  }
+
+  // Cancel adding new category
+  const handleCancelCategory = () => {
+    setEditingNewCategory(null)
+  }
+
+  // Cancel adding new subject
+  const handleCancelSubject = () => {
+    setEditingNewSubject(null)
+  }
+
+  // Helper function to recursively render categories with editing subjects
+  const renderCategoryWithEditingSubject = (category: Categories, level: number) => {
+    return (
+      <React.Fragment key={category._id}>
+        <CategorySection
+          category={category}
+          level={level}
+          onAddCategory={handleAddCategory}
+          onAddSubject={handleAddSubject}
+        />
+
+        {/* New category being added under this category */}
+        {editingNewCategory && editingNewCategory.parentId === category._id && (
+          <CategoryRow
+            category={editingNewCategory.category}
+            level={level + 1}
+            isEditing={true}
+            onChange={handleCategoryChange}
+            onSave={handleSaveCategory}
+            onCancel={handleCancelCategory}
+          />
+        )}
+
+        {/* New subject being added to this category - HIỂN THỊ TRƯỚC DANH SÁCH MÔN HỌC */}
+        {editingNewSubject && editingNewSubject.categoryId === category._id && (
+          <SubjectRow
+            subject={editingNewSubject.subject}
+            level={level + 1}
+            isEditing={true}
+            onChange={handleSubjectChange}
+            onSave={handleSaveSubject}
+            onCancel={handleCancelSubject}
+          />
+        )}
+
+        {/* Subjects directly under this category */}
+        {category.subjects?.map(subject => <SubjectRow key={subject._id} subject={subject} level={level + 1} />)}
+
+        {/* Recursively render subcategories */}
+        {category.categoriesC3?.map(subCategory => renderCategoryWithEditingSubject(subCategory, level + 1))}
+      </React.Fragment>
+    )
+  }
 
   return (
     <TableContainer>
@@ -106,36 +330,77 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
             <TableCell sx={{ fontWeight: 'bold' }}>Loại môn</TableCell>
             <TableCell sx={{ fontWeight: 'bold' }}>ĐK Tuyên Quyết</TableCell>
             <TableCell sx={{ fontWeight: 'bold' }}>ĐK học trước</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>Học kỳ triển khai</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' }}>HK triển khai</TableCell>
+            <TableCell width={100} sx={{ fontWeight: 'bold' }}>
+              Hành động
+            </TableCell>
           </StyledTableRow>
         </TableHead>
         <TableBody>
-          {data?.map(program => (
-            <React.Fragment key={program._id}>
-              {/* Program header */}
-              <TableRow
-                sx={{
-                  backgroundColor: settings.mode === 'dark' ? '#4D55CC' : '#578FCA'
-                }}
-              >
-                <TableCell colSpan={9} sx={{ fontWeight: 'bold' }}>
-                  {program.titleN} {program.titleV} ({program.credits} tín chỉ)
-                </TableCell>
-              </TableRow>
+          {programData?.map(program => {
+            return (
+              <React.Fragment key={program._id}>
+                {/* Program header */}
+                <TableRow
+                  sx={{
+                    backgroundColor: settings.mode === 'dark' ? '#4D55CC' : '#578FCA'
+                  }}
+                >
+                  <TableCell colSpan={1} sx={{ fontWeight: 'bold' }}>
+                    {program.titleN} {program.titleV}
+                  </TableCell>
+                  <TableCell align='right'>{program.credits}</TableCell>
+                  <TableCell colSpan={7} sx={{ textAlign: 'right' }}></TableCell>
+                  <TableCell sx={{ textAlign: 'right' }}>
+                    <Tooltip title='Thêm môn học'>
+                      <IconButton size='small' onClick={() => handleAddTopLevelSubject(program._id)}>
+                        <SubjectIcon fontSize='small' />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title='Thêm danh mục'>
+                      <IconButton size='small' onClick={() => handleAddTopLevelCategory(program._id)}>
+                        <CategoryIcon fontSize='small' />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
 
-              {/* Subjects directly under program */}
-              {program.subjects?.map(subject => <SubjectRow key={subject._id} subject={subject} level={2} />)}
+                {/* New category being added to this program - DISPLAY FIRST */}
+                {editingNewCategory && editingNewCategory.programId === program._id && (
+                  <CategoryRow
+                    category={editingNewCategory.category}
+                    level={2}
+                    isEditing={true}
+                    onChange={handleCategoryChange}
+                    onSave={handleSaveCategory}
+                    onCancel={handleCancelCategory}
+                  />
+                )}
 
-              {/* Categories under program */}
-              {program.categories?.map(category => (
-                <CategorySection key={category._id} category={category} level={3} />
-              ))}
-            </React.Fragment>
-          ))}
+                {/* New subject being added to this program - DISPLAY FIRST */}
+                {editingNewSubject && editingNewSubject.categoryId === program._id && (
+                  <SubjectRow
+                    subject={editingNewSubject.subject}
+                    level={3}
+                    isEditing={true}
+                    onChange={handleSubjectChange}
+                    onSave={handleSaveSubject}
+                    onCancel={handleCancelSubject}
+                  />
+                )}
+
+                {/* Subjects directly under program */}
+                {program.subjects?.map(subject => <SubjectRow key={subject._id} subject={subject} level={2} />)}
+
+                {/* Use the new helper function to render categories with editing subjects */}
+                {program.categories?.map(category => renderCategoryWithEditingSubject(category, 2))}
+              </React.Fragment>
+            )
+          })}
           {isLoading ? (
             <TableLoading colSpan={20} />
           ) : (
-            <TableNoData notFound={data?.length === 0} title={'Không tìm dữ liệu nào'} />
+            <TableNoData notFound={programData?.length === 0} title={'Không tìm dữ liệu nào'} />
           )}
         </TableBody>
       </Table>

@@ -1,22 +1,28 @@
 'use client'
 import { useCallback, useState } from 'react'
 
-import { Button, Typography } from '@mui/material'
+import { Button, Divider, Typography } from '@mui/material'
 
 import { toast } from 'react-toastify'
 
 import { LoadingButton } from '@mui/lab'
 
 import type { KeyedMutator } from 'swr'
-import { mutate as fetcher } from 'swr'
+import useSWR, { mutate as fetcher } from 'swr'
 
 import { useAcedemicProcessStore } from '@/stores/acedemicProcess.store'
 import { CustomDialog } from '@/components/CustomDialog'
 import mailService from '@/services/mail.service'
+import Iconify from '@/components/iconify'
 
 export default function SendMailModal({ id, mutate }: { id: string; mutate: KeyedMutator<any> }) {
   const { openSendEmail, tooogleSendEmail } = useAcedemicProcessStore()
   const [loading, setLoading] = useState(false)
+
+  const { data: numberOfSendMail, isLoading } = useSWR(
+    id ? `/api/notification/get-number-notification/${id}` : null,
+    () => mailService.getNumberSend(id)
+  )
 
   const onSendMail = async () => {
     // send mail
@@ -67,12 +73,27 @@ export default function SendMailModal({ id, mutate }: { id: string; mutate: Keye
           <Button variant='outlined' onClick={onClose}>
             Hủy
           </Button>
-          <LoadingButton loading={loading} variant='contained' onClick={onSendMail}>
+          <LoadingButton loading={loading} variant='contained' disabled={isLoading} onClick={onSendMail}>
             Gửi mail
           </LoadingButton>
         </>
       }
     >
+      {isLoading ? (
+        <div className='flex items-center gap-2'>
+          <Iconify icon={'mdi:loading'} className='animate-spin' />
+          <p>Đang tính toán số lượng mail cần gửi...</p>
+        </div>
+      ) : (
+        <div>
+          <p>
+            Số lượng mail sẽ gửi để thông báo xử lý học tập là{' '}
+            <strong className='text-red-700'>{numberOfSendMail?.numberRemindProcess} mail</strong> Bao gồm sinh viên bị
+            XLHV và CVHT phụ trách lớp niên chế của các sinh viên bị xử lý
+          </p>
+        </div>
+      )}
+      <Divider sx={{ my: 2 }} />
       <Typography variant='h6'>
         <strong className='text-red-700'>Lưu ý: </strong> Việc gửi mail này sẽ gửi đến{' '}
         <strong>Cán bộ giảng viên</strong> phụ trách lớp niên chế của các sinh viên bị xử lý và các{' '}

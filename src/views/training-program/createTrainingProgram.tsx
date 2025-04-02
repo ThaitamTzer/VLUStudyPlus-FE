@@ -25,8 +25,9 @@ import CustomTextField from '@/@core/components/mui/TextField'
 
 const schema = v.object({
   title: v.pipe(v.string(), v.nonEmpty('Tên không được để trống'), v.maxLength(100, 'Độ dài tối đa 100 ký tự')),
+  major: v.undefinedable(v.pipe(v.string(), v.nonEmpty('Chuyên ngành không được để trống')), ''),
   credit: v.pipe(v.number(), v.minValue(1, 'Số tín chỉ phải lớn hơn 0')),
-  cohortId: v.pipe(v.string(), v.nonEmpty('Khóa không được để trống'))
+  cohortId: v.undefinedable(v.pipe(v.string(), v.nonEmpty('Khóa không được để trống')), '')
 })
 
 type FormData = InferInput<typeof schema>
@@ -37,7 +38,7 @@ type CreateTrainingProgramProps = {
 
 export default function CreateTrainingProgram(props: CreateTrainingProgramProps) {
   const { mutate } = props
-  const { cohorOptions } = useShare()
+  const { cohorOptions, majorOptions } = useShare()
   const [loading, setLoading] = useState(false)
 
   const { openCreateTrainingProgram, toogleCreateTrainingProgram } = useTrainingProgramStore()
@@ -53,7 +54,8 @@ export default function CreateTrainingProgram(props: CreateTrainingProgramProps)
     defaultValues: {
       title: '',
       credit: 0,
-      cohortId: ''
+      cohortId: '',
+      major: ''
     }
   })
 
@@ -166,16 +168,58 @@ export default function CreateTrainingProgram(props: CreateTrainingProgramProps)
         </Grid>
         <Grid item xs={12}>
           <Controller
+            name='major'
+            control={control}
+            render={({ field }) => (
+              <CustomTextField
+                {...field}
+                label='Ngành'
+                error={!!errors.major}
+                helperText={errors.major?.message}
+                fullWidth
+                select
+                SelectProps={{
+                  MenuProps: {
+                    PaperProps: {
+                      sx: {
+                        maxHeight: 300
+                      }
+                    }
+                  }
+                }}
+              >
+                {majorOptions.map(option => {
+                  return (
+                    <MenuItem key={option._id} value={option._id}>
+                      {option.majorName}
+                    </MenuItem>
+                  )
+                })}
+              </CustomTextField>
+            )}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Controller
             name='cohortId'
             control={control}
             render={({ field }) => (
               <CustomTextField
                 {...field}
-                label='Khóa'
+                label='Niên khóa'
                 error={!!errors.cohortId}
                 helperText={errors.cohortId?.message}
                 fullWidth
                 select
+                SelectProps={{
+                  MenuProps: {
+                    PaperProps: {
+                      sx: {
+                        maxHeight: 300
+                      }
+                    }
+                  }
+                }}
               >
                 {cohorOptions.map(option => {
                   return (

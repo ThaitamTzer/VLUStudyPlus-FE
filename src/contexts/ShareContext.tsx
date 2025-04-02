@@ -22,6 +22,8 @@ import type { TypeProcessType } from '@/types/management/typeProcessType'
 import type { ClassLecturer } from '@/types/management/classLecturerType'
 import type { ProcessResultType } from '@/types/management/processResultType'
 import resultProcessService from '@/services/resultProcess.service'
+import majorService from '@/services/major.service'
+import type { Major } from '@/types/management/majorType'
 
 type ShareContextType = {
   cohorOptions: Cohort[]
@@ -31,6 +33,8 @@ type ShareContextType = {
   typeProcess: TypeProcessType[]
   classCVHT: ClassLecturer[]
   resultProcess: ProcessResultType[]
+  majorOptions: Major[]
+  setMajorOptions: (options: Major[]) => void
   setCohortOptions: (options: Cohort[]) => void
   setClassOptions: (options: Class[]) => void
   setTermOptions: (options: Term[]) => void
@@ -51,6 +55,8 @@ type ShareContextType = {
   setPageStudent: (page: number) => void
   limitStudent: number
   setLimitStudent: (limit: number) => void
+  pageMajor: number
+  setPageMajor: (page: number) => void
 }
 
 const defaultProvider: ShareContextType = {
@@ -79,7 +85,11 @@ const defaultProvider: ShareContextType = {
   classCVHT: [],
   setClassCVHT: () => null,
   resultProcess: [],
-  setProcessResult: () => null
+  setProcessResult: () => null,
+  majorOptions: [],
+  setMajorOptions: () => null,
+  pageMajor: 100,
+  setPageMajor: () => null
 }
 
 const ShareContext = createContext(defaultProvider)
@@ -105,6 +115,8 @@ const ShareProvider = ({ children }: Props) => {
   const [limitTerm, setLimitTerm] = useState(300)
   const [pageStudent, setPageStudent] = useState(1)
   const [limitStudent, setLimitStudent] = useState(300)
+  const [majorOptions, setMajorOptions] = useState<Major[]>([])
+  const [pageMajor, setPageMajor] = useState(100)
 
   const fetcherTerm = ['/term', pageTerm, limitTerm]
   const fetcherClass = ['/class', page, limit]
@@ -159,6 +171,13 @@ const ShareProvider = ({ children }: Props) => {
     revalidateOnFocus: false
   })
 
+  useSWR(user ? '/major' : null, () => majorService.getAll(pageMajor), {
+    onSuccess: data => {
+      setMajorOptions(data.majors)
+    },
+    revalidateOnFocus: false
+  })
+
   const value = {
     cohorOptions,
     classOptions,
@@ -185,7 +204,11 @@ const ShareProvider = ({ children }: Props) => {
     classCVHT,
     setClassCVHT,
     resultProcess: processResult,
-    setProcessResult
+    setProcessResult,
+    majorOptions,
+    setMajorOptions,
+    pageMajor,
+    setPageMajor
   }
 
   return (

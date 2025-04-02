@@ -1,6 +1,8 @@
 'use client'
 import { useCallback, useState } from 'react'
 
+import dynamic from 'next/dynamic'
+
 import {
   Dialog,
   DialogTitle,
@@ -23,16 +25,18 @@ import CustomTextField from '@/@core/components/mui/TextField'
 import DebouncedInput from '@/components/debouncedInput'
 import TablePaginationCustomNoURL from '@/components/table/TablePaginationNoURL'
 import { useShare } from '@/hooks/useShare'
-import ManualAddAcedemicProcess from '../manualAddAcedemicProcess'
-import TableAcedemicProcess from './tableAcedemicProcess'
-import TableFilter from './tableFilter'
-import ManualEditAcedemicProcess from './editAcedemicProcess'
-import AlertDelete from '@/components/alertModal'
-import ViewDetailAcedecmicProcess from './viewDetailAcedemicProcess'
-import UpdateAcedemicProcessStatus from '../updateAcedemicProcessStatus'
 import type { LearnProcessType } from '@/types/management/learnProcessType'
-import SendMailModal from './sendMailModal'
-import SendMailModalRemind from './sendMailModalRemind'
+
+const TableFilter = dynamic(() => import('./tableFilter'), { ssr: false })
+const TableAcedemicProcess = dynamic(() => import('./tableAcedemicProcess'), { ssr: false })
+const AlertDelete = dynamic(() => import('@/components/alertModal'), { ssr: false })
+const ManualAddAcedemicProcess = dynamic(() => import('../manualAddAcedemicProcess'), { ssr: false })
+const ManualEditAcedemicProcess = dynamic(() => import('./editAcedemicProcess'), { ssr: false })
+const ViewDetailAcedecmicProcess = dynamic(() => import('./viewDetailAcedemicProcess'), { ssr: false })
+
+const UpdateAcedemicProcessStatus = dynamic(() => import('../updateAcedemicProcessStatus'), { ssr: false })
+const SendMailModal = dynamic(() => import('./sendMailModal'), { ssr: false })
+const SendMailModalRemind = dynamic(() => import('./sendMailModalRemind'), { ssr: false })
 
 export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcedemicProcess: LearnProcessType[] }) {
   const {
@@ -80,10 +84,6 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
       sortOrder,
       searchKey
     )
-  )
-
-  const { data: classList } = useSWR(id ? 'classListInProcess' : null, () =>
-    learnProcessService.getListClassInProcess(id as string)
   )
 
   const handleSort = (field: string) => {
@@ -273,7 +273,7 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
         open={openManualAddFromViewByCate}
       />
       <SendMailModal id={acedemicProcess?._id || ''} mutate={mutate} />
-      <SendMailModalRemind classList={classList || ({} as any)} id={acedemicProcess?._id || ''} />
+      <SendMailModalRemind id={acedemicProcess?._id || ''} />
       <AlertDelete
         open={openDeleteViewAcedemicProcess}
         onClose={toogleDeleteViewAcedemicProcess}

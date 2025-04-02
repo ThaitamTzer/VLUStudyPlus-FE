@@ -766,7 +766,7 @@ export default function ManualAddAcedemicProcess({
                   <CustomTextField
                     {...field}
                     fullWidth
-                    label='Ghi chú'
+                    label='Lưu ý'
                     multiline
                     maxRows={3}
                     rows={3}

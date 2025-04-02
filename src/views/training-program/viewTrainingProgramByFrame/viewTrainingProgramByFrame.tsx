@@ -25,6 +25,8 @@ export default function ViewTrainingProgramByFrame() {
     trainingProgramService.getTrainingProgramByFrame(id)
   )
 
+  console.log('data', data)
+
   const renderDialog = useMemo(
     () => (
       <CustomDialog

@@ -1,5 +1,5 @@
 'use client'
-import { useCallback, useState, useMemo } from 'react'
+import { useCallback, useState } from 'react'
 
 import { Button, Checkbox, FormControlLabel, Grid } from '@mui/material'
 import * as v from 'valibot'
@@ -11,32 +11,26 @@ import { toast } from 'react-toastify'
 
 import { LoadingButton } from '@mui/lab'
 
+import useSWR from 'swr'
+
 import { useAcedemicProcessStore } from '@/stores/acedemicProcess.store'
 import { CustomDialog } from '@/components/CustomDialog'
 import mailService from '@/services/mail.service'
-import type { ListClassInProcess } from '@/types/management/learnProcessType'
-import CustomTextField from '@/@core/components/mui/TextField'
-import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
 
 const schema = v.object({
-  classId: v.string(),
-  processed: v.boolean()
+  processed: v.boolean(),
+  commitment: v.boolean()
 })
 
 type FormData = InferInput<typeof schema>
 
-export default function SendMailModalRemind({ id, classList }: { id: string; classList: ListClassInProcess[] }) {
+export default function SendMailModalRemind({ id }: { id: string }) {
   const { openSendEmailRemind, toogleSendEmailRemind } = useAcedemicProcessStore()
   const [loading, setLoading] = useState(false)
 
-  const classOptions = useMemo(() => {
-    if (!Array.isArray(classList)) return []
-
-    return classList.map(item => ({
-      classId: item.classId,
-      userName: item.userName
-    }))
-  }, [classList])
+  const { data, isLoading } = useSWR(id ? `/api/notification/get-number-remind/${id}` : null, () =>
+    mailService.getNumberSend(id)
+  )
 
   const {
     control,
@@ -45,8 +39,8 @@ export default function SendMailModalRemind({ id, classList }: { id: string; cla
   } = useForm<FormData>({
     resolver: valibotResolver(schema),
     defaultValues: {
-      classId: 'Tất cả',
-      processed: false
+      processed: false,
+      commitment: false
     }
   })
 
@@ -54,19 +48,12 @@ export default function SendMailModalRemind({ id, classList }: { id: string; cla
     // Kiểm tra nếu không có `id`
     if (!id) return toast.error('Đã có lỗi xảy ra, vui lòng thử lại sau!')
 
-    const newData = {
-      ...data,
-      classId: data.classId === 'Tất cả' ? '' : data.classId
-    }
-
     const formData = new FormData()
 
-    // Chỉ thêm `classId` nếu nó không rỗng
-    if (newData.classId) {
-      formData.append('classId', newData.classId)
-    }
+    const { processed, commitment } = data
 
-    formData.append('processed', newData.processed ? 'true' : 'false')
+    formData.append('processed', processed.toString())
+    formData.append('commitment', commitment.toString())
 
     setLoading(true)
 
@@ -121,57 +108,100 @@ export default function SendMailModalRemind({ id, classList }: { id: string; cla
         <Grid item xs={12}>
           <Controller
             control={control}
-            name='classId'
-            render={({ field: { value, onChange, ...field } }) => {
-              const selectedValues = value ? value.split(',') : []
-              const isAllSelected = selectedValues.includes('Tất cả')
+            name='processed'
+            render={({ field }) => (
+              <FormControlLabel
+                label={
+                  <div>
+                    Gửi thông báo nhắc nhở XLHV{' '}
+                    {isLoading && !data ? (
+                      <>
+                        <style jsx>{`
+                          @keyframes ping-custom {
+                            75%,
+                            100% {
+                              transform: scale(2);
+                              opacity: 0;
+                            }
+                          }
 
-              return (
-                <CustomAutocomplete
-                  {...field}
-                  fullWidth
-                  multiple
-                  id='statusHandling'
-                  options={[{ classId: 'Tất cả', userName: 'Tất cả' }, ...classOptions]}
-                  value={
-                    isAllSelected
-                      ? [{ classId: 'Tất cả', userName: 'Tất cả' }]
-                      : classOptions.filter(item => selectedValues.includes(item.classId))
-                  }
-                  onChange={(_, newValue) => {
-                    if (newValue.some(item => item.classId === 'Tất cả')) {
-                      onChange('Tất cả')
-                    } else {
-                      onChange(newValue.map(item => item.classId).join(','))
-                    }
-                  }}
-                  getOptionLabel={option => option.classId}
-                  noOptionsText='Không có lớp học nào'
-                  isOptionEqualToValue={(option, value) => option.classId === value.classId}
-                  disableCloseOnSelect
-                  renderInput={params => (
-                    <CustomTextField
-                      {...params}
-                      fullWidth
-                      label='Chọn lớp học cần gửi mail'
-                      {...(errors.classId && {
-                        error: true,
-                        helperText: errors.classId?.message?.toString()
-                      })}
-                    />
-                  )}
-                />
-              )
-            }}
+                          .animate-ping-custom {
+                            animation: ping-custom 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+                          }
+
+                          .delay-1 {
+                            animation-delay: 0.2s;
+                          }
+
+                          .delay-2 {
+                            animation-delay: 0.4s;
+                          }
+                        `}</style>
+                        <span className='animate-ping-custom'>.</span>
+                        <span className='animate-ping-custom delay-1'>.</span>
+                        <span className='animate-ping-custom delay-2'>.</span>
+                      </>
+                    ) : (
+                      '(' + data?.numberRemindProcess + ' mail)'
+                    )}
+                  </div>
+                }
+                control={
+                  <Checkbox
+                    {...field}
+                    checked={field.value}
+                    onChange={e => field.onChange(e.target.checked)}
+                    {...(errors.processed && {
+                      error: true,
+                      helperText: errors.processed.message?.toString()
+                    })}
+                  />
+                }
+              />
+            )}
           />
         </Grid>
         <Grid item xs={12}>
           <Controller
             control={control}
-            name='processed'
+            name='commitment'
             render={({ field }) => (
               <FormControlLabel
-                label='Gửi luôn cho những cố vấn học tập, sinh viên đã xử lý ?'
+                label={
+                  <div>
+                    Gửi thông báo nhắc nhở sinh viên làm đơn cam kết{' '}
+                    {isLoading && !data ? (
+                      <>
+                        <style jsx>{`
+                          @keyframes ping-custom {
+                            75%,
+                            100% {
+                              transform: scale(2);
+                              opacity: 0;
+                            }
+                          }
+
+                          .animate-ping-custom {
+                            animation: ping-custom 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+                          }
+
+                          .delay-1 {
+                            animation-delay: 0.2s;
+                          }
+
+                          .delay-2 {
+                            animation-delay: 0.4s;
+                          }
+                        `}</style>
+                        <span className='animate-ping-custom'>.</span>
+                        <span className='animate-ping-custom delay-1'>.</span>
+                        <span className='animate-ping-custom delay-2'>.</span>
+                      </>
+                    ) : (
+                      '(' + data?.numberRemindCommitment + ' mail)'
+                    )}
+                  </div>
+                }
                 control={
                   <Checkbox
                     {...field}

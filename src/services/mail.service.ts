@@ -1,5 +1,6 @@
 import axiosClient from '@/libs/axios'
 import axiosUpload from '@/libs/axiosUpload'
+import type { NumberOfSendMail } from '@/types/mailTypes'
 
 const mailService = {
   async sendMail(academicCategoryId: string, successCallback?: (res: any) => void, errorCallback?: (err: any) => void) {
@@ -18,6 +19,12 @@ const mailService = {
 
       return Promise.reject(error)
     }
+  },
+
+  async getNumberSend(academicCategoryId: string) {
+    const res = await axiosClient.get(`/api/notification/get-number-remind?academicCategoryId=${academicCategoryId}`)
+
+    return res.data as NumberOfSendMail
   },
 
   async remindMail(

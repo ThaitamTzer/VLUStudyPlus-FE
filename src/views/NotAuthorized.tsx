@@ -46,11 +46,11 @@ const NotAuthorized = ({ mode }: { mode: SystemMode }) => {
           <Typography className='font-medium text-8xl' color='text.primary'>
             401
           </Typography>
-          <Typography variant='h4'>You are not authorized! 🔐</Typography>
-          <Typography>You don&#39;t have permission to access this page. Go Home!</Typography>
+          <Typography variant='h4'>Bạn không có quyền truy cập! 🔐</Typography>
+          <Typography>Bạn không có quyền truy cập vào trang này, vui lòng trở lại trang chủ!</Typography>
         </div>
         <Button href={'/'} component={Link} variant='contained'>
-          Back To Home
+          Về trang chủ
         </Button>
         <img
           alt='error-401-illustration'

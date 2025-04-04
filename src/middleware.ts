@@ -43,7 +43,7 @@ export function middleware(req: NextRequest) {
   if (!ability.can(acl.action, acl.subject)) {
     console.warn('🚫 Người dùng không có quyền truy cập vào:', url)
 
-    return NextResponse.redirect(new URL('/404', req.url))
+    return NextResponse.redirect(new URL('/not-found', req.url))
   }
 
   return NextResponse.next()

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 
 import { useSearchParams, useRouter } from 'next/navigation'
 
@@ -28,7 +28,7 @@ import PreviewImport from './previewImport'
 const AddModal = dynamic(() => import('./modal/addModal'), { ssr: false })
 const UpdateModal = dynamic(() => import('./modal/updateModal'), { ssr: false })
 const EditClassModal = dynamic(() => import('./modal/editClassModal'), { ssr: false })
-const ViewListStudentByClass = dynamic(() => import('@/views/class/modal/viewListStudentByClassModal'))
+const ViewListStudentByClass = dynamic(() => import('@/views/class/modal/viewListStudentByClassModal'), { ssr: false })
 
 export default function ClassPage() {
   const {
@@ -54,28 +54,31 @@ export default function ClassPage() {
   const typeList = searchParams.get('typeList') || ''
   const searchKey = searchParams.get('searchKey') || ''
 
-  const handleSort = (field: string) => {
-    const isAsc = sortField === field && sortOrder === 'asc'
-    const newSortOrder = isAsc ? 'desc' : 'asc'
+  const handleSort = useCallback(
+    (field: string) => {
+      const isAsc = sortField === field && sortOrder === 'asc'
+      const newSortOrder = isAsc ? 'desc' : 'asc'
 
-    const params = new URLSearchParams()
+      const params = new URLSearchParams()
 
-    params.set('page', '1')
-    params.set('limit', limit.toString())
-    params.set('filterField', filterField)
-    params.set('filterValue', filterValue)
-    params.set('sortField', field)
-    params.set('sortOrder', newSortOrder)
-    params.set('typeList', typeList)
+      params.set('page', '1')
+      params.set('limit', limit.toString())
+      params.set('filterField', filterField)
+      params.set('filterValue', filterValue)
+      params.set('sortField', field)
+      params.set('sortOrder', newSortOrder)
+      params.set('typeList', typeList)
 
-    if (searchKey) {
-      params.set('searchKey', searchKey)
-    }
+      if (searchKey) {
+        params.set('searchKey', searchKey)
+      }
 
-    router.push(`?${params.toString()}`, {
-      scroll: false
-    })
-  }
+      router.push(`?${params.toString()}`, {
+        scroll: false
+      })
+    },
+    [filterField, filterValue, limit, router, searchKey, sortField, sortOrder, typeList]
+  )
 
   const { data, isLoading, mutate } = useSWR(
     ['/api/classData', page, limit, filterField, filterValue, sortField, sortOrder, typeList, searchKey],
@@ -126,6 +129,37 @@ export default function ClassPage() {
       }
     )
   }
+
+  const renderTable = useMemo(
+    () => (
+      <>
+        {typeList === 'groupedByLecture' ? (
+          <ClassListFilter
+            data={data?.data || []}
+            handleSort={handleSort}
+            sortField={sortField}
+            sortOrder={sortOrder}
+            limit={limit}
+            loading={isLoading}
+            page={page}
+            total={data?.pagination.totalItems || 0}
+          />
+        ) : (
+          <ClassList
+            classes={data?.data || []}
+            total={data?.pagination.totalItems || 0}
+            loading={isLoading}
+            limit={limit}
+            page={page}
+            sortField={sortField}
+            sortOrder={sortOrder}
+            handleSort={handleSort}
+          />
+        )}
+      </>
+    ),
+    [typeList, data, isLoading, page, limit, sortField, sortOrder, handleSort]
+  )
 
   return (
     <>
@@ -228,30 +262,7 @@ export default function ClassPage() {
             </Button>
           </div>
         </div>
-        {typeList === 'groupedByLecture' ? (
-          <ClassListFilter
-            data={data?.data || []}
-            handleSort={handleSort}
-            sortField={sortField}
-            sortOrder={sortOrder}
-            limit={limit}
-            loading={isLoading}
-            page={page}
-            total={data?.pagination.totalItems || 0}
-          />
-        ) : (
-          <ClassList
-            classes={data?.data || []}
-            total={data?.pagination.totalItems || 0}
-            loading={isLoading}
-            limit={limit}
-            page={page}
-            sortField={sortField}
-            sortOrder={sortOrder}
-            handleSort={handleSort}
-          />
-        )}
-
+        {renderTable}
         <TablePagination
           component={() => (
             <TablePaginationCustom

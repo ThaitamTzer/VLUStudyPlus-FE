@@ -5,7 +5,7 @@
     "action": "manage",
     "subject": "all",
     "color": {
-      "subject_color": "#FF0000",
+      "subject_color": "#C7AA51",
       "action_color": "#FF69B4"
     }
   },
@@ -15,7 +15,7 @@
     "action": "read",
     "subject": "role",
     "color": {
-      "subject_color": "#4CAF50",
+      "subject_color": "#E9B0DE",
       "action_color": "#8BC34A"
     }
   },
@@ -25,7 +25,7 @@
     "action": "create",
     "subject": "role",
     "color": {
-      "subject_color": "#2196F3",
+      "subject_color": "#E9B0DE",
       "action_color": "#03A9F4"
     }
   },
@@ -35,7 +35,7 @@
     "action": "update",
     "subject": "role",
     "color": {
-      "subject_color": "#9C27B0",
+      "subject_color": "#E9B0DE",
       "action_color": "#E91E63"
     }
   },
@@ -45,7 +45,617 @@
     "action": "delete",
     "subject": "role",
     "color": {
-      "subject_color": "#F44336",
+      "subject_color": "#E9B0DE",
+      "action_color": "#FF5722"
+    }
+  },
+  {
+    "id": 5,
+    "namePermission": "Xem giảng viên",
+    "action": "read",
+    "subject": "lecturer",
+    "color": {
+      "subject_color": "#3E52B0",
+      "action_color": "#8BC34A"
+    }
+  },
+  {
+    "id": 6,
+    "namePermission": "Tạo giảng viên",
+    "action": "create",
+    "subject": "lecturer",
+    "color": {
+      "subject_color": "#3E52B0",
+      "action_color": "#03A9F4"
+    }
+  },
+  {
+    "id": 7,
+    "namePermission": "Cập nhật giảng viên",
+    "action": "update",
+    "subject": "lecturer",
+    "color": {
+      "subject_color": "#3E52B0",
+      "action_color": "#E91E63"
+    }
+  },
+  {
+    "id": 8,
+    "namePermission": "Chặn giảng viên",
+    "action": "block",
+    "subject": "lecturer",
+    "color": {
+      "subject_color": "#3E52B0",
+      "action_color": "#795548"
+    }
+  },
+  {
+    "id": 9,
+    "namePermission": "Nhập giảng viên",
+    "action": "import",
+    "subject": "lecturer",
+    "color": {
+      "subject_color": "#3E52B0",
+      "action_color": "#607D8B"
+    }
+  },
+  {
+    "id": 10,
+    "namePermission": "Xem sinh viên",
+    "action": "read",
+    "subject": "student",
+    "color": {
+      "subject_color": "#FB0BC8",
+      "action_color": "#8BC34A"
+    }
+  },
+  {
+    "id": 11,
+    "namePermission": "Tạo sinh viên",
+    "action": "create",
+    "subject": "student",
+    "color": {
+      "subject_color": "#FB0BC8",
+      "action_color": "#03A9F4"
+    }
+  },
+  {
+    "id": 12,
+    "namePermission": "Cập nhật sinh viên",
+    "action": "update",
+    "subject": "student",
+    "color": {
+      "subject_color": "#FB0BC8",
+      "action_color": "#E91E63"
+    }
+  },
+  {
+    "id": 13,
+    "namePermission": "Chặn sinh viên",
+    "action": "block",
+    "subject": "student",
+    "color": {
+      "subject_color": "#FB0BC8",
+      "action_color": "#795548"
+    }
+  },
+  {
+    "id": 14,
+    "namePermission": "Xem học kỳ",
+    "action": "read",
+    "subject": "term",
+    "color": {
+      "subject_color": "#69E5A2",
+      "action_color": "#8BC34A"
+    }
+  },
+  {
+    "id": 15,
+    "namePermission": "Tạo học kỳ",
+    "action": "create",
+    "subject": "term",
+    "color": {
+      "subject_color": "#69E5A2",
+      "action_color": "#03A9F4"
+    }
+  },
+  {
+    "id": 16,
+    "namePermission": "Cập nhật học kỳ",
+    "action": "update",
+    "subject": "term",
+    "color": {
+      "subject_color": "#69E5A2",
+      "action_color": "#E91E63"
+    }
+  },
+  {
+    "id": 17,
+    "namePermission": "Xóa học kỳ",
+    "action": "delete",
+    "subject": "term",
+    "color": {
+      "subject_color": "#69E5A2",
+      "action_color": "#FF5722"
+    }
+  },
+  {
+    "id": 18,
+    "namePermission": "Xem niên khóa",
+    "action": "read",
+    "subject": "cohort",
+    "color": {
+      "subject_color": "#48C986",
+      "action_color": "#8BC34A"
+    }
+  },
+  {
+    "id": 19,
+    "namePermission": "Tạo niên khóa",
+    "action": "create",
+    "subject": "cohort",
+    "color": {
+      "subject_color": "#48C986",
+      "action_color": "#03A9F4"
+    }
+  },
+  {
+    "id": 20,
+    "namePermission": "Cập nhật niên khóa",
+    "action": "update",
+    "subject": "cohort",
+    "color": {
+      "subject_color": "#48C986",
+      "action_color": "#E91E63"
+    }
+  },
+  {
+    "id": 21,
+    "namePermission": "Xóa niên khóa",
+    "action": "delete",
+    "subject": "cohort",
+    "color": {
+      "subject_color": "#48C986",
+      "action_color": "#FF5722"
+    }
+  },
+  {
+    "id": 22,
+    "namePermission": "Xem ngành",
+    "action": "read",
+    "subject": "major",
+    "color": {
+      "subject_color": "#EAE026",
+      "action_color": "#8BC34A"
+    }
+  },
+  {
+    "id": 23,
+    "namePermission": "Tạo ngành",
+    "action": "create",
+    "subject": "major",
+    "color": {
+      "subject_color": "#EAE026",
+      "action_color": "#03A9F4"
+    }
+  },
+  {
+    "id": 24,
+    "namePermission": "Cập nhật ngành",
+    "action": "update",
+    "subject": "major",
+    "color": {
+      "subject_color": "#EAE026",
+      "action_color": "#E91E63"
+    }
+  },
+  {
+    "id": 25,
+    "namePermission": "Xóa ngành",
+    "action": "delete",
+    "subject": "major",
+    "color": {
+      "subject_color": "#EAE026",
+      "action_color": "#FF5722"
+    }
+  },
+  {
+    "id": 26,
+    "namePermission": "Xem lớp",
+    "action": "read",
+    "subject": "class",
+    "color": {
+      "subject_color": "#0AB61D",
+      "action_color": "#8BC34A"
+    }
+  },
+  {
+    "id": 27,
+    "namePermission": "Tạo lớp",
+    "action": "create",
+    "subject": "class",
+    "color": {
+      "subject_color": "#0AB61D",
+      "action_color": "#03A9F4"
+    }
+  },
+  {
+    "id": 28,
+    "namePermission": "Cập nhật lớp",
+    "action": "update",
+    "subject": "class",
+    "color": {
+      "subject_color": "#0AB61D",
+      "action_color": "#E91E63"
+    }
+  },
+  {
+    "id": 29,
+    "namePermission": "Nhập sinh viên",
+    "action": "import",
+    "subject": "class",
+    "color": {
+      "subject_color": "#0AB61D",
+      "action_color": "#607D8B"
+    }
+  },
+  {
+    "id": 30,
+    "namePermission": "Nhập sinh viên",
+    "action": "import",
+    "subject": "student",
+    "color": {
+      "subject_color": "#FB0BC8",
+      "action_color": "#607D8B"
+    }
+  },
+  {
+    "id": 31,
+    "namePermission": "Tạo loại xử lý",
+    "action": "create",
+    "subject": "typeProcessing",
+    "color": {
+      "subject_color": "#F3BAE8",
+      "action_color": "#03A9F4"
+    }
+  },
+  {
+    "id": 32,
+    "namePermission": "Cập nhật loại xử lý",
+    "action": "update",
+    "subject": "typeProcessing",
+    "color": {
+      "subject_color": "#F3BAE8",
+      "action_color": "#E91E63"
+    }
+  },
+  {
+    "id": 33,
+    "namePermission": "Xem loại xử lý",
+    "action": "read",
+    "subject": "typeProcessing",
+    "color": {
+      "subject_color": "#F3BAE8",
+      "action_color": "#8BC34A"
+    }
+  },
+  {
+    "id": 34,
+    "namePermission": "Xóa loại xử lý",
+    "action": "delete",
+    "subject": "typeProcessing",
+    "color": {
+      "subject_color": "#F3BAE8",
+      "action_color": "#FF5722"
+    }
+  },
+  {
+    "id": 35,
+    "namePermission": "Nhập học vụ",
+    "action": "import",
+    "subject": "academic",
+    "color": {
+      "subject_color": "#DB476F",
+      "action_color": "#607D8B"
+    }
+  },
+  {
+    "id": 36,
+    "namePermission": "Tạo kỳ xử lý",
+    "action": "create",
+    "subject": "academicSession",
+    "color": {
+      "subject_color": "#5D3492",
+      "action_color": "#03A9F4"
+    }
+  },
+  {
+    "id": 37,
+    "namePermission": "Xem kỳ xử lý",
+    "action": "read",
+    "subject": "academicSession",
+    "color": {
+      "subject_color": "#5D3492",
+      "action_color": "#8BC34A"
+    }
+  },
+  {
+    "id": 38,
+    "namePermission": "Cập nhật kỳ xử lý",
+    "action": "update",
+    "subject": "academicSession",
+    "color": {
+      "subject_color": "#5D3492",
+      "action_color": "#E91E63"
+    }
+  },
+  {
+    "id": 39,
+    "namePermission": "Xóa kỳ xử lý",
+    "action": "delete",
+    "subject": "academicSession",
+    "color": {
+      "subject_color": "#5D3492",
+      "action_color": "#FF5722"
+    }
+  },
+  {
+    "id": 40,
+    "namePermission": "Tạo kết quả xử lý",
+    "action": "create",
+    "subject": "processingResult",
+    "color": {
+      "subject_color": "#EA3EF0",
+      "action_color": "#03A9F4"
+    }
+  },
+  {
+    "id": 41,
+    "namePermission": "Xem kết quả xử lý",
+    "action": "read",
+    "subject": "processingResult",
+    "color": {
+      "subject_color": "#EA3EF0",
+      "action_color": "#8BC34A"
+    }
+  },
+  {
+    "id": 42,
+    "namePermission": "Cập nhật kết quả xử lý",
+    "action": "update",
+    "subject": "processingResult",
+    "color": {
+      "subject_color": "#EA3EF0",
+      "action_color": "#E91E63"
+    }
+  },
+  {
+    "id": 43,
+    "namePermission": "Xóa kết quả xử lý",
+    "action": "delete",
+    "subject": "processingResult",
+    "color": {
+      "subject_color": "#EA3EF0",
+      "action_color": "#FF5722"
+    }
+  },
+  {
+    "id": 44,
+    "namePermission": "Tạo cam kết",
+    "action": "create",
+    "subject": "commitment-form",
+    "color": {
+      "subject_color": "#37F1EA",
+      "action_color": "#03A9F4"
+    }
+  },
+  {
+    "id": 45,
+    "namePermission": "Xem cam kết",
+    "action": "read",
+    "subject": "commitment-form",
+    "color": {
+      "subject_color": "#37F1EA",
+      "action_color": "#8BC34A"
+    }
+  },
+  {
+    "id": 46,
+    "namePermission": "Cập nhật cam kết",
+    "action": "update",
+    "subject": "commitment-form",
+    "color": {
+      "subject_color": "#37F1EA",
+      "action_color": "#E91E63"
+    }
+  },
+  {
+    "id": 47,
+    "namePermission": "Xóa cam kết",
+    "action": "delete",
+    "subject": "commitment-form",
+    "color": {
+      "subject_color": "#37F1EA",
+      "action_color": "#FF5722"
+    }
+  },
+  {
+    "id": 48,
+    "namePermission": "Gửi thông báo mail",
+    "action": "sendMail",
+    "subject": "notification",
+    "color": {
+      "subject_color": "#77971D",
+      "action_color": "#FFC107"
+    }
+  },
+  {
+    "id": 49,
+    "namePermission": "Tạo quy trình học vụ",
+    "action": "create",
+    "subject": "academic",
+    "color": {
+      "subject_color": "#DB476F",
+      "action_color": "#03A9F4"
+    }
+  },
+  {
+    "id": 50,
+    "namePermission": "Xem toàn bộ học vụ BCN Khoa",
+    "action": "readallbcnk",
+    "subject": "academic",
+    "color": {
+      "subject_color": "#DB476F",
+      "action_color": "#00BCD4"
+    }
+  },
+  {
+    "id": 51,
+    "namePermission": "Xem chi tiết học vụ BCN Khoa",
+    "action": "readdetailbcnk",
+    "subject": "academic",
+    "color": {
+      "subject_color": "#DB476F",
+      "action_color": "#009688"
+    }
+  },
+  {
+    "id": 52,
+    "namePermission": "Xem chi tiết học vụ CVHT",
+    "action": "readallcvht",
+    "subject": "academic",
+    "color": {
+      "subject_color": "#DB476F",
+      "action_color": "#CDDC39"
+    }
+  },
+  {
+    "id": 53,
+    "namePermission": "Xem chi tiết học vụ CVHT",
+    "action": "readdetailcvht",
+    "subject": "academic",
+    "color": {
+      "subject_color": "#DB476F",
+      "action_color": "#673AB7"
+    }
+  },
+  {
+    "id": 54,
+    "namePermission": "Cập nhật quy trình học vụ",
+    "action": "update",
+    "subject": "academic",
+    "color": {
+      "subject_color": "#DB476F",
+      "action_color": "#E91E63"
+    }
+  },
+  {
+    "id": 55,
+    "namePermission": "Xóa quy trình học vụ",
+    "action": "delete",
+    "subject": "academic",
+    "color": {
+      "subject_color": "#DB476F",
+      "action_color": "#FF5722"
+    }
+  },
+  {
+    "id": 56,
+    "namePermission": "Xem tiến trình học vụ của tôi",
+    "action": "readmyprocess",
+    "subject": "academic",
+    "color": {
+      "subject_color": "#DB476F",
+      "action_color": "#3F51B5"
+    }
+  },
+  {
+    "id": 57,
+    "namePermission": "Tạo CTĐT",
+    "action": "create",
+    "subject": "trainingProgram",
+    "color": {
+      "subject_color": "#20FCBD",
+      "action_color": "#03A9F4"
+    }
+  },
+  {
+    "id": 58,
+    "namePermission": "Xem CTĐT",
+    "action": "read",
+    "subject": "trainingProgram",
+    "color": {
+      "subject_color": "#20FCBD",
+      "action_color": "#8BC34A"
+    }
+  },
+  {
+    "id": 59,
+    "namePermission": "Cập nhật CTĐT",
+    "action": "update",
+    "subject": "trainingProgram",
+    "color": {
+      "subject_color": "#20FCBD",
+      "action_color": "#E91E63"
+    }
+  },
+  {
+    "id": 60,
+    "namePermission": "Xóa CTĐT",
+    "action": "delete",
+    "subject": "trainingProgram",
+    "color": {
+      "subject_color": "#20FCBD",
+      "action_color": "#FF5722"
+    }
+  },
+  {
+    "id": 61,
+    "namePermission": "Nhập CTĐT",
+    "action": "import",
+    "subject": "trainingProgram",
+    "color": {
+      "subject_color": "#20FCBD",
+      "action_color": "#607D8B"
+    }
+  },
+  {
+    "id": 62,
+    "namePermission": "Tạo học phần",
+    "action": "create",
+    "subject": "subject",
+    "color": {
+      "subject_color": "#529100",
+      "action_color": "#03A9F4"
+    }
+  },
+  {
+    "id": 63,
+    "namePermission": "Xem học phần",
+    "action": "read",
+    "subject": "subject",
+    "color": {
+      "subject_color": "#529100",
+      "action_color": "#8BC34A"
+    }
+  },
+  {
+    "id": 64,
+    "namePermission": "Cập nhật học phần",
+    "action": "update",
+    "subject": "subject",
+    "color": {
+      "subject_color": "#529100",
+      "action_color": "#E91E63"
+    }
+  },
+  {
+    "id": 65,
+    "namePermission": "Xóa học phần",
+    "action": "delete",
+    "subject": "subject",
+    "color": {
+      "subject_color": "#529100",
       "action_color": "#FF5722"
     }
   }

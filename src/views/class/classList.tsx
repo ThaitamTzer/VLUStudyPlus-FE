@@ -91,7 +91,7 @@ export default function ClassList({
               <StyledTableRow key={c._id}>
                 <TableCell size='small'>{stt}</TableCell>
                 <TableCell size='small'>{c.classId}</TableCell>
-                <TableCell size='small'>{c.cohortId.cohortId}</TableCell>
+                <TableCell size='small'>{c.cohortId?.cohortId}</TableCell>
                 <TableCell size='small'>
                   {c?.userName} - {c?.userId}
                 </TableCell>

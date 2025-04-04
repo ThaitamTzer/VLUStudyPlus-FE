@@ -73,8 +73,9 @@ export default function TableTrainingProgram(props: TableTrainingProgramProps) {
           <StyledTableRow sx={{ textTransform: 'uppercase' }}>
             <TableCell width='1px'>STT</TableCell>
             <TableCell>Tên khung chương trình</TableCell>
+            <TableCell>Ngành</TableCell>
             <TableCell>Tổng số tính chỉ</TableCell>
-            <TableCell colSpan={2}>Niên khóa</TableCell>
+            <TableCell colSpan={2}>Khóa</TableCell>
           </StyledTableRow>
         </TableHead>
         <TableBody>
@@ -85,8 +86,9 @@ export default function TableTrainingProgram(props: TableTrainingProgramProps) {
               <StyledTableRow key={item._id}>
                 <TableCell width='1px'>{stt}</TableCell>
                 <TableCell>{item.title}</TableCell>
+                <TableCell>{item.majorId?.majorName || '-'}</TableCell>
                 <TableCell>{item.credit}</TableCell>
-                <TableCell>{item.cohortId.cohortId}</TableCell>
+                <TableCell>{item.cohortId?.cohortId}</TableCell>
                 <TableCell align='right' size='small'>
                   <Tooltip arrow title='Xem chương trình đào tạo'>
                     <IconButton

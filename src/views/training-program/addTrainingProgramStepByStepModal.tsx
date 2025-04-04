@@ -37,12 +37,13 @@ import CustomTextField from '@/@core/components/mui/TextField'
 import { useShare } from '@/hooks/useShare'
 import Iconify from '@/components/iconify'
 import { useTrainingProgramStore } from '@/stores/trainingProgram.store'
+import trainingProgramService from '@/services/trainingprogram.service'
 
 // import trainingProgramService from '@/services/trainingprogram.service'
 
 const schema = v.object({
   title: v.pipe(v.string(), v.nonEmpty('Tên không được để trống'), v.maxLength(100, 'Độ dài tối đa 100 ký tự')),
-  major: v.undefinedable(v.pipe(v.string(), v.nonEmpty('Chuyên ngành không được để trống')), ''),
+  majorId: v.undefinedable(v.pipe(v.string(), v.nonEmpty('Chuyên ngành không được để trống')), ''),
   credit: v.pipe(v.number(), v.minValue(1, 'Số tín chỉ phải lớn hơn 0')),
   cohortId: v.undefinedable(v.pipe(v.string(), v.nonEmpty('Khóa không được để trống')), '')
 })
@@ -64,7 +65,8 @@ type AddTrainingProgramStepByStepModalProps = {
 export default function AddTrainingProgramStepByStepModal(props: AddTrainingProgramStepByStepModalProps) {
   const { mutate } = props
 
-  const { trainingProgram } = useTrainingProgramStore()
+  const { openCreateTrainingProgram, toogleCreateTrainingProgram, toogleImportProgramLoading } =
+    useTrainingProgramStore()
 
   const steps = ['Tạo khung chương trình đào tạo', 'Import chi tiết khung chương trình']
 
@@ -96,7 +98,7 @@ export default function AddTrainingProgramStepByStepModal(props: AddTrainingProg
       title: '',
       credit: 0,
       cohortId: '',
-      major: ''
+      majorId: ''
     }
   })
 
@@ -131,26 +133,80 @@ export default function AddTrainingProgramStepByStepModal(props: AddTrainingProg
     }
   })
 
-  const handleImport = useCallback(async (data: any) => {
-    if (!trainingProgram) return toast.error('Chưa có khung chương trình nào được chọn!')
-
-    toast.loading('Đang tải lên tệp...')
-
-    setLoading(true)
-    const formData = new FormData()
-
-    formData.append('file', data.file[0])
-
-    mutate()
-  }, [])
-
   const onClose = useCallback(() => {
+    toogleCreateTrainingProgram()
     reset()
     importReset()
     setFiles([])
     setActiveStep(0)
     setDataCreateForm(null)
-  }, [reset, importReset])
+  }, [reset, importReset, toogleCreateTrainingProgram])
+
+  const handleImport = useCallback(
+    async (data: any) => {
+      const toastID = toast.loading('Đang thêm khung chương trình đào tạo...')
+
+      setLoading(true)
+      const formData = new FormData()
+
+      formData.append('file', data.file[0])
+
+      await trainingProgramService.create(
+        dataCreateForm,
+        async res => {
+          toast.success(
+            'Thêm khung chương trình đào tạo thành công, Đang tiến hành import chi tiết khung chương trình đào tạo',
+            {
+              autoClose: 5000
+            }
+          )
+          mutate()
+          toogleImportProgramLoading()
+          onClose()
+          await trainingProgramService.import(
+            res._id,
+            formData,
+            () => {
+              toast.update(toastID, {
+                render: 'Import chi tiết khung chương trình đào tạo thành công',
+                type: 'success',
+                isLoading: false,
+                autoClose: 2000
+              })
+              mutate()
+              toogleImportProgramLoading()
+              setLoading(false)
+            },
+            err => {
+              toast.update(toastID, {
+                render: err.message,
+                type: 'error',
+                isLoading: false,
+                autoClose: 5000
+              })
+              toast.error('Hãy thử cập nhật lại file sau đó import lại', {
+                autoClose: 5000
+              })
+              toogleImportProgramLoading()
+              onClose()
+              setLoading(false)
+            }
+          )
+        },
+        err => {
+          toast.update(toastID, {
+            render: err.message,
+            type: 'error',
+            isLoading: false,
+            autoClose: 2000
+          })
+          setActiveStep(0)
+          setLoading(false)
+        }
+      )
+    },
+    [mutate, dataCreateForm, onClose, toogleImportProgramLoading]
+  )
 
   const onSubmit = importHandleSubmit(handleImport)
 
@@ -182,7 +238,14 @@ export default function AddTrainingProgramStepByStepModal(props: AddTrainingProg
   }
 
   return (
-    <CustomDialog open={false} maxWidth='sm' fullWidth title='Thêm chương trình đào tạo' onClose={onClose} closeOutside>
+    <CustomDialog
+      open={openCreateTrainingProgram}
+      maxWidth='sm'
+      fullWidth
+      title='Thêm chương trình đào tạo'
+      onClose={onClose}
+      closeOutside
+    >
       <Stepper activeStep={activeStep} alternativeLabel>
         {steps.map(label => (
           <Step key={label}>
@@ -241,14 +304,14 @@ export default function AddTrainingProgramStepByStepModal(props: AddTrainingProg
                 </Grid>
                 <Grid item xs={12}>
                   <Controller
-                    name='major'
+                    name='majorId'
                     control={control}
                     render={({ field }) => (
                       <CustomTextField
                         {...field}
                         label='Ngành'
-                        error={!!errors.major}
-                        helperText={errors.major?.message}
+                        error={!!errors.majorId}
+                        helperText={errors.majorId?.message}
                         fullWidth
                         select
                         SelectProps={{

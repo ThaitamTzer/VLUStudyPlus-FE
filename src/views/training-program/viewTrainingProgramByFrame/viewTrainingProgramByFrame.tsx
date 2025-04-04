@@ -21,11 +21,9 @@ export default function ViewTrainingProgramByFrame() {
 
   const id = trainingProgram?._id || ''
 
-  const { data, isLoading } = useSWR(`/api/training-program/view-training-program/${id}`, () =>
+  const { data, isLoading } = useSWR(id ? `/api/training-program/view-training-program/${id}` : null, () =>
     trainingProgramService.getTrainingProgramByFrame(id)
   )
-
-  console.log('data', data)
 
   const renderDialog = useMemo(
     () => (

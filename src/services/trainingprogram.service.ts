@@ -1,6 +1,10 @@
 import axiosClient from '@/libs/axios'
 import axiosUpload from '@/libs/axiosUpload'
-import type { TrainingProgramByFrame, TrainingProgramListType } from '@/types/management/trainningProgramType'
+import type {
+  ResCreateFrame,
+  TrainingProgramByFrame,
+  TrainingProgramListType
+} from '@/types/management/trainningProgramType'
 
 const trainingProgramService = {
   getAll: async (page?: number, limit?: number, filterField?: string, filterValue?: string, searchKey?: string) => {
@@ -17,11 +21,11 @@ const trainingProgramService = {
     return res.data as TrainingProgramListType
   },
 
-  create: async (data: any, successCallBack?: (res: any) => void, errorCallBack?: (res: any) => void) => {
+  create: async (data: any, successCallBack?: (res: ResCreateFrame) => void, errorCallBack?: (res: any) => void) => {
     try {
       return await axiosClient.post('/api/training-program', data).then(res => {
         if (successCallBack) {
-          successCallBack(res)
+          successCallBack(res.data)
         }
 
         return res
@@ -96,6 +100,53 @@ const trainingProgramService = {
     const res = await axiosClient.get(`/api/training-program/view-training-program/${id}`)
 
     return res.data as TrainingProgramByFrame[]
+  },
+
+  addCategory2: async (
+    id: string,
+    data: any,
+    successCallBack?: (res: any) => void,
+    errorCallBack?: (res: any) => void
+  ) => {
+    try {
+      return await axiosClient.post(`/api/training-program/create-category-2/${id}`, data).then(res => {
+        if (successCallBack) {
+          successCallBack(res)
+        }
+
+        return res
+      })
+    } catch (error) {
+      if (errorCallBack) {
+        errorCallBack(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+
+  addCategory3: async (
+    cateId1: string,
+    cateId2: string,
+    data: any,
+    successCallBack?: (res: any) => void,
+    errorCallBack?: (res: any) => void
+  ) => {
+    try {
+      return await axiosClient.post(`/api/training-program/create-category-3/${cateId1}/${cateId2}`, data).then(res => {
+        if (successCallBack) {
+          successCallBack(res)
+        }
+
+        return res
+      })
+    } catch (error) {
+      if (errorCallBack) {
+        errorCallBack(error)
+      }
+
+      return Promise.reject(error)
+    }
   }
 }
 

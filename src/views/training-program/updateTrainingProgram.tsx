@@ -56,7 +56,8 @@ export default function UpdateTrainingProgram({ mutate }: UpdateTrainingProgramP
       reset({
         title: trainingProgram.title || '',
         credit: trainingProgram.credit || 0,
-        cohortId: trainingProgram?.cohortId?._id || ''
+        cohortId: trainingProgram?.cohortId?._id || '',
+        major: trainingProgram?.majorId?._id || ''
       })
     }
   }, [trainingProgram, reset])

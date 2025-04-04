@@ -6,6 +6,11 @@ export type TrainingProgramType = {
     _id: string
     cohortId: string
   }
+  majorId: {
+    _id: string
+    majorId: string
+    majorName: string
+  }
   createdAt: string | Date
   updatedAt: string | Date
 }
@@ -35,6 +40,16 @@ export type Subjects = {
   inCharge: string
   implementationSemester: string
   note: string
+  createdAt: string | Date
+  updatedAt: string | Date
+}
+
+export type ResCreateFrame = {
+  title: string
+  credit: number
+  cohortId: string
+  majorId: string
+  _id: string
   createdAt: string | Date
   updatedAt: string | Date
 }

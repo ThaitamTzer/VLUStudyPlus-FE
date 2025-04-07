@@ -51,61 +51,173 @@ export default function TableImported(prop: TableImportedProps) {
         header: 'Mã SV',
         cell: info => info.getValue()
       }),
-      columnHelper.accessor('lastName', {
+      columnHelper.accessor('firstName', {
         header: 'Họ',
         cell: info => info.getValue()
       }),
-      columnHelper.accessor('firstName', {
+      columnHelper.accessor('lastName', {
         header: 'Tên',
-        cell: info => info.getValue()
-      }),
-      columnHelper.accessor('classId', {
-        header: 'Lớp',
         cell: info => info.getValue()
       }),
       columnHelper.accessor('cohortName', {
         header: 'Khóa',
         cell: info => info.getValue()
       }),
+      columnHelper.accessor('classId', {
+        header: 'Lớp',
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('groupedByInstruction', {
+        header: 'Phân loại đối tượng theo hướng dẫn',
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('sdtsv', {
+        header: 'Sdt SV',
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('sdtlh', {
+        header: 'Sdt LH',
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('sdthktt', {
+        header: 'Sdt HKTT',
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('sdtcha', {
+        header: 'Sdt Cha',
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('sdtme', {
+        header: 'Sdt Mẹ',
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('major', {
+        header: 'Ngành',
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('DTBC', {
+        header: 'DTBC',
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('DTBCTL', {
+        header: 'DTBCTL',
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('DTB10', {
+        header: 'DTB10',
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('DTBCTL10', {
+        header: 'DTBCTL10',
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('TCTL', {
+        header: 'TCTL',
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('TCCN', {
+        header: 'TCCN',
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('TONGTCCTDT', {
+        header: 'TONGTCCTDT',
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('percentTL', {
+        header: '% TL',
+        cell: info => {
+          const value = info.getValue()
+
+          if (value === null || value === undefined) return '-'
+
+          // Parse the value to ensure it's a number, then round to integer
+          const numValue = typeof value === 'string' ? parseFloat(value) : value
+
+          return Math.round(numValue)
+        }
+      }),
+      columnHelper.accessor('processingHandle.statusProcess', {
+        header: () => {
+          const processingHandleObj = data[0]?.processingHandle || {}
+          const note = processingHandleObj.note || ''
+
+          return (
+            <div>
+              <span>XLHT - {note} (UIS - XLHT theo quy chế)</span>
+            </div>
+          )
+        },
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('countWarning.academicWarningsCount', {
+        header: () => {
+          const countWarningObj = data[0]?.countWarning || {}
+          const note = countWarningObj.note || ''
+
+          return (
+            <div>
+              <span>Đếm số lần bị XLHT qua 10 học kỳ ({note})</span>
+            </div>
+          )
+        },
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('courseRegistration.note', {
+        header: 'Tình trạng ĐKHP HK tiếp theo',
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('RQS', {
+        header: 'RQS',
+        cell: info => info.getValue()
+      }),
       columnHelper.accessor('faculty', {
         header: 'Khoa',
         cell: info => info.getValue()
       }),
-      columnHelper.accessor('year', {
-        header: 'Năm học',
+      columnHelper.accessor('list', {
+        header: 'Danh sách',
         cell: info => info.getValue()
       }),
-      columnHelper.accessor('termName', {
-        header: 'Học kỳ',
+      columnHelper.accessor('list', {
+        header: 'Danh sách',
         cell: info => info.getValue()
       }),
-      columnHelper.accessor('handlingStatusByAAO', {
-        header: 'Trạng thái xử lý',
-        cell: info => info.getValue()
-      }),
+      columnHelper.accessor('statusOn.status', {
+        header: () => {
+          const statusOnObj = data[0]?.statusOn || {}
+          const note = statusOnObj.note || ''
 
-      // columnHelper.accessor('DTBC', {
-      //   header: 'ĐTB',
-      //   cell: info => info.getValue()
-      // }),
-      // columnHelper.accessor('STC', {
-      //   header: 'STC',
-      //   cell: info => info.getValue()
-      // }),
-      // columnHelper.accessor('DTBCTL', {
-      //   header: 'ĐTBCTL',
-      //   cell: info => info.getValue()
-      // }),
-      // columnHelper.accessor('STCTL', {
-      //   header: 'STCTL',
-      //   cell: info => info.getValue()
-      // }),
-      columnHelper.accessor('reasonHandling', {
-        header: 'Lý do xử lý',
+          return (
+            <div>
+              <span>Tình trạng ({note})</span>
+            </div>
+          )
+        },
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('yearLevel', {
+        header: 'SV năm thứ (xếp theo STC trung bình toàn trường)',
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('reasonHandling.reason', {
+        header: () => {
+          const reasonHandlingObj = data[0]?.reasonHandling || {}
+          const note = reasonHandlingObj.note || ''
+
+          return (
+            <div>
+              <span>Lý do XLHT ({note})</span>
+            </div>
+          )
+        },
+        cell: info => info.getValue()
+      }),
+      columnHelper.accessor('resultHandlingBefore', {
+        header: 'Kết quả XLHT các HK trước',
         cell: info => info.getValue()
       })
     ],
-    []
+    [data]
   )
 
   const table = useReactTable({

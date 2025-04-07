@@ -291,7 +291,7 @@
   },
   {
     "id": 29,
-    "namePermission": "Nhập sinh viên",
+    "namePermission": "Nhập lớp",
     "action": "import",
     "subject": "class",
     "color": {

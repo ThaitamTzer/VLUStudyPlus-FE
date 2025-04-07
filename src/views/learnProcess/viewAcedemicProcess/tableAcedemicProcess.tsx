@@ -50,8 +50,6 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
     toogleOpenUpdateAcedemicProcessStatus
   } = props
 
-  console.log(data)
-
   const termNames = Array.from(new Set(data?.data.flatMap(d => d.processing.map(p => p.termName)) || []))
 
   const termNamesCouseRegistration = Array.from(

@@ -7,20 +7,32 @@ export type LearnProcessType = {
   isNotification: boolean
 }
 
-type Major = {
-  termName: string
+type ProcessingHandle = {
+  statusProcess: string
+  note: string
   _id: string
 }
 
-type Processing = {
-  statusHandling: string
-  termName: string
+type CountWarning = {
+  academicWarningsCount: number
+  note: string
   _id: string
 }
 
 type CourseRegistration = {
   isRegister: boolean
-  termName: string
+  note: string
+  _id: string
+}
+
+type StatusOn = {
+  status: string
+  note: string
+  _id: string
+}
+type ReasonHandling = {
+  reason: string
+  note: string
   _id: string
 }
 
@@ -29,31 +41,47 @@ export type Inserted = {
   studentId: string
   lastName: string
   firstName: string
-  classId: string
   cohortName: string
-  major: Major[]
-  processing: Processing[]
-  handlingStatusByAAO: string
-  note: string
-  courseRegistration: CourseRegistration[]
+  classId: string
+  groupedByInstruction: string
+  sdtsv: string
+  sdtlh: string
+  sdthktt: string
+  sdtcha: string
+  sdtme: string
+  major: string
   DTBC: number
-  STC: number
   DTBCTL: number
-  STCTL: number
-  reasonHandling: string
-  yearLevel: string
+  DTB10: number
+  DTBCTL10: number
+  TCTL: number
+  TCCN: number
+  TONGTCCTDT: number
+  percentTL: number
+  processingHandle: ProcessingHandle
+  countWarning: CountWarning
+  courseRegistration: CourseRegistration
+  admissionYear: number
+  RQS: string
   faculty: string
-  year: string
-  termName: string
+  list: string
+  statusOn: StatusOn
+  yearLevel: string
+  reasonHandling: ReasonHandling
+  resultHandlingBefore: string
   _id: string
   createdAt: string | Date
   updatedAt: string | Date
 }
 
 export type MissingInfoRows = {
-  stt: number
+  stt: string
   row: number
   message: string
+  details: {
+    studentId: string
+  }
+  data: any
 }
 
 export type ImportResult = {

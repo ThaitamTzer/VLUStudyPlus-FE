@@ -27,7 +27,7 @@ type TableMissingProps = {
 }
 
 type MissingInfoRowsWithStt = MissingInfoRows & {
-  stt?: number
+  no?: number
 }
 
 const columnHelper = createColumnHelper<MissingInfoRowsWithStt>()

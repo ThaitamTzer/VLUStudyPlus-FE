@@ -25,13 +25,11 @@ export function middleware(req: NextRequest) {
   } catch (error) {
     console.error('❌ Lỗi parse userData từ cookie:', error)
 
-    return NextResponse.redirect(new URL('/404', req.url))
+    return NextResponse.redirect(new URL('/not-found', req.url))
   }
 
   if (!userData) {
-    console.warn('❌ userData không hợp lệ.')
-
-    return NextResponse.redirect(new URL('/404', req.url))
+    return NextResponse.redirect(new URL('/not-found', req.url))
   }
 
   console.log('✅ userData hợp lệ:', userData)
@@ -43,7 +41,7 @@ export function middleware(req: NextRequest) {
   if (!ability.can(acl.action, acl.subject)) {
     console.warn('🚫 Người dùng không có quyền truy cập vào:', url)
 
-    return NextResponse.redirect(new URL('/not-found', req.url))
+    return NextResponse.redirect(new URL('/unauthorized', req.url))
   }
 
   return NextResponse.next()

@@ -13,11 +13,11 @@ import { CustomDialog } from '@/components/CustomDialog'
 import mailService from '@/services/mail.service'
 import Iconify from '@/components/iconify'
 
-export default function SendMailModalRemind({ id }: { id: string }) {
+export default function ModalSendMailComimmtment({ id }: { id: string }) {
   const { openSendEmailRemind, toogleSendEmailRemind } = useAcedemicProcessStore()
   const [loading, setLoading] = useState(false)
 
-  const { data, isLoading } = useSWR(id ? `/api/notification/get-number-remind/${id}` : null, () =>
+  const { data, isLoading } = useSWR(id ? `/api/notification/get-number-commitment/${id}` : null, () =>
     mailService.getNumberSend(id)
   )
 
@@ -70,12 +70,16 @@ export default function SendMailModalRemind({ id }: { id: string }) {
       title='Xác nhận gửi mail nhắc nhở XLHV'
       actions={
         <>
-          <Button variant='outlined' onClick={onClose}>
-            Hủy
-          </Button>
-          <LoadingButton loading={loading} variant='contained' onClick={onSendMail}>
-            Gửi mail
-          </LoadingButton>
+          {data && data?.numberRemindCommitment > 0 && (
+            <>
+              <Button variant='outlined' onClick={onClose}>
+                Hủy
+              </Button>
+              <LoadingButton loading={loading} variant='contained' onClick={onSendMail}>
+                Gửi mail
+              </LoadingButton>
+            </>
+          )}
         </>
       }
     >
@@ -86,12 +90,12 @@ export default function SendMailModalRemind({ id }: { id: string }) {
               <Iconify icon='mdi:loading' className='animate-spin' />
               <span className='ml-2'>Đang tải dữ liệu...</span>
             </div>
-          ) : data?.numberRemindProcess === 0 ? (
-            <p>Không cần gửi nhắc nhở vì các XLHV đã được xử lý thực hiện</p>
+          ) : data?.numberRemindCommitment === 0 ? (
+            <p>Không có sinh viên nào hiện cần làm đơn</p>
           ) : (
             <p>
-              Số lượng mail sẽ gửi là {data?.numberRemindProcess} mail, bao gồm sinh viên bị XLHV và CVHT. Bạn có chắc
-              chắn muốn gửi ?
+              Số lượng mail sẽ gửi cho sinh viên cần làm đơn là {data?.numberRemindCommitment} mail. Bạn có chắc chắn
+              muốn gửi ?
             </p>
           )}
         </Grid>

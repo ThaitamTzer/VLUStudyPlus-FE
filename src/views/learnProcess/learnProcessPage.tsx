@@ -34,6 +34,8 @@ import ViewCommitmentForms from '../commitmentForms/viewCommitmentForm'
 import ViewCommitmentFormsOfCVHT from '../commitmentForms/viewCommitmentFormOfCVHT'
 import Iconify from '@/components/iconify'
 
+// import { useAbility } from '@/hooks/useAbility'
+
 const TableTypeProcess = dynamic(() => import('../type-process/list'), { ssr: false })
 const AddAcedemicProcess = dynamic(() => import('./addAcedemicProcess'), { ssr: false })
 const UpdateAcedemicProcess = dynamic(() => import('./updateAcedemicProcess'), { ssr: false })
@@ -45,6 +47,8 @@ const ViewAcedemicProcess = dynamic(() => import('./viewAcedemicProcess/viewAced
 
 export default function LearnProcessPage() {
   const columns = useColumns()
+
+  // const ability = useAbility()
 
   const {
     toogleAddAcedemicProcess,
@@ -210,6 +214,7 @@ export default function LearnProcessPage() {
               placeholder='Tìm kiếm'
               className='max-sm:is-full'
             />
+            {/* {ability && ability.can && ability.can('create', 'casca') && ( */}
             <Button
               variant='contained'
               startIcon={<i className='tabler-plus' />}
@@ -218,6 +223,7 @@ export default function LearnProcessPage() {
             >
               Thêm kỳ XLHT
             </Button>
+            {/* )} */}
           </div>
         </div>
         {renderTable}

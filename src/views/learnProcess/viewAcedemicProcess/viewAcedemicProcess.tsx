@@ -11,8 +11,7 @@ import {
   Typography,
   Card,
   MenuItem,
-  TablePagination,
-  Button
+  TablePagination
 } from '@mui/material'
 import useSWR from 'swr'
 
@@ -26,6 +25,7 @@ import DebouncedInput from '@/components/debouncedInput'
 import TablePaginationCustomNoURL from '@/components/table/TablePaginationNoURL'
 import { useShare } from '@/hooks/useShare'
 import type { LearnProcessType } from '@/types/management/learnProcessType'
+import { NotificantionAction } from './notificationAction'
 
 const TableFilter = dynamic(() => import('./tableFilter'), { ssr: false })
 const TableAcedemicProcess = dynamic(() => import('./tableAcedemicProcess'), { ssr: false })
@@ -193,35 +193,13 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
                   placeholder='Tìm kiếm'
                   className='max-sm:is-full sm:is-[300px]'
                 />
-                {!acedemicProcess?.isNotification ? (
-                  <Button
-                    disabled={data?.pagination.totalItems === 0}
-                    onClick={tooogleSendEmail}
-                    variant='contained'
-                    startIcon={<Iconify icon='fluent-emoji-flat:bell' />}
-                    className='max-sm:is-full'
-                  >
-                    Thông báo XLHV GV-SV
-                  </Button>
-                ) : (
-                  <Button
-                    disabled={data?.pagination.totalItems === 0}
-                    variant='contained'
-                    onClick={toogleSendEmailRemind}
-                    startIcon={<Iconify icon='fluent-emoji-flat:bell' />}
-                    className='max-sm:is-full'
-                  >
-                    Gửi email nhắc nhở
-                  </Button>
-                )}
-                <Button
-                  onClick={toogleManualAddFromViewByCate}
-                  variant='contained'
-                  startIcon={<i className='tabler-plus' />}
-                  className='max-sm:is-full'
-                >
-                  Thêm XLHV
-                </Button>
+                <NotificantionAction
+                  acedemicProcess={acedemicProcess}
+                  data={data}
+                  tooogleSendEmail={tooogleSendEmail}
+                  toogleSendEmailRemind={toogleSendEmailRemind}
+                  toogleManualAddFromViewByCate={toogleManualAddFromViewByCate}
+                />
               </div>
             </div>
             <TableAcedemicProcess

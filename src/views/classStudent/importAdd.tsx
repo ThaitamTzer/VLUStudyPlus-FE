@@ -49,7 +49,9 @@ export default function ImportStudent({
     setUpdateResult,
     toogleImportResult,
     setOpenAddModal,
-    toogleProgress
+    toogleProgress,
+    setIsCompleted,
+    setIsProcessing
   } = useClassStudentStore()
 
   const handleImportResult = (res: ImportStudentResult) => {
@@ -121,6 +123,8 @@ export default function ImportStudent({
 
   const handleUpload = handleSubmit(async data => {
     toogleProgress()
+    setIsProcessing(true)
+    setIsCompleted(false)
     setLoading(true)
     const formData = new FormData()
 
@@ -143,7 +147,8 @@ export default function ImportStudent({
           transition: Flip,
           closeButton: true
         })
-        toogleProgress()
+        setIsProcessing(false)
+        setIsCompleted(true)
         toogleImportResult()
         mutate()
         setLoading(false)

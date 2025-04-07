@@ -10,6 +10,8 @@ type States = {
   trainingProgram: TrainingProgramType | null
   openImportProgramLoading: boolean
   openViewTrainingProgramByFrame: boolean
+  isProgress: boolean
+  isComplete: boolean
 }
 
 type Actions = {
@@ -20,6 +22,8 @@ type Actions = {
   setTrainingProgram: (trainingProgram: TrainingProgramType | null) => void
   toogleImportProgramLoading: () => void
   toogleViewTrainingProgramByFrame: () => void
+  setIsProgress: (isProgress: boolean) => void
+  setIsComplete: (isComplete: boolean) => void
 }
 
 export const useTrainingProgramStore = create<States & Actions>(set => ({
@@ -30,6 +34,10 @@ export const useTrainingProgramStore = create<States & Actions>(set => ({
   trainingProgram: null,
   openImportProgramLoading: false,
   openViewTrainingProgramByFrame: false,
+  isProgress: false,
+  isComplete: false,
+  setIsProgress: (isProgress: boolean) => set({ isProgress }),
+  setIsComplete: (isComplete: boolean) => set({ isComplete }),
   toogleViewTrainingProgramByFrame: () =>
     set(state => ({ openViewTrainingProgramByFrame: !state.openViewTrainingProgramByFrame })),
   toogleImportProgramLoading: () => set(state => ({ openImportProgramLoading: !state.openImportProgramLoading })),

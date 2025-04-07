@@ -2,19 +2,7 @@
 
 import { useCallback, useState } from 'react'
 
-import {
-  Stepper,
-  Step,
-  StepLabel,
-  Button,
-  Typography,
-  Box,
-  Grid,
-  MenuItem,
-  List,
-  ListItem,
-  IconButton
-} from '@mui/material'
+import { Stepper, Step, StepLabel, Button, Typography, Box, Grid, List, ListItem, IconButton } from '@mui/material'
 
 import type { KeyedMutator } from 'swr'
 
@@ -24,7 +12,7 @@ import * as v from 'valibot'
 
 import { valibotResolver } from '@hookform/resolvers/valibot'
 
-import { Controller, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 
 import { LoadingButton } from '@mui/lab'
 
@@ -33,11 +21,11 @@ import { useDropzone } from 'react-dropzone'
 import { toast } from 'react-toastify'
 
 import { CustomDialog } from '@/components/CustomDialog'
-import CustomTextField from '@/@core/components/mui/TextField'
 import { useShare } from '@/hooks/useShare'
 import Iconify from '@/components/iconify'
 import { useTrainingProgramStore } from '@/stores/trainingProgram.store'
 import trainingProgramService from '@/services/trainingprogram.service'
+import CreateTrainingProgram from './createTrainingProgram'
 
 // import trainingProgramService from '@/services/trainingprogram.service'
 
@@ -65,8 +53,13 @@ type AddTrainingProgramStepByStepModalProps = {
 export default function AddTrainingProgramStepByStepModal(props: AddTrainingProgramStepByStepModalProps) {
   const { mutate } = props
 
-  const { openCreateTrainingProgram, toogleCreateTrainingProgram, toogleImportProgramLoading } =
-    useTrainingProgramStore()
+  const {
+    openCreateTrainingProgram,
+    toogleCreateTrainingProgram,
+    toogleImportProgramLoading,
+    setIsComplete,
+    setIsProgress
+  } = useTrainingProgramStore()
 
   const steps = ['Tạo khung chương trình đào tạo', 'Import chi tiết khung chương trình']
 
@@ -75,8 +68,6 @@ export default function AddTrainingProgramStepByStepModal(props: AddTrainingProg
   const [loading, setLoading] = useState(false)
   const { cohorOptions, majorOptions } = useShare()
   const [files, setFiles] = useState<File[]>([])
-
-  console.log('dataCreateForm', dataCreateForm)
 
   const handleBack = () => {
     setActiveStep(prevActiveStep => prevActiveStep - 1)
@@ -146,6 +137,8 @@ export default function AddTrainingProgramStepByStepModal(props: AddTrainingProg
     async (data: any) => {
       const toastID = toast.loading('Đang thêm khung chương trình đào tạo...')
 
+      setIsProgress(true)
+      setIsComplete(false)
       setLoading(true)
       const formData = new FormData()
 
@@ -167,14 +160,9 @@ export default function AddTrainingProgramStepByStepModal(props: AddTrainingProg
             res._id,
             formData,
             () => {
-              toast.update(toastID, {
-                render: 'Import chi tiết khung chương trình đào tạo thành công',
-                type: 'success',
-                isLoading: false,
-                autoClose: 2000
-              })
+              setIsProgress(false)
+              setIsComplete(true)
               mutate()
-              toogleImportProgramLoading()
               setLoading(false)
             },
             err => {
@@ -205,7 +193,7 @@ export default function AddTrainingProgramStepByStepModal(props: AddTrainingProg
         }
       )
     },
-    [mutate, dataCreateForm, onClose, toogleImportProgramLoading]
+    [mutate, dataCreateForm, onClose, toogleImportProgramLoading, setIsProgress, setIsComplete, setLoading]
   )
 
   const onSubmit = importHandleSubmit(handleImport)
@@ -261,115 +249,12 @@ export default function AddTrainingProgramStepByStepModal(props: AddTrainingProg
       ) : (
         <Box sx={{ mt: 2 }}>
           {activeStep === 0 && (
-            <>
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <Controller
-                    name='title'
-                    control={control}
-                    render={({ field }) => (
-                      <CustomTextField
-                        {...field}
-                        label='Tên khung chương trình'
-                        error={!!errors.title}
-                        helperText={errors.title?.message}
-                        fullWidth
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Controller
-                    name='credit'
-                    control={control}
-                    render={({ field: { onChange, ...field } }) => (
-                      <CustomTextField
-                        {...field}
-                        label='Tổng số tín chỉ'
-                        error={!!errors.credit}
-                        helperText={errors.credit?.message}
-                        type='number'
-                        fullWidth
-                        onFocus={e => {
-                          e.target.select()
-                        }}
-                        onChange={e => {
-                          const value = e.target.value
-
-                          onChange(value === '' ? 0 : Number(value))
-                        }}
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Controller
-                    name='majorId'
-                    control={control}
-                    render={({ field }) => (
-                      <CustomTextField
-                        {...field}
-                        label='Ngành'
-                        error={!!errors.majorId}
-                        helperText={errors.majorId?.message}
-                        fullWidth
-                        select
-                        SelectProps={{
-                          MenuProps: {
-                            PaperProps: {
-                              sx: {
-                                maxHeight: 300
-                              }
-                            }
-                          }
-                        }}
-                      >
-                        {majorOptions.map(option => {
-                          return (
-                            <MenuItem key={option._id} value={option._id}>
-                              {option.majorName}
-                            </MenuItem>
-                          )
-                        })}
-                      </CustomTextField>
-                    )}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Controller
-                    name='cohortId'
-                    control={control}
-                    render={({ field }) => (
-                      <CustomTextField
-                        {...field}
-                        label='Niên khóa'
-                        error={!!errors.cohortId}
-                        helperText={errors.cohortId?.message}
-                        fullWidth
-                        select
-                        SelectProps={{
-                          MenuProps: {
-                            PaperProps: {
-                              sx: {
-                                maxHeight: 300
-                              }
-                            }
-                          }
-                        }}
-                      >
-                        {cohorOptions.map(option => {
-                          return (
-                            <MenuItem key={option._id} value={option._id}>
-                              {option.cohortId}
-                            </MenuItem>
-                          )
-                        })}
-                      </CustomTextField>
-                    )}
-                  />
-                </Grid>
-              </Grid>
-            </>
+            <CreateTrainingProgram
+              cohorOptions={cohorOptions}
+              majorOptions={majorOptions}
+              control={control}
+              errors={errors}
+            />
           )}
           {activeStep === 1 && (
             <>

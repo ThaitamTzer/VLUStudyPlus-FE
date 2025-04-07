@@ -68,7 +68,7 @@ export default function TableImported(prop: TableImportedProps) {
         cell: info => info.getValue()
       }),
       columnHelper.accessor('groupedByInstruction', {
-        header: 'Phân loại đối tượng theo hướng dẫn',
+        header: 'Đối tượng',
         cell: info => info.getValue()
       }),
       columnHelper.accessor('sdtsv', {

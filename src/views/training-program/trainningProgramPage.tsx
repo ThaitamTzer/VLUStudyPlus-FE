@@ -46,7 +46,8 @@ export default function TrainingProgramPage() {
   const filterValue = searchParams.get('filterValue') || ''
   const searchKey = searchParams.get('searchKey') || ''
 
-  const { toogleCreateTrainingProgram, openImportProgramLoading } = useTrainingProgramStore()
+  const { toogleCreateTrainingProgram, openImportProgramLoading, isComplete, isProgress, toogleImportProgramLoading } =
+    useTrainingProgramStore()
 
   const fetcher = ['/training-program', page, limit, filterField, filterValue, searchKey]
 
@@ -184,7 +185,12 @@ export default function TrainingProgramPage() {
       <DeleteTrainingProgram mutate={mutate} />
       <ImportTrainingProgram mutate={mutate} />
       <ViewTrainingProgramByFrame />
-      <ProgressModal open={openImportProgramLoading} />
+      <ProgressModal
+        open={openImportProgramLoading}
+        isCompleted={isComplete}
+        isProcessing={isProgress}
+        onClose={toogleImportProgramLoading}
+      />
     </>
   )
 }

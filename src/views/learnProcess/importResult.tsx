@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-import { Badge, Dialog, DialogContent, DialogTitle, IconButton, Tab } from '@mui/material'
+import { Badge, Dialog, DialogContent, DialogTitle, IconButton, Tab, Typography } from '@mui/material'
 
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 
@@ -27,6 +27,7 @@ export default function ImportResult() {
   return (
     <Dialog open={openImportResultModal} onClose={handleClose} maxWidth='xl' fullWidth>
       <DialogTitle>
+        <Typography variant='h4'>Kết quả nhập dữ liệu</Typography>
         <IconButton
           sx={{
             position: 'absolute',

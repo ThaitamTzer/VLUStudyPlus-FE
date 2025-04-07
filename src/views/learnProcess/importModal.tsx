@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import type { KeyedMutator } from 'swr'
 import * as v from 'valibot'
@@ -38,11 +38,13 @@ export default function ImportModal(props: ImportModalProps) {
     openImportModal,
     toogleImportModal,
     acedemicProcess,
-    toogleImportResultModal,
     setInserted,
     setDuplicateRows,
     setMissingInfoRows,
-    toogleProgress
+    toogleProgress,
+    setIsCompleted,
+    setIsProcessing,
+    setAcedemicProcess
   } = useAcedemicProcessStore()
 
   const {
@@ -66,12 +68,13 @@ export default function ImportModal(props: ImportModalProps) {
     }
   }
 
-  const onClose = () => {
+  const onClose = useCallback(() => {
     reset()
     toogleImportModal()
     setValue('file', [])
     setFiles([])
-  }
+    setAcedemicProcess(null)
+  }, [reset, toogleImportModal, setValue, setFiles, setAcedemicProcess])
 
   const onSubmit = handleSubmit(async data => {
     if (!acedemicProcess) return
@@ -83,6 +86,8 @@ export default function ImportModal(props: ImportModalProps) {
 
     onClose()
     toogleProgress()
+    setIsProcessing(true)
+    setIsCompleted(false)
     setLoading(true)
 
     await learnProcessService.import(
@@ -98,8 +103,8 @@ export default function ImportModal(props: ImportModalProps) {
           closeButton: true
         })
         mutate()
-        toogleProgress()
-        toogleImportResultModal()
+        setIsProcessing(false)
+        setIsCompleted(true)
       },
       err => {
         setLoading(false)
@@ -119,7 +124,7 @@ export default function ImportModal(props: ImportModalProps) {
       files={files}
       setFiles={setFiles}
       onOpen={openImportModal}
-      onClose={toogleImportModal}
+      onClose={onClose}
       title='Import danh sách xử lý học tập'
       onSubmit={onSubmit}
       setValue={setValue}

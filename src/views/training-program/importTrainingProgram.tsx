@@ -38,7 +38,9 @@ export default function ImportTrainingProgram(props: ImportTrainingProgramProps)
     openImportTrainingProgramSession,
     toogleImportProgramLoading,
     toogleImportTrainingProgramSession,
-    trainingProgram
+    trainingProgram,
+    setIsComplete,
+    setIsProgress
   } = useTrainingProgramStore()
 
   const {
@@ -67,6 +69,8 @@ export default function ImportTrainingProgram(props: ImportTrainingProgramProps)
     const toastId = toast.loading('Đang tải lên tệp...')
 
     onClose()
+    setIsComplete(false)
+    setIsProgress(true)
     setLoading(true)
     toogleImportProgramLoading()
     const formData = new FormData()
@@ -83,7 +87,8 @@ export default function ImportTrainingProgram(props: ImportTrainingProgramProps)
           isLoading: false,
           autoClose: 2000
         })
-        toogleImportProgramLoading()
+        setIsComplete(true)
+        setIsProgress(false)
         setLoading(false)
         mutate()
       },

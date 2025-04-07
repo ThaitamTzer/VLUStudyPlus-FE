@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import type { ColumnDef } from '@tanstack/react-table'
 import { createColumnHelper } from '@tanstack/react-table'
@@ -26,7 +26,8 @@ export const useColumns = () => {
     toogleUpdateAcedemicProcess,
     toogleDeleteAcedemicProcess,
     toogleImportModal,
-    toogleViewByCategory
+    toogleViewByCategory,
+    setSession
   } = useAcedemicProcessStore()
 
   const {
@@ -35,6 +36,22 @@ export const useColumns = () => {
     toogleViewCommnitmentByCategoryOfCVHT,
     setAcedemicProcessCommimentOfCVHT
   } = useCommitmentStore()
+
+  const handleOpenImport = useCallback(
+    (acedemicProcess: LearnProcessType) => {
+      setAcedemicProcess(acedemicProcess)
+      toogleImportModal()
+    },
+    [toogleImportModal, setAcedemicProcess]
+  )
+
+  const handleOpenViewByCategory = useCallback(
+    (session: LearnProcessType) => {
+      setSession(session)
+      toogleViewByCategory()
+    },
+    [setSession, toogleViewByCategory]
+  )
 
   return useMemo<ColumnDef<AcedemicProcessWithAction, any>[]>(
     () => [
@@ -61,8 +78,7 @@ export const useColumns = () => {
             <Tooltip title='Xem danh sách xử lý học tập' arrow>
               <IconButton
                 onClick={() => {
-                  toogleViewByCategory()
-                  setAcedemicProcess(infor.row.original)
+                  handleOpenViewByCategory(infor.row.original)
                 }}
               >
                 <Iconify icon='mingcute:information-fill' color='#2092ec' />
@@ -94,8 +110,7 @@ export const useColumns = () => {
             <Tooltip title='Import danh sách xử lý học tập' arrow>
               <IconButton
                 onClick={() => {
-                  toogleImportModal()
-                  setAcedemicProcess(infor.row.original)
+                  handleOpenImport(infor.row.original)
                 }}
               >
                 <Iconify icon='tabler:file-import' className='text-success' />
@@ -129,16 +144,16 @@ export const useColumns = () => {
       })
     ],
     [
-      setAcedemicProcess,
-      toogleUpdateAcedemicProcess,
-      toogleDeleteAcedemicProcess,
-      toogleImportModal,
-      toogleViewByCategory,
+      user?.role.name,
+      handleOpenViewByCategory,
+      toogleViewCommnitmentByCategoryOfCVHT,
+      setAcedemicProcessCommimentOfCVHT,
       toogleViewCommnitmentByCategory,
       setAcedemicProcessCommiment,
-      toogleViewCommnitmentByCategoryOfCVHT,
-      user?.role.name,
-      setAcedemicProcessCommimentOfCVHT
+      handleOpenImport,
+      setAcedemicProcess,
+      toogleUpdateAcedemicProcess,
+      toogleDeleteAcedemicProcess
     ]
   )
 }

@@ -1,131 +1,24 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { Grid, MenuItem } from '@mui/material'
+import { Controller } from 'react-hook-form'
 
-import type { KeyedMutator } from 'swr'
-
-import { Button, Grid, MenuItem } from '@mui/material'
-import { LoadingButton } from '@mui/lab'
-
-import * as v from 'valibot'
-import type { InferInput } from 'valibot'
-import { useForm, Controller } from 'react-hook-form'
-
-import { valibotResolver } from '@hookform/resolvers/valibot'
-
-import { toast } from 'react-toastify'
-
-import trainingProgramService from '@/services/trainingprogram.service'
-
-import { useShare } from '@/hooks/useShare'
-
-import { CustomDialog } from '@/components/CustomDialog'
-import { useTrainingProgramStore } from '@/stores/trainingProgram.store'
 import CustomTextField from '@/@core/components/mui/TextField'
-
-const schema = v.object({
-  title: v.pipe(v.string(), v.nonEmpty('Tên không được để trống'), v.maxLength(100, 'Độ dài tối đa 100 ký tự')),
-  major: v.undefinedable(v.pipe(v.string(), v.nonEmpty('Chuyên ngành không được để trống')), ''),
-  credit: v.pipe(v.number(), v.minValue(1, 'Số tín chỉ phải lớn hơn 0')),
-  cohortId: v.undefinedable(v.pipe(v.string(), v.nonEmpty('Khóa không được để trống')), '')
-})
-
-type FormData = InferInput<typeof schema>
+import type { Major } from '@/types/management/majorType'
+import type { Cohort } from '@/types/management/cohortType'
 
 type CreateTrainingProgramProps = {
-  mutate: KeyedMutator<any>
+  control: any
+  errors: any
+  majorOptions: Major[]
+  cohorOptions: Cohort[]
 }
 
 export default function CreateTrainingProgram(props: CreateTrainingProgramProps) {
-  const { mutate } = props
-  const { cohorOptions, majorOptions } = useShare()
-  const [loading, setLoading] = useState(false)
-
-  const { openCreateTrainingProgram, toogleCreateTrainingProgram } = useTrainingProgramStore()
-
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors }
-  } = useForm<FormData>({
-    mode: 'all',
-    resolver: valibotResolver(schema),
-    defaultValues: {
-      title: '',
-      credit: 0,
-      cohortId: '',
-      major: ''
-    }
-  })
-
-  const onClose = useCallback(() => {
-    toogleCreateTrainingProgram()
-    reset()
-  }, [toogleCreateTrainingProgram, reset])
-
-  const onSubmit = handleSubmit(async data => {
-    const toastId = toast.loading('Đang tạo khung chương trình đào tạo...')
-
-    setLoading(true)
-
-    await trainingProgramService.create(
-      data,
-      () => {
-        setLoading(false)
-        mutate()
-        toast.update(toastId, {
-          render: 'Tạo khung chương trình đào tạo thành công',
-          type: 'success',
-          isLoading: false,
-          autoClose: 2000
-        })
-        onClose()
-      },
-      err => {
-        setLoading(false)
-        toast.update(toastId, {
-          render: err.message,
-          type: 'error',
-          isLoading: false,
-          autoClose: 2000
-        })
-      }
-    )
-  })
+  const { control, errors, majorOptions, cohorOptions } = props
 
   return (
-    <CustomDialog
-      open={openCreateTrainingProgram}
-      onClose={onClose}
-      title='Thêm khung chương trình đào tạo'
-      closeOutside
-      maxWidth='sm'
-      onSubmit={onSubmit}
-      actions={
-        <>
-          <Button
-            variant='outlined'
-            color='inherit'
-            onClick={() => {
-              onClose()
-            }}
-          >
-            Hủy
-          </Button>
-          <LoadingButton
-            variant='contained'
-            type='submit'
-            loading={loading}
-            sx={{
-              marginLeft: 1
-            }}
-          >
-            Lưu
-          </LoadingButton>
-        </>
-      }
-    >
+    <>
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Controller
@@ -168,14 +61,14 @@ export default function CreateTrainingProgram(props: CreateTrainingProgramProps)
         </Grid>
         <Grid item xs={12}>
           <Controller
-            name='major'
+            name='majorId'
             control={control}
             render={({ field }) => (
               <CustomTextField
                 {...field}
                 label='Ngành'
-                error={!!errors.major}
-                helperText={errors.major?.message}
+                error={!!errors.majorId}
+                helperText={errors.majorId?.message}
                 fullWidth
                 select
                 SelectProps={{
@@ -233,6 +126,6 @@ export default function CreateTrainingProgram(props: CreateTrainingProgramProps)
           />
         </Grid>
       </Grid>
-    </CustomDialog>
+    </>
   )
 }

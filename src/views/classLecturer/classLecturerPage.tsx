@@ -117,7 +117,7 @@ export default function ClassLecturerPage() {
         </TabPanel>
       </AddModal>
       <PreviewImport />
-      <ProgressModal open={loading} />
+      <ProgressModal open={loading} isCompleted={!loading} isProcessing={loading} />
     </>
   )
 }

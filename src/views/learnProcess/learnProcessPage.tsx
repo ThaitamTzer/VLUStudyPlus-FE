@@ -58,7 +58,11 @@ export default function LearnProcessPage() {
     toogleManualAdd,
     openManualAdd,
     openProgress,
-    setAcedemicProcess
+    setAcedemicProcess,
+    isCompleted,
+    isProcessing,
+    toogleProgress,
+    toogleImportResultModal
   } = useAcedemicProcessStore()
 
   const { data, mutate, isLoading } = useSWR('/api/learnProcess', learnProcessService.getAll, {
@@ -236,7 +240,13 @@ export default function LearnProcessPage() {
       <ViewAcedemicProcess listAcedemicProcess={data || []} />
       <ViewCommitmentForms />
       <ViewCommitmentFormsOfCVHT />
-      <ProgressModal open={openProgress} />
+      <ProgressModal
+        open={openProgress}
+        isCompleted={isCompleted}
+        isProcessing={isProcessing}
+        openEnded={toogleImportResultModal}
+        onClose={toogleProgress}
+      />
       <AlertDelete
         countdown
         open={openDeleteAcedemicProcess}

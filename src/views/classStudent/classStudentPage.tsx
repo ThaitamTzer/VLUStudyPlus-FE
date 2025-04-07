@@ -25,7 +25,7 @@ import UpdateAddStudent from './updateStudent'
 import ProgressModal from '../../components/dialogs/progressModal'
 
 export default function ClassStudentPage() {
-  const { setOpenAddModal, openProgress } = useClassStudentStore()
+  const { setOpenAddModal, openProgress, isCompleted, isProcessing, toogleProgress } = useClassStudentStore()
 
   const router = useRouter()
 
@@ -216,7 +216,12 @@ export default function ClassStudentPage() {
           }}
         />
       </Card>
-      <ProgressModal open={openProgress} />
+      <ProgressModal
+        open={openProgress}
+        isProcessing={isProcessing}
+        isCompleted={isCompleted}
+        onClose={toogleProgress}
+      />
       <AddModal>
         <TabPanel value='1'>
           <ManualAddStudent mutate={mutate} />

@@ -25,13 +25,16 @@ type States = {
   openUpdateAcedemicProcessStatus: boolean
   openSendEmail: boolean
   openSendEmailRemind: boolean
+  isProcessing: boolean
+  isCompleted: boolean
+  session: LearnProcessType | null
 }
 
 type Actions = {
   toogleAddAcedemicProcess: () => void
   toogleUpdateAcedemicProcess: () => void
   toogleDeleteAcedemicProcess: () => void
-  setAcedemicProcess: (acedemicProcess: LearnProcessType) => void
+  setAcedemicProcess: (acedemicProcess: LearnProcessType | null) => void
   toogleImportModal: () => void
   toogleImportResultModal: () => void
   setInserted: (inserted: Inserted[]) => void
@@ -50,6 +53,9 @@ type Actions = {
   toogleUpdateAcedemicProcessStatus: () => void
   tooogleSendEmail: () => void
   toogleSendEmailRemind: () => void
+  setIsProcessing: (isProcessing: boolean) => void
+  setIsCompleted: (isCompleted: boolean) => void
+  setSession: (session: LearnProcessType | null) => void
 }
 
 export const useAcedemicProcessStore = create<States & Actions>(set => ({
@@ -75,6 +81,12 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
   openUpdateAcedemicProcessStatus: false,
   openSendEmail: false,
   openSendEmailRemind: false,
+  isProcessing: false,
+  isCompleted: false,
+  session: null,
+  setSession: session => set({ session }),
+  setIsProcessing: isProcessing => set({ isProcessing }),
+  setIsCompleted: isCompleted => set({ isCompleted }),
   toogleSendEmailRemind: () => set(state => ({ openSendEmailRemind: !state.openSendEmailRemind })),
   tooogleSendEmail: () => set(state => ({ openSendEmail: !state.openSendEmail })),
   toogleUpdateAcedemicProcessStatus: () =>

@@ -24,6 +24,7 @@ import DebouncedInput from '@/components/debouncedInput'
 
 type TableMissingProps = {
   data: MissingInfoRows[]
+  minWidth?: number
 }
 
 type MissingInfoRowsWithStt = MissingInfoRows & {
@@ -35,6 +36,8 @@ const columnHelper = createColumnHelper<MissingInfoRowsWithStt>()
 export default function TableMissing(prop: TableMissingProps) {
   const { data } = prop
   const [globalFilter, setGlobalFilter] = useState('')
+
+  console.log('data', data)
 
   const columns = useMemo<ColumnDef<MissingInfoRowsWithStt, any>[]>(
     () => [
@@ -95,7 +98,7 @@ export default function TableMissing(prop: TableMissingProps) {
           </Grid>
         </Grid>
       </CardContent>
-      <TanstackTable table={table} title='Danh sách lỗi' />
+      <TanstackTable table={table} title='Danh sách lỗi' minWidth={1100} />
       <TablePagination
         component={() => <TablePaginationComponent table={table as Table<unknown>} />}
         count={table.getFilteredRowModel().rows.length}

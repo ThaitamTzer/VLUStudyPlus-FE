@@ -1,5 +1,5 @@
 'use client'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
@@ -42,8 +42,8 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
   const {
     openViewByCategory,
     toogleViewByCategory,
-    acedemicProcess,
-    setAcedemicProcess,
+    session,
+    setSession,
     toogleManualAddFromViewByCate,
     openManualAddFromViewByCate,
     toogleEditViewAcedemicProcess,
@@ -60,7 +60,9 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
 
   const { cohorOptions } = useShare()
 
-  const id = acedemicProcess?._id
+  const id = useMemo(() => session?._id, [session])
+
+  console.log('acedemicProcess', session)
 
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
@@ -134,7 +136,7 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
     setSortField('')
     setSortOrder('asc')
     setSearchKey('')
-    setAcedemicProcess({} as any)
+    setSession(null)
   }
 
   return (
@@ -157,7 +159,7 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
               textTransform: 'uppercase'
             }}
           >
-            Danh sách {acedemicProcess?.title}
+            Danh sách {session?.title}
           </Typography>
         </DialogTitle>
         <DialogContent>
@@ -194,7 +196,7 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
                   className='max-sm:is-full sm:is-[300px]'
                 />
                 <NotificantionAction
-                  acedemicProcess={acedemicProcess}
+                  acedemicProcess={session}
                   data={data}
                   tooogleSendEmail={tooogleSendEmail}
                   toogleSendEmailRemind={toogleSendEmailRemind}
@@ -250,8 +252,8 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
         onClose={toogleManualAddFromViewByCate}
         open={openManualAddFromViewByCate}
       />
-      <SendMailModal id={acedemicProcess?._id || ''} mutate={mutate} />
-      <SendMailModalRemind id={acedemicProcess?._id || ''} />
+      <SendMailModal id={session?._id || ''} mutate={mutate} />
+      <SendMailModalRemind id={session?._id || ''} />
       <AlertDelete
         open={openDeleteViewAcedemicProcess}
         onClose={toogleDeleteViewAcedemicProcess}

@@ -9,15 +9,22 @@ import TableNoData from '@/components/table/TableNotFound'
 export default function TanstackTable({
   table,
   title,
-  loading
+  loading,
+  minWidth = 5000
 }: {
   table: Table<any>
   title?: string
   loading?: boolean
+  minWidth?: number
 }) {
   return (
     <TableContainer sx={{ position: 'relative', overflowX: 'auto', maxHeight: 'calc(100vh - 300px)' }}>
-      <MuiTable stickyHeader sx={{ minWidth: 1000 }}>
+      <MuiTable
+        stickyHeader
+        sx={{
+          minWidth: minWidth
+        }}
+      >
         <TableHead>
           <StyledTableRow sx={{ textTransform: 'uppercase' }}>
             {table.getHeaderGroups().map(headerGroup =>

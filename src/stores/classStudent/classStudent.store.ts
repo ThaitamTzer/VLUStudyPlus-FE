@@ -15,6 +15,8 @@ type States = {
   duplicateRows: MissingInforType[]
   openAddModal: boolean
   openProgress: boolean
+  isCompleted: boolean
+  isProcessing: boolean
 }
 
 type Actions = {
@@ -29,6 +31,8 @@ type Actions = {
   setDuplicateRows: (data: MissingInforType[]) => void
   setOpenAddModal: (open: boolean) => void
   toogleProgress: () => void
+  setIsCompleted: (isCompleted: boolean) => void
+  setIsProcessing: (isProcessing: boolean) => void
 }
 
 export const useClassStudentStore = create<States & Actions>(set => ({
@@ -44,6 +48,10 @@ export const useClassStudentStore = create<States & Actions>(set => ({
   openUpdateStudent: false,
   openAddModal: false,
   openProgress: false,
+  isCompleted: false,
+  isProcessing: false,
+  setIsCompleted: isCompleted => set({ isCompleted }),
+  setIsProcessing: isProcessing => set({ isProcessing }),
   toogleUpdateStudent: student => set(state => ({ openUpdateStudent: !state.openUpdateStudent, student })),
   toogleImportStudent: () => set(state => ({ openImportStudent: !state.openImportStudent })),
   toogleImportResult: () => set(state => ({ openImportResult: !state.openImportResult })),

@@ -12,6 +12,9 @@ type States = {
   openViewTrainingProgramByFrame: boolean
   isProgress: boolean
   isComplete: boolean
+  openCreateCategory1: boolean
+  openEditCategory1: boolean
+  programid: string | null
 }
 
 type Actions = {
@@ -24,6 +27,9 @@ type Actions = {
   toogleViewTrainingProgramByFrame: () => void
   setIsProgress: (isProgress: boolean) => void
   setIsComplete: (isComplete: boolean) => void
+  toogleCreateCategory1: () => void
+  toogleUpdateCategory1: () => void
+  setProgramId: (programid: string) => void
 }
 
 export const useTrainingProgramStore = create<States & Actions>(set => ({
@@ -36,6 +42,12 @@ export const useTrainingProgramStore = create<States & Actions>(set => ({
   openViewTrainingProgramByFrame: false,
   isProgress: false,
   isComplete: false,
+  openCreateCategory1: false,
+  openEditCategory1: false,
+  programid: null,
+  setProgramId: (programid: string | null) => set({ programid }),
+  toogleUpdateCategory1: () => set(state => ({ openEditCategory1: !state.openEditCategory1 })),
+  toogleCreateCategory1: () => set(state => ({ openCreateCategory1: !state.openCreateCategory1 })),
   setIsProgress: (isProgress: boolean) => set({ isProgress }),
   setIsComplete: (isComplete: boolean) => set({ isComplete }),
   toogleViewTrainingProgramByFrame: () =>

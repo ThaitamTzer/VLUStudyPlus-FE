@@ -1,22 +1,15 @@
-'use client'
-
 import { useCallback, useState } from 'react'
 
 import * as v from 'valibot'
 import type { InferInput } from 'valibot'
 import { valibotResolver } from '@hookform/resolvers/valibot'
 import { IconButton, TableCell, TableRow, TextField } from '@mui/material'
-
 import SaveIcon from '@mui/icons-material/Save'
 import CancelIcon from '@mui/icons-material/Cancel'
-
 import { Controller, useForm } from 'react-hook-form'
-
 import type { KeyedMutator } from 'swr'
-
 import { toast } from 'react-toastify'
 
-import type { Categories } from '@/types/management/trainningProgramType'
 import { useSettings } from '@/@core/hooks/useSettings'
 import trainingProgramService from '@/services/trainingprogram.service'
 
@@ -28,25 +21,15 @@ const schema = v.object({
 
 type CategoryForm = InferInput<typeof schema>
 
-interface CategoryRowProps {
-  category: Categories
+interface AddCategoryFormProps {
   level: number
-  isEditing?: boolean
-  onCancel?: () => void
+  onCancel: () => void
   mutate: KeyedMutator<any>
   idCate1: string
   idCate2?: string
 }
 
-const CategoryRow: React.FC<CategoryRowProps> = ({
-  category,
-  level,
-  isEditing,
-  onCancel,
-  mutate,
-  idCate1,
-  idCate2
-}) => {
+const AddCategoryForm: React.FC<AddCategoryFormProps> = ({ level, onCancel, mutate, idCate1, idCate2 }) => {
   const { settings } = useSettings()
   const [loading, setLoading] = useState<boolean>(false)
 
@@ -59,9 +42,9 @@ const CategoryRow: React.FC<CategoryRowProps> = ({
     resolver: valibotResolver(schema),
     mode: 'all',
     defaultValues: {
-      titleN: category.titleN,
-      titleV: category.titleV,
-      credits: category.credits
+      titleN: '',
+      titleV: '',
+      credits: 0
     }
   })
 
@@ -83,7 +66,7 @@ const CategoryRow: React.FC<CategoryRowProps> = ({
               isLoading: false,
               autoClose: 2000
             })
-            onCancel?.()
+            onCancel()
             mutate()
             setLoading(false)
           },
@@ -126,7 +109,7 @@ const CategoryRow: React.FC<CategoryRowProps> = ({
               isLoading: false,
               autoClose: 2000
             })
-            onCancel?.()
+            onCancel()
             mutate()
             setLoading(false)
           },
@@ -161,83 +144,6 @@ const CategoryRow: React.FC<CategoryRowProps> = ({
 
   const onAddCategory = handleSubmit(onSubmit)
 
-  if (isEditing) {
-    return (
-      <TableRow>
-        <TableCell
-          sx={{
-            paddingLeft: `${level * 9}px`,
-            backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
-          }}
-        >
-          <Controller
-            name='titleN'
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                size='small'
-                error={!!errors.titleN}
-                helperText={errors.titleN?.message}
-                placeholder='Số TT danh mục'
-              />
-            )}
-          />
-          <Controller
-            name='titleV'
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                size='small'
-                error={!!errors.titleV}
-                helperText={errors.titleV?.message}
-                placeholder='Tên danh mục'
-              />
-            )}
-          />
-        </TableCell>
-        <TableCell
-          align='right'
-          sx={{
-            backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
-          }}
-        >
-          <Controller
-            name='credits'
-            control={control}
-            render={({ field: { onChange, ...field } }) => (
-              <TextField
-                {...field}
-                size='small'
-                type='number'
-                error={!!errors.credits}
-                helperText={errors.credits?.message}
-                placeholder='Số tín chỉ'
-                onChange={e => onChange(e.target.value === '' ? 0 : Number(e.target.value))}
-                onFocus={e => e.target.select()}
-              />
-            )}
-          />
-        </TableCell>
-        <TableCell
-          colSpan={8}
-          align='right'
-          sx={{
-            backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
-          }}
-        >
-          <IconButton size='small' onClick={onAddCategory} disabled={loading}>
-            <SaveIcon fontSize='small' />
-          </IconButton>
-          <IconButton size='small' onClick={onCancel} disabled={loading}>
-            <CancelIcon fontSize='small' />
-          </IconButton>
-        </TableCell>
-      </TableRow>
-    )
-  }
-
   return (
     <TableRow>
       <TableCell
@@ -246,7 +152,32 @@ const CategoryRow: React.FC<CategoryRowProps> = ({
           backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
         }}
       >
-        {category.titleN} {category.titleV}
+        <Controller
+          name='titleN'
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              size='small'
+              error={!!errors.titleN}
+              helperText={errors.titleN?.message}
+              placeholder='Số TT danh mục'
+            />
+          )}
+        />
+        <Controller
+          name='titleV'
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              size='small'
+              error={!!errors.titleV}
+              helperText={errors.titleV?.message}
+              placeholder='Tên danh mục'
+            />
+          )}
+        />
       </TableCell>
       <TableCell
         align='right'
@@ -254,10 +185,39 @@ const CategoryRow: React.FC<CategoryRowProps> = ({
           backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
         }}
       >
-        {category.credits}
+        <Controller
+          name='credits'
+          control={control}
+          render={({ field: { onChange, ...field } }) => (
+            <TextField
+              {...field}
+              size='small'
+              type='number'
+              error={!!errors.credits}
+              helperText={errors.credits?.message}
+              placeholder='Số tín chỉ'
+              onChange={e => onChange(e.target.value === '' ? 0 : Number(e.target.value))}
+              onFocus={e => e.target.select()}
+            />
+          )}
+        />
+      </TableCell>
+      <TableCell
+        colSpan={8}
+        align='right'
+        sx={{
+          backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
+        }}
+      >
+        <IconButton size='small' onClick={onAddCategory} disabled={loading}>
+          <SaveIcon fontSize='small' />
+        </IconButton>
+        <IconButton size='small' onClick={onCancel} disabled={loading}>
+          <CancelIcon fontSize='small' />
+        </IconButton>
       </TableCell>
     </TableRow>
   )
 }
 
-export default CategoryRow
+export default AddCategoryForm

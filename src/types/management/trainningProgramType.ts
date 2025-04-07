@@ -1,3 +1,5 @@
+import type { KeyedMutator } from 'swr'
+
 export type TrainingProgramType = {
   _id: string
   title: string
@@ -79,4 +81,5 @@ export type TrainingProgramByFrame = {
   credits: number
   subjects: Subjects[]
   categories: Categories[]
+  mutate?: KeyedMutator<any>
 }

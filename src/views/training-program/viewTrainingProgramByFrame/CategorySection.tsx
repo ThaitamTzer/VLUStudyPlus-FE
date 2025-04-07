@@ -1,20 +1,22 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { IconButton, TableCell, TableRow, Tooltip } from '@mui/material'
 import SubjectIcon from '@mui/icons-material/Book'
 import CategoryIcon from '@mui/icons-material/Folder'
 import EditIcon from '@mui/icons-material/Edit'
 
-import { useSettings } from '@/@core/hooks/useSettings'
+import type { KeyedMutator } from 'swr'
+
 import type { Categories } from '@/types/management/trainningProgramType'
+import UpdateCategoryForm from './UpdateCategoryForm'
 
 interface CategorySectionProps {
   category: Categories
   level: number
   onAddCategory: (parentId: string, idCate1: string) => void
   onAddSubject: (categoryId: string) => void
-  onEditCategory?: (category: Categories, level: number) => void
   idCate1?: string
+  mutate: KeyedMutator<any>
 }
 
 const CategorySection: React.FC<CategorySectionProps> = ({
@@ -22,63 +24,68 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   level,
   onAddCategory,
   onAddSubject,
-  onEditCategory,
-  idCate1
+  idCate1,
+  mutate
 }) => {
-  const { settings } = useSettings()
-  const canAddSubcategory = level < 3 // Only allow adding subcategories up to level 3
+  const [isEditing, setIsEditing] = useState(false)
+
+  const handleEdit = () => {
+    setIsEditing(true)
+  }
+
+  const handleCancel = () => {
+    setIsEditing(false)
+  }
+
+  if (isEditing) {
+    return (
+      <UpdateCategoryForm
+        category={category}
+        level={level}
+        onCancel={handleCancel}
+        mutate={mutate}
+        idCate1={idCate1 || ''}
+        idCate2={level > 1 ? category._id : undefined}
+      />
+    )
+  }
 
   return (
-    <>
-      {/* Header row for the category */}
-      <TableRow>
-        <TableCell
-          colSpan={1}
-          sx={{
-            paddingLeft: `${level * 9}px`,
-            fontWeight: 'bold',
-            backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
-          }}
-        >
-          {category.titleN} {category.titleV}
-        </TableCell>
-        <TableCell
-          align='right'
-          sx={{
-            backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a',
-            textAlign: 'right'
-          }}
-        >
-          {category.credits}
-        </TableCell>
-        <TableCell
-          colSpan={8}
-          sx={{
-            backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a',
-            textAlign: 'right'
-          }}
-        >
-          <Tooltip title='Sửa danh mục'>
-            <IconButton size='small' onClick={() => onEditCategory?.(category, level)} sx={{ mr: 1 }}>
-              <EditIcon fontSize='small' />
+    <TableRow>
+      <TableCell
+        sx={{
+          paddingLeft: `${level * 9}px`,
+          backgroundColor: '#578FCA7a'
+        }}
+      >
+        <div className='flex items-center gap-2'>
+          <span>{category.titleN}</span>
+          <span>{category.titleV}</span>
+        </div>
+      </TableCell>
+      <TableCell align='right' sx={{ backgroundColor: '#578FCA7a' }}>
+        {category.credits}
+      </TableCell>
+      <TableCell colSpan={8} align='right' sx={{ backgroundColor: '#578FCA7a' }}>
+        <Tooltip title='Thêm môn học'>
+          <IconButton size='small' onClick={() => onAddSubject(category._id)}>
+            <SubjectIcon fontSize='small' />
+          </IconButton>
+        </Tooltip>
+        {level < 3 && (
+          <Tooltip title={`Thêm danh mục cấp ${level + 1}`}>
+            <IconButton size='small' onClick={() => onAddCategory(category._id, idCate1 || '')}>
+              <CategoryIcon fontSize='small' />
             </IconButton>
           </Tooltip>
-          <Tooltip title='Thêm môn học'>
-            <IconButton size='small' onClick={() => onAddSubject(category._id)} sx={{ mr: 1 }}>
-              <SubjectIcon fontSize='small' />
-            </IconButton>
-          </Tooltip>
-
-          {canAddSubcategory && (
-            <Tooltip title={`Thêm danh mục cấp ${level + 1}`}>
-              <IconButton size='small' onClick={() => onAddCategory(category._id, idCate1 || category._id)}>
-                <CategoryIcon fontSize='small' />
-              </IconButton>
-            </Tooltip>
-          )}
-        </TableCell>
-      </TableRow>
-    </>
+        )}
+        <Tooltip title='Chỉnh sửa'>
+          <IconButton size='small' onClick={handleEdit}>
+            <EditIcon fontSize='small' />
+          </IconButton>
+        </Tooltip>
+      </TableCell>
+    </TableRow>
   )
 }
 

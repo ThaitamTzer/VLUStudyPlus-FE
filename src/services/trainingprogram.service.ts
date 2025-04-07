@@ -102,6 +102,29 @@ const trainingProgramService = {
     return res.data as TrainingProgramByFrame[]
   },
 
+  createCategory1: async (
+    id: string,
+    data: any,
+    successCallBack?: (res: any) => void,
+    errorCallBack?: (res: any) => void
+  ) => {
+    try {
+      return await axiosClient.post(`/api/training-program/create-category-1/${id}`, data).then(res => {
+        if (successCallBack) {
+          successCallBack(res)
+        }
+
+        return res
+      })
+    } catch (error) {
+      if (errorCallBack) {
+        errorCallBack(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+
   addCategory2: async (
     id: string,
     data: any,

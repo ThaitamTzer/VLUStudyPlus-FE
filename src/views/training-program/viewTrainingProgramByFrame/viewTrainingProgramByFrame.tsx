@@ -21,7 +21,7 @@ export default function ViewTrainingProgramByFrame() {
 
   const id = trainingProgram?._id || ''
 
-  const { data, isLoading } = useSWR(id ? `/api/training-program/view-training-program/${id}` : null, () =>
+  const { data, isLoading, mutate } = useSWR(id ? `/api/training-program/view-training-program/${id}` : null, () =>
     trainingProgramService.getTrainingProgramByFrame(id)
   )
 
@@ -42,11 +42,11 @@ export default function ViewTrainingProgramByFrame() {
               </Button>
             </div>
           </div>
-          <FlatTrainingProgramTable data={data || []} isLoading={isLoading} />
+          <FlatTrainingProgramTable data={data || []} isLoading={isLoading} mutate={mutate} />
         </Card>
       </CustomDialog>
     ),
-    [openViewTrainingProgramByFrame, data, onClose, isLoading, trainingProgram?.title]
+    [openViewTrainingProgramByFrame, data, onClose, isLoading, trainingProgram?.title, mutate]
   )
 
   return <>{renderDialog}</>

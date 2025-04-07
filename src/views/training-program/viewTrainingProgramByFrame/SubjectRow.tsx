@@ -129,7 +129,7 @@ const SubjectRow: React.FC<SubjectRowProps> = ({ subject, level, isEditing, onCh
       <TableCell align='right'>{subject.LT}</TableCell>
       <TableCell align='right'>{subject.TH}</TableCell>
       <TableCell align='right'>{subject.TT}</TableCell>
-      <TableCell>{subject.isRequire === 'true' ? 'Bắt buộc' : 'Tự chọn'}</TableCell>
+      <TableCell>{subject.isRequire ? 'Bắt buộc' : 'Tự chọn'}</TableCell>
       <TableCell>{subject.prerequisites}</TableCell>
       <TableCell>{subject.preConditions}</TableCell>
       <TableCell>{subject.implementationSemester}</TableCell>

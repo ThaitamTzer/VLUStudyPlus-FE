@@ -61,9 +61,10 @@ export const aclConfig: ACLConfig = {
   '/student-acedemic-process': {
     action: 'readmyprocess',
     subject: 'academic'
-  },
-  '/training-program': {
-    action: 'read',
-    subject: 'trainingProgram'
   }
+
+  // '/training-program': {
+  //   action: 'read',
+  //   subject: 'trainingProgram'
+  // }
 }

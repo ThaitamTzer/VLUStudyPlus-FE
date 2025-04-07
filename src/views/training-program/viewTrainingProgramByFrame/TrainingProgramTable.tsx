@@ -6,6 +6,8 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconB
 import SubjectIcon from '@mui/icons-material/Book'
 import CategoryIcon from '@mui/icons-material/Folder'
 
+import type { KeyedMutator } from 'swr'
+
 import StyledTableRow from '@/components/table/StyledTableRow'
 import type { Categories, Subjects, TrainingProgramByFrame } from '@/types/management/trainningProgramType'
 import { useSettings } from '@/@core/hooks/useSettings'
@@ -47,9 +49,10 @@ const emptySubject: Omit<Subjects, '_id'> = {
 interface FlatTrainingProgramTableProps {
   data: TrainingProgramByFrame[]
   isLoading?: boolean
+  mutate: KeyedMutator<any>
 }
 
-const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ data, isLoading }) => {
+const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ data, isLoading, mutate }) => {
   const { settings } = useSettings()
   const [programData, setProgramData] = useState<TrainingProgramByFrame[]>(data || [])
 
@@ -58,6 +61,7 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
     parentId: string | null
     programId: string | null
     category: Categories & { _id: string }
+    idCate1: string | null
   } | null>(null)
 
   const [editingNewSubject, setEditingNewSubject] = useState<{
@@ -65,14 +69,19 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
     subject: Subjects & { _id: string }
   } | null>(null)
 
+  // const [editingCategory, setEditingCategory] = useState<{
+  //   originalId: string // ID của danh mục gốc
+  //   category: Categories & { _id: string }
+  //   level: number
+  // } | null>(null)
+
   // Update local data when prop changes
   React.useEffect(() => {
     setProgramData(data || [])
   }, [data])
 
   // Add a new subcategory to a parent category
-  const handleAddCategory = (parentId: string) => {
-    // Create a temporary category with ID
+  const handleAddCategory = (parentId: string, idCate1: string) => {
     const newCategory = {
       ...emptyCategory,
       _id: `temp-${Date.now()}`
@@ -81,7 +90,8 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
     setEditingNewCategory({
       parentId,
       programId: null,
-      category: newCategory
+      category: newCategory,
+      idCate1 // Thêm idCate1 vào state
     })
   }
 
@@ -110,7 +120,8 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
     setEditingNewCategory({
       parentId: null,
       programId,
-      category: newCategory
+      category: newCategory,
+      idCate1: programId // Thêm idCate1 vào state
     })
   }
 
@@ -128,18 +139,13 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
     })
   }
 
-  // Update fields of the new category
-  const handleCategoryChange = (field: keyof Categories, value: any) => {
-    if (!editingNewCategory) return
-
-    setEditingNewCategory({
-      ...editingNewCategory,
-      category: {
-        ...editingNewCategory.category,
-        [field]: value
-      }
-    })
-  }
+  // const handleStartEditCategory = (category: Categories, level: number) => {
+  //   setEditingCategory({
+  //     originalId: category._id,
+  //     category: { ...category },
+  //     level
+  //   })
+  // }
 
   // Update fields of the new subject
   const handleSubjectChange = (field: keyof Subjects, value: any) => {
@@ -259,7 +265,7 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
   }
 
   // Helper function to recursively render categories with editing subjects
-  const renderCategoryWithEditingSubject = (category: Categories, level: number) => {
+  const renderCategoryWithEditingSubject = (category: Categories, level: number, idCate1?: string) => {
     return (
       <React.Fragment key={category._id}>
         <CategorySection
@@ -267,6 +273,7 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
           level={level}
           onAddCategory={handleAddCategory}
           onAddSubject={handleAddSubject}
+          idCate1={idCate1 || ''}
         />
 
         {/* New category being added under this category */}
@@ -275,7 +282,9 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
             category={editingNewCategory.category}
             level={level + 1}
             isEditing={true}
-            onChange={handleCategoryChange}
+            idCate1={editingNewCategory.idCate1 || ''}
+            idCate2={editingNewCategory.parentId || ''}
+            mutate={mutate}
             onSave={handleSaveCategory}
             onCancel={handleCancelCategory}
           />
@@ -312,26 +321,32 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
               textTransform: 'uppercase'
             }}
           >
-            <TableCell width={500} sx={{ fontWeight: 'bold' }}>
+            <TableCell width={400} sx={{ fontWeight: 'bold' }}>
               Môn học
             </TableCell>
-            <TableCell align='right' sx={{ fontWeight: 'bold' }}>
-              Tín chỉ
+            <TableCell width={100} align='right' sx={{ fontWeight: 'bold' }}>
+              TC
             </TableCell>
-            <TableCell align='right' sx={{ fontWeight: 'bold' }}>
+            <TableCell width={100} align='right' sx={{ fontWeight: 'bold' }}>
               STLT
             </TableCell>
-            <TableCell align='right' sx={{ fontWeight: 'bold' }}>
+            <TableCell width={100} align='right' sx={{ fontWeight: 'bold' }}>
               STTH
             </TableCell>
-            <TableCell align='right' sx={{ fontWeight: 'bold' }}>
+            <TableCell width={100} align='right' sx={{ fontWeight: 'bold' }}>
               STTT
             </TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>Loại môn</TableCell>
+            <TableCell width={115} sx={{ fontWeight: 'bold' }}>
+              Loại môn
+            </TableCell>
             <TableCell sx={{ fontWeight: 'bold' }}>ĐK Tuyên Quyết</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>ĐK học trước</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>HK triển khai</TableCell>
+            <TableCell width={300} sx={{ fontWeight: 'bold' }}>
+              ĐK học trước
+            </TableCell>
             <TableCell width={100} sx={{ fontWeight: 'bold' }}>
+              HKTK
+            </TableCell>
+            <TableCell width={200} sx={{ fontWeight: 'bold' }}>
               Hành động
             </TableCell>
           </StyledTableRow>
@@ -357,7 +372,7 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
                         <SubjectIcon fontSize='small' />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title='Thêm danh mục'>
+                    <Tooltip title='Thêm danh mục cấp 2'>
                       <IconButton size='small' onClick={() => handleAddTopLevelCategory(program._id)}>
                         <CategoryIcon fontSize='small' />
                       </IconButton>
@@ -371,7 +386,9 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
                     category={editingNewCategory.category}
                     level={2}
                     isEditing={true}
-                    onChange={handleCategoryChange}
+                    idCate1={editingNewCategory.idCate1 || ''}
+                    idCate2={editingNewCategory.parentId || ''}
+                    mutate={mutate}
                     onSave={handleSaveCategory}
                     onCancel={handleCancelCategory}
                   />
@@ -393,7 +410,7 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
                 {program.subjects?.map(subject => <SubjectRow key={subject._id} subject={subject} level={2} />)}
 
                 {/* Use the new helper function to render categories with editing subjects */}
-                {program.categories?.map(category => renderCategoryWithEditingSubject(category, 2))}
+                {program.categories?.map(category => renderCategoryWithEditingSubject(category, 2, program._id))}
               </React.Fragment>
             )
           })}

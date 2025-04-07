@@ -244,6 +244,70 @@ const trainingProgramService = {
 
       return Promise.reject(error)
     }
+  },
+
+  deleteCate1: async (id: string, successCallBack?: (res: any) => void, errorCallBack?: (res: any) => void) => {
+    try {
+      return await axiosClient.delete(`/api/training-program/delete-category-1/${id}`).then(res => {
+        if (successCallBack) {
+          successCallBack(res)
+        }
+
+        return res
+      })
+    } catch (error) {
+      if (errorCallBack) {
+        errorCallBack(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+
+  deleteCate2: async (
+    idC1: string,
+    idC2: string,
+    successCallBack?: (res: any) => void,
+    errorCallBack?: (res: any) => void
+  ) => {
+    try {
+      return await axiosClient.delete(`/api/training-program/delete-category-2/${idC1}/${idC2}`).then(res => {
+        if (successCallBack) {
+          successCallBack(res)
+        }
+
+        return res
+      })
+    } catch (error) {
+      if (errorCallBack) {
+        errorCallBack(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+  deleteCate3: async (
+    idC1: string,
+    idC2: string,
+    idC3: string,
+    successCallBack?: (res: any) => void,
+    errorCallBack?: (res: any) => void
+  ) => {
+    try {
+      return await axiosClient.delete(`/api/training-program/delete-category-3/${idC1}/${idC2}/${idC3}`).then(res => {
+        if (successCallBack) {
+          successCallBack(res)
+        }
+
+        return res
+      })
+    } catch (error) {
+      if (errorCallBack) {
+        errorCallBack(error)
+      }
+
+      return Promise.reject(error)
+    }
   }
 }
 

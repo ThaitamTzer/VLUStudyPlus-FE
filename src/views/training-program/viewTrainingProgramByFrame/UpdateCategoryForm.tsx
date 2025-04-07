@@ -30,6 +30,7 @@ interface UpdateCategoryFormProps {
   mutate: KeyedMutator<any>
   idCate1: string
   idCate2?: string
+  idCate3?: string
 }
 
 const UpdateCategoryForm: React.FC<UpdateCategoryFormProps> = ({
@@ -38,10 +39,13 @@ const UpdateCategoryForm: React.FC<UpdateCategoryFormProps> = ({
   onCancel,
   mutate,
   idCate1,
-  idCate2
+  idCate2,
+  idCate3
 }) => {
   const { settings } = useSettings()
   const [loading, setLoading] = useState<boolean>(false)
+
+  console.log(idCate1, idCate2, idCate3)
 
   const {
     control,
@@ -118,7 +122,7 @@ const UpdateCategoryForm: React.FC<UpdateCategoryFormProps> = ({
           await trainingProgramService.updateCategory3(
             idCate1,
             idCate2,
-            category._id,
+            idCate3 || '',
             data,
             () => {
               toast.update(toastID, {

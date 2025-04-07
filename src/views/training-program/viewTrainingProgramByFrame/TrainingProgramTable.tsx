@@ -38,7 +38,13 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
   } = useTrainingProgramTable({ data, mutate })
 
   // Helper function to recursively render categories with editing subjects
-  const renderCategoryWithEditingSubject = (category: Categories, level: number, idCate1?: string) => {
+  const renderCategoryWithEditingSubject = (
+    category: Categories,
+    level: number,
+    idCate1?: string,
+    idCate2?: string,
+    idCate3?: string
+  ) => {
     return (
       <React.Fragment key={category._id}>
         <CategorySection
@@ -48,6 +54,8 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
           onAddCategory={handleAddCategory}
           onAddSubject={handleAddSubject}
           idCate1={idCate1 || ''}
+          idCate2={idCate2 || ''}
+          idCate3={idCate3 || ''}
         />
 
         {/* New category being added under this category */}
@@ -82,7 +90,7 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
 
         {/* Recursively render subcategories */}
         {category.categoriesC3?.map((subCategory: Categories) =>
-          renderCategoryWithEditingSubject(subCategory, level + 1)
+          renderCategoryWithEditingSubject(subCategory, level + 1, idCate1, category._id, subCategory._id)
         )}
       </React.Fragment>
     )
@@ -134,7 +142,9 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
                   {program.subjects?.map(subject => <SubjectRow key={subject._id} subject={subject} level={2} />)}
 
                   {/* Use the new helper function to render categories with editing subjects */}
-                  {program.categories?.map(category => renderCategoryWithEditingSubject(category, 2, program._id))}
+                  {program.categories?.map(category =>
+                    renderCategoryWithEditingSubject(category, 2, program._id, category._id)
+                  )}
                 </React.Fragment>
               )
             })}

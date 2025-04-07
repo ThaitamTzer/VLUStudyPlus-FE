@@ -6,12 +6,14 @@ import { IconButton, TableCell, TableRow, Tooltip } from '@mui/material'
 import SubjectIcon from '@mui/icons-material/Book'
 import CategoryIcon from '@mui/icons-material/Folder'
 import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
 import type { KeyedMutator } from 'swr'
 
 import { useSettings } from '@/@core/hooks/useSettings'
 import { useTrainingProgramStore } from '@/stores/trainingProgram.store'
 import type { TrainingProgramByFrame } from '@/types/management/trainningProgramType'
 import UpdateCategory1Modal from '../UpdateCategory1Modal'
+import DeleteCategoryModal from '../DeleteCategoryModal'
 
 interface ProgramRowProps {
   program: TrainingProgramByFrame
@@ -24,6 +26,7 @@ const ProgramRow = ({ program, onAddSubject, onAddCategory, mutate }: ProgramRow
   const { settings } = useSettings()
   const { toogleUpdateCategory1, setProgramId } = useTrainingProgramStore()
   const [openUpdateModal, setOpenUpdateModal] = useState(false)
+  const [openDeleteModal, setOpenDeleteModal] = useState(false)
 
   const handleOpenUpdateCate1 = useCallback(
     (id: string) => {
@@ -36,6 +39,14 @@ const ProgramRow = ({ program, onAddSubject, onAddCategory, mutate }: ProgramRow
 
   const handleCloseUpdateModal = useCallback(() => {
     setOpenUpdateModal(false)
+  }, [])
+
+  const handleOpenDeleteModal = useCallback(() => {
+    setOpenDeleteModal(true)
+  }, [])
+
+  const handleCloseDeleteModal = useCallback(() => {
+    setOpenDeleteModal(false)
   }, [])
 
   return (
@@ -66,6 +77,11 @@ const ProgramRow = ({ program, onAddSubject, onAddCategory, mutate }: ProgramRow
               <EditIcon />
             </IconButton>
           </Tooltip>
+          <Tooltip title='Xóa danh mục'>
+            <IconButton size='small' onClick={handleOpenDeleteModal}>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
         </TableCell>
       </TableRow>
 
@@ -75,6 +91,15 @@ const ProgramRow = ({ program, onAddSubject, onAddCategory, mutate }: ProgramRow
         mutate={mutate}
         programId={program._id}
         category={program}
+      />
+
+      <DeleteCategoryModal
+        open={openDeleteModal}
+        onClose={handleCloseDeleteModal}
+        mutate={mutate}
+        programId={program._id}
+        categoryId={program._id}
+        level={1}
       />
     </>
   )

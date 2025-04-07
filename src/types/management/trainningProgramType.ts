@@ -71,6 +71,7 @@ export type Categories = {
   credits: number
   subjects: Subjects[]
   categoriesC3?: CategoriesC3[]
+  parentId?: string
 }
 
 export type TrainingProgramByFrame = {

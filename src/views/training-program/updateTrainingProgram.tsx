@@ -21,7 +21,7 @@ const schema = v.object({
   title: v.pipe(v.string(), v.nonEmpty('Tên không được để trống'), v.maxLength(100, 'Độ dài tối đa 100 ký tự')),
   credit: v.pipe(v.number(), v.minValue(1, 'Số tín chỉ phải lớn hơn 0')),
   cohortId: v.undefinedable(v.pipe(v.string(), v.nonEmpty('Khóa không được để trống')), ''),
-  major: v.undefinedable(v.pipe(v.string(), v.nonEmpty('Chuyên ngành không được để trống')), '')
+  majorId: v.undefinedable(v.pipe(v.string(), v.nonEmpty('Chuyên ngành không được để trống')), '')
 })
 
 type FormData = InferInput<typeof schema>
@@ -46,7 +46,7 @@ export default function UpdateTrainingProgram({ mutate }: UpdateTrainingProgramP
   } = useForm<FormData>({
     mode: 'all',
     resolver: valibotResolver(schema),
-    defaultValues: { title: '', credit: 0, cohortId: '', major: '' }
+    defaultValues: { title: '', credit: 0, cohortId: '', majorId: '' }
   })
 
   const watchedValues = watch() // Lấy dữ liệu đang nhập vào
@@ -57,7 +57,7 @@ export default function UpdateTrainingProgram({ mutate }: UpdateTrainingProgramP
         title: trainingProgram.title || '',
         credit: trainingProgram.credit || 0,
         cohortId: trainingProgram?.cohortId?._id || '',
-        major: trainingProgram?.majorId?._id || ''
+        majorId: trainingProgram?.majorId?._id || ''
       })
     }
   }, [trainingProgram, reset])
@@ -173,14 +173,14 @@ export default function UpdateTrainingProgram({ mutate }: UpdateTrainingProgramP
         </Grid>
         <Grid item xs={12}>
           <Controller
-            name='major'
+            name='majorId'
             control={control}
             render={({ field }) => (
               <CustomTextField
                 {...field}
                 label='Chuyên ngành'
-                error={!!errors.major}
-                helperText={errors.major?.message}
+                error={!!errors.majorId}
+                helperText={errors.majorId?.message}
                 fullWidth
                 select
                 SelectProps={{

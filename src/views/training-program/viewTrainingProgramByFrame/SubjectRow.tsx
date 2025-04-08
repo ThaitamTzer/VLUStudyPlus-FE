@@ -1,10 +1,10 @@
 'use client'
-import { FormControl, IconButton, MenuItem, Select, Stack, TableCell, TextField, Tooltip } from '@mui/material'
+import { FormControl, IconButton, MenuItem, Select, Stack, TableCell, TextField } from '@mui/material'
 
 import SaveIcon from '@mui/icons-material/Save'
 import CancelIcon from '@mui/icons-material/Cancel'
 
-import Iconify from '@/components/iconify'
+// import Iconify from '@/components/iconify'
 import type { Subjects } from '@/types/management/trainningProgramType'
 import StyledTableRow from '@/components/table/StyledTableRow'
 
@@ -134,7 +134,7 @@ const SubjectRow: React.FC<SubjectRowProps> = ({ subject, level, isEditing, onCh
       <TableCell>{subject.preConditions}</TableCell>
       <TableCell>{subject.implementationSemester}</TableCell>
       <TableCell>
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        {/* <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <Tooltip title='Cập nhật môn học' arrow>
             <IconButton size='small' color='primary'>
               <Iconify icon='eva:edit-fill' />
@@ -145,7 +145,7 @@ const SubjectRow: React.FC<SubjectRowProps> = ({ subject, level, isEditing, onCh
               <Iconify icon='eva:trash-2-outline' />
             </IconButton>
           </Tooltip>
-        </div>
+        </div> */}
       </TableCell>
     </StyledTableRow>
   )

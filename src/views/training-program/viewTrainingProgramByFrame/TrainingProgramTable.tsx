@@ -20,9 +20,21 @@ interface FlatTrainingProgramTableProps {
   data: TrainingProgramByFrame[]
   isLoading?: boolean
   mutate: KeyedMutator<any>
+  onAddSubjectInCate?: (category: {
+    id: string
+    level: 1 | 2 | 3
+    idCate1?: string
+    idCate2?: string
+    idCate3?: string
+  }) => void
 }
 
-const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ data, isLoading, mutate }) => {
+const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({
+  data,
+  isLoading,
+  mutate,
+  onAddSubjectInCate
+}) => {
   const {
     programData,
     editingNewCategory,
@@ -53,6 +65,7 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
           mutate={mutate}
           onAddCategory={handleAddCategory}
           onAddSubject={handleAddSubject}
+          onAddSubjectInCate={onAddSubjectInCate}
           idCate1={idCate1 || ''}
           idCate2={idCate2 || ''}
           idCate3={idCate3 || ''}
@@ -110,6 +123,7 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
                     program={program}
                     onAddSubject={handleAddTopLevelSubject}
                     onAddCategory={handleAddTopLevelCategory}
+                    onAddSubjectInCate={onAddSubjectInCate}
                     mutate={mutate}
                   />
 

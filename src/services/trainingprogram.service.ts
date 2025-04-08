@@ -308,6 +308,107 @@ const trainingProgramService = {
 
       return Promise.reject(error)
     }
+  },
+
+  addSubjectInFrame: async (
+    id: string,
+    data: any,
+    successCallBack?: (res: any) => void,
+    errorCallBack?: (err: any) => void
+  ) => {
+    try {
+      return await axiosClient
+        .post(`/api/training-program/create-subject-in-training-program/${id}`, data)
+        .then(res => {
+          if (successCallBack) {
+            successCallBack(res)
+          }
+
+          return res
+        })
+    } catch (error) {
+      if (errorCallBack) {
+        errorCallBack(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+
+  addSubjectInFrameInCate1: async (
+    id: string,
+    data: any,
+    successCallBack?: (res: any) => void,
+    errorCallBack?: (err: any) => void
+  ) => {
+    try {
+      return await axiosClient.put(`/api/training-program/add-subject-for-category-C1/${id}`, data).then(res => {
+        if (successCallBack) {
+          successCallBack(res)
+        }
+
+        return res
+      })
+    } catch (error) {
+      if (errorCallBack) {
+        errorCallBack(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+
+  addSubjectInFrameInCate2: async (
+    idC1: string,
+    idC2: string,
+    data: any,
+    successCallBack?: (res: any) => void,
+    errorCallBack?: (err: any) => void
+  ) => {
+    try {
+      return await axiosClient
+        .put(`/api/training-program/update-subject-for-category-C2/${idC1}/${idC2}`, data)
+        .then(res => {
+          if (successCallBack) {
+            successCallBack(res)
+          }
+
+          return res
+        })
+    } catch (error) {
+      if (errorCallBack) {
+        errorCallBack(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+
+  addSubjectInFrameInCate3: async (
+    idC1: string,
+    idC2: string,
+    idC3: string,
+    data: any,
+    successCallBack?: (res: any) => void,
+    errorCallBack?: (err: any) => void
+  ) => {
+    try {
+      return await axiosClient
+        .put(`/api/training-program/update-subject-for-category-C3/${idC1}/${idC2}/${idC3}`, data)
+        .then(res => {
+          if (successCallBack) {
+            successCallBack(res)
+          }
+
+          return res
+        })
+    } catch (error) {
+      if (errorCallBack) {
+        errorCallBack(error)
+      }
+
+      return Promise.reject(error)
+    }
   }
 }
 

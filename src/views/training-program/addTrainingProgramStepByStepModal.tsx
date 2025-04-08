@@ -147,12 +147,13 @@ export default function AddTrainingProgramStepByStepModal(props: AddTrainingProg
       await trainingProgramService.create(
         dataCreateForm,
         async res => {
-          toast.success(
-            'Thêm khung chương trình đào tạo thành công, Đang tiến hành import chi tiết khung chương trình đào tạo',
-            {
-              autoClose: 5000
-            }
-          )
+          toast.update(toastID, {
+            render:
+              'Thêm khung chương trình đào tạo thành công, Đang tiến hành import chi tiết khung chương trình đào tạo',
+            type: 'success',
+            isLoading: false,
+            autoClose: 5000
+          })
           mutate()
           toogleImportProgramLoading()
           onClose()

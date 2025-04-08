@@ -15,6 +15,10 @@ type States = {
   openCreateCategory1: boolean
   openEditCategory1: boolean
   programid: string | null
+  openAddSubjectInFrame: boolean
+  openAddSubjectInCate: boolean
+  openAddSubjectModal: boolean
+  selectedProgramId: string
 }
 
 type Actions = {
@@ -30,6 +34,10 @@ type Actions = {
   toogleCreateCategory1: () => void
   toogleUpdateCategory1: () => void
   setProgramId: (programid: string) => void
+  toogleOpenAddSubjectInFrame: () => void
+  toogleOpenAddSubjectInCate: () => void
+  toogleAddSubjectModal: () => void
+  setSelectedProgramId: (id: string) => void
 }
 
 export const useTrainingProgramStore = create<States & Actions>(set => ({
@@ -45,6 +53,12 @@ export const useTrainingProgramStore = create<States & Actions>(set => ({
   openCreateCategory1: false,
   openEditCategory1: false,
   programid: null,
+  openAddSubjectInCate: false,
+  openAddSubjectInFrame: false,
+  openAddSubjectModal: false,
+  selectedProgramId: '',
+  toogleOpenAddSubjectInCate: () => set(state => ({ openAddSubjectInCate: !state.openAddSubjectInCate })),
+  toogleOpenAddSubjectInFrame: () => set(state => ({ openAddSubjectInFrame: !state.openAddSubjectInFrame })),
   setProgramId: (programid: string | null) => set({ programid }),
   toogleUpdateCategory1: () => set(state => ({ openEditCategory1: !state.openEditCategory1 })),
   toogleCreateCategory1: () => set(state => ({ openCreateCategory1: !state.openCreateCategory1 })),
@@ -58,5 +72,7 @@ export const useTrainingProgramStore = create<States & Actions>(set => ({
   toogleDeleteTrainingProgram: () => set(state => ({ openDeleteTrainingProgram: !state.openDeleteTrainingProgram })),
   toogleImportTrainingProgramSession: () =>
     set(state => ({ openImportTrainingProgramSession: !state.openImportTrainingProgramSession })),
-  setTrainingProgram: (trainingProgram: TrainingProgramType | null) => set({ trainingProgram })
+  setTrainingProgram: (trainingProgram: TrainingProgramType | null) => set({ trainingProgram }),
+  toogleAddSubjectModal: () => set(state => ({ openAddSubjectModal: !state.openAddSubjectModal })),
+  setSelectedProgramId: (id: string) => set({ selectedProgramId: id })
 }))

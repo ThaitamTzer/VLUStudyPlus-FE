@@ -85,6 +85,10 @@ export default function TrainingProgramPage() {
                 <Iconify icon='fluent:table-add-20-regular' color='#198754' />
                 <ListItemText primary='Nhập chương trình đào tạo' />
               </ListItem>
+              <ListItem>
+                <Iconify icon='material-symbols:add-circle-outline' color='#0d6efd' />
+                <ListItemText primary='Thêm môn học vào khung chương trình đào tạo' />
+              </ListItem>
             </List>
           </div>
         </CardContent>

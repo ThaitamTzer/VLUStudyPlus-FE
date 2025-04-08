@@ -4,6 +4,8 @@ import { useCallback } from 'react'
 
 import { useSearchParams, useRouter } from 'next/navigation'
 
+import dynamic from 'next/dynamic'
+
 import useSWR from 'swr'
 
 import {
@@ -23,18 +25,22 @@ import PageHeader from '@/components/page-header'
 import trainingProgramService from '@/services/trainingprogram.service'
 import CustomTextField from '@/@core/components/mui/TextField'
 import DebouncedInput from '@/components/debouncedInput'
-import TableTrainingProgram from './tableTrainingProgram'
 import TablePaginationCustom from '@/components/table/TablePagination'
 import { useTrainingProgramStore } from '@/stores/trainingProgram.store'
 
-// import CreateTrainingProgram from './createTrainingProgram'
 import Iconify from '@/components/iconify'
-import UpdateTrainingProgram from './updateTrainingProgram'
-import DeleteTrainingProgram from './deleteTrainingProgram'
-import ImportTrainingProgram from './importTrainingProgram'
 import ProgressModal from '@/components/dialogs/progressModal'
-import ViewTrainingProgramByFrame from './viewTrainingProgramByFrame/viewTrainingProgramByFrame'
-import AddTrainingProgramStepByStepModal from './addTrainingProgramStepByStepModal'
+
+const TableTrainingProgram = dynamic(() => import('./tableTrainingProgram'), { ssr: false })
+const UpdateTrainingProgram = dynamic(() => import('./updateTrainingProgram'), { ssr: false })
+const DeleteTrainingProgram = dynamic(() => import('./deleteTrainingProgram'), { ssr: false })
+const ImportTrainingProgram = dynamic(() => import('./importTrainingProgram'), { ssr: false })
+
+const ViewTrainingProgramByFrame = dynamic(() => import('./viewTrainingProgramByFrame/viewTrainingProgramByFrame'), {
+  ssr: false
+})
+
+const AddTrainingProgramStepByStepModal = dynamic(() => import('./addTrainingProgramStepByStepModal'), { ssr: false })
 
 export default function TrainingProgramPage() {
   const router = useRouter()
@@ -179,7 +185,6 @@ export default function TrainingProgramPage() {
           }}
         />
       </Card>
-      {/* <CreateTrainingProgram mutate={mutate} /> */}
       <AddTrainingProgramStepByStepModal mutate={mutate} />
       <UpdateTrainingProgram mutate={mutate} />
       <DeleteTrainingProgram mutate={mutate} />

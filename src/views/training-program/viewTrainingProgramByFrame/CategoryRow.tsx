@@ -23,7 +23,7 @@ import trainingProgramService from '@/services/trainingprogram.service'
 const schema = v.object({
   titleN: v.pipe(v.string(), v.trim(), v.nonEmpty('Số TT danh mục không được để trống')),
   titleV: v.pipe(v.string(), v.trim(), v.nonEmpty('Tên danh mục không được để trống')),
-  credits: v.pipe(v.number(), v.minValue(1, 'Số tín chỉ không được nhỏ hơn 0'))
+  credits: v.pipe(v.number(), v.minValue(0, 'Số tín chỉ không được nhỏ hơn 0'))
 })
 
 type CategoryForm = InferInput<typeof schema>
@@ -214,7 +214,7 @@ const CategoryRow: React.FC<CategoryRowProps> = ({
                 error={!!errors.credits}
                 helperText={errors.credits?.message}
                 placeholder='Số tín chỉ'
-                onChange={e => onChange(e.target.value === '' ? 0 : Number(e.target.value))}
+                onChange={e => onChange(Number(e.target.value))}
                 onFocus={e => e.target.select()}
               />
             )}

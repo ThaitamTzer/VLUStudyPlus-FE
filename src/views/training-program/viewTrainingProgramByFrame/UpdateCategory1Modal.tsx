@@ -129,7 +129,7 @@ const UpdateCategory1Modal = ({ open, onClose, mutate, programId, category }: Up
           <Controller
             name='credits'
             control={control}
-            render={({ field }) => (
+            render={({ field: { onChange, ...field } }) => (
               <CustomTextField
                 {...field}
                 fullWidth
@@ -137,6 +137,7 @@ const UpdateCategory1Modal = ({ open, onClose, mutate, programId, category }: Up
                 label='Số tín chỉ'
                 error={!!errors.credits}
                 helperText={errors.credits?.message}
+                onChange={e => onChange(Number(e.target.value))}
               />
             )}
           />

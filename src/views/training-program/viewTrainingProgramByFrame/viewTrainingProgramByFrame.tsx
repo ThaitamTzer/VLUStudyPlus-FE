@@ -18,7 +18,8 @@ export default function ViewTrainingProgramByFrame() {
     toogleViewTrainingProgramByFrame,
     trainingProgram,
     toogleCreateCategory1,
-    openCreateCategory1
+    openCreateCategory1,
+    toogleOpenChangeHistory
   } = useTrainingProgramStore()
 
   const onClose = useCallback(() => {
@@ -35,6 +36,10 @@ export default function ViewTrainingProgramByFrame() {
     toogleCreateCategory1()
   }, [toogleCreateCategory1])
 
+  const handleOpenChangeHistory = useCallback(() => {
+    toogleOpenChangeHistory()
+  }, [toogleOpenChangeHistory])
+
   const renderDialog = useMemo(
     () => (
       <CustomDialog
@@ -46,6 +51,16 @@ export default function ViewTrainingProgramByFrame() {
         <Card>
           <div className='flex justify-between flex-col items-start sm:flex-row sm:items-center sm:justify-end p-6 border-bs gap-4'>
             <div className='flex flex-col sm:flex-row max-sm:is-full items-start sm:items-center gap-4'>
+              {/* Xem lịch sử chỉnh sửa */}
+              <Button
+                variant='contained'
+                className='max-sm:is-full'
+                color='secondary'
+                onClick={handleOpenChangeHistory}
+              >
+                <span className='text-sm font-semibold'>Xem lịch sử chỉnh sửa</span>
+              </Button>
+
               <Button variant='contained' className='max-sm:is-full' onClick={handleOpenCreateCate1}>
                 <span className='text-sm font-semibold'>Thêm danh mục cấp 1</span>
               </Button>
@@ -63,7 +78,8 @@ export default function ViewTrainingProgramByFrame() {
       trainingProgram?.title,
       mutate,
       handleOpenCreateCate1,
-      id
+      id,
+      handleOpenChangeHistory
     ]
   )
 

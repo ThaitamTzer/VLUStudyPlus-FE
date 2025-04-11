@@ -19,6 +19,7 @@ type States = {
   selectedProgramId: string
   openDeleteSubject: boolean
   subject: Subjects | null
+  openChangeHistory: boolean
 }
 
 type Actions = {
@@ -38,6 +39,7 @@ type Actions = {
   setSelectedProgramId: (id: string) => void
   toogleOpenDeleteSubject: () => void
   setSubject: (subject: Subjects | null) => void
+  toogleOpenChangeHistory: () => void
 }
 
 export const useTrainingProgramStore = create<States & Actions>(set => ({
@@ -57,6 +59,7 @@ export const useTrainingProgramStore = create<States & Actions>(set => ({
   selectedProgramId: '',
   openDeleteSubject: false,
   subject: null,
+  openChangeHistory: false,
   toogleOpenAddSubjectInCate: () => set(state => ({ openAddSubjectInCate: !state.openAddSubjectInCate })),
   setProgramId: (programid: string | null) => set({ programid }),
   toogleUpdateCategory1: () => set(state => ({ openEditCategory1: !state.openEditCategory1 })),
@@ -74,5 +77,6 @@ export const useTrainingProgramStore = create<States & Actions>(set => ({
   setTrainingProgram: (trainingProgram: TrainingProgramType | null) => set({ trainingProgram }),
   setSelectedProgramId: (id: string) => set({ selectedProgramId: id }),
   toogleOpenDeleteSubject: () => set(state => ({ openDeleteSubject: !state.openDeleteSubject })),
-  setSubject: (subject: Subjects | null) => set({ subject })
+  setSubject: (subject: Subjects | null) => set({ subject }),
+  toogleOpenChangeHistory: () => set(state => ({ openChangeHistory: !state.openChangeHistory }))
 }))

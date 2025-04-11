@@ -197,7 +197,7 @@ const UpdateCategoryForm: React.FC<UpdateCategoryFormProps> = ({
         <Controller
           name='credits'
           control={control}
-          render={({ field }) => (
+          render={({ field: { onChange, ...field } }) => (
             <CustomTextField
               {...field}
               type='number'
@@ -206,6 +206,7 @@ const UpdateCategoryForm: React.FC<UpdateCategoryFormProps> = ({
               helperText={errors.credits?.message}
               size='small'
               disabled={loading}
+              onChange={e => onChange(Number(e.target.value))}
             />
           )}
         />

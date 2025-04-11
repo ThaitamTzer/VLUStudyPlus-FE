@@ -246,15 +246,24 @@ const trainingProgramService = {
     }
   },
 
-  deleteCate1: async (id: string, successCallBack?: (res: any) => void, errorCallBack?: (res: any) => void) => {
+  deleteCate1: async (
+    id: string,
+    reason: string,
+    successCallBack?: (res: any) => void,
+    errorCallBack?: (res: any) => void
+  ) => {
     try {
-      return await axiosClient.delete(`/api/training-program/delete-category-1/${id}`).then(res => {
-        if (successCallBack) {
-          successCallBack(res)
-        }
+      return await axiosClient
+        .delete(`/api/training-program/delete-category-1/${id}`, {
+          data: { reason }
+        })
+        .then(res => {
+          if (successCallBack) {
+            successCallBack(res)
+          }
 
-        return res
-      })
+          return res
+        })
     } catch (error) {
       if (errorCallBack) {
         errorCallBack(error)
@@ -267,17 +276,22 @@ const trainingProgramService = {
   deleteCate2: async (
     idC1: string,
     idC2: string,
+    reason: string,
     successCallBack?: (res: any) => void,
     errorCallBack?: (res: any) => void
   ) => {
     try {
-      return await axiosClient.delete(`/api/training-program/delete-category-2/${idC1}/${idC2}`).then(res => {
-        if (successCallBack) {
-          successCallBack(res)
-        }
+      return await axiosClient
+        .delete(`/api/training-program/delete-category-2/${idC1}/${idC2}`, {
+          data: { reason }
+        })
+        .then(res => {
+          if (successCallBack) {
+            successCallBack(res)
+          }
 
-        return res
-      })
+          return res
+        })
     } catch (error) {
       if (errorCallBack) {
         errorCallBack(error)
@@ -290,17 +304,22 @@ const trainingProgramService = {
     idC1: string,
     idC2: string,
     idC3: string,
+    reason: string,
     successCallBack?: (res: any) => void,
     errorCallBack?: (res: any) => void
   ) => {
     try {
-      return await axiosClient.delete(`/api/training-program/delete-category-3/${idC1}/${idC2}/${idC3}`).then(res => {
-        if (successCallBack) {
-          successCallBack(res)
-        }
+      return await axiosClient
+        .delete(`/api/training-program/delete-category-3/${idC1}/${idC2}/${idC3}`, {
+          data: { reason }
+        })
+        .then(res => {
+          if (successCallBack) {
+            successCallBack(res)
+          }
 
-        return res
-      })
+          return res
+        })
     } catch (error) {
       if (errorCallBack) {
         errorCallBack(error)

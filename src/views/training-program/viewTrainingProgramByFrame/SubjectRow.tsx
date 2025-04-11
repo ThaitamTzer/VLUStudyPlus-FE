@@ -1,4 +1,6 @@
 'use client'
+import { useEffect, useState } from 'react'
+
 import { FormControl, IconButton, MenuItem, Select, Stack, TableCell, TextField, Tooltip } from '@mui/material'
 import { Controller, useForm } from 'react-hook-form'
 import * as v from 'valibot'
@@ -9,27 +11,15 @@ import SaveIcon from '@mui/icons-material/Save'
 import CancelIcon from '@mui/icons-material/Cancel'
 
 // import Iconify from '@/components/iconify'
+import type { KeyedMutator } from 'swr'
+
 import type { Subjects } from '@/types/management/trainningProgramType'
 import StyledTableRow from '@/components/table/StyledTableRow'
 import Iconify from '@/components/iconify'
 import subjectServices from '@/services/subject.service'
 
-interface SubjectRowProps {
-  subject: Subjects
-  level: number
-  isEditing?: boolean
-  onChange?: (field: keyof Subjects, value: any) => void
-  onSave?: (data: any) => void
-  onCancel?: () => void
-  programId?: string
-  categoryId?: string
-  categoryLevel?: number
-  idCate1: string
-  idCate2: string
-  idCate3: string
-}
-
-const schema = v.object({
+// Tách schema validation ra riêng
+const subjectSchema = v.object({
   courseCode: v.pipe(
     v.string(),
     v.nonEmpty('Mã môn học không được để trống'),
@@ -60,7 +50,7 @@ const schema = v.object({
     v.minValue(0, 'Số giờ tự học phải lớn hơn hoặc bằng 0'),
     v.maxValue(150, 'Số giờ tự học không được quá 150')
   ),
-  isRequire: v.string(),
+  isRequire: v.boolean(),
   prerequisites: v.pipe(
     v.string(),
     v.nonEmpty('Điều kiện tiên quyết không được để trống'),
@@ -78,7 +68,80 @@ const schema = v.object({
   )
 })
 
-type SubjectForm = v.InferInput<typeof schema>
+type SubjectForm = v.InferInput<typeof subjectSchema>
+
+interface FormFieldProps {
+  name: keyof SubjectForm
+  control: any
+  errors: any
+  type?: 'text' | 'number'
+  [key: string]: any
+}
+
+interface FormSelectProps {
+  name: keyof SubjectForm
+  control: any
+  errors: any
+  options: Array<{
+    value: string
+    label: string
+  }>
+}
+
+// Tách component form field
+const FormField: React.FC<FormFieldProps> = ({ name, control, errors, type = 'text', ...props }) => (
+  <Controller
+    name={name}
+    control={control}
+    render={({ field: { onChange, ...field } }) => (
+      <TextField
+        {...field}
+        {...props}
+        size='small'
+        type={type}
+        error={!!errors[name]}
+        helperText={errors[name]?.message}
+        fullWidth
+        onChange={e => onChange(type === 'number' ? Number(e.target.value) : e.target.value)}
+      />
+    )}
+  />
+)
+
+// Tách component form select
+const FormSelect: React.FC<FormSelectProps> = ({ name, control, errors, options }) => (
+  <Controller
+    name={name}
+    control={control}
+    render={({ field }) => (
+      <FormControl fullWidth size='small'>
+        <Select {...field} error={!!errors[name]}>
+          {options.map(option => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    )}
+  />
+)
+
+interface SubjectRowProps {
+  subject: Subjects
+  level: number
+  isEditing?: boolean
+  onChange?: (field: keyof Subjects, value: any) => void
+  onSave?: (data: any) => void
+  onCancel?: () => void
+  programId?: string
+  categoryId?: string
+  categoryLevel?: number
+  idCate1: string
+  idCate2: string
+  idCate3: string
+  mutate?: KeyedMutator<any>
+}
 
 const SubjectRow: React.FC<SubjectRowProps> = ({
   subject,
@@ -91,19 +154,16 @@ const SubjectRow: React.FC<SubjectRowProps> = ({
   categoryLevel,
   idCate1,
   idCate2,
-  idCate3
+  idCate3,
+  mutate
 }) => {
-  console.log('idCate1', idCate1)
-  console.log('idCate2', idCate2)
-  console.log('idCate3', idCate3)
-  console.log('programId', programId)
-
   const {
     control,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    reset
   } = useForm<SubjectForm>({
-    resolver: valibotResolver(schema),
+    resolver: valibotResolver(subjectSchema),
     mode: 'all',
     defaultValues: {
       courseCode: subject.courseCode,
@@ -119,86 +179,54 @@ const SubjectRow: React.FC<SubjectRowProps> = ({
     }
   })
 
-  const onSubmit = handleSubmit(async data => {
-    if (!programId) {
-      toast.error('Không tìm thấy ID khung chương trình đào tạo')
+  const [isUpdating, setIsUpdating] = useState(false)
 
-      return
-    }
+  useEffect(() => {
+    reset({
+      courseCode: subject.courseCode,
+      courseName: subject.courseName,
+      credits: subject.credits,
+      LT: subject.LT,
+      TH: subject.TH,
+      TT: subject.TT,
+      isRequire: subject.isRequire,
+      prerequisites: subject.prerequisites,
+      preConditions: subject.preConditions,
+      implementationSemester: Number(subject.implementationSemester)
+    })
+  }, [subject, reset])
 
-    if (!categoryId) {
-      toast.error('Không tìm thấy ID danh mục')
+  const handleUpdate = () => setIsUpdating(true)
+  const handleCancelUpdate = () => setIsUpdating(false)
 
-      return
-    }
-
-    const toastId = toast.loading('Đang thêm môn học...')
+  const handleApiCall = async (data: SubjectForm, isUpdate = false) => {
+    const toastId = toast.loading(isUpdate ? 'Đang cập nhật môn học...' : 'Đang thêm môn học...')
 
     try {
-      // Xác định cấp độ danh mục và gọi API tương ứng
-      if (categoryLevel === 1) {
-        await subjectServices.createSubject(
-          programId,
-          idCate1,
+      if (isUpdate) {
+        if (!subject._id) {
+          toast.error('Không tìm thấy ID môn học')
+
+          return
+        }
+
+        await subjectServices.updateSubject(
+          subject._id,
           data,
           () => {
             toast.update(toastId, {
-              render: 'Thêm môn học thành công',
+              render: 'Cập nhật môn học thành công',
               type: 'success',
               isLoading: false,
               autoClose: 2000
             })
+            setIsUpdating(false)
             onSave?.(data)
+            mutate?.()
           },
           err => {
             toast.update(toastId, {
-              render: err?.message || 'Có lỗi xảy ra khi thêm môn học',
-              type: 'error',
-              isLoading: false,
-              autoClose: 2000
-            })
-          }
-        )
-      } else if (categoryLevel === 2) {
-        await subjectServices.createSubject(
-          programId,
-          idCate2,
-          data,
-          () => {
-            toast.update(toastId, {
-              render: 'Thêm môn học thành công',
-              type: 'success',
-              isLoading: false,
-              autoClose: 2000
-            })
-            onSave?.(data)
-          },
-          err => {
-            toast.update(toastId, {
-              render: err?.message || 'Có lỗi xảy ra khi thêm môn học',
-              type: 'error',
-              isLoading: false,
-              autoClose: 2000
-            })
-          }
-        )
-      } else if (categoryLevel === 3) {
-        await subjectServices.createSubject(
-          programId,
-          idCate3,
-          data,
-          () => {
-            toast.update(toastId, {
-              render: 'Thêm môn học thành công',
-              type: 'success',
-              isLoading: false,
-              autoClose: 2000
-            })
-            onSave?.(data)
-          },
-          err => {
-            toast.update(toastId, {
-              render: err?.message || 'Có lỗi xảy ra khi thêm môn học',
+              render: err?.message || 'Có lỗi xảy ra khi cập nhật môn học',
               type: 'error',
               isLoading: false,
               autoClose: 2000
@@ -206,196 +234,133 @@ const SubjectRow: React.FC<SubjectRowProps> = ({
           }
         )
       } else {
-        toast.update(toastId, {
-          render: 'Không xác định được cấp độ danh mục',
-          type: 'error',
-          isLoading: false,
-          autoClose: 2000
-        })
+        if (!programId || !categoryId) {
+          toast.error('Thiếu thông tin cần thiết')
+
+          return
+        }
+
+        const categoryIdMap: Record<number, string> = {
+          1: idCate1,
+          2: idCate2,
+          3: idCate3
+        }
+
+        const targetCategoryId = categoryIdMap[categoryLevel || 1]
+
+        if (!targetCategoryId) {
+          toast.error('Không xác định được cấp độ danh mục')
+
+          return
+        }
+
+        await subjectServices.createSubject(
+          programId,
+          targetCategoryId,
+          data,
+          () => {
+            toast.update(toastId, {
+              render: 'Thêm môn học thành công',
+              type: 'success',
+              isLoading: false,
+              autoClose: 2000
+            })
+            onSave?.(data)
+            mutate?.()
+          },
+          err => {
+            toast.update(toastId, {
+              render: err?.message || 'Có lỗi xảy ra khi thêm môn học',
+              type: 'error',
+              isLoading: false,
+              autoClose: 2000
+            })
+          }
+        )
       }
     } catch (error) {
       toast.update(toastId, {
-        render: 'Có lỗi xảy ra khi thêm môn học',
+        render: `Có lỗi xảy ra khi ${isUpdate ? 'cập nhật' : 'thêm'} môn học`,
         type: 'error',
         isLoading: false,
         autoClose: 2000
       })
     }
-  })
+  }
+
+  const onSubmit = handleSubmit(data => handleApiCall(data))
+  const handleUpdateSubmit = handleSubmit(data => handleApiCall(data, true))
+
+  const renderFormFields = () => (
+    <>
+      <TableCell sx={{ paddingLeft: `${level * 9}px` }}>
+        <Stack direction='column' spacing={1}>
+          <FormField name='courseCode' control={control} errors={errors} placeholder='Mã môn học' sx={{ mb: 1 }} />
+          <FormField name='courseName' control={control} errors={errors} placeholder='Tên môn học' />
+        </Stack>
+      </TableCell>
+      <TableCell align='right'>
+        <FormField name='credits' control={control} errors={errors} type='number' />
+      </TableCell>
+      <TableCell align='right'>
+        <FormField name='LT' control={control} errors={errors} type='number' />
+      </TableCell>
+      <TableCell align='right'>
+        <FormField name='TH' control={control} errors={errors} type='number' />
+      </TableCell>
+      <TableCell align='right'>
+        <FormField name='TT' control={control} errors={errors} type='number' />
+      </TableCell>
+      <TableCell>
+        <FormSelect
+          name='isRequire'
+          control={control}
+          errors={errors}
+          options={[
+            { value: 'true', label: 'Bắt buộc' },
+            { value: 'false', label: 'Tự chọn' }
+          ]}
+        />
+      </TableCell>
+      <TableCell width={150}>
+        <FormField name='prerequisites' control={control} errors={errors} />
+      </TableCell>
+      <TableCell>
+        <FormField name='preConditions' control={control} errors={errors} />
+      </TableCell>
+      <TableCell>
+        <FormField name='implementationSemester' control={control} errors={errors} type='number' />
+      </TableCell>
+    </>
+  )
+
+  const renderActionButtons = (onSubmit: (() => void) | undefined, onCancel: (() => void) | undefined) => (
+    <TableCell>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+        <IconButton size='small' onClick={() => onSubmit?.()} color='primary'>
+          <SaveIcon fontSize='small' />
+        </IconButton>
+        <IconButton size='small' onClick={() => onCancel?.()} color='error'>
+          <CancelIcon fontSize='small' />
+        </IconButton>
+      </div>
+    </TableCell>
+  )
 
   if (isEditing) {
     return (
       <StyledTableRow>
-        <TableCell sx={{ paddingLeft: `${level * 9}px` }}>
-          <Stack direction='column' spacing={1}>
-            <Controller
-              name='courseCode'
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  size='small'
-                  placeholder='Mã môn học'
-                  error={!!errors.courseCode}
-                  helperText={errors.courseCode?.message}
-                  sx={{ mb: 1 }}
-                />
-              )}
-            />
-            <Controller
-              name='courseName'
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  size='small'
-                  placeholder='Tên môn học'
-                  error={!!errors.courseName}
-                  helperText={errors.courseName?.message}
-                />
-              )}
-            />
-          </Stack>
-        </TableCell>
-        <TableCell align='right'>
-          <Controller
-            name='credits'
-            control={control}
-            render={({ field: { onChange, ...field } }) => (
-              <TextField
-                {...field}
-                size='small'
-                type='number'
-                error={!!errors.credits}
-                helperText={errors.credits?.message}
-                fullWidth
-                onChange={e => onChange(Number(e.target.value))}
-              />
-            )}
-          />
-        </TableCell>
-        <TableCell align='right'>
-          <Controller
-            name='LT'
-            control={control}
-            render={({ field: { onChange, ...field } }) => (
-              <TextField
-                {...field}
-                size='small'
-                type='number'
-                error={!!errors.LT}
-                helperText={errors.LT?.message}
-                fullWidth
-                onChange={e => onChange(Number(e.target.value))}
-              />
-            )}
-          />
-        </TableCell>
-        <TableCell align='right'>
-          <Controller
-            name='TH'
-            control={control}
-            render={({ field: { onChange, ...field } }) => (
-              <TextField
-                {...field}
-                size='small'
-                type='number'
-                error={!!errors.TH}
-                helperText={errors.TH?.message}
-                fullWidth
-                onChange={e => onChange(Number(e.target.value))}
-              />
-            )}
-          />
-        </TableCell>
-        <TableCell align='right'>
-          <Controller
-            name='TT'
-            control={control}
-            render={({ field: { onChange, ...field } }) => (
-              <TextField
-                {...field}
-                size='small'
-                type='number'
-                error={!!errors.TT}
-                helperText={errors.TT?.message}
-                fullWidth
-                onChange={e => onChange(Number(e.target.value))}
-              />
-            )}
-          />
-        </TableCell>
-        <TableCell>
-          <Controller
-            name='isRequire'
-            control={control}
-            render={({ field }) => (
-              <FormControl fullWidth size='small'>
-                <Select {...field} error={!!errors.isRequire}>
-                  <MenuItem value='true'>Bắt buộc</MenuItem>
-                  <MenuItem value='false'>Tự chọn</MenuItem>
-                </Select>
-              </FormControl>
-            )}
-          />
-        </TableCell>
-        <TableCell width={150}>
-          <Controller
-            name='prerequisites'
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                size='small'
-                error={!!errors.prerequisites}
-                helperText={errors.prerequisites?.message}
-                fullWidth
-              />
-            )}
-          />
-        </TableCell>
-        <TableCell>
-          <Controller
-            name='preConditions'
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                size='small'
-                error={!!errors.preConditions}
-                helperText={errors.preConditions?.message}
-                fullWidth
-              />
-            )}
-          />
-        </TableCell>
-        <TableCell>
-          <Controller
-            name='implementationSemester'
-            control={control}
-            render={({ field: { onChange, ...field } }) => (
-              <TextField
-                {...field}
-                size='small'
-                type='number'
-                error={!!errors.implementationSemester}
-                helperText={errors.implementationSemester?.message}
-                fullWidth
-                onChange={e => onChange(Number(e.target.value))}
-              />
-            )}
-          />
-        </TableCell>
-        <TableCell>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
-            <IconButton size='small' onClick={onSubmit} color='primary'>
-              <SaveIcon fontSize='small' />
-            </IconButton>
-            <IconButton size='small' onClick={onCancel} color='error'>
-              <CancelIcon fontSize='small' />
-            </IconButton>
-          </div>
-        </TableCell>
+        {renderFormFields()}
+        {renderActionButtons(onSubmit, onCancel)}
+      </StyledTableRow>
+    )
+  }
+
+  if (isUpdating) {
+    return (
+      <StyledTableRow>
+        {renderFormFields()}
+        {renderActionButtons(handleUpdateSubmit, handleCancelUpdate)}
       </StyledTableRow>
     )
   }
@@ -420,7 +385,7 @@ const SubjectRow: React.FC<SubjectRowProps> = ({
       <TableCell>
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <Tooltip title='Cập nhật môn học' arrow>
-            <IconButton size='small' color='primary'>
+            <IconButton size='small' color='primary' onClick={handleUpdate}>
               <Iconify icon='eva:edit-fill' />
             </IconButton>
           </Tooltip>

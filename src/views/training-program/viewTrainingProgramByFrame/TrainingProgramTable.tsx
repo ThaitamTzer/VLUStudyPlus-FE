@@ -93,6 +93,7 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
             idCate1={idCate1 || ''}
             idCate2={idCate2 || ''}
             idCate3={idCate3 || ''}
+            mutate={mutate}
           />
         )}
 
@@ -108,6 +109,7 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
             idCate1={idCate1 || ''}
             idCate2={idCate2 || ''}
             idCate3={idCate3 || ''}
+            mutate={mutate}
           />
         ))}
 
@@ -164,6 +166,7 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
                       idCate1={program._id}
                       idCate2={program._id}
                       idCate3={program._id}
+                      mutate={mutate}
                     />
                   )}
 
@@ -177,6 +180,7 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
                       idCate1={program._id}
                       idCate2={program._id}
                       idCate3={program._id}
+                      mutate={mutate}
                     />
                   ))}
 

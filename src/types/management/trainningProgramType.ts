@@ -36,12 +36,12 @@ export type Subjects = {
   LT: number
   TH: number
   TT: number
-  isRequire: string
+  isRequire: boolean
   prerequisites: string
   preConditions: string
   subjectCode: string
   inCharge: string
-  implementationSemester: string
+  implementationSemester: number
   note: string
   createdAt: string | Date
   updatedAt: string | Date

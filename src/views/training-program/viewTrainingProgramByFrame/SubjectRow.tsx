@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { FormControl, IconButton, MenuItem, Select, Stack, TableCell, TextField, Tooltip } from '@mui/material'
 import { Controller, useForm } from 'react-hook-form'
@@ -14,9 +14,10 @@ import CancelIcon from '@mui/icons-material/Cancel'
 import type { KeyedMutator } from 'swr'
 
 import type { Subjects } from '@/types/management/trainningProgramType'
-import StyledTableRow from '@/components/table/StyledTableRow'
 import Iconify from '@/components/iconify'
 import subjectServices from '@/services/subject.service'
+import { useTrainingProgramStore } from '@/stores/trainingProgram.store'
+import AnimatedTableRow from './AnimatedTableRow'
 
 // Tách schema validation ra riêng
 const subjectSchema = v.object({
@@ -50,7 +51,7 @@ const subjectSchema = v.object({
     v.minValue(0, 'Số giờ tự học phải lớn hơn hoặc bằng 0'),
     v.maxValue(150, 'Số giờ tự học không được quá 150')
   ),
-  isRequire: v.boolean(),
+  isRequire: v.any(),
   prerequisites: v.pipe(
     v.string(),
     v.nonEmpty('Điều kiện tiên quyết không được để trống'),
@@ -143,6 +144,20 @@ interface SubjectRowProps {
   mutate?: KeyedMutator<any>
 }
 
+// Hàm helper để so sánh và chỉ lấy dữ liệu đã thay đổi
+const getChangedFields = (originalData: any, newData: any) => {
+  const changedFields: Record<string, any> = {}
+
+  Object.keys(newData).forEach(key => {
+    // Kiểm tra nếu giá trị đã thay đổi
+    if (JSON.stringify(originalData[key]) !== JSON.stringify(newData[key])) {
+      changedFields[key] = newData[key]
+    }
+  })
+
+  return changedFields
+}
+
 const SubjectRow: React.FC<SubjectRowProps> = ({
   subject,
   level,
@@ -179,7 +194,23 @@ const SubjectRow: React.FC<SubjectRowProps> = ({
     }
   })
 
+  const { toogleOpenDeleteSubject, setSubject } = useTrainingProgramStore()
+
   const [isUpdating, setIsUpdating] = useState(false)
+
+  // Giữ lại dữ liệu ban đầu của môn học để so sánh sau này
+  const originalSubjectData = {
+    courseCode: subject.courseCode,
+    courseName: subject.courseName,
+    credits: subject.credits,
+    LT: subject.LT,
+    TH: subject.TH,
+    TT: subject.TT,
+    isRequire: subject.isRequire,
+    prerequisites: subject.prerequisites,
+    preConditions: subject.preConditions,
+    implementationSemester: Number(subject.implementationSemester)
+  }
 
   useEffect(() => {
     reset({
@@ -289,7 +320,68 @@ const SubjectRow: React.FC<SubjectRowProps> = ({
   }
 
   const onSubmit = handleSubmit(data => handleApiCall(data))
-  const handleUpdateSubmit = handleSubmit(data => handleApiCall(data, true))
+
+  const handleUpdateSubmit = handleSubmit(async data => {
+    if (!subject._id) {
+      toast.error('Không tìm thấy ID môn học')
+
+      return
+    }
+
+    // Lọc ra chỉ các trường đã thay đổi
+    const changedFields = getChangedFields(originalSubjectData, data)
+
+    // Kiểm tra nếu không có trường nào được thay đổi
+    if (Object.keys(changedFields).length === 0) {
+      toast.info('Không có thông tin nào được thay đổi')
+      setIsUpdating(false)
+
+      return
+    }
+
+    const toastId = toast.loading('Đang cập nhật môn học...')
+
+    try {
+      await subjectServices.updateSubject(
+        subject._id,
+        changedFields, // Chỉ gửi các trường đã thay đổi
+        () => {
+          toast.update(toastId, {
+            render: 'Cập nhật môn học thành công',
+            type: 'success',
+            isLoading: false,
+            autoClose: 2000
+          })
+          setIsUpdating(false)
+          onSave?.(data)
+          mutate?.()
+        },
+        err => {
+          toast.update(toastId, {
+            render: err?.message || 'Có lỗi xảy ra khi cập nhật môn học',
+            type: 'error',
+            isLoading: false,
+            autoClose: 2000
+          })
+        }
+      )
+    } catch (error) {
+      toast.update(toastId, {
+        render: 'Có lỗi xảy ra khi cập nhật môn học',
+        type: 'error',
+        isLoading: false,
+        autoClose: 2000
+      })
+    }
+  })
+
+  const handleDelete = useCallback(
+    (subject: Subjects) => {
+      setSubject(subject)
+      toogleOpenDeleteSubject()
+    },
+    [toogleOpenDeleteSubject, setSubject]
+  )
 
   const renderFormFields = () => (
     <>
@@ -326,7 +418,7 @@ const SubjectRow: React.FC<SubjectRowProps> = ({
         <FormField name='prerequisites' control={control} errors={errors} />
       </TableCell>
       <TableCell>
-        <FormField name='preConditions' control={control} errors={errors} />
+        <FormField name='preConditions' control={control} errors={errors} multiline rows={2} />
       </TableCell>
       <TableCell>
         <FormField name='implementationSemester' control={control} errors={errors} type='number' />
@@ -349,24 +441,24 @@ const SubjectRow: React.FC<SubjectRowProps> = ({
 
   if (isEditing) {
     return (
-      <StyledTableRow>
+      <AnimatedTableRow isEditing>
         {renderFormFields()}
         {renderActionButtons(onSubmit, onCancel)}
-      </StyledTableRow>
+      </AnimatedTableRow>
     )
   }
 
   if (isUpdating) {
     return (
-      <StyledTableRow>
+      <AnimatedTableRow isEditing>
         {renderFormFields()}
         {renderActionButtons(handleUpdateSubmit, handleCancelUpdate)}
-      </StyledTableRow>
+      </AnimatedTableRow>
     )
   }
 
   return (
-    <StyledTableRow>
+    <AnimatedTableRow>
       <TableCell sx={{ paddingLeft: `${level * 9}px` }}>
         <Stack direction='row' spacing={1} alignItems='center'>
           <span>
@@ -390,13 +482,13 @@ const SubjectRow: React.FC<SubjectRowProps> = ({
             </IconButton>
           </Tooltip>
           <Tooltip title='Xóa môn học' arrow>
-            <IconButton size='small' color='error'>
+            <IconButton size='small' color='error' onClick={() => handleDelete(subject)}>
               <Iconify icon='eva:trash-2-outline' />
             </IconButton>
           </Tooltip>
         </div>
       </TableCell>
-    </StyledTableRow>
+    </AnimatedTableRow>
   )
 }
 

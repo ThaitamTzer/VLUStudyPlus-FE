@@ -15,7 +15,9 @@ import SubjectRow from './SubjectRow'
 import CategoryRow from './CategoryRow'
 import TrainingProgramHeader from './components/TrainingProgramHeader'
 import ProgramRow from './components/ProgramRow'
+import { useTrainingProgramStore } from '@/stores/trainingProgram.store'
 import { useTrainingProgramTable } from './hooks/useTrainingProgramTable'
+import DeleteSubjectModal from './DeleteSubjectModal'
 
 interface FlatTrainingProgramTableProps {
   data: TrainingProgramByFrame[]
@@ -38,6 +40,8 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
     handleCancelCategory,
     handleCancelSubject
   } = useTrainingProgramTable({ data, mutate })
+
+  const { toogleOpenDeleteSubject, openDeleteSubject, subject } = useTrainingProgramStore()
 
   // Helper function to recursively render categories with editing subjects
   const renderCategoryWithEditingSubject = (
@@ -199,6 +203,12 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
           </TableBody>
         </Table>
       </TableContainer>
+      <DeleteSubjectModal
+        open={openDeleteSubject}
+        onClose={toogleOpenDeleteSubject}
+        subject={subject || ({} as Subjects)}
+        onSuccess={mutate}
+      />
     </>
   )
 }

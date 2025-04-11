@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { TrainingProgramType } from '@/types/management/trainningProgramType'
+import type { Subjects, TrainingProgramType } from '@/types/management/trainningProgramType'
 
 type States = {
   openCreateTrainingProgram: boolean
@@ -17,6 +17,8 @@ type States = {
   programid: string | null
   openAddSubjectInCate: boolean
   selectedProgramId: string
+  openDeleteSubject: boolean
+  subject: Subjects | null
 }
 
 type Actions = {
@@ -34,6 +36,8 @@ type Actions = {
   setProgramId: (programid: string) => void
   toogleOpenAddSubjectInCate: () => void
   setSelectedProgramId: (id: string) => void
+  toogleOpenDeleteSubject: () => void
+  setSubject: (subject: Subjects | null) => void
 }
 
 export const useTrainingProgramStore = create<States & Actions>(set => ({
@@ -51,6 +55,8 @@ export const useTrainingProgramStore = create<States & Actions>(set => ({
   programid: null,
   openAddSubjectInCate: false,
   selectedProgramId: '',
+  openDeleteSubject: false,
+  subject: null,
   toogleOpenAddSubjectInCate: () => set(state => ({ openAddSubjectInCate: !state.openAddSubjectInCate })),
   setProgramId: (programid: string | null) => set({ programid }),
   toogleUpdateCategory1: () => set(state => ({ openEditCategory1: !state.openEditCategory1 })),
@@ -66,5 +72,7 @@ export const useTrainingProgramStore = create<States & Actions>(set => ({
   toogleImportTrainingProgramSession: () =>
     set(state => ({ openImportTrainingProgramSession: !state.openImportTrainingProgramSession })),
   setTrainingProgram: (trainingProgram: TrainingProgramType | null) => set({ trainingProgram }),
-  setSelectedProgramId: (id: string) => set({ selectedProgramId: id })
+  setSelectedProgramId: (id: string) => set({ selectedProgramId: id }),
+  toogleOpenDeleteSubject: () => set(state => ({ openDeleteSubject: !state.openDeleteSubject })),
+  setSubject: (subject: Subjects | null) => set({ subject })
 }))

@@ -42,9 +42,14 @@ const subjectServices = {
     }
   },
 
-  deleteSubject: async (id: string, successCallback?: (res: any) => void, errorCallback?: (err: any) => void) => {
+  deleteSubject: async (
+    id: string,
+    data: any,
+    successCallback?: (res: any) => void,
+    errorCallback?: (err: any) => void
+  ) => {
     try {
-      return await axiosClient.delete(`/api/subject/delete-subject/${id}`).then(res => {
+      return await axiosClient.delete(`/api/subject/delete-subject/${id}`, { data }).then(res => {
         successCallback && successCallback(res.data)
 
         return res

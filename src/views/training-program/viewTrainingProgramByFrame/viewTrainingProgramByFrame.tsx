@@ -40,7 +40,6 @@ export default function ViewTrainingProgramByFrame() {
       <CustomDialog
         open={openViewTrainingProgramByFrame}
         onClose={onClose}
-        closeOutside
         title={`${trainingProgram?.title?.toLocaleUpperCase()}`}
         fullScreen
       >

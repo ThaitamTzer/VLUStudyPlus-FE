@@ -30,7 +30,8 @@ const TableFilter = dynamic(() => import('./tableFilter'), { ssr: false })
 const TableAcedemicProcess = dynamic(() => import('./tableAcedemicProcess'), { ssr: false })
 const AlertDelete = dynamic(() => import('@/components/alertModal'), { ssr: false })
 const ManualAddAcedemicProcess = dynamic(() => import('../manualAddAcedemicProcess'), { ssr: false })
-const ViewDetailAcedecmicProcess = dynamic(() => import('./viewDetailAcedemicProcess'), { ssr: false })
+
+// const ViewDetailAcedecmicProcess = dynamic(() => import('./viewDetailAcedemicProcess'), { ssr: false })
 
 const UpdateAcedemicProcessStatus = dynamic(() => import('../updateAcedemicProcessStatus'), { ssr: false })
 const SendMailModal = dynamic(() => import('./sendMailModal'), { ssr: false })
@@ -234,7 +235,7 @@ export default function ViewAcedemicProcess() {
           </Card>
         </DialogContent>
       </Dialog>
-      <ViewDetailAcedecmicProcess id={processing?._id || ''} />
+      {/* <ViewDetailAcedecmicProcess id={processing?._id || ''} /> */}
       <UpdateAcedemicProcessStatus mutate={mutate} />
 
       <ManualAddAcedemicProcess

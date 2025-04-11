@@ -17,7 +17,7 @@ type NotificantionActionProps = {
 }
 
 export const NotificantionAction = (props: NotificantionActionProps) => {
-  const { acedemicProcess, tooogleSendEmail, toogleSendEmailRemind, toogleManualAddFromViewByCate, data } = props
+  const { acedemicProcess, tooogleSendEmail, toogleSendEmailRemind, data } = props
 
   const id = acedemicProcess?._id || ''
 
@@ -63,14 +63,6 @@ export const NotificantionAction = (props: NotificantionActionProps) => {
           )}
         </>
       )}
-      <Button
-        onClick={toogleManualAddFromViewByCate}
-        variant='contained'
-        startIcon={<i className='tabler-plus' />}
-        className='max-sm:is-full'
-      >
-        Thêm XLHV
-      </Button>
     </div>
   )
 }

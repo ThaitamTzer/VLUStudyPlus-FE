@@ -6,7 +6,6 @@ import {
   TableBody,
   TableSortLabel,
   Stack,
-  MenuItem,
   IconButton,
   Tooltip,
   Badge
@@ -16,7 +15,6 @@ import StyledTableRow from '@/components/table/StyledTableRow'
 import TableLoading from '@/components/table/TableLoading'
 import TableNoData from '@/components/table/TableNotFound'
 import type { ListProcessingType, ProcessingType } from '@/types/management/learnProcessType'
-import RowAction from '@/components/rowAction'
 import Iconify from '@/components/iconify'
 
 type TableAcedemicProcessProps = {
@@ -45,7 +43,6 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
     handleSort,
     toogleDeleteViewAcedemicProcess,
     setProcessing,
-    toogleViewDetailAcedemicProcess,
     toogleOpenUpdateAcedemicProcessStatus
   } = props
 
@@ -472,7 +469,7 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                     borderLeft: { xs: 'none', sm: '1px solid rgba(224, 224, 224, 1)' }
                   }}
                 >
-                  <Tooltip arrow title='Xem chi tiết xử lý học tập'>
+                  {/* <Tooltip arrow title='Xem chi tiết xử lý học tập'>
                     <IconButton
                       size='small'
                       color='info'
@@ -483,8 +480,32 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                     >
                       <Iconify icon='bi:eye' />
                     </IconButton>
+                  </Tooltip> */}
+                  <Tooltip title='Cập nhật kết quả xử lý' arrow>
+                    <IconButton
+                      size='small'
+                      color='warning'
+                      onClick={() => {
+                        setProcessing(d)
+                        toogleOpenUpdateAcedemicProcessStatus()
+                      }}
+                    >
+                      <Iconify icon='fluent:edit-32-regular' />
+                    </IconButton>
                   </Tooltip>
-                  <RowAction size='small'>
+                  <Tooltip title='Xóa XLHV' arrow>
+                    <IconButton
+                      size='small'
+                      color='error'
+                      onClick={() => {
+                        setProcessing(d)
+                        toogleDeleteViewAcedemicProcess()
+                      }}
+                    >
+                      <Iconify icon='solar:trash-bin-2-linear' />
+                    </IconButton>
+                  </Tooltip>
+                  {/* <RowAction size='small'>
                     <MenuItem
                       onClick={() => {
                         setProcessing(d)
@@ -503,7 +524,7 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                       <Iconify icon='solar:trash-bin-2-linear' />
                       Xóa
                     </MenuItem>
-                  </RowAction>
+                  </RowAction> */}
                 </TableCell>
               </StyledTableRow>
             )

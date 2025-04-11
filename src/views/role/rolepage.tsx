@@ -31,6 +31,7 @@ export default function RolePage() {
 
   const [searchValue, setSearchValue] = useState(searchKey)
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const updateQueryParams = useCallback(
     debounce(value => {
       const params = new URLSearchParams()

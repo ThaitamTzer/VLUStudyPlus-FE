@@ -19,17 +19,10 @@ interface ProgramRowProps {
   program: TrainingProgramByFrame
   onAddSubject: (programId: string) => void
   onAddCategory: (programId: string) => void
-  onAddSubjectInCate?: (category: {
-    id: string
-    level: 1 | 2 | 3
-    idCate1?: string
-    idCate2?: string
-    idCate3?: string
-  }) => void
   mutate: KeyedMutator<any>
 }
 
-const ProgramRow: React.FC<ProgramRowProps> = ({ program, onAddCategory, onAddSubjectInCate, mutate }) => {
+const ProgramRow: React.FC<ProgramRowProps> = ({ program, onAddCategory, onAddSubject, mutate }) => {
   const { settings } = useSettings()
   const { toogleUpdateCategory1, setProgramId } = useTrainingProgramStore()
   const [openUpdateModal, setOpenUpdateModal] = useState(false)
@@ -72,15 +65,9 @@ const ProgramRow: React.FC<ProgramRowProps> = ({ program, onAddCategory, onAddSu
           <Tooltip title='Thêm môn học'>
             <IconButton
               size='small'
-              onClick={() =>
-                onAddSubjectInCate?.({
-                  id: program._id,
-                  level: 1,
-                  idCate1: program._id,
-                  idCate2: undefined,
-                  idCate3: undefined
-                })
-              }
+              onClick={() => {
+                onAddSubject(program._id)
+              }}
             >
               <SubjectIcon fontSize='small' />
             </IconButton>

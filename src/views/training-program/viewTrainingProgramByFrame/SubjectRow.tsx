@@ -1,5 +1,9 @@
 'use client'
-import { FormControl, IconButton, MenuItem, Select, Stack, TableCell, TextField } from '@mui/material'
+import { FormControl, IconButton, MenuItem, Select, Stack, TableCell, TextField, Tooltip } from '@mui/material'
+import { Controller, useForm } from 'react-hook-form'
+import * as v from 'valibot'
+import { valibotResolver } from '@hookform/resolvers/valibot'
+import { toast } from 'react-toastify'
 
 import SaveIcon from '@mui/icons-material/Save'
 import CancelIcon from '@mui/icons-material/Cancel'
@@ -7,108 +11,384 @@ import CancelIcon from '@mui/icons-material/Cancel'
 // import Iconify from '@/components/iconify'
 import type { Subjects } from '@/types/management/trainningProgramType'
 import StyledTableRow from '@/components/table/StyledTableRow'
+import Iconify from '@/components/iconify'
+import subjectServices from '@/services/subject.service'
 
 interface SubjectRowProps {
   subject: Subjects
   level: number
   isEditing?: boolean
   onChange?: (field: keyof Subjects, value: any) => void
-  onSave?: () => void
+  onSave?: (data: any) => void
   onCancel?: () => void
+  programId?: string
+  categoryId?: string
+  categoryLevel?: number
+  idCate1: string
+  idCate2: string
+  idCate3: string
 }
 
-const SubjectRow: React.FC<SubjectRowProps> = ({ subject, level, isEditing, onChange, onSave, onCancel }) => {
+const schema = v.object({
+  courseCode: v.pipe(
+    v.string(),
+    v.nonEmpty('Mã môn học không được để trống'),
+    v.maxLength(20, 'Mã môn học không được quá 20 ký tự')
+  ),
+  courseName: v.pipe(
+    v.string(),
+    v.nonEmpty('Tên môn học không được để trống'),
+    v.maxLength(100, 'Tên môn học không được quá 100 ký tự')
+  ),
+  credits: v.pipe(
+    v.number(),
+    v.minValue(0, 'Số tín chỉ phải lớn hơn hoặc bằng 0'),
+    v.maxValue(10, 'Số tín chỉ không được quá 10')
+  ),
+  LT: v.pipe(
+    v.number(),
+    v.minValue(0, 'Số giờ lý thuyết phải lớn hơn hoặc bằng 0'),
+    v.maxValue(150, 'Số giờ lý thuyết không được quá 150')
+  ),
+  TH: v.pipe(
+    v.number(),
+    v.minValue(0, 'Số giờ thực hành phải lớn hơn hoặc bằng 0'),
+    v.maxValue(150, 'Số giờ thực hành không được quá 150')
+  ),
+  TT: v.pipe(
+    v.number(),
+    v.minValue(0, 'Số giờ tự học phải lớn hơn hoặc bằng 0'),
+    v.maxValue(150, 'Số giờ tự học không được quá 150')
+  ),
+  isRequire: v.string(),
+  prerequisites: v.pipe(
+    v.string(),
+    v.nonEmpty('Điều kiện tiên quyết không được để trống'),
+    v.maxLength(100, 'Điều kiện tiên quyết không được quá 100 ký tự')
+  ),
+  preConditions: v.pipe(
+    v.string(),
+    v.nonEmpty('Điều kiện tiên quyết không được để trống'),
+    v.maxLength(255, 'Điều kiện tiên quyết không được quá 255 ký tự')
+  ),
+  implementationSemester: v.pipe(
+    v.number(),
+    v.minValue(1, 'Học kỳ thực hiện phải lớn hơn hoặc bằng 1'),
+    v.maxValue(10, 'Học kỳ thực hiện không được quá 10')
+  )
+})
+
+type SubjectForm = v.InferInput<typeof schema>
+
+const SubjectRow: React.FC<SubjectRowProps> = ({
+  subject,
+  level,
+  isEditing,
+  onSave,
+  onCancel,
+  programId,
+  categoryId,
+  categoryLevel,
+  idCate1,
+  idCate2,
+  idCate3
+}) => {
+  console.log('idCate1', idCate1)
+  console.log('idCate2', idCate2)
+  console.log('idCate3', idCate3)
+  console.log('programId', programId)
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<SubjectForm>({
+    resolver: valibotResolver(schema),
+    mode: 'all',
+    defaultValues: {
+      courseCode: subject.courseCode,
+      courseName: subject.courseName,
+      credits: subject.credits,
+      LT: subject.LT,
+      TH: subject.TH,
+      TT: subject.TT,
+      isRequire: subject.isRequire,
+      prerequisites: subject.prerequisites,
+      preConditions: subject.preConditions,
+      implementationSemester: Number(subject.implementationSemester)
+    }
+  })
+
+  const onSubmit = handleSubmit(async data => {
+    if (!programId) {
+      toast.error('Không tìm thấy ID khung chương trình đào tạo')
+
+      return
+    }
+
+    if (!categoryId) {
+      toast.error('Không tìm thấy ID danh mục')
+
+      return
+    }
+
+    const toastId = toast.loading('Đang thêm môn học...')
+
+    try {
+      // Xác định cấp độ danh mục và gọi API tương ứng
+      if (categoryLevel === 1) {
+        await subjectServices.createSubject(
+          programId,
+          idCate1,
+          data,
+          () => {
+            toast.update(toastId, {
+              render: 'Thêm môn học thành công',
+              type: 'success',
+              isLoading: false,
+              autoClose: 2000
+            })
+            onSave?.(data)
+          },
+          err => {
+            toast.update(toastId, {
+              render: err?.message || 'Có lỗi xảy ra khi thêm môn học',
+              type: 'error',
+              isLoading: false,
+              autoClose: 2000
+            })
+          }
+        )
+      } else if (categoryLevel === 2) {
+        await subjectServices.createSubject(
+          programId,
+          idCate2,
+          data,
+          () => {
+            toast.update(toastId, {
+              render: 'Thêm môn học thành công',
+              type: 'success',
+              isLoading: false,
+              autoClose: 2000
+            })
+            onSave?.(data)
+          },
+          err => {
+            toast.update(toastId, {
+              render: err?.message || 'Có lỗi xảy ra khi thêm môn học',
+              type: 'error',
+              isLoading: false,
+              autoClose: 2000
+            })
+          }
+        )
+      } else if (categoryLevel === 3) {
+        await subjectServices.createSubject(
+          programId,
+          idCate3,
+          data,
+          () => {
+            toast.update(toastId, {
+              render: 'Thêm môn học thành công',
+              type: 'success',
+              isLoading: false,
+              autoClose: 2000
+            })
+            onSave?.(data)
+          },
+          err => {
+            toast.update(toastId, {
+              render: err?.message || 'Có lỗi xảy ra khi thêm môn học',
+              type: 'error',
+              isLoading: false,
+              autoClose: 2000
+            })
+          }
+        )
+      } else {
+        toast.update(toastId, {
+          render: 'Không xác định được cấp độ danh mục',
+          type: 'error',
+          isLoading: false,
+          autoClose: 2000
+        })
+      }
+    } catch (error) {
+      toast.update(toastId, {
+        render: 'Có lỗi xảy ra khi thêm môn học',
+        type: 'error',
+        isLoading: false,
+        autoClose: 2000
+      })
+    }
+  })
+
   if (isEditing) {
     return (
       <StyledTableRow>
         <TableCell sx={{ paddingLeft: `${level * 9}px` }}>
-          <Stack direction='row' spacing={1}>
-            <TextField
-              size='small'
-              value={subject.courseCode}
-              onChange={e => onChange?.('courseCode', e.target.value)}
-              placeholder='Mã môn học'
-              sx={{ mb: 1 }}
+          <Stack direction='column' spacing={1}>
+            <Controller
+              name='courseCode'
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  size='small'
+                  placeholder='Mã môn học'
+                  error={!!errors.courseCode}
+                  helperText={errors.courseCode?.message}
+                  sx={{ mb: 1 }}
+                />
+              )}
             />
-            <TextField
-              size='small'
-              value={subject.courseName}
-              onChange={e => onChange?.('courseName', e.target.value)}
-              placeholder='Tên môn học'
+            <Controller
+              name='courseName'
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  size='small'
+                  placeholder='Tên môn học'
+                  error={!!errors.courseName}
+                  helperText={errors.courseName?.message}
+                />
+              )}
             />
           </Stack>
         </TableCell>
         <TableCell align='right'>
-          <TextField
-            size='small'
-            type='number'
-            value={subject.credits}
-            onChange={e => onChange?.('credits', Number(e.target.value))}
-            fullWidth
+          <Controller
+            name='credits'
+            control={control}
+            render={({ field: { onChange, ...field } }) => (
+              <TextField
+                {...field}
+                size='small'
+                type='number'
+                error={!!errors.credits}
+                helperText={errors.credits?.message}
+                fullWidth
+                onChange={e => onChange(Number(e.target.value))}
+              />
+            )}
           />
         </TableCell>
         <TableCell align='right'>
-          <TextField
-            size='small'
-            type='number'
-            value={subject.LT}
-            onChange={e => onChange?.('LT', Number(e.target.value))}
-            fullWidth
+          <Controller
+            name='LT'
+            control={control}
+            render={({ field: { onChange, ...field } }) => (
+              <TextField
+                {...field}
+                size='small'
+                type='number'
+                error={!!errors.LT}
+                helperText={errors.LT?.message}
+                fullWidth
+                onChange={e => onChange(Number(e.target.value))}
+              />
+            )}
           />
         </TableCell>
         <TableCell align='right'>
-          <TextField
-            size='small'
-            type='number'
-            value={subject.TH}
-            onChange={e => onChange?.('TH', Number(e.target.value))}
-            fullWidth
+          <Controller
+            name='TH'
+            control={control}
+            render={({ field: { onChange, ...field } }) => (
+              <TextField
+                {...field}
+                size='small'
+                type='number'
+                error={!!errors.TH}
+                helperText={errors.TH?.message}
+                fullWidth
+                onChange={e => onChange(Number(e.target.value))}
+              />
+            )}
           />
         </TableCell>
         <TableCell align='right'>
-          <TextField
-            size='small'
-            type='number'
-            value={subject.TT}
-            onChange={e => onChange?.('TT', Number(e.target.value))}
-            fullWidth
+          <Controller
+            name='TT'
+            control={control}
+            render={({ field: { onChange, ...field } }) => (
+              <TextField
+                {...field}
+                size='small'
+                type='number'
+                error={!!errors.TT}
+                helperText={errors.TT?.message}
+                fullWidth
+                onChange={e => onChange(Number(e.target.value))}
+              />
+            )}
           />
         </TableCell>
         <TableCell>
-          <FormControl fullWidth size='small'>
-            <Select value={subject.isRequire} onChange={e => onChange?.('isRequire', e.target.value)}>
-              <MenuItem value='true'>Bắt buộc</MenuItem>
-              <MenuItem value='false'>Tự chọn</MenuItem>
-            </Select>
-          </FormControl>
+          <Controller
+            name='isRequire'
+            control={control}
+            render={({ field }) => (
+              <FormControl fullWidth size='small'>
+                <Select {...field} error={!!errors.isRequire}>
+                  <MenuItem value='true'>Bắt buộc</MenuItem>
+                  <MenuItem value='false'>Tự chọn</MenuItem>
+                </Select>
+              </FormControl>
+            )}
+          />
         </TableCell>
-        <TableCell>
-          <TextField
-            size='small'
-            value={subject.prerequisites}
-            onChange={e => onChange?.('prerequisites', e.target.value)}
-            fullWidth
+        <TableCell width={150}>
+          <Controller
+            name='prerequisites'
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                size='small'
+                error={!!errors.prerequisites}
+                helperText={errors.prerequisites?.message}
+                fullWidth
+              />
+            )}
           />
         </TableCell>
         <TableCell>
-          <TextField
-            size='small'
-            value={subject.preConditions}
-            onChange={e => onChange?.('preConditions', e.target.value)}
-            fullWidth
+          <Controller
+            name='preConditions'
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                size='small'
+                error={!!errors.preConditions}
+                helperText={errors.preConditions?.message}
+                fullWidth
+              />
+            )}
           />
         </TableCell>
         <TableCell>
-          <TextField
-            size='small'
-            value={subject.implementationSemester}
-            onChange={e => onChange?.('implementationSemester', e.target.value)}
-            fullWidth
+          <Controller
+            name='implementationSemester'
+            control={control}
+            render={({ field: { onChange, ...field } }) => (
+              <TextField
+                {...field}
+                size='small'
+                type='number'
+                error={!!errors.implementationSemester}
+                helperText={errors.implementationSemester?.message}
+                fullWidth
+                onChange={e => onChange(Number(e.target.value))}
+              />
+            )}
           />
         </TableCell>
         <TableCell>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
-            <IconButton size='small' onClick={onSave} color='primary'>
+            <IconButton size='small' onClick={onSubmit} color='primary'>
               <SaveIcon fontSize='small' />
             </IconButton>
             <IconButton size='small' onClick={onCancel} color='error'>
@@ -123,7 +403,11 @@ const SubjectRow: React.FC<SubjectRowProps> = ({ subject, level, isEditing, onCh
   return (
     <StyledTableRow>
       <TableCell sx={{ paddingLeft: `${level * 9}px` }}>
-        {subject.courseCode} - {subject.courseName}
+        <Stack direction='row' spacing={1} alignItems='center'>
+          <span>
+            {subject.courseCode} - {subject.courseName}
+          </span>
+        </Stack>
       </TableCell>
       <TableCell align='right'>{subject.credits}</TableCell>
       <TableCell align='right'>{subject.LT}</TableCell>
@@ -134,7 +418,7 @@ const SubjectRow: React.FC<SubjectRowProps> = ({ subject, level, isEditing, onCh
       <TableCell>{subject.preConditions}</TableCell>
       <TableCell>{subject.implementationSemester}</TableCell>
       <TableCell>
-        {/* <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <Tooltip title='Cập nhật môn học' arrow>
             <IconButton size='small' color='primary'>
               <Iconify icon='eva:edit-fill' />
@@ -145,7 +429,7 @@ const SubjectRow: React.FC<SubjectRowProps> = ({ subject, level, isEditing, onCh
               <Iconify icon='eva:trash-2-outline' />
             </IconButton>
           </Tooltip>
-        </div> */}
+        </div>
       </TableCell>
     </StyledTableRow>
   )

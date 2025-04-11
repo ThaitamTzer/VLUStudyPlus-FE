@@ -2,7 +2,8 @@
 
 import React from 'react'
 
-import { Table, TableBody, TableContainer } from '@mui/material'
+import { Table, TableBody, TableContainer, IconButton, Tooltip } from '@mui/material'
+import SubjectIcon from '@mui/icons-material/Book'
 
 import type { KeyedMutator } from 'swr'
 
@@ -20,21 +21,10 @@ interface FlatTrainingProgramTableProps {
   data: TrainingProgramByFrame[]
   isLoading?: boolean
   mutate: KeyedMutator<any>
-  onAddSubjectInCate?: (category: {
-    id: string
-    level: 1 | 2 | 3
-    idCate1?: string
-    idCate2?: string
-    idCate3?: string
-  }) => void
+  programId?: string
 }
 
-const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({
-  data,
-  isLoading,
-  mutate,
-  onAddSubjectInCate
-}) => {
+const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ data, isLoading, mutate, programId }) => {
   const {
     programData,
     editingNewCategory,
@@ -64,11 +54,16 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({
           level={level}
           mutate={mutate}
           onAddCategory={handleAddCategory}
-          onAddSubject={handleAddSubject}
-          onAddSubjectInCate={onAddSubjectInCate}
           idCate1={idCate1 || ''}
           idCate2={idCate2 || ''}
           idCate3={idCate3 || ''}
+          renderAddSubjectButton={() => (
+            <Tooltip title='Thêm môn học'>
+              <IconButton size='small' onClick={() => handleAddSubject(category._id)} sx={{ ml: 1 }}>
+                <SubjectIcon fontSize='small' />
+              </IconButton>
+            </Tooltip>
+          )}
         />
 
         {/* New category being added under this category */}
@@ -90,19 +85,34 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({
             subject={editingNewSubject.subject}
             level={level + 1}
             isEditing={true}
-            onChange={handleSubjectChange}
             onSave={handleSaveSubject}
             onCancel={handleCancelSubject}
+            programId={programId}
+            categoryId={category._id}
+            categoryLevel={level}
+            idCate1={idCate1 || ''}
+            idCate2={idCate2 || ''}
+            idCate3={idCate3 || ''}
           />
         )}
 
         {/* Subjects directly under this category */}
         {category.subjects?.map((subject: Subjects) => (
-          <SubjectRow key={subject._id} subject={subject} level={level + 1} />
+          <SubjectRow
+            key={subject._id}
+            subject={subject}
+            level={level + 1}
+            programId={programId}
+            categoryId={category._id}
+            categoryLevel={level}
+            idCate1={idCate1 || ''}
+            idCate2={idCate2 || ''}
+            idCate3={idCate3 || ''}
+          />
         ))}
 
         {/* Recursively render subcategories */}
-        {category.categoriesC3?.map((subCategory: Categories) =>
+        {category.categoriesC3?.map(subCategory =>
           renderCategoryWithEditingSubject(subCategory, level + 1, idCate1, category._id, subCategory._id)
         )}
       </React.Fragment>
@@ -123,7 +133,6 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({
                     program={program}
                     onAddSubject={handleAddTopLevelSubject}
                     onAddCategory={handleAddTopLevelCategory}
-                    onAddSubjectInCate={onAddSubjectInCate}
                     mutate={mutate}
                   />
 
@@ -149,11 +158,27 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({
                       onChange={handleSubjectChange}
                       onSave={handleSaveSubject}
                       onCancel={handleCancelSubject}
+                      programId={programId}
+                      categoryId={program._id}
+                      categoryLevel={1}
+                      idCate1={program._id}
+                      idCate2={program._id}
+                      idCate3={program._id}
                     />
                   )}
 
                   {/* Subjects directly under program */}
-                  {program.subjects?.map(subject => <SubjectRow key={subject._id} subject={subject} level={2} />)}
+                  {program.subjects?.map(subject => (
+                    <SubjectRow
+                      key={subject._id}
+                      subject={subject}
+                      level={2}
+                      programId={programId}
+                      idCate1={program._id}
+                      idCate2={program._id}
+                      idCate3={program._id}
+                    />
+                  ))}
 
                   {/* Use the new helper function to render categories with editing subjects */}
                   {program.categories?.map(category =>

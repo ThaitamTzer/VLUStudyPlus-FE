@@ -129,11 +129,13 @@ export const useTrainingProgramTable = ({ data, mutate }: UseTrainingProgramTabl
   }
 
   // Save the new subject
-  const handleSaveSubject = () => {
+  const handleSaveSubject = async (data: any) => {
     if (!editingNewSubject) return
 
-    const updatedData = [...programData]
     const { categoryId, subject } = editingNewSubject
+
+    // Cập nhật dữ liệu cục bộ
+    const updatedData = [...programData]
 
     for (const program of updatedData) {
       // Find the category in the program's categories tree
@@ -144,7 +146,13 @@ export const useTrainingProgramTable = ({ data, mutate }: UseTrainingProgramTabl
               categories[i].subjects = []
             }
 
-            categories[i].subjects.push(subject)
+            // Cập nhật dữ liệu môn học với dữ liệu từ form
+            const updatedSubject = {
+              ...subject,
+              ...data
+            }
+
+            categories[i].subjects.push(updatedSubject)
 
             return true
           }
@@ -166,6 +174,9 @@ export const useTrainingProgramTable = ({ data, mutate }: UseTrainingProgramTabl
 
     setProgramData(updatedData)
     setEditingNewSubject(null)
+
+    // Cập nhật dữ liệu từ server
+    mutate()
   }
 
   // Cancel adding new category

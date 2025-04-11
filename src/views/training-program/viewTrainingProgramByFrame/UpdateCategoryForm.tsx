@@ -149,7 +149,7 @@ const UpdateCategoryForm: React.FC<UpdateCategoryFormProps> = ({
         setLoading(false)
       }
     },
-    [category._id, idCate1, idCate2, level, mutate, onCancel]
+    [idCate1, idCate2, level, mutate, onCancel, idCate3]
   )
 
   return (

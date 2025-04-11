@@ -31,11 +31,27 @@ type ImportAddProps = {
   errors: any
   files: File[]
   setFiles: (files: File[]) => void
+  checkFile?: boolean
+  handleCheckFile?: () => void
 }
 
 export default function ImportAdd(props: ImportAddProps) {
-  const { title, onSubmit, onClose, onOpen, pathToFile, loading, children, reset, setValue, errors, files, setFiles } =
-    props
+  const {
+    title,
+    onSubmit,
+    onClose,
+    onOpen,
+    pathToFile,
+    loading,
+    children,
+    reset,
+    setValue,
+    errors,
+    files,
+    setFiles,
+    checkFile,
+    handleCheckFile
+  } = props
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles: File[]) => {
@@ -155,12 +171,17 @@ export default function ImportAdd(props: ImportAddProps) {
               ))}
             </List>
             <Box mt={2} display='flex' justifyContent='flex-end' gap={2}>
-              <Button variant='outlined' color='primary' onClick={handleClose}>
+              <Button variant='outlined' color='error' onClick={handleClose}>
                 Hủy
               </Button>
-              <LoadingButton loading={loading} variant='contained' color='primary' onClick={onSubmit}>
+              <LoadingButton loading={loading} variant='contained' color='success' onClick={onSubmit}>
                 Thêm
               </LoadingButton>
+              {checkFile && (
+                <Button variant='outlined' color='info' onClick={handleCheckFile}>
+                  So sánh dữ liệu
+                </Button>
+              )}
             </Box>
           </Box>
         )}

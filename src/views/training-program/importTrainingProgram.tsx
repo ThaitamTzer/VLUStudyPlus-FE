@@ -43,6 +43,8 @@ export default function ImportTrainingProgram(props: ImportTrainingProgramProps)
     setIsProgress
   } = useTrainingProgramStore()
 
+  console.log('trainingProgram', trainingProgram)
+
   const {
     handleSubmit,
     reset,
@@ -107,6 +109,10 @@ export default function ImportTrainingProgram(props: ImportTrainingProgramProps)
 
   const handleImport = useCallback(onSubmit, [onSubmit])
 
+  const handleCheckFile = useCallback(() => {
+    console.log('check file')
+  }, [])
+
   const renderImport = useMemo(
     () => (
       <ImportAdd
@@ -121,6 +127,8 @@ export default function ImportTrainingProgram(props: ImportTrainingProgramProps)
         reset={reset}
         files={files}
         setFiles={setFiles}
+        handleCheckFile={handleCheckFile}
+        checkFile={trainingProgram?.statusImport}
       />
     ),
     [
@@ -133,7 +141,9 @@ export default function ImportTrainingProgram(props: ImportTrainingProgramProps)
       reset,
       trainingProgram?.title,
       setFiles,
-      files
+      files,
+      trainingProgram?.statusImport,
+      handleCheckFile
     ]
   )
 

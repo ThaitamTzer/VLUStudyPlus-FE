@@ -13,6 +13,7 @@ export type TrainingProgramType = {
     majorId: string
     majorName: string
   }
+  statusImport: boolean
   createdAt: string | Date
   updatedAt: string | Date
 }
@@ -83,4 +84,64 @@ export type TrainingProgramByFrame = {
   subjects: Subjects[]
   categories: Categories[]
   mutate?: KeyedMutator<any>
+}
+
+type ChangeSubjects = {
+  stt: string
+  oldCourseCode: string
+  oldCourseName: string
+  newCourseName: string
+  oldCredits: number
+  newCredits: string
+  oldLT: number
+  newLT: string
+  oldTH: number
+  newTH: string
+  oldTT: number
+  newTT: string
+  oldIsRequired: boolean
+  newIsRequired: boolean
+  oldPrerequisites: string
+  newPrerequisites: string
+  oldPreConditions: string
+  newPreConditions: string
+  oldSubjectCode: string
+  newSubjectCode: string
+  oldInCharge: string
+  newInCharge: string
+  oldImplementationSemester: number
+  newImplementationSemester: number
+  oldNote: string
+  newNote: string
+}
+
+type NewCategory = {
+  level: number
+  titleN: string
+  titleV: string
+  credits: number
+}
+
+type NewSubjects = {
+  stt: string
+  courseCode: string
+  courseName: string
+  credits: string
+  LT: string
+  TH: string
+  TT: string
+  isRequire: boolean
+  prerequisites: string
+  preConditions: string
+  subjectCode: string
+  inCharge: string
+  implementationSemester: string
+  note: string
+}
+export type ImportChangeData = {
+  message: string
+  changes: []
+  newCategory: NewCategory[]
+  changeSubjects: ChangeSubjects[]
+  newSubjects: NewSubjects[]
 }

@@ -79,7 +79,7 @@ export default function ProcessResultPage() {
       columnHelper.accessor('action', {
         header: '',
         meta: {
-          algin: 'right'
+          align: 'right'
         },
         cell: infor => (
           <>

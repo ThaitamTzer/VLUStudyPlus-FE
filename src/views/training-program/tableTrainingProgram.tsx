@@ -2,12 +2,11 @@
 
 import { useCallback } from 'react'
 
-import { IconButton, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, Tooltip } from '@mui/material'
+import { IconButton, Table, TableBody, TableCell, TableContainer, TableHead, Tooltip } from '@mui/material'
 
 import StyledTableRow from '@/components/table/StyledTableRow'
 import type { TrainingProgramType } from '@/types/management/trainningProgramType'
 import { useTrainingProgramStore } from '@/stores/trainingProgram.store'
-import RowAction from '@/components/rowAction'
 import Iconify from '@/components/iconify'
 import TableLoading from '@/components/table/TableLoading'
 import TableNoData from '@/components/table/TableNotFound'
@@ -109,30 +108,24 @@ export default function TableTrainingProgram(props: TableTrainingProgramProps) {
                       <Iconify icon='fluent:table-add-20-regular' color='#198754' />
                     </IconButton>
                   </Tooltip>
-                  <RowAction>
-                    <MenuItem
+                  <Tooltip title='Cập nhật khung chương trình' arrow>
+                    <IconButton
                       onClick={() => {
                         handleOpenUpdateTrainingProgram(item)
                       }}
-                      sx={{
-                        color: 'warning.main'
-                      }}
                     >
-                      <Iconify icon='carbon:edit' />
-                      Cập nhật khung chương trình
-                    </MenuItem>
-                    <MenuItem
+                      <Iconify icon='carbon:edit' color='#f1c40f' />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title='Xóa khung chương trình' arrow>
+                    <IconButton
                       onClick={() => {
                         handleOpenDeleteTrainingProgram(item)
                       }}
-                      sx={{
-                        color: 'error.main'
-                      }}
                     >
-                      <Iconify icon='iconamoon:trash-light' />
-                      Xóa khung chương trình
-                    </MenuItem>
-                  </RowAction>
+                      <Iconify icon='iconamoon:trash-light' color='#e74c3c' />
+                    </IconButton>
+                  </Tooltip>
                 </TableCell>
               </StyledTableRow>
             )

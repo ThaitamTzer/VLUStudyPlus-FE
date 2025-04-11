@@ -69,7 +69,7 @@ export default function CommitmentFormsPage() {
       columnHelper.accessor('action', {
         header: '',
         meta: {
-          algin: 'left'
+          align: 'left'
         },
         cell: infor => (
           <>

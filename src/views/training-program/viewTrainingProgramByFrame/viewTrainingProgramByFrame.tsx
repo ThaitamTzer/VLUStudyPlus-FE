@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useCallback, useState } from 'react'
+import { useMemo, useCallback } from 'react'
 
 import useSWR from 'swr'
 
@@ -12,7 +12,8 @@ import trainingProgramService from '@/services/trainingprogram.service'
 import FlatTrainingProgramTable from './TrainingProgramTable'
 import AddCategory1Modal from './AddCategory1Modal'
 import AddSubjectToFrameModal from './AddSubjectToFrameModal'
-import AddSubjectInCateModal from './AddSubjectInCateModal'
+
+// import AddSubjectInCateModal from './AddSubjectInCateModal'
 
 export default function ViewTrainingProgramByFrame() {
   const {
@@ -26,15 +27,15 @@ export default function ViewTrainingProgramByFrame() {
   } = useTrainingProgramStore()
 
   // State cho modal thêm môn học vào danh mục
-  const [openAddSubjectInCate, setOpenAddSubjectInCate] = useState<boolean>(false)
+  // const [openAddSubjectInCate, setOpenAddSubjectInCate] = useState<boolean>(false)
 
-  const [selectedCategory, setSelectedCategory] = useState<{
-    id: string
-    level: 1 | 2 | 3
-    idCate1?: string
-    idCate2?: string
-    idCate3?: string
-  } | null>(null)
+  // const [selectedCategory, setSelectedCategory] = useState<{
+  //   id: string
+  //   level: 1 | 2 | 3
+  //   idCate1?: string
+  //   idCate2?: string
+  //   idCate3?: string
+  // } | null>(null)
 
   const onClose = useCallback(() => {
     toogleViewTrainingProgramByFrame()
@@ -55,20 +56,20 @@ export default function ViewTrainingProgramByFrame() {
   }, [toogleOpenAddSubjectInFrame])
 
   // Hàm mở modal thêm môn học vào danh mục
-  const handleOpenAddSubjectInCate = useCallback(
-    (category: { id: string; level: 1 | 2 | 3; idCate1?: string; idCate2?: string; idCate3?: string }) => {
-      setSelectedCategory(category)
-      setOpenAddSubjectInCate(true)
-    },
-    []
-  )
+  // const handleOpenAddSubjectInCate = useCallback(
+  //   (category: { id: string; level: 1 | 2 | 3; idCate1?: string; idCate2?: string; idCate3?: string }) => {
+  //     setSelectedCategory(category)
+  //     setOpenAddSubjectInCate(true)
+  //   },
+  //   []
+  // )
 
   // Hàm đóng modal thêm môn học vào danh mục
-  const handleCloseAddSubjectInCate = useCallback(() => {
-    setOpenAddSubjectInCate(false)
-    setSelectedCategory(null)
-    mutate()
-  }, [mutate])
+  // const handleCloseAddSubjectInCate = useCallback(() => {
+  //   setOpenAddSubjectInCate(false)
+  //   setSelectedCategory(null)
+  //   mutate()
+  // }, [mutate])
 
   const renderDialog = useMemo(
     () => (
@@ -94,7 +95,7 @@ export default function ViewTrainingProgramByFrame() {
             data={data || []}
             isLoading={isLoading}
             mutate={mutate}
-            onAddSubjectInCate={handleOpenAddSubjectInCate}
+            onAddSubjectInCate={() => {}}
           />
         </Card>
       </CustomDialog>
@@ -107,8 +108,7 @@ export default function ViewTrainingProgramByFrame() {
       trainingProgram?.title,
       mutate,
       handleOpenCreateCate1,
-      handleOpenAddSubjectInFrame,
-      handleOpenAddSubjectInCate
+      handleOpenAddSubjectInFrame
     ]
   )
 
@@ -124,29 +124,29 @@ export default function ViewTrainingProgramByFrame() {
     [openAddSubjectInFrame, toogleOpenAddSubjectInFrame, id]
   )
 
-  const renderAddSubjectInCate = useMemo(() => {
-    if (!selectedCategory) return null
+  // const renderAddSubjectInCate = useMemo(() => {
+  //   if (!selectedCategory) return null
 
-    return (
-      <AddSubjectInCateModal
-        open={openAddSubjectInCate}
-        onClose={handleCloseAddSubjectInCate}
-        programId={id}
-        categoryId1={selectedCategory.idCate1}
-        categoryId2={selectedCategory.idCate2}
-        categoryId3={selectedCategory.idCate3}
-        categoryLevel={selectedCategory.level}
-        onSuccess={mutate}
-      />
-    )
-  }, [openAddSubjectInCate, selectedCategory, id, handleCloseAddSubjectInCate, mutate])
+  //   return (
+  //     <AddSubjectInCateModal
+  //       open={openAddSubjectInCate}
+  //       onClose={handleCloseAddSubjectInCate}
+  //       programId={id}
+  //       categoryId1={selectedCategory.idCate1}
+  //       categoryId2={selectedCategory.idCate2}
+  //       categoryId3={selectedCategory.idCate3}
+  //       categoryLevel={selectedCategory.level}
+  //       onSuccess={mutate}
+  //     />
+  //   )
+  // }, [openAddSubjectInCate, selectedCategory, id, handleCloseAddSubjectInCate, mutate])
 
   return (
     <>
       {renderDialog}
       {renderAddCate1}
       {renderAddSubjectInframe}
-      {renderAddSubjectInCate}
+      {/* {renderAddSubjectInCate} */}
     </>
   )
 }

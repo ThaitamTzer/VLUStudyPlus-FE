@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, Typography } from '@mui/material'
 
@@ -25,8 +25,8 @@ import CustomTextField from '@/@core/components/mui/TextField'
 import learnProcessService from '@/services/learnProcess.service'
 
 const schema = v.object({
-  processingResultId: v.pipe(v.string(), v.nonEmpty('Vui lòng chọn kết quả xử lý')),
-  reason: v.optional(v.string())
+  CVHTHandle: v.pipe(v.string(), v.nonEmpty('Vui lòng chọn kết quả xử lý')),
+  CVHTNote: v.optional(v.string())
 })
 
 type FormInput = InferInput<typeof schema>
@@ -44,10 +44,19 @@ export default function UpdateAcedemicProcessStatus({ mutate }: { mutate: KeyedM
   } = useForm<FormInput>({
     resolver: valibotResolver(schema),
     defaultValues: {
-      processingResultId: '',
-      reason: ''
+      CVHTHandle: processing?.CVHTHandle?._id || '',
+      CVHTNote: processing?.CVHTNote || ''
     }
   })
+
+  useEffect(() => {
+    if (processing) {
+      reset({
+        CVHTHandle: processing?.CVHTHandle?._id || '',
+        CVHTNote: processing?.CVHTNote || ''
+      })
+    }
+  }, [processing, reset])
 
   const onClose = () => {
     toogleUpdateAcedemicProcessStatus()
@@ -108,7 +117,7 @@ export default function UpdateAcedemicProcessStatus({ mutate }: { mutate: KeyedM
             <Grid item xs={12}>
               <Controller
                 control={control}
-                name='processingResultId'
+                name='CVHTHandle'
                 render={({ field: { value, onChange, ...field } }) => (
                   <CustomAutocomplete
                     {...field}
@@ -122,10 +131,10 @@ export default function UpdateAcedemicProcessStatus({ mutate }: { mutate: KeyedM
                       <CustomTextField
                         {...params}
                         fullWidth
-                        label='Kết quả xử lý'
-                        {...(errors.processingResultId && {
+                        label='Tình trạng xử lý'
+                        {...(errors.CVHTHandle && {
                           error: true,
-                          helperText: errors.processingResultId.message
+                          helperText: errors.CVHTHandle.message
                         })}
                       />
                     )}
@@ -136,8 +145,8 @@ export default function UpdateAcedemicProcessStatus({ mutate }: { mutate: KeyedM
             <Grid item xs={12}>
               <Controller
                 control={control}
-                name='reason'
-                render={({ field }) => <CustomTextField {...field} fullWidth label='Lý do' multiline rows={4} />}
+                name='CVHTNote'
+                render={({ field }) => <CustomTextField {...field} fullWidth label='Ghi chú' multiline rows={4} />}
               />
             </Grid>
           </Grid>

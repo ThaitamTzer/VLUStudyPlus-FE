@@ -43,25 +43,18 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
     sortField,
     sortOrder,
     handleSort,
-    toogleEditViewAcedemicProcess,
     toogleDeleteViewAcedemicProcess,
     setProcessing,
     toogleViewDetailAcedemicProcess,
     toogleOpenUpdateAcedemicProcessStatus
   } = props
 
-  const termNames = Array.from(new Set(data?.data.flatMap(d => d.processing.map(p => p.termName)) || []))
-
-  const termNamesCouseRegistration = Array.from(
-    new Set(data?.data.flatMap(d => d.courseRegistration.map(p => p.termName)) || [])
-  )
-
   const renderStudent = (student: ProcessingType) => {
     return (
       <Stack key={student._id} direction='column'>
         <Stack spacing={2}>
           <p>
-            {student.studentId} - {student.firstName} {student.lastName}
+            {student.studentId} - {student.lastName} {student.firstName}
           </p>
         </Stack>
         <p>
@@ -73,7 +66,7 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
 
   return (
     <TableContainer sx={{ position: 'relative', overflowX: 'auto', maxHeight: 'calc(100vh - 300px)' }}>
-      <Table stickyHeader sx={{ minWidth: 3100 }}>
+      <Table stickyHeader sx={{ minWidth: 3500 }}>
         <TableHead>
           <StyledTableRow
             sx={{
@@ -81,6 +74,7 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
             }}
           >
             <TableCell
+              width={1}
               sx={{
                 position: {
                   xs: 'none',
@@ -100,6 +94,7 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
               Stt
             </TableCell>
             <TableCell
+              width={300}
               sx={{
                 position: {
                   xs: 'none',
@@ -128,50 +123,69 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                 Sinh viên
               </TableSortLabel>
             </TableCell>
-            {termNames.map(term => (
-              <TableCell key={term}>XLHV ({term})</TableCell>
-            ))}
-
-            <TableCell>
+            <TableCell width={200}>
               <TableSortLabel
-                active={sortField === 'handlingStatusByAAO'}
+                active={sortField === 'CVHTHandle.processingResultName'}
                 direction={sortOrder === 'desc' ? 'desc' : 'asc'}
-                onClick={() => handleSort('handlingStatusByAAO')}
+                onClick={() => handleSort('CVHTHandle.processingResultName')}
               >
-                Diện XLHV (PĐT đề nghị)
+                CVHT ghi nhận tình trạng xử lý
               </TableSortLabel>
             </TableCell>
             <TableCell>
               <TableSortLabel
-                active={sortField === 'status'}
+                active={sortField === 'CVHTNote'}
                 direction={sortOrder === 'desc' ? 'desc' : 'asc'}
-                onClick={() => handleSort('status')}
+                onClick={() => handleSort('CVHTNote')}
               >
-                CVHT Xử lý
+                CVHT ghi chú cụ thể khác
               </TableSortLabel>
             </TableCell>
             <TableCell>
               <TableSortLabel
-                active={sortField === 'commitment'}
+                active={sortField === 'handlerName'}
                 direction={sortOrder === 'desc' ? 'desc' : 'asc'}
-                onClick={() => handleSort('commitment')}
+                onClick={() => handleSort('handlerName')}
               >
-                Đơn cam kết
+                Người xử lý
+              </TableSortLabel>
+            </TableCell>
+            <TableCell width={200}>
+              <TableSortLabel
+                active={sortField === 'processingHandle'}
+                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
+                onClick={() => handleSort('processingHandle')}
+              >
+                XLHT {data?.data[0]?.processingHandle?.note} (UIS - XLHT theo quy chế)
               </TableSortLabel>
             </TableCell>
             <TableCell>
               <TableSortLabel
-                active={sortField === 'processingResult'}
+                active={sortField === 'reasonHandling'}
                 direction={sortOrder === 'desc' ? 'desc' : 'asc'}
-                onClick={() => handleSort('processingResult')}
+                onClick={() => handleSort('reasonHandling')}
               >
-                Kết quả xử lý
+                Lý do XLHT {data?.data[0]?.reasonHandling?.note}
               </TableSortLabel>
             </TableCell>
-            <TableCell>Lưu ý</TableCell>
-            {termNamesCouseRegistration.map(term => (
-              <TableCell key={term}>ĐKMH ({term})</TableCell>
-            ))}
+            <TableCell>
+              <TableSortLabel
+                active={sortField === 'statusOn'}
+                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
+                onClick={() => handleSort('statusOn')}
+              >
+                Tình trạng
+              </TableSortLabel>
+            </TableCell>
+            <TableCell>
+              <TableSortLabel
+                active={sortField === 'courseRegistration'}
+                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
+                onClick={() => handleSort('courseRegistration')}
+              >
+                Đăng ký môn học
+              </TableSortLabel>
+            </TableCell>
             <TableCell>
               <TableSortLabel
                 active={sortField === 'DTBC'}
@@ -179,15 +193,6 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                 onClick={() => handleSort('DTBC')}
               >
                 ĐTBC
-              </TableSortLabel>
-            </TableCell>
-            <TableCell>
-              <TableSortLabel
-                active={sortField === 'STC'}
-                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
-                onClick={() => handleSort('STC')}
-              >
-                STC
               </TableSortLabel>
             </TableCell>
             <TableCell>
@@ -201,20 +206,101 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
             </TableCell>
             <TableCell>
               <TableSortLabel
-                active={sortField === 'STCTL'}
+                active={sortField === 'TCTL'}
                 direction={sortOrder === 'desc' ? 'desc' : 'asc'}
-                onClick={() => handleSort('STCTL')}
+                onClick={() => handleSort('TCTL')}
               >
-                STCTL
+                TCTL
               </TableSortLabel>
             </TableCell>
             <TableCell>
               <TableSortLabel
-                active={sortField === 'reasonHandling'}
+                active={sortField === 'TCCN'}
                 direction={sortOrder === 'desc' ? 'desc' : 'asc'}
-                onClick={() => handleSort('reasonHandling')}
+                onClick={() => handleSort('TCCN')}
               >
-                Lý do XLHV (UIS)
+                TCCN
+              </TableSortLabel>
+            </TableCell>
+            <TableCell>
+              <TableSortLabel
+                active={sortField === 'TONGTCCTDT'}
+                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
+                onClick={() => handleSort('TONGTCCTDT')}
+              >
+                Tổng TC
+              </TableSortLabel>
+            </TableCell>
+            <TableCell>
+              <TableSortLabel
+                active={sortField === 'percentTL'}
+                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
+                onClick={() => handleSort('percentTL')}
+              >
+                % TL
+              </TableSortLabel>
+            </TableCell>
+            <TableCell>
+              <TableSortLabel
+                active={sortField === 'DTB10'}
+                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
+                onClick={() => handleSort('DTB10')}
+              >
+                ĐTB10
+              </TableSortLabel>
+            </TableCell>
+            <TableCell>
+              <TableSortLabel
+                active={sortField === 'DTBCTL10'}
+                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
+                onClick={() => handleSort('DTBCTL10')}
+              >
+                ĐTBCTL10
+              </TableSortLabel>
+            </TableCell>
+            <TableCell>
+              <TableSortLabel
+                active={sortField === 'academicWarningsCount'}
+                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
+                onClick={() => handleSort('academicWarningsCount')}
+              >
+                Số lần cảnh báo
+              </TableSortLabel>
+            </TableCell>
+            <TableCell>
+              <TableSortLabel
+                active={sortField === 'admissionYear'}
+                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
+                onClick={() => handleSort('admissionYear')}
+              >
+                Năm nhập học
+              </TableSortLabel>
+            </TableCell>
+            <TableCell>
+              <TableSortLabel
+                active={sortField === 'RQS'}
+                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
+                onClick={() => handleSort('RQS')}
+              >
+                RQS
+              </TableSortLabel>
+            </TableCell>
+            <TableCell>
+              <TableSortLabel
+                active={sortField === 'list'}
+                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
+                onClick={() => handleSort('list')}
+              >
+                Danh sách
+              </TableSortLabel>
+            </TableCell>
+            <TableCell width={300}>
+              <TableSortLabel
+                active={sortField === 'resultHandlingBefore'}
+                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
+                onClick={() => handleSort('resultHandlingBefore')}
+              >
+                Kết quả xử lý trước
               </TableSortLabel>
             </TableCell>
             <TableCell>
@@ -233,24 +319,6 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                 onClick={() => handleSort('faculty')}
               >
                 Khoa
-              </TableSortLabel>
-            </TableCell>
-            <TableCell>
-              <TableSortLabel
-                active={sortField === 'year'}
-                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
-                onClick={() => handleSort('year')}
-              >
-                Năm học
-              </TableSortLabel>
-            </TableCell>
-            <TableCell>
-              <TableSortLabel
-                active={sortField === 'termName'}
-                direction={sortOrder === 'desc' ? 'desc' : 'asc'}
-                onClick={() => handleSort('termName')}
-              >
-                Học kỳ
               </TableSortLabel>
             </TableCell>
             <TableCell
@@ -321,18 +389,13 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                 >
                   {renderStudent(d)}
                 </TableCell>
-                {termNames.map(term => {
-                  const processingData = d.processing.find(p => p.termName === term)
-
-                  return (
-                    <TableCell key={term}>
-                      {processingData && processingData.statusHandling ? processingData.statusHandling : '-'}
-                    </TableCell>
-                  )
-                })}
-                <TableCell>{d.handlingStatusByAAO}</TableCell>
+                <TableCell width={200}>{d.CVHTHandle?.processingResultName || '-'}</TableCell>
+                <TableCell width={200}>{d.CVHTNote || '-'}</TableCell>
+                <TableCell width={10}>{d.handlerName || '-'}</TableCell>
+                <TableCell>{d.processingHandle?.statusProcess || '-'}</TableCell>
+                <TableCell width={200}>{d.reasonHandling?.reason || '-'}</TableCell>
                 <TableCell>
-                  {d.status ? (
+                  {d.statusOn?.status ? (
                     <Badge
                       sx={{
                         backgroundColor: 'success.main',
@@ -341,7 +404,7 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                         borderRadius: '5px'
                       }}
                     >
-                      Đã xử lý
+                      {d.statusOn.status}
                     </Badge>
                   ) : (
                     <Badge
@@ -357,7 +420,7 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                   )}
                 </TableCell>
                 <TableCell>
-                  {d.commitment ? (
+                  {d.courseRegistration?.isRegister ? (
                     <Badge
                       sx={{
                         backgroundColor: 'success.main',
@@ -366,68 +429,36 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                         borderRadius: '5px'
                       }}
                     >
-                      Đã làm đơn
-                    </Badge>
-                  ) : d?.processingResult?.commitment === undefined ? (
-                    <Badge
-                      sx={{
-                        backgroundColor: 'info.main',
-                        color: 'white',
-                        padding: '5px 10px',
-                        borderRadius: '5px'
-                      }}
-                    >
-                      Chờ CVHT xử lý
-                    </Badge>
-                  ) : d?.processingResult?.commitment ? (
-                    <Badge
-                      sx={{
-                        backgroundColor: 'warning.main',
-                        color: 'white',
-                        padding: '5px 10px',
-                        borderRadius: '5px'
-                      }}
-                    >
-                      Sinh viên chưa làm đơn
+                      Đã đăng ký
                     </Badge>
                   ) : (
                     <Badge
                       sx={{
-                        backgroundColor: 'secondary.main',
+                        backgroundColor: 'error.main',
                         color: 'white',
                         padding: '5px 10px',
                         borderRadius: '5px'
                       }}
                     >
-                      Sinh viên không cần làm đơn
+                      Chưa đăng ký
                     </Badge>
                   )}
                 </TableCell>
-                <TableCell>{d.processingResult?.processingResultName || ''}</TableCell>
-                <TableCell>{d.note || ''}</TableCell>
-                {termNamesCouseRegistration.map(term => {
-                  const courseRegistrationData = d.courseRegistration.find(p => p.termName === term)
-
-                  return (
-                    <TableCell key={term}>
-                      {courseRegistrationData ? (courseRegistrationData.isRegister ? 'Có' : 'Không') : '-'}
-                      {courseRegistrationData
-                        ? courseRegistrationData.note
-                          ? ` => ${courseRegistrationData.note}`
-                          : ''
-                        : ''}
-                    </TableCell>
-                  )
-                })}
                 <TableCell width={10}>{d.DTBC}</TableCell>
-                <TableCell width={10}>{d.STC}</TableCell>
                 <TableCell width={10}>{d.DTBCTL}</TableCell>
-                <TableCell width={10}>{d.STCTL}</TableCell>
-                <TableCell width={200}>{d.reasonHandling}</TableCell>
+                <TableCell width={10}>{d.TCTL}</TableCell>
+                <TableCell width={10}>{d.TCCN}</TableCell>
+                <TableCell width={10}>{d.TONGTCCTDT}</TableCell>
+                <TableCell width={10}>{d.percentTL?.toFixed(2) || '-'}</TableCell>
+                <TableCell width={10}>{d.DTB10}</TableCell>
+                <TableCell width={10}>{d.DTBCTL10}</TableCell>
+                <TableCell width={10}>{d.countWarning?.academicWarningsCount || '-'}</TableCell>
+                <TableCell width={10}>{d.admissionYear || '-'}</TableCell>
+                <TableCell width={10}>{d.RQS || '-'}</TableCell>
+                <TableCell width={10}>{d.list || '-'}</TableCell>
+                <TableCell>{d.resultHandlingBefore || '-'}</TableCell>
                 <TableCell>{d.yearLevel || '-'}</TableCell>
                 <TableCell>{d.faculty}</TableCell>
-                <TableCell>{d.year}</TableCell>
-                <TableCell>{d.termName}</TableCell>
                 <TableCell
                   align='right'
                   sx={{
@@ -462,15 +493,6 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                     >
                       <Iconify icon='fluent:edit-32-regular' />
                       Cập nhật kết quả xử lý
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        setProcessing(d)
-                        toogleEditViewAcedemicProcess()
-                      }}
-                    >
-                      <Iconify icon='fluent:edit-32-regular' />
-                      Sửa
                     </MenuItem>
                     <MenuItem
                       onClick={() => {

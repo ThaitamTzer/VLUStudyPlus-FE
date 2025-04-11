@@ -8,17 +8,7 @@ import dynamic from 'next/dynamic'
 
 import useSWR from 'swr'
 
-import {
-  Button,
-  Card,
-  CardContent,
-  List,
-  ListItem,
-  ListItemText,
-  MenuItem,
-  TablePagination,
-  Typography
-} from '@mui/material'
+import { Button, Card, MenuItem, TablePagination, Typography, Box, Grid } from '@mui/material'
 
 import PageHeader from '@/components/page-header'
 
@@ -67,31 +57,149 @@ export default function TrainingProgramPage() {
 
   return (
     <>
-      <PageHeader title='Danh sách khung chương trình đào tạo' />
-      <Card
-        sx={{
-          mt: 4
-        }}
-      >
-        <CardContent>
-          <div>
-            <Typography variant='h6'>Chú thích:</Typography>
-            <List dense>
-              <ListItem>
-                <Iconify icon='mingcute:information-fill' className='text-primary' />
-                <ListItemText primary='Xem chương trình đào tạo' />
-              </ListItem>
-              <ListItem>
-                <Iconify icon='fluent:table-add-20-regular' color='#198754' />
-                <ListItemText primary='Nhập chương trình đào tạo' />
-              </ListItem>
-              <ListItem>
-                <Iconify icon='material-symbols:add-circle-outline' color='#0d6efd' />
-                <ListItemText primary='Thêm môn học vào khung chương trình đào tạo' />
-              </ListItem>
-            </List>
-          </div>
-        </CardContent>
+      <PageHeader title='Quản lý khung chương trình đào tạo' />
+      <Card sx={{ mt: 4, mb: 4, borderRadius: 2, boxShadow: '0 4px 12px 0 rgba(0,0,0,0.05)' }}>
+        <Box sx={{ p: 2 }}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={4}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  p: 1.5,
+                  borderRadius: 2,
+                  bgcolor: 'rgba(32, 146, 236, 0.08)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-3px)',
+                    boxShadow: '0 4px 12px 0 rgba(32, 146, 236, 0.2)'
+                  }
+                }}
+              >
+                <Box
+                  sx={{
+                    mr: 2,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    bgcolor: 'rgba(32, 146, 236, 0.2)',
+                    p: 1,
+                    borderRadius: '50%'
+                  }}
+                >
+                  <Iconify icon='mingcute:information-fill' color='#2092ec' fontSize={24} />
+                </Box>
+                <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                  <strong>Xem chi tiết khung chương trình</strong>
+                </Typography>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  p: 1.5,
+                  borderRadius: 2,
+                  bgcolor: 'rgba(46, 204, 113, 0.08)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-3px)',
+                    boxShadow: '0 4px 12px 0 rgba(46, 204, 113, 0.2)'
+                  }
+                }}
+              >
+                <Box
+                  sx={{
+                    mr: 2,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    bgcolor: 'rgba(46, 204, 113, 0.2)',
+                    p: 1,
+                    borderRadius: '50%'
+                  }}
+                >
+                  <Iconify icon='fluent:table-add-20-regular' color='#2ecc71' fontSize={24} />
+                </Box>
+                <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                  <strong>Import khung chương trình</strong>
+                </Typography>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  p: 1.5,
+                  borderRadius: 2,
+                  bgcolor: 'rgba(241, 196, 15, 0.08)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-3px)',
+                    boxShadow: '0 4px 12px 0 rgba(241, 196, 15, 0.2)'
+                  }
+                }}
+              >
+                <Box
+                  sx={{
+                    mr: 2,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    bgcolor: 'rgba(241, 196, 15, 0.2)',
+                    p: 1,
+                    borderRadius: '50%'
+                  }}
+                >
+                  <Iconify icon='solar:pen-2-linear' color='#f1c40f' fontSize={24} />
+                </Box>
+                <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                  <strong>Cập nhật khung chương trình</strong>
+                </Typography>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  p: 1.5,
+                  borderRadius: 2,
+                  bgcolor: 'rgba(231, 76, 60, 0.08)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-3px)',
+                    boxShadow: '0 4px 12px 0 rgba(231, 76, 60, 0.2)'
+                  }
+                }}
+              >
+                <Box
+                  sx={{
+                    mr: 2,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    bgcolor: 'rgba(231, 76, 60, 0.2)',
+                    p: 1,
+                    borderRadius: '50%'
+                  }}
+                >
+                  <Iconify icon='solar:trash-bin-2-linear' color='#e74c3c' fontSize={24} />
+                </Box>
+                <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                  <strong>Xóa khung chương trình</strong>
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
+      </Card>
+      <Card sx={{ mt: 4, boxShadow: 5 }}>
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <CustomTextField
             select

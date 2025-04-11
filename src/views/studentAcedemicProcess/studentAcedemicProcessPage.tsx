@@ -11,8 +11,6 @@ import {
   CardHeader,
   Tooltip,
   Divider,
-  Alert,
-  AlertTitle,
   Box,
   Chip,
   LinearProgress,
@@ -46,16 +44,7 @@ export default function StudentAcedemicProcessPage() {
     }
   )
 
-  const { toogleAddCommitmentForm, setIdProcess, setProcessObj, toogleStudentViewDetailCommitmentForm } =
-    useStudentAcedemicProcessStore()
-
-  const handleAddCommitment = useCallback(
-    (id: string) => {
-      setIdProcess(id)
-      toogleAddCommitmentForm()
-    },
-    [setIdProcess, toogleAddCommitmentForm]
-  )
+  const { setProcessObj, toogleStudentViewDetailCommitmentForm } = useStudentAcedemicProcessStore()
 
   const handleOpenViewDetailCommitmentForm = useCallback(
     (processObj: ProcessingType) => {
@@ -69,36 +58,17 @@ export default function StudentAcedemicProcessPage() {
     setExpandedId(expandedId === id ? null : id)
   }
 
-  const renderCommitmentStatus = (student: any) => {
-    if (student.commitment) {
-      return <Chip label='Đã làm đơn' color='success' icon={<Iconify icon='mdi:check-circle' />} />
+  const renderProcessingStatus = (student: ProcessingType) => {
+    if (student.reasonHandling?._id) {
+      return <Chip label={`${student.reasonHandling.reason} `} color='error' />
     }
 
-    if (student.processingResult?.commitment === undefined) {
-      return <Chip label='Chờ CVHT xử lý' color='info' icon={<Iconify icon='mdi:clock-outline' />} />
-    }
-
-    if (student.processingResult?.commitment) {
-      return <Chip label='Cần làm đơn cam kết' color='warning' icon={<Iconify icon='mdi:alert' />} />
-    }
-
-    return <Chip label='Không cần làm đơn' color='default' />
+    return <Chip label='Chưa xử lý' color='default' icon={<Iconify icon='mdi:clock-outline' />} />
   }
-
-  // Đếm số đơn cần phải làm
-  const commitmentNeededCount =
-    studentData?.filter(student => student.processingResult?.commitment && !student.commitment).length || 0
 
   return (
     <>
       <PageHeader title='Xử lý học tập của sinh viên' />
-      {commitmentNeededCount > 0 && (
-        <Alert severity='warning' sx={{ mt: 2, mb: 2, borderRadius: 2, boxShadow: 2 }}>
-          <AlertTitle sx={{ fontWeight: 'bold' }}>Chú ý!</AlertTitle>
-          Bạn có {commitmentNeededCount} yêu cầu cần làm đơn cam kết. Vui lòng hoàn thành để tránh bị ảnh hưởng đến kết
-          quả học tập!
-        </Alert>
-      )}
 
       {isLoading ? (
         <Box sx={{ width: '100%', mt: 4 }}>
@@ -125,102 +95,57 @@ export default function StudentAcedemicProcessPage() {
                   borderRadius: 2,
                   transition: 'transform 0.3s',
                   '&:hover': { transform: 'translateY(-4px)' },
-                  boxShadow:
-                    student.processingResult?.commitment && !student.commitment ? '0 0 15px rgba(255, 152, 0, 0.5)' : 3
+                  boxShadow: 3
                 }}
               >
                 <CardHeader
                   title={
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Iconify icon='mdi:file-document' fontSize={24} color='primary.main' />
                       <Typography variant='h6' sx={{ fontWeight: 'bold' }}>
                         {student.academicCategory.title}
                       </Typography>
                     </Box>
                   }
+                  subheader={
+                    <Stack direction='row' spacing={1} sx={{ mt: 1 }}>
+                      <Chip
+                        size='small'
+                        icon={<Iconify icon='mdi:school' />}
+                        label={`Lớp: ${student.classId}`}
+                        variant='outlined'
+                      />
+                      <Chip
+                        size='small'
+                        icon={<Iconify icon='mdi:account-group' />}
+                        label={`Khóa: ${student.cohortName}`}
+                        variant='outlined'
+                      />
+                    </Stack>
+                  }
                   action={
                     <Stack direction='row' spacing={1}>
-                      {student?.processingResult?.commitment && !student.commitment && (
-                        <Tooltip title='Tạo đơn cam kết' arrow>
-                          <CustomIconButton
-                            variant='contained'
-                            color='warning'
-                            onClick={() => {
-                              handleAddCommitment(student._id)
-                            }}
-                            sx={{
-                              animation: 'pulse 1.5s infinite',
-                              '@keyframes pulse': {
-                                '0%': { boxShadow: '0 0 0 0 rgba(255, 152, 0, 0.7)' },
-                                '70%': { boxShadow: '0 0 0 10px rgba(255, 152, 0, 0)' },
-                                '100%': { boxShadow: '0 0 0 0 rgba(255, 152, 0, 0)' }
-                              }
-                            }}
-                          >
-                            <Iconify icon='mdi:file-plus' />
-                          </CustomIconButton>
-                        </Tooltip>
-                      )}
-                      {student.commitment && (
-                        <Tooltip title='Xem đơn cam kết' arrow>
-                          <CustomIconButton
-                            variant='contained'
-                            color='primary'
-                            onClick={() => {
-                              handleOpenViewDetailCommitmentForm(student)
-                            }}
-                          >
-                            <Iconify icon='mdi:file-document-outline' />
-                          </CustomIconButton>
-                        </Tooltip>
-                      )}
+                      <Tooltip title='Xem chi tiết' arrow>
+                        <CustomIconButton
+                          variant='contained'
+                          color='primary'
+                          onClick={() => {
+                            handleOpenViewDetailCommitmentForm(student)
+                          }}
+                        >
+                          <Iconify icon='mdi:file-document-outline' />
+                        </CustomIconButton>
+                      </Tooltip>
                     </Stack>
                   }
                 />
                 <CardContent>
                   <Stack spacing={2}>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-                      <Chip
-                        icon={<Iconify icon='mdi:calendar' />}
-                        label={`Học kỳ: ${student.termName}`}
-                        variant='outlined'
-                        size='small'
-                      />
-                      <Chip
-                        icon={<Iconify icon='mdi:school' />}
-                        label={`Năm học: ${student.year}`}
-                        variant='outlined'
-                        size='small'
-                      />
-                    </Box>
-
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <Typography variant='body1'>
                         <Box component='span' sx={{ fontWeight: 'bold', mr: 1 }}>
-                          Diện XLHV (PĐT đề nghị):
+                          Lý do XLHT {student.reasonHandling?.note}:
                         </Box>
-                        <Chip label={student.handlingStatusByAAO} color='error' size='small' />
-                      </Typography>
-
-                      <Typography variant='body1'>
-                        <Box component='span' sx={{ fontWeight: 'bold', mr: 1 }}>
-                          Trạng thái XLHV:
-                        </Box>
-                        <Chip
-                          label={student.status ? 'Đã xử lý' : 'Chưa xử lý'}
-                          color={student.status ? 'success' : 'default'}
-                          size='small'
-                          icon={<Iconify icon={student.status ? 'mdi:check' : 'mdi:clock-outline'} />}
-                        />
-                      </Typography>
-                    </Box>
-
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <Typography variant='body1'>
-                        <Box component='span' sx={{ fontWeight: 'bold', mr: 1 }}>
-                          Trạng thái đơn cam kết:
-                        </Box>
-                        {renderCommitmentStatus(student)}
+                        {renderProcessingStatus(student)}
                       </Typography>
 
                       <Button
@@ -243,12 +168,70 @@ export default function StudentAcedemicProcessPage() {
                         }}
                       >
                         <Stack spacing={2}>
-                          <Typography variant='body1'>
-                            <Box component='span' sx={{ fontWeight: 'bold', mr: 1 }}>
-                              Lý do xử lý:
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                            <Typography variant='body1' sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                              Thông tin xử lý học tập
+                            </Typography>
+
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Iconify icon='mdi:account-group' color='primary.main' />
+                              <Typography variant='body2'>
+                                <Box component='span' sx={{ fontWeight: 'bold' }}>
+                                  Đối tượng:{' '}
+                                </Box>
+                                {student.groupedByInstruction}
+                              </Typography>
                             </Box>
-                            {student.reasonHandling}
+
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Iconify icon='mdi:calendar-clock' color='primary.main' />
+                              <Typography variant='body2'>
+                                <Box component='span' sx={{ fontWeight: 'bold' }}>
+                                  Đợt xử lý:{' '}
+                                </Box>
+                                {student.processingHandle?.statusProcess}
+                                {student.processingHandle?.note && ` (${student.processingHandle.note})`}
+                              </Typography>
+                            </Box>
+
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Iconify icon='mdi:alert-circle' color='primary.main' />
+                              <Typography variant='body2'>
+                                <Box component='span' sx={{ fontWeight: 'bold' }}>
+                                  Lý do XLHT:{' '}
+                                </Box>
+                                {student.reasonHandling?.reason}
+                                {student.reasonHandling?.note && ` (${student.reasonHandling.note})`}
+                              </Typography>
+                            </Box>
+                          </Box>
+
+                          <Divider />
+
+                          <Typography variant='body2' sx={{ fontWeight: 'bold' }}>
+                            Thông tin sinh viên
                           </Typography>
+
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                            <Chip
+                              icon={<Iconify icon='mdi:school' />}
+                              label={`Khoa: ${student.faculty}`}
+                              variant='outlined'
+                              size='small'
+                            />
+                            <Chip
+                              icon={<Iconify icon='mdi:account-school' />}
+                              label={`Năm thứ: ${student.yearLevel}`}
+                              variant='outlined'
+                              size='small'
+                            />
+                            <Chip
+                              icon={<Iconify icon='mdi:book-open-variant' />}
+                              label={`Ngành: ${student.major}`}
+                              variant='outlined'
+                              size='small'
+                            />
+                          </Box>
 
                           <Divider />
 
@@ -256,63 +239,130 @@ export default function StudentAcedemicProcessPage() {
                             Đăng ký môn học:
                           </Typography>
 
-                          {student.courseRegistration.map((course, index) => (
-                            <Box
-                              key={index}
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1
-                              }}
-                            >
-                              <Iconify
-                                icon={course.isRegister ? 'mdi:check-circle' : 'mdi:close-circle'}
-                                color={course.isRegister ? 'success.main' : 'error.main'}
-                              />
-                              <Typography variant='body2'>
-                                <strong>ĐKMH {course.termName}:</strong>{' '}
-                                {course.isRegister ? 'Đã đăng ký' : 'Chưa đăng ký'}
-                                {course.note ? ` (${course.note})` : ''}
-                              </Typography>
-                            </Box>
-                          ))}
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1
+                            }}
+                          >
+                            <Iconify
+                              icon={student.courseRegistration?.isRegister ? 'mdi:check-circle' : 'mdi:close-circle'}
+                              color={student.courseRegistration?.isRegister ? 'success.main' : 'error.main'}
+                            />
+                            <Typography variant='body2'>
+                              {student.courseRegistration?.isRegister ? 'Đã đăng ký' : 'Chưa đăng ký'}
+                              {student.courseRegistration?.note ? ` (${student.courseRegistration.note})` : ''}
+                            </Typography>
+                          </Box>
 
                           <Divider />
 
                           <Typography variant='body2' sx={{ fontWeight: 'bold' }}>
-                            Xử lý học vụ (UIS)
+                            Thông tin học tập:
                           </Typography>
 
-                          {student.processing.map((process, index) => (
-                            <Box
-                              key={index}
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1
-                              }}
-                            >
-                              <Iconify icon='mdi:clock-time-four-outline' />
+                          <Grid container spacing={2}>
+                            <Grid item xs={6}>
                               <Typography variant='body2'>
-                                <strong>Học kỳ {process.termName}:</strong> {process.statusHandling}
+                                <Box component='span' sx={{ fontWeight: 'bold' }}>
+                                  ĐTBC:{' '}
+                                </Box>
+                                {student.DTBC}
                               </Typography>
-                            </Box>
-                          ))}
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Typography variant='body2'>
+                                <Box component='span' sx={{ fontWeight: 'bold' }}>
+                                  ĐTBCTL:{' '}
+                                </Box>
+                                {student.DTBCTL}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Typography variant='body2'>
+                                <Box component='span' sx={{ fontWeight: 'bold' }}>
+                                  TCTL:{' '}
+                                </Box>
+                                {student.TCTL}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Typography variant='body2'>
+                                <Box component='span' sx={{ fontWeight: 'bold' }}>
+                                  TCCN:{' '}
+                                </Box>
+                                {student.TCCN}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Typography variant='body2'>
+                                <Box component='span' sx={{ fontWeight: 'bold' }}>
+                                  Tổng TCCTDT:{' '}
+                                </Box>
+                                {student.TONGTCCTDT}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Typography variant='body2'>
+                                <Box component='span' sx={{ fontWeight: 'bold' }}>
+                                  Phần trăm TL:{' '}
+                                </Box>
+                                {student.percentTL?.toFixed(2)}%
+                              </Typography>
+                            </Grid>
+                          </Grid>
+
+                          <Divider />
+
+                          <Typography variant='body2' sx={{ fontWeight: 'bold' }}>
+                            Thông tin liên hệ:
+                          </Typography>
+
+                          <Grid container spacing={2}>
+                            <Grid item xs={6}>
+                              <Typography variant='body2'>
+                                <Box component='span' sx={{ fontWeight: 'bold' }}>
+                                  SĐT SV:{' '}
+                                </Box>
+                                {student.sdtsv || '-'}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Typography variant='body2'>
+                                <Box component='span' sx={{ fontWeight: 'bold' }}>
+                                  SĐT Lớp trưởng:{' '}
+                                </Box>
+                                {student.sdtlh || '-'}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Typography variant='body2'>
+                                <Box component='span' sx={{ fontWeight: 'bold' }}>
+                                  SĐT HKTT:{' '}
+                                </Box>
+                                {student.sdthktt || '-'}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Typography variant='body2'>
+                                <Box component='span' sx={{ fontWeight: 'bold' }}>
+                                  SĐT Cha:{' '}
+                                </Box>
+                                {student.sdtcha || '-'}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Typography variant='body2'>
+                                <Box component='span' sx={{ fontWeight: 'bold' }}>
+                                  SĐT Mẹ:{' '}
+                                </Box>
+                                {student.sdtme || '-'}
+                              </Typography>
+                            </Grid>
+                          </Grid>
                         </Stack>
                       </Paper>
-                    )}
-
-                    {student.processingResult?.commitment && !student.commitment && (
-                      <Button
-                        variant='contained'
-                        color='warning'
-                        fullWidth
-                        startIcon={<Iconify icon='mdi:file-plus' />}
-                        onClick={() => handleAddCommitment(student._id)}
-                        sx={{ mt: 1 }}
-                      >
-                        Tạo đơn cam kết
-                      </Button>
                     )}
                   </Stack>
                 </CardContent>

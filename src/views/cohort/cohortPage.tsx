@@ -99,7 +99,7 @@ export default function CohortPage() {
       columnHelper.accessor('action', {
         header: '',
         meta: {
-          algin: 'right'
+          align: 'right'
         },
         cell: infor => (
           <>

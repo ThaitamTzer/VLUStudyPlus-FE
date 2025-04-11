@@ -207,7 +207,7 @@ const learnProcessService = {
       ...(searchKey && { searchKey })
     }
 
-    const res = await axiosClient.get(`/api/academic-processing/view-list-academicProcessing-of-category?id=${id}`, {
+    const res = await axiosClient.get(`/api/academic-processing/view-list-academicProcessing-of-category/${id}`, {
       params
     })
 

@@ -17,7 +17,7 @@ import {
   useReactTable
 } from '@tanstack/react-table'
 
-import { Box, Button, Card, CardContent, MenuItem, TablePagination, Typography } from '@mui/material'
+import { Button, Card, MenuItem, TablePagination, Typography, Box, Grid } from '@mui/material'
 
 import { toast } from 'react-toastify'
 
@@ -44,6 +44,221 @@ const ImportModal = dynamic(() => import('./importModal'), { ssr: false })
 const ImportResult = dynamic(() => import('./importResult'), { ssr: false })
 const ManualAddAcedemicProcess = dynamic(() => import('./manualAddAcedemicProcess'), { ssr: false })
 const ViewAcedemicProcess = dynamic(() => import('./viewAcedemicProcess/viewAcedemicProcess'), { ssr: false })
+
+// Component hiển thị ghi chú
+const NotesPanel = () => {
+  return (
+    <Card sx={{ mt: 4, mb: 4, borderRadius: 2, boxShadow: '0 4px 12px 0 rgba(0,0,0,0.05)' }}>
+      <Box sx={{ p: 2 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6} md={4}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                p: 1.5,
+                borderRadius: 2,
+                bgcolor: 'rgba(32, 146, 236, 0.08)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-3px)',
+                  boxShadow: '0 4px 12px 0 rgba(32, 146, 236, 0.2)'
+                }
+              }}
+            >
+              <Box
+                sx={{
+                  mr: 2,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  bgcolor: 'rgba(32, 146, 236, 0.2)',
+                  p: 1,
+                  borderRadius: '50%'
+                }}
+              >
+                <Iconify icon='mingcute:information-fill' color='#2092ec' fontSize={24} />
+              </Box>
+              <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                <strong>Xem danh sách xử lý học tập</strong>
+              </Typography>
+            </Box>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                p: 1.5,
+                borderRadius: 2,
+                bgcolor: 'rgba(142, 68, 173, 0.08)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-3px)',
+                  boxShadow: '0 4px 12px 0 rgba(142, 68, 173, 0.2)'
+                }
+              }}
+            >
+              <Box
+                sx={{
+                  mr: 2,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  bgcolor: 'rgba(142, 68, 173, 0.2)',
+                  p: 1,
+                  borderRadius: '50%'
+                }}
+              >
+                <Iconify icon='hugeicons:files-01' color='#8e44ad' fontSize={24} />
+              </Box>
+              <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                <strong>Xem danh sách đơn cam kết</strong>
+              </Typography>
+            </Box>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                p: 1.5,
+                borderRadius: 2,
+                bgcolor: 'rgba(46, 204, 113, 0.08)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-3px)',
+                  boxShadow: '0 4px 12px 0 rgba(46, 204, 113, 0.2)'
+                }
+              }}
+            >
+              <Box
+                sx={{
+                  mr: 2,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  bgcolor: 'rgba(46, 204, 113, 0.2)',
+                  p: 1,
+                  borderRadius: '50%'
+                }}
+              >
+                <Iconify icon='tabler:file-import' color='#2ecc71' fontSize={24} />
+              </Box>
+              <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                <strong>Import danh sách xử lý học tập</strong>
+              </Typography>
+            </Box>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                p: 1.5,
+                borderRadius: 2,
+                bgcolor: 'rgba(241, 196, 15, 0.08)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-3px)',
+                  boxShadow: '0 4px 12px 0 rgba(241, 196, 15, 0.2)'
+                }
+              }}
+            >
+              <Box
+                sx={{
+                  mr: 2,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  bgcolor: 'rgba(241, 196, 15, 0.2)',
+                  p: 1,
+                  borderRadius: '50%'
+                }}
+              >
+                <Iconify icon='solar:pen-2-linear' color='#f1c40f' fontSize={24} />
+              </Box>
+              <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                <strong>Cập nhật kỳ xử lý</strong>
+              </Typography>
+            </Box>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                p: 1.5,
+                borderRadius: 2,
+                bgcolor: 'rgba(231, 76, 60, 0.08)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-3px)',
+                  boxShadow: '0 4px 12px 0 rgba(231, 76, 60, 0.2)'
+                }
+              }}
+            >
+              <Box
+                sx={{
+                  mr: 2,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  bgcolor: 'rgba(231, 76, 60, 0.2)',
+                  p: 1,
+                  borderRadius: '50%'
+                }}
+              >
+                <Iconify icon='solar:trash-bin-2-linear' color='#e74c3c' fontSize={24} />
+              </Box>
+              <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                <strong>Xóa kỳ xử lý</strong>
+              </Typography>
+            </Box>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                p: 1.5,
+                borderRadius: 2,
+                bgcolor: 'rgba(52, 152, 219, 0.08)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-3px)',
+                  boxShadow: '0 4px 12px 0 rgba(52, 152, 219, 0.2)'
+                }
+              }}
+            >
+              <Box
+                sx={{
+                  mr: 2,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  bgcolor: 'rgba(52, 152, 219, 0.2)',
+                  p: 1,
+                  borderRadius: '50%'
+                }}
+              >
+                <Iconify icon='tabler-plus' color='#3498db' fontSize={24} />
+              </Box>
+              <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                <strong>Thêm kỳ XLHT</strong>
+              </Typography>
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
+    </Card>
+  )
+}
 
 export default function LearnProcessPage() {
   const columns = useColumns()
@@ -160,46 +375,8 @@ export default function LearnProcessPage() {
   return (
     <>
       <PageHeader title='Danh sách kỳ xử lý học tập' />
+      <NotesPanel />
       <Card sx={{ mt: 4, boxShadow: 5 }}>
-        <CardContent>
-          <Typography variant='h6' fontWeight='bold' gutterBottom>
-            Hướng dẫn thao tác
-          </Typography>
-          <Box display='grid' gridTemplateColumns='repeat(auto-fit, minmax(150px, 1fr))' gap={2}>
-            {[
-              { icon: 'mingcute:information-fill', color: '#2092ec', label: 'Xem danh sách xử lý học tập' },
-              { icon: 'hugeicons:files-01', color: '#8e44ad', label: 'Xem danh sách đơn cam kết' },
-              { icon: 'tabler:file-import', color: 'green', label: 'Import danh sách xử lý học tập' },
-              { icon: 'solar:pen-2-linear', color: 'orange', label: 'Cập nhật kỳ xử lý' },
-              { icon: 'solar:trash-bin-2-linear', color: 'red', label: 'Xóa kỳ xử lý' }
-            ].map((item, index) => (
-              <Box
-                key={index}
-                display='flex'
-                alignItems='center'
-                gap={1}
-                sx={{
-                  p: 2,
-                  borderRadius: '8px',
-                  boxShadow: 5,
-                  transition: 'all 0.3s',
-                  '&:hover': { boxShadow: 3 }
-                }}
-              >
-                <Iconify icon={item.icon} color={item.color} width={24} height={24} />
-                <Typography variant='body2' fontWeight='500'>
-                  {item.label}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-          <Typography variant='h6' fontWeight='bold' gutterBottom sx={{ mt: 4 }}>
-            Thêm xử lý học vụ
-          </Typography>
-          <Typography variant='body1' gutterBottom>
-            Bạn có thể thêm xử lý học tập bằng cách xem danh sách xử lý học tập và chọn Thêm XLHV.
-          </Typography>
-        </CardContent>
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <CustomTextField
             select
@@ -237,7 +414,7 @@ export default function LearnProcessPage() {
       <UpdateAcedemicProcess mutate={mutate} />
       <ImportModal mutate={mutate} />
       <ImportResult />
-      <ViewAcedemicProcess listAcedemicProcess={data || []} />
+      <ViewAcedemicProcess />
       <ViewCommitmentForms />
       <ViewCommitmentFormsOfCVHT />
       <ProgressModal

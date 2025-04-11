@@ -47,7 +47,7 @@ export default function CohortList({ table }: CohortListProps) {
                   <TableCell
                     width={(cell.column.columnDef.meta as any)?.width}
                     size='small'
-                    align={(cell.column.columnDef.meta as any)?.algin}
+                    align={(cell.column.columnDef.meta as any)?.align}
                     key={cell.id}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

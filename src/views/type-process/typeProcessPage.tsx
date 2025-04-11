@@ -81,7 +81,7 @@ export default function TypeProcessPage() {
       columnHelper.accessor('action', {
         header: '',
         meta: {
-          algin: 'right'
+          align: 'right'
         },
         cell: infor => (
           <RowAction>

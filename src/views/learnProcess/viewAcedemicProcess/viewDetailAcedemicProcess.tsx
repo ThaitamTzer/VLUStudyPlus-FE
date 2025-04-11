@@ -113,8 +113,8 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
                 <Divider sx={{ my: 2, borderColor: 'rgba(0,0,0,0.08)' }} />
 
                 <InfoGrid>
-                  <InfoItemSmall emoji='🎓' label='Năm học' value={data.checkAcademicProcessing.year} />
-                  <InfoItemSmall emoji='🗓️' label='Học kỳ' value={data.checkAcademicProcessing.termName} />
+                  <InfoItemSmall emoji='🎓' label='Năm học' value={data.checkAcademicProcessing.yearLevel} />
+                  <InfoItemSmall emoji='🗓️' label='Học kỳ' value={data.checkAcademicProcessing.admissionYear} />
                   <InfoItemSmall
                     emoji='📊'
                     label='Điểm TB chung'
@@ -124,7 +124,7 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
                       </Box>
                     }
                   />
-                  <InfoItemSmall emoji='🪙' label='Số tín chỉ' value={data.checkAcademicProcessing.STC} />
+                  <InfoItemSmall emoji='🪙' label='Số tín chỉ' value={data.checkAcademicProcessing.TONGTCCTDT} />
                   <InfoItemSmall
                     emoji='📈'
                     label='Điểm TB tích lũy'
@@ -134,7 +134,7 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
                       </Box>
                     }
                   />
-                  <InfoItemSmall emoji='🪙' label='Số TC tích lũy' value={data.checkAcademicProcessing.STCTL} />
+                  <InfoItemSmall emoji='🪙' label='Số TC tích lũy' value={data.checkAcademicProcessing.TCTL} />
                 </InfoGrid>
               </Card>
             </Grid>
@@ -158,11 +158,11 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
                       label='Diện XLHV'
                       value={
                         <Chip
-                          label={data.checkAcademicProcessing.handlingStatusByAAO}
+                          label={data.checkAcademicProcessing.statusOn.status}
                           color={
-                            data.checkAcademicProcessing.handlingStatusByAAO === 'Đạt'
+                            data.checkAcademicProcessing.statusOn.status === 'Đạt'
                               ? 'success'
-                              : data.checkAcademicProcessing.handlingStatusByAAO === 'Không đạt'
+                              : data.checkAcademicProcessing.statusOn.status === 'Không đạt'
                                 ? 'error'
                                 : 'error'
                           }
@@ -176,13 +176,17 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
-                    <InfoItem emoji='❗' label='Lý do XLHV (UIS)' value={data.checkAcademicProcessing.reasonHandling} />
+                    <InfoItem
+                      emoji='❗'
+                      label='Lý do XLHV (UIS)'
+                      value={data.checkAcademicProcessing.reasonHandling.reason}
+                    />
                   </Grid>
                   <Grid item xs={12}>
                     <InfoItem
                       emoji='📝'
                       label='Lưu ý'
-                      value={data.checkAcademicProcessing.note || 'Không có ghi chú'}
+                      value={data.checkAcademicProcessing.statusOn.note || 'Không có ghi chú'}
                     />
                   </Grid>
                 </Grid>
@@ -190,7 +194,7 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
             </Grid>
 
             {/* Processing History Section */}
-            {data.checkAcademicProcessing.processing && data.checkAcademicProcessing.processing.length > 0 && (
+            {data.checkAcademicProcessing.processingHandle && (
               <Grid item xs={12}>
                 <Card
                   sx={{
@@ -203,52 +207,50 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
                   <Divider sx={{ my: 2, borderColor: 'rgba(0,0,0,0.08)' }} />
 
                   <Grid container spacing={2}>
-                    {data.checkAcademicProcessing.processing.map((process, index) => (
-                      <Grid item xs={12} sm={6} md={4} key={index}>
-                        <Card
-                          variant='outlined'
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Card
+                        variant='outlined'
+                        sx={{
+                          p: 2,
+                          height: '100%',
+                          borderRadius: '8px',
+                          borderColor: '#d1d5db',
+                          borderLeft: '4px solid #6366f1'
+                        }}
+                      >
+                        <Box display='flex' alignItems='center' gap={1} mb={1}>
+                          <span style={{ fontSize: '1.2rem' }}>📝</span>
+                          <Typography variant='subtitle2' fontWeight='bold'>
+                            Học kỳ {data.checkAcademicProcessing.processingHandle.note}
+                          </Typography>
+                        </Box>
+                        <Chip
+                          label={data.checkAcademicProcessing.processingHandle.statusProcess}
+                          color={
+                            data.checkAcademicProcessing.processingHandle.statusProcess === 'Đạt'
+                              ? 'success'
+                              : data.checkAcademicProcessing.processingHandle.statusProcess === 'Cảnh cáo học vụ'
+                                ? 'warning'
+                                : data.checkAcademicProcessing.processingHandle.statusProcess === 'Buộc thôi học'
+                                  ? 'error'
+                                  : 'default'
+                          }
+                          size='small'
                           sx={{
-                            p: 2,
-                            height: '100%',
-                            borderRadius: '8px',
-                            borderColor: '#d1d5db',
-                            borderLeft: '4px solid #6366f1'
+                            fontWeight: 'medium',
+                            px: 0.5,
+                            fontSize: '0.75rem'
                           }}
-                        >
-                          <Box display='flex' alignItems='center' gap={1} mb={1}>
-                            <span style={{ fontSize: '1.2rem' }}>📝</span>
-                            <Typography variant='subtitle2' fontWeight='bold'>
-                              Học kỳ {process.termName}
-                            </Typography>
-                          </Box>
-                          <Chip
-                            label={process.statusHandling}
-                            color={
-                              process.statusHandling === 'Đạt'
-                                ? 'success'
-                                : process.statusHandling === 'Cảnh cáo học vụ'
-                                  ? 'warning'
-                                  : process.statusHandling === 'Buộc thôi học'
-                                    ? 'error'
-                                    : 'default'
-                            }
-                            size='small'
-                            sx={{
-                              fontWeight: 'medium',
-                              px: 0.5,
-                              fontSize: '0.75rem'
-                            }}
-                          />
-                        </Card>
-                      </Grid>
-                    ))}
+                        />
+                      </Card>
+                    </Grid>
                   </Grid>
                 </Card>
               </Grid>
             )}
 
             {/* Course Registration Section */}
-            {data.checkAcademicProcessing.courseRegistration.length > 0 && (
+            {data.checkAcademicProcessing.courseRegistration && (
               <Grid item xs={12}>
                 <Card
                   sx={{
@@ -261,37 +263,43 @@ export default function ViewDetailAcedecmicProcess(props: ViewDetailAcedecmicPro
                   <Divider sx={{ my: 2, borderColor: 'rgba(0,0,0,0.08)' }} />
 
                   <Grid container spacing={2}>
-                    {data.checkAcademicProcessing.courseRegistration.map((course, index) => (
-                      <Grid item xs={12} sm={6} md={4} key={index}>
-                        <Card
-                          variant='outlined'
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Card
+                        variant='outlined'
+                        sx={{
+                          p: 2,
+                          height: '100%',
+                          borderRadius: '8px',
+                          borderColor: data.checkAcademicProcessing.courseRegistration.isRegister
+                            ? '#d1fae5'
+                            : '#fee2e2',
+                          borderLeft: data.checkAcademicProcessing.courseRegistration.isRegister
+                            ? '4px solid #10b981'
+                            : '4px solid #ef4444'
+                        }}
+                      >
+                        <Box display='flex' alignItems='center' gap={1} mb={1}>
+                          <span style={{ fontSize: '1.2rem' }}>
+                            {data.checkAcademicProcessing.courseRegistration.isRegister ? '✅' : '❌'}
+                          </span>
+                          <Typography variant='subtitle2' fontWeight='bold'>
+                            Học kỳ {data.checkAcademicProcessing.courseRegistration.note}
+                          </Typography>
+                        </Box>
+                        <Chip
+                          label={
+                            data.checkAcademicProcessing.courseRegistration.isRegister ? 'Đã đăng ký' : 'Chưa đăng ký'
+                          }
+                          color={data.checkAcademicProcessing.courseRegistration.isRegister ? 'success' : 'error'}
+                          size='small'
                           sx={{
-                            p: 2,
-                            height: '100%',
-                            borderRadius: '8px',
-                            borderColor: course.isRegister ? '#d1fae5' : '#fee2e2',
-                            borderLeft: course.isRegister ? '4px solid #10b981' : '4px solid #ef4444'
+                            fontWeight: 'medium',
+                            px: 0.5,
+                            fontSize: '0.75rem'
                           }}
-                        >
-                          <Box display='flex' alignItems='center' gap={1} mb={1}>
-                            <span style={{ fontSize: '1.2rem' }}>{course.isRegister ? '✅' : '❌'}</span>
-                            <Typography variant='subtitle2' fontWeight='bold'>
-                              Học kỳ {course.termName}
-                            </Typography>
-                          </Box>
-                          <Chip
-                            label={course.isRegister ? 'Đã đăng ký' : 'Chưa đăng ký'}
-                            color={course.isRegister ? 'success' : 'error'}
-                            size='small'
-                            sx={{
-                              fontWeight: 'medium',
-                              px: 0.5,
-                              fontSize: '0.75rem'
-                            }}
-                          />
-                        </Card>
-                      </Grid>
-                    ))}
+                        />
+                      </Card>
+                    </Grid>
                   </Grid>
                 </Card>
               </Grid>

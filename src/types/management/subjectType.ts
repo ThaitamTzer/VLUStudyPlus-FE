@@ -1,19 +1,17 @@
 export type SubjectType = {
   _id: string
-  categoryTrainingProgramIds: [null]
-  courseCode: string
-  courseName: string
-  credits: number
-  LT: number
-  TH: number
-  TT: number
-  isRequire: boolean
-  prerequisites: string
-  preConditions: string
-  subjectCode: string
-  inCharge: string
-  implementationSemester: number
-  note: string
+  title: string
+  credit: number
+  cohortId: {
+    _id: string
+    cohortId: string
+  }
+  majorId: {
+    _id: string
+    majorId: string
+    majorName: string
+  }
+  statusImport: boolean
   createdAt: string | Date
   updatedAt: string | Date
 }

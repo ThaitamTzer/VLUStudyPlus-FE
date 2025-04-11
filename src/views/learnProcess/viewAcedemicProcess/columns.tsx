@@ -2,10 +2,9 @@ import { useCallback, useMemo } from 'react'
 
 import type { ColumnDef } from '@tanstack/react-table'
 import { createColumnHelper } from '@tanstack/react-table'
-import { IconButton, MenuItem, Tooltip } from '@mui/material'
+import { IconButton, Tooltip } from '@mui/material'
 
 import type { LearnProcessType } from '@/types/management/learnProcessType'
-import RowAction from '@/components/rowAction'
 import Iconify from '@/components/iconify'
 import { useAcedemicProcessStore } from '@/stores/acedemicProcess.store'
 import { useCommitmentStore } from '@/stores/commitment.store'
@@ -71,7 +70,7 @@ export const useColumns = () => {
       columnHelper.accessor('action', {
         header: '',
         meta: {
-          algin: 'right'
+          align: 'right'
         },
         cell: infor => (
           <>
@@ -116,28 +115,26 @@ export const useColumns = () => {
                 <Iconify icon='tabler:file-import' className='text-success' />
               </IconButton>
             </Tooltip>
-            <RowAction>
-              <MenuItem
-                sx={{ color: 'warning.main' }}
+            <Tooltip title='Cập nhật kỳ xử lý' arrow>
+              <IconButton
                 onClick={() => {
                   setAcedemicProcess(infor.row.original)
                   toogleUpdateAcedemicProcess()
                 }}
               >
-                <Iconify icon='solar:pen-2-linear' />
-                Cập nhật kỳ xử lý
-              </MenuItem>
-              <MenuItem
-                sx={{ color: 'error.main' }}
+                <Iconify icon='solar:pen-2-linear' color='#f1c40f' />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Xóa kỳ xử lý' arrow>
+              <IconButton
                 onClick={() => {
                   setAcedemicProcess(infor.row.original)
                   toogleDeleteAcedemicProcess()
                 }}
               >
-                <Iconify icon='solar:trash-bin-2-linear' />
-                Xóa kỳ xử lý
-              </MenuItem>
-            </RowAction>
+                <Iconify icon='solar:trash-bin-2-linear' color='#e74c3c' />
+              </IconButton>
+            </Tooltip>
           </>
         ),
         enableSorting: false

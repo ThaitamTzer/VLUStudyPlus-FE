@@ -24,21 +24,19 @@ import CustomTextField from '@/@core/components/mui/TextField'
 import DebouncedInput from '@/components/debouncedInput'
 import TablePaginationCustomNoURL from '@/components/table/TablePaginationNoURL'
 import { useShare } from '@/hooks/useShare'
-import type { LearnProcessType } from '@/types/management/learnProcessType'
 import { NotificantionAction } from './notificationAction'
 
 const TableFilter = dynamic(() => import('./tableFilter'), { ssr: false })
 const TableAcedemicProcess = dynamic(() => import('./tableAcedemicProcess'), { ssr: false })
 const AlertDelete = dynamic(() => import('@/components/alertModal'), { ssr: false })
 const ManualAddAcedemicProcess = dynamic(() => import('../manualAddAcedemicProcess'), { ssr: false })
-const ManualEditAcedemicProcess = dynamic(() => import('./editAcedemicProcess'), { ssr: false })
 const ViewDetailAcedecmicProcess = dynamic(() => import('./viewDetailAcedemicProcess'), { ssr: false })
 
 const UpdateAcedemicProcessStatus = dynamic(() => import('../updateAcedemicProcessStatus'), { ssr: false })
 const SendMailModal = dynamic(() => import('./sendMailModal'), { ssr: false })
 const SendMailModalRemind = dynamic(() => import('./sendMailModalRemind'), { ssr: false })
 
-export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcedemicProcess: LearnProcessType[] }) {
+export default function ViewAcedemicProcess() {
   const {
     openViewByCategory,
     toogleViewByCategory,
@@ -47,7 +45,6 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
     toogleManualAddFromViewByCate,
     openManualAddFromViewByCate,
     toogleEditViewAcedemicProcess,
-    openEditViewAcedemicProcess,
     setProcessing,
     toogleDeleteViewAcedemicProcess,
     openDeleteViewAcedemicProcess,
@@ -61,8 +58,6 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
   const { cohorOptions } = useShare()
 
   const id = useMemo(() => session?._id, [session])
-
-  console.log('acedemicProcess', session)
 
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
@@ -241,12 +236,7 @@ export default function ViewAcedemicProcess({ listAcedemicProcess }: { listAcede
       </Dialog>
       <ViewDetailAcedecmicProcess id={processing?._id || ''} />
       <UpdateAcedemicProcessStatus mutate={mutate} />
-      <ManualEditAcedemicProcess
-        mutate={mutate}
-        listAcedemicProcess={listAcedemicProcess}
-        onClose={toogleEditViewAcedemicProcess}
-        open={openEditViewAcedemicProcess}
-      />
+
       <ManualAddAcedemicProcess
         mutate={mutate}
         onClose={toogleManualAddFromViewByCate}

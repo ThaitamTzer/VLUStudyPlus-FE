@@ -117,15 +117,8 @@ export type AddProcessType = {
   termName: string
 }
 
-type major = {
-  termName: string
-  _id: string
-}
-
 export type ProcessingType = {
   _id: string
-  commitment: boolean
-  status: boolean
   academicCategory: {
     _id: string
     title: string
@@ -133,30 +126,44 @@ export type ProcessingType = {
   studentId: string
   lastName: string
   firstName: string
-  classId: string
   cohortName: string
-  processing: processing[]
-  handlingStatusByAAO: string
-  note: string
-  courseRegistration: courseRegistration[]
+  classId: string
+  groupedByInstruction: string
+  sdtsv: string
+  sdtlh: string
+  sdthktt: string
+  sdtcha: string
+  sdtme: string
+  major: string
   DTBC: number
-  STC: number
   DTBCTL: number
-  STCTL: number
-  reasonHandling: string
-  yearLevel: string
+  DTB10: number
+  DTBCTL10: number
+  TCTL: number
+  TCCN: number
+  TONGTCCTDT: number
+  percentTL: number
+  processingHandle: ProcessingHandle
+  countWarning: CountWarning
+  courseRegistration: CourseRegistration
+  admissionYear: number
+  RQS: string
   faculty: string
-  year: string
-  termName: string
-  major: major[]
-  processingResult?: {
+  list: string
+  statusOn: StatusOn
+  yearLevel: string
+  reasonHandling: ReasonHandling
+  resultHandlingBefore: string
+  createdAt: string | Date
+  updatedAt: string | Date
+  CVHTHandle?: {
     _id: string
     processingResultName: string
     commitment: boolean
   }
-  reason?: string
-  createdAt: string | Date
-  updatedAt: string | Date
+  CVHTNote?: string
+  handlerId?: string
+  handlerName?: string
 }
 
 export type ListProcessingType = {

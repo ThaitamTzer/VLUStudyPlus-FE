@@ -10,6 +10,7 @@ type ProgressModalProps = {
   open: boolean
   isProcessing: boolean
   isCompleted: boolean
+  isError?: boolean
   pauseAt?: number
   processingMessage?: string
   completedMessage?: string
@@ -22,6 +23,7 @@ export default function ProgressModal({
   open,
   isProcessing,
   isCompleted,
+  isError = false,
   pauseAt = 85,
   processingMessage = 'Đang xử lý dữ liệu...',
   completedMessage = 'Hoàn thành!',
@@ -81,20 +83,27 @@ export default function ProgressModal({
     return () => clearInterval(completeTimer)
   }, [isCompleted])
 
+  // Đảm bảo luôn đạt 100% khi hoàn thành
+  useEffect(() => {
+    if (isCompleted && progress < 100) {
+      setProgress(100)
+    }
+  }, [isCompleted, progress])
+
   // Auto close khi đạt 100%
   useEffect(() => {
-    if (progress === 100 && isCompleted) {
-      const closeTimeout = setTimeout(() => {
-        // Gọi callback mở modal khác nếu có
-        openEnded?.()
+    if (progress === 100 && isCompleted && !isError) {
+      // Gọi callback mở modal khác trước
+      openEnded?.()
 
-        // Đóng modal hiện tại nếu có callback
+      // Sau đó đóng modal hiện tại sau một khoảng thời gian
+      const closeTimeout = setTimeout(() => {
         onClose?.()
       }, autoCloseDelay)
 
       return () => clearTimeout(closeTimeout)
     }
-  }, [progress, isCompleted, onClose, autoCloseDelay, openEnded])
+  }, [progress, isCompleted, onClose, autoCloseDelay, openEnded, isError])
 
   useEffect(() => {
     if (!open) {
@@ -174,14 +183,14 @@ export default function ProgressModal({
           </Box>
 
           <Typography variant='h5' gutterBottom>
-            {progress === 100 ? completedMessage : processingMessage}
+            {isError ? 'Có lỗi xảy ra!' : progress === 100 ? completedMessage : processingMessage}
           </Typography>
 
           <Box mt={2} width='100%'>
             <LinearProgress
               variant='determinate'
               value={progress}
-              color={progress === 100 ? 'success' : 'primary'}
+              color={isError ? 'error' : progress === 100 ? 'success' : 'primary'}
               sx={{
                 height: 10,
                 borderRadius: 5,
@@ -191,15 +200,17 @@ export default function ProgressModal({
             />
             <Typography variant='body2' textAlign='center'>
               {progress}% hoàn thành
-              {isPaused && !isCompleted && ' (Dữ liệu vẫn đang được xử lý)'}
+              {isPaused && !isCompleted && !isError && ' (Dữ liệu vẫn đang được xử lý)'}
             </Typography>
           </Box>
 
           <Box mt={3}>
             <Typography variant='body2' color='text.secondary' textAlign='center'>
-              {progress === 100
-                ? 'Quá trình đã hoàn tất thành công! Tiến trình sẽ tự động đóng sau 2 giây.'
-                : 'Vui lòng không tắt trình duyệt hoặc làm mới trang trong khi hệ thống đang xử lý'}
+              {isError
+                ? 'Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau.'
+                : progress === 100
+                  ? 'Quá trình đã hoàn tất thành công! Tiến trình sẽ tự động đóng sau 2 giây.'
+                  : 'Vui lòng không tắt trình duyệt hoặc làm mới trang trong khi hệ thống đang xử lý'}
             </Typography>
           </Box>
         </Box>

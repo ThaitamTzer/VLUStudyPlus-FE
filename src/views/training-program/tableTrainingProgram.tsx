@@ -89,7 +89,7 @@ export default function TableTrainingProgram(props: TableTrainingProgramProps) {
                 <TableCell>{item.credit}</TableCell>
                 <TableCell>{item.cohortId?.cohortId}</TableCell>
                 <TableCell align='right' size='small'>
-                  <Tooltip arrow title='Xem chương trình đào tạo'>
+                  <Tooltip arrow title='Xem chi tiết khung chương trình đào tạo'>
                     <IconButton
                       onClick={() => {
                         toogleViewTrainingProgramByFrame()
@@ -99,7 +99,7 @@ export default function TableTrainingProgram(props: TableTrainingProgramProps) {
                       <Iconify icon='mingcute:information-fill' className='text-primary' />
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title='Nhập chương trình đào tạo' arrow>
+                  <Tooltip title='Import chi tiết khung' arrow>
                     <IconButton
                       onClick={() => {
                         handleOpenImportTrainingProgram(item)

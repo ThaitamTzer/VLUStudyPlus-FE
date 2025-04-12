@@ -177,7 +177,6 @@ export default function AddTrainingProgramStepByStepModal(props: AddTrainingProg
                 autoClose: 5000
               })
               toogleImportProgramLoading()
-              onClose()
               setLoading(false)
             }
           )

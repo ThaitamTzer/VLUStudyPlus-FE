@@ -20,6 +20,7 @@ type States = {
   openDeleteSubject: boolean
   subject: Subjects | null
   openChangeHistory: boolean
+  openCompareBeforeImport: boolean
 }
 
 type Actions = {
@@ -40,6 +41,7 @@ type Actions = {
   toogleOpenDeleteSubject: () => void
   setSubject: (subject: Subjects | null) => void
   toogleOpenChangeHistory: () => void
+  toogleOpenCompareBeforeImport: () => void
 }
 
 export const useTrainingProgramStore = create<States & Actions>(set => ({
@@ -60,6 +62,7 @@ export const useTrainingProgramStore = create<States & Actions>(set => ({
   openDeleteSubject: false,
   subject: null,
   openChangeHistory: false,
+  openCompareBeforeImport: false,
   toogleOpenAddSubjectInCate: () => set(state => ({ openAddSubjectInCate: !state.openAddSubjectInCate })),
   setProgramId: (programid: string | null) => set({ programid }),
   toogleUpdateCategory1: () => set(state => ({ openEditCategory1: !state.openEditCategory1 })),
@@ -78,5 +81,6 @@ export const useTrainingProgramStore = create<States & Actions>(set => ({
   setSelectedProgramId: (id: string) => set({ selectedProgramId: id }),
   toogleOpenDeleteSubject: () => set(state => ({ openDeleteSubject: !state.openDeleteSubject })),
   setSubject: (subject: Subjects | null) => set({ subject }),
-  toogleOpenChangeHistory: () => set(state => ({ openChangeHistory: !state.openChangeHistory }))
+  toogleOpenChangeHistory: () => set(state => ({ openChangeHistory: !state.openChangeHistory })),
+  toogleOpenCompareBeforeImport: () => set(state => ({ openCompareBeforeImport: !state.openCompareBeforeImport }))
 }))

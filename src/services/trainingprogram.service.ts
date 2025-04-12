@@ -1,5 +1,6 @@
 import axiosClient from '@/libs/axios'
 import axiosUpload from '@/libs/axiosUpload'
+import type { CompareBeforeImportType } from '@/types/management/compareBeforImportType'
 import type {
   ResCreateFrame,
   TrainingProgramByFrame,
@@ -320,6 +321,27 @@ const trainingProgramService = {
 
           return res
         })
+    } catch (error) {
+      if (errorCallBack) {
+        errorCallBack(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+
+  compareDataBeforeImport: async (
+    id: string,
+    data: FormData,
+    successCallBack?: (res: CompareBeforeImportType) => void,
+    errorCallBack?: (res: any) => void
+  ) => {
+    try {
+      return await axiosUpload.post(`/api/training-program/compare-training-program/${id}`, data).then(res => {
+        successCallBack && successCallBack(res.data)
+
+        return res
+      })
     } catch (error) {
       if (errorCallBack) {
         errorCallBack(error)

@@ -33,6 +33,7 @@ type ImportAddProps = {
   setFiles: (files: File[]) => void
   checkFile?: boolean
   handleCheckFile?: () => void
+  note?: string
 }
 
 export default function ImportAdd(props: ImportAddProps) {
@@ -50,7 +51,8 @@ export default function ImportAdd(props: ImportAddProps) {
     files,
     setFiles,
     checkFile,
-    handleCheckFile
+    handleCheckFile,
+    note
   } = props
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -179,10 +181,15 @@ export default function ImportAdd(props: ImportAddProps) {
               </LoadingButton>
               {checkFile && (
                 <Button variant='outlined' color='info' onClick={handleCheckFile}>
-                  So sánh dữ liệu
+                  So sánh CTĐT
                 </Button>
               )}
             </Box>
+            {note && (
+              <Typography variant='body2' mt={2}>
+                {note}
+              </Typography>
+            )}
           </Box>
         )}
       </DialogContent>

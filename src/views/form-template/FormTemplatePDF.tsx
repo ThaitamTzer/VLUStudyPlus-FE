@@ -272,8 +272,9 @@ const FormTemplate = ({ data }: { data: FormTemplateType }) => {
                             flexDirection: 'row'
                           }}
                         >
-                          <View style={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
-                            <Text style={[styles.fieldLabel, { flexGrow: 1 }]}>{field.label}:</Text>
+                          <View style={{ display: 'flex', flexDirection: 'row' }}>
+                            <Text style={[styles.fieldLabel, { flexGrow: 1 }]}>{field.label}</Text>
+                            {field.type !== 'checkbox' && <Text style={[styles.fieldLabel]}>:</Text>}
                           </View>
 
                           {field.type !== 'shortText' && field.type !== 'checkbox' && (

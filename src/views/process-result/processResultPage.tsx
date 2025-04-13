@@ -32,6 +32,7 @@ import { useResultProcessStore } from '@/stores/resultProcess.store'
 import AddProcessResult from './addprocessResult'
 import UpdateProcessResult from './updateprocessResult'
 import AlertDelete from '@/components/alertModal'
+import formTemplateService from '@/services/formTemplate.service'
 
 type ProcessResultWithAction = ProcessResultType & {
   stt?: number
@@ -42,6 +43,10 @@ const columnHelper = createColumnHelper<ProcessResultWithAction>()
 
 export default function ProcessResultPage() {
   const { data, mutate, isLoading } = useSWR('/api/processing-result', resultProcessService.getAll)
+
+  const { data: formTemplateData } = useSWR('/list-form-template', formTemplateService.getAllFormTemplate, {
+    revalidateOnMount: false
+  })
 
   const {
     toogleAddResultProcess,
@@ -72,10 +77,20 @@ export default function ProcessResultPage() {
         sortingFn: 'alphanumeric'
       }),
       columnHelper.accessor('commitment', {
-        header: 'Có làm đơn cam kết ?',
-        cell: infor => (infor.getValue() ? 'Có' : 'Không'),
+        header: 'Thực hiện làm đơn',
+        cell: infor => (infor.getValue() ? 'Cần làm đơn' : 'Không cần làm đơn'),
         sortingFn: 'alphanumeric'
       }),
+      columnHelper.accessor('formTemplateId', {
+        header: 'Đơn cần làm',
+        cell: infor => {
+          const formTemplate = formTemplateData?.find(item => item._id === infor.getValue())
+
+          return formTemplate?.title
+        },
+        sortingFn: 'alphanumeric'
+      }),
+
       columnHelper.accessor('action', {
         header: '',
         meta: {
@@ -107,7 +122,7 @@ export default function ProcessResultPage() {
         )
       })
     ],
-    [setResultProcessData, toolEditResultProcess, toogleDeleteResultProcess]
+    [setResultProcessData, toolEditResultProcess, toogleDeleteResultProcess, formTemplateData]
   )
 
   const table = useReactTable({
@@ -199,7 +214,7 @@ export default function ProcessResultPage() {
             </Button>
           </div>
         </div>
-        <TanstackTable table={table} loading={isLoading} />
+        <TanstackTable table={table} loading={isLoading} minWidth={1100} />
         <TablePagination
           component={() => <TablePaginationComponent table={table as Table<unknown>} />}
           count={table.getFilteredRowModel().rows.length}
@@ -208,8 +223,8 @@ export default function ProcessResultPage() {
           onPageChange={(_, page) => table.setPageIndex(page - 1)}
         />
       </Card>
-      <AddProcessResult mutate={mutate} />
-      <UpdateProcessResult mutate={mutate} />
+      <AddProcessResult mutate={mutate} formTemplateData={formTemplateData || []} />
+      <UpdateProcessResult mutate={mutate} formTemplateData={formTemplateData || []} />
       <AlertDelete
         open={openDeleteResultProcess}
         onClose={toogleDeleteResultProcess}

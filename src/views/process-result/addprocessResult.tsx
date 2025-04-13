@@ -16,6 +16,7 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
+  MenuItem,
   Typography
 } from '@mui/material'
 
@@ -36,13 +37,21 @@ const schema = v.object({
     v.nonEmpty('Tên kết quả xử lý không được để trống'),
     v.maxLength(255, 'Tên kết quả không được quá 255 ký tự')
   ),
-  commitment: v.boolean()
+  commitment: v.boolean(),
+  formTemplateId: v.string()
 })
 
 type FormData = InferInput<typeof schema>
 
-export default function AddProcessResult({ mutate }: { mutate: KeyedMutator<any> }) {
+export default function AddProcessResult({
+  mutate,
+  formTemplateData
+}: {
+  mutate: KeyedMutator<any>
+  formTemplateData: any[]
+}) {
   const { toogleAddResultProcess, openAddResultProcess } = useResultProcessStore()
+
   const [loading, setLoading] = useState(false)
 
   const {
@@ -147,6 +156,21 @@ export default function AddProcessResult({ mutate }: { mutate: KeyedMutator<any>
                       />
                     }
                   />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Controller
+                control={control}
+                name='formTemplateId'
+                render={({ field }) => (
+                  <CustomTextField {...field} label='Mẫu đơn' fullWidth select>
+                    {formTemplateData?.map(item => (
+                      <MenuItem key={item._id} value={item._id}>
+                        {item.title}
+                      </MenuItem>
+                    ))}
+                  </CustomTextField>
                 )}
               />
             </Grid>

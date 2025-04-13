@@ -16,6 +16,7 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
+  MenuItem,
   Typography
 } from '@mui/material'
 
@@ -36,12 +37,19 @@ const schema = v.object({
     v.nonEmpty('Tên kết quả xử lý không được để trống'),
     v.maxLength(255, 'Tên kết quả không được quá 255 ký tự')
   ),
-  commitment: v.boolean()
+  commitment: v.boolean(),
+  formTemplateId: v.string()
 })
 
 type FormData = InferInput<typeof schema>
 
-export default function UpdateProcessResult({ mutate }: { mutate: KeyedMutator<any> }) {
+export default function UpdateProcessResult({
+  mutate,
+  formTemplateData
+}: {
+  mutate: KeyedMutator<any>
+  formTemplateData: any[]
+}) {
   const { toolEditResultProcess, openEditResultProcess, resultProcessData, setResultProcessData } =
     useResultProcessStore()
 
@@ -56,7 +64,8 @@ export default function UpdateProcessResult({ mutate }: { mutate: KeyedMutator<a
     resolver: valibotResolver(schema),
     defaultValues: {
       processingResultName: resultProcessData?.processingResultName || '',
-      commitment: resultProcessData?.commitment || false
+      commitment: resultProcessData?.commitment || false,
+      formTemplateId: resultProcessData?.formTemplateId || ''
     }
   })
 
@@ -65,7 +74,8 @@ export default function UpdateProcessResult({ mutate }: { mutate: KeyedMutator<a
 
     reset({
       processingResultName: resultProcessData.processingResultName,
-      commitment: resultProcessData.commitment
+      commitment: resultProcessData.commitment,
+      formTemplateId: resultProcessData.formTemplateId
     })
   }, [resultProcessData, reset])
 
@@ -162,6 +172,21 @@ export default function UpdateProcessResult({ mutate }: { mutate: KeyedMutator<a
                       />
                     }
                   />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Controller
+                control={control}
+                name='formTemplateId'
+                render={({ field }) => (
+                  <CustomTextField {...field} label='Mẫu đơn' fullWidth select>
+                    {formTemplateData?.map(item => (
+                      <MenuItem key={item._id} value={item._id}>
+                        {item.title}
+                      </MenuItem>
+                    ))}
+                  </CustomTextField>
                 )}
               />
             </Grid>

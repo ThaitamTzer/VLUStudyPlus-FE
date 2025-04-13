@@ -223,7 +223,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           <MenuItem href='/learning-processing' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
             Kỳ XLHV
           </MenuItem>
-          <MenuItem href='/commitment-forms' icon={<Iconify icon='icon-park-outline:doc-detail' />}>
+          <MenuItem href='/form-template' icon={<Iconify icon='icon-park-outline:doc-detail' />}>
             Đơn cam kết
           </MenuItem>
         </SubMenu>

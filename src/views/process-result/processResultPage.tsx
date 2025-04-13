@@ -45,7 +45,8 @@ export default function ProcessResultPage() {
   const { data, mutate, isLoading } = useSWR('/api/processing-result', resultProcessService.getAll)
 
   const { data: formTemplateData } = useSWR('/list-form-template', formTemplateService.getAllFormTemplate, {
-    revalidateOnMount: false
+    revalidateOnMount: true,
+    revalidateOnFocus: false
   })
 
   const {

@@ -276,7 +276,7 @@ const FormTemplate = ({ data }: { data: FormTemplateType }) => {
                             <Text style={[styles.fieldLabel, { flexGrow: 1 }]}>{field.label}:</Text>
                           </View>
 
-                          {field.type !== 'shortText' && (
+                          {field.type !== 'shortText' && field.type !== 'checkbox' && (
                             <View
                               style={{
                                 marginBottom: 4,

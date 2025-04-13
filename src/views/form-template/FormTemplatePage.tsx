@@ -118,9 +118,6 @@ export default function FormTemplatePage() {
                 <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
                   {template.description}
                 </Typography>
-                <Typography variant='caption' color='text.secondary'>
-                  Mã đơn: {template.documentCode}
-                </Typography>
               </CardContent>
               <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
                 <Tooltip title='Xem PDF'>

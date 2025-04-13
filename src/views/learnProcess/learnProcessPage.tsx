@@ -17,7 +17,7 @@ import {
   useReactTable
 } from '@tanstack/react-table'
 
-import { Button, Card, MenuItem, TablePagination, Typography, Box, Grid } from '@mui/material'
+import { Button, Card, MenuItem, TablePagination, Typography, Box, Grid, Skeleton } from '@mui/material'
 
 import { toast } from 'react-toastify'
 
@@ -407,7 +407,7 @@ export default function LearnProcessPage() {
             {/* )} */}
           </div>
         </div>
-        {renderTable}
+        {isLoading ? <Skeleton variant='rectangular' height={500} animation='wave' /> : renderTable}
       </Card>
       <AddAcedemicProcess mutate={mutate} />
       <ManualAddAcedemicProcess mutate={mutate} open={openManualAdd} onClose={toogleManualAdd} />

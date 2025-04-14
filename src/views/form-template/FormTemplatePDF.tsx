@@ -213,16 +213,18 @@ const FormTemplate = ({ data }: { data: FormTemplateType }) => {
             }}
           >
             <Text style={styles.header}>{data.title.toUpperCase()}</Text>
-            <Text
-              style={{
-                fontFamily: 'Times_new_roman',
-                fontSize: 13,
-                textAlign: 'center',
-                fontStyle: 'italic'
-              }}
-            >
-              ({data.description})
-            </Text>
+            {data.description && (
+              <Text
+                style={{
+                  fontFamily: 'Times_new_roman',
+                  fontSize: 13,
+                  textAlign: 'center',
+                  fontStyle: 'italic'
+                }}
+              >
+                ({data.description})
+              </Text>
+            )}
           </View>
 
           {/* Người nhận */}
@@ -269,28 +271,103 @@ const FormTemplate = ({ data }: { data: FormTemplateType }) => {
                             marginBottom: 1,
                             display: 'flex',
                             flexGrow: 1,
-                            flexDirection: 'row'
+                            flexDirection:
+                              field.type === 'textarea' ? 'column' : field.type === 'array' ? 'column' : 'row'
                           }}
                         >
                           <View style={{ display: 'flex', flexDirection: 'row' }}>
-                            <Text style={[styles.fieldLabel, { flexGrow: 1 }]}>{field.label}</Text>
+                            <Text
+                              style={[
+                                styles.fieldLabel,
+                                { flexGrow: field.type === 'textarea' ? 0 : field.type === 'array' ? 0 : 1 }
+                              ]}
+                            >
+                              {field.label}
+                            </Text>
                             {field.type !== 'checkbox' && <Text style={[styles.fieldLabel]}>:</Text>}
                           </View>
 
-                          {field.type !== 'shortText' && field.type !== 'checkbox' && (
+                          {field.type !== 'shortText' &&
+                            field.type !== 'checkbox' &&
+                            field.type !== 'textarea' &&
+                            field.type !== 'array' && (
+                              <View
+                                style={{
+                                  marginBottom: 4,
+                                  marginLeft: 3,
+                                  marginRight: 5,
+                                  display: 'flex',
+                                  flexGrow: 1,
+                                  width: '10%',
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  borderBottom: '1px dotted #000'
+                                }}
+                              ></View>
+                            )}
+                          {field.type === 'textarea' && (
+                            <>
+                              {Array.from({ length: 3 }).map((_, index) => (
+                                <View
+                                  key={index}
+                                  style={{
+                                    width: '99%',
+                                    margin: '10px 0',
+                                    marginRight: 10,
+                                    display: 'flex',
+                                    flexGrow: 1,
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    borderBottom: '1px dotted #000'
+                                  }}
+                                ></View>
+                              ))}
+                            </>
+                          )}
+                          {field.type === 'array' && (
                             <View
                               style={{
-                                marginBottom: 4,
-                                marginLeft: 3,
-                                marginRight: 5,
                                 display: 'flex',
-                                flexGrow: 1,
-                                width: '10%',
                                 flexDirection: 'row',
-                                alignItems: 'center',
-                                borderBottom: '1px dotted #000'
+                                width: '100%',
+                                gap: 15
                               }}
-                            ></View>
+                            >
+                              <View style={{ display: 'flex', flexDirection: 'column', width: '50%' }}>
+                                {Array.from({ length: 7 }).map((_, index) => (
+                                  <View
+                                    key={index}
+                                    style={{
+                                      width: '100%',
+                                      margin: '10px 0',
+                                      marginRight: 10,
+                                      display: 'flex',
+                                      flexGrow: 1,
+                                      flexDirection: 'row',
+                                      alignItems: 'center',
+                                      borderBottom: '1px dotted #000'
+                                    }}
+                                  ></View>
+                                ))}
+                              </View>
+                              <View style={{ display: 'flex', flexDirection: 'column', width: '50%' }}>
+                                {Array.from({ length: 7 }).map((_, index) => (
+                                  <View
+                                    key={index}
+                                    style={{
+                                      width: '100%',
+                                      margin: '10px 0',
+                                      marginRight: 10,
+                                      display: 'flex',
+                                      flexGrow: 1,
+                                      flexDirection: 'row',
+                                      alignItems: 'center',
+                                      borderBottom: '1px dotted #000'
+                                    }}
+                                  ></View>
+                                ))}
+                              </View>
+                            </View>
                           )}
                         </View>
                       )
@@ -304,13 +381,27 @@ const FormTemplate = ({ data }: { data: FormTemplateType }) => {
           <Text style={styles.dateText}>TP. Hồ Chí Minh, ngày ......... tháng ......... năm .........</Text>
 
           {/* Phần chữ ký */}
-          <View style={styles.signatureSection}>
+          <View
+            style={{
+              display: 'flex',
+              width: '100%',
+              marginTop: 10
+            }}
+          >
             {signatureSections.map((section, index) => (
-              <View key={index} style={styles.signatureBox}>
+              <View key={index} style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
                 {groupFieldsByRow(section.fields).map((rowFields, rowIndex) => (
-                  <View key={rowIndex}>
+                  <View
+                    key={rowIndex}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      marginBottom: 1,
+                      width: '100%'
+                    }}
+                  >
                     {rowFields.map((field, fieldIndex) => (
-                      <View key={fieldIndex}>
+                      <View key={fieldIndex} style={{ display: 'flex', flexDirection: 'column', width: '48%' }}>
                         <Text style={styles.signatureTitle}>{field.label}</Text>
                         <Text style={styles.signaturePlaceholder}>(Ký và ghi rõ họ tên)</Text>
                       </View>

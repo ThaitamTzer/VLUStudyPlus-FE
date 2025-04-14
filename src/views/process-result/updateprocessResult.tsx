@@ -65,7 +65,7 @@ export default function UpdateProcessResult({
     defaultValues: {
       processingResultName: resultProcessData?.processingResultName || '',
       commitment: resultProcessData?.commitment || false,
-      formTemplateId: resultProcessData?.formTemplateId || ''
+      formTemplateId: resultProcessData?.formTemplateId?._id || ''
     }
   })
 
@@ -75,7 +75,7 @@ export default function UpdateProcessResult({
     reset({
       processingResultName: resultProcessData.processingResultName,
       commitment: resultProcessData.commitment,
-      formTemplateId: resultProcessData.formTemplateId
+      formTemplateId: resultProcessData.formTemplateId?._id
     })
   }, [resultProcessData, reset])
 

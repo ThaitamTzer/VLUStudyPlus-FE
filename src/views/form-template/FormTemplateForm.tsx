@@ -17,10 +17,10 @@ const FIELD_TYPES = [
   { value: 'shortText', label: 'Chữ ngắn' },
   { value: 'longText', label: 'Chữ dài' },
   { value: 'number', label: 'Số' },
-  { value: 'array', label: 'Mảng' },
+  { value: 'array', label: 'Danh sách' },
   { value: 'date', label: 'Ngày' },
   { value: 'checkbox', label: 'Checkbox' },
-  { value: 'textArea', label: 'Mô tả' }
+  { value: 'textarea', label: 'Mô tả' }
 ]
 
 const SIGNATURE_TYPES = [
@@ -31,7 +31,7 @@ const SIGNATURE_TYPES = [
 ]
 
 interface FormTemplateFormProps {
-  template?: FormTemplate & { _id: string }
+  template?: FormTemplate & { _id: string; isNew?: boolean }
   onClose: () => void
 }
 
@@ -257,7 +257,7 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
 
   const handleSubmit = async () => {
     try {
-      if (template) {
+      if (template && !template.isNew) {
         const toastID = toast.loading('Đang cập nhật đơn....')
 
         await formTemplateService.updateFormTemplate(
@@ -276,7 +276,7 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
           },
           err => {
             toast.update(toastID, {
-              render: err.message || 'Đã cập nhật đơn thành công',
+              render: err.message || 'Đã có lỗi xảy ra',
               type: 'error',
               isLoading: false,
               autoClose: 3000
@@ -301,7 +301,7 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
           },
           err => {
             toast.update(toastID, {
-              render: err.message || 'Đã tạo đơn thành công',
+              render: err.message || 'Đã có lỗi xảy ra',
               type: 'error',
               isLoading: false,
               autoClose: 3000
@@ -309,8 +309,6 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
           }
         )
       }
-
-      onClose()
     } catch (error) {
       console.error('Error saving form template:', error)
     }
@@ -318,7 +316,9 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
 
   return (
     <>
-      <DialogTitle sx={{ pb: 0 }}>{template ? 'Chỉnh sửa mẫu đơn' : 'Thêm mẫu đơn mới'}</DialogTitle>
+      <DialogTitle sx={{ pb: 0 }}>
+        {template?.isNew ? 'Tạo bản sao mới' : template ? 'Chỉnh sửa mẫu đơn' : 'Thêm mẫu đơn mới'}
+      </DialogTitle>
       <DialogContent>
         <Tabs
           value={activeTab}
@@ -380,7 +380,7 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
           variant='contained'
           disabled={!formData.title || !formData.sections.every(section => section.fields.length > 0)}
         >
-          {template ? 'Cập nhật' : 'Thêm mới'}
+          {template?.isNew ? 'Tạo bản sao' : template ? 'Cập nhật' : 'Thêm mới'}
         </Button>
       </DialogActions>
     </>

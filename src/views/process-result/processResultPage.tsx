@@ -82,14 +82,9 @@ export default function ProcessResultPage() {
         cell: infor => (infor.getValue() ? 'Cần làm đơn' : 'Không cần làm đơn'),
         sortingFn: 'alphanumeric'
       }),
-      columnHelper.accessor('formTemplateId', {
+      columnHelper.accessor('formTemplateId.title', {
         header: 'Đơn cần làm',
-        cell: infor => {
-          const formTemplate = formTemplateData?.find(item => item._id === infor.getValue())
-
-          return formTemplate?.title
-        },
-        sortingFn: 'alphanumeric'
+        cell: infor => infor.getValue()
       }),
 
       columnHelper.accessor('action', {
@@ -123,7 +118,7 @@ export default function ProcessResultPage() {
         )
       })
     ],
-    [setResultProcessData, toolEditResultProcess, toogleDeleteResultProcess, formTemplateData]
+    [setResultProcessData, toolEditResultProcess, toogleDeleteResultProcess]
   )
 
   const table = useReactTable({

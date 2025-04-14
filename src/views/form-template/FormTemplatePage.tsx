@@ -18,7 +18,13 @@ import {
   Typography,
   useTheme
 } from '@mui/material'
-import { Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon, PictureAsPdf as PdfIcon } from '@mui/icons-material'
+import {
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+  PictureAsPdf as PdfIcon,
+  ContentCopy as CopyIcon
+} from '@mui/icons-material'
 
 import { toast } from 'react-toastify'
 
@@ -56,6 +62,22 @@ export default function FormTemplatePage() {
     setOpenPDF(true)
   }
 
+  const handleDuplicate = (template: any) => {
+    // Tạo bản sao mới hoàn toàn của template
+    const duplicatedTemplate = {
+      ...template,
+      title: `${template.title} (Bản sao)`,
+      _id: undefined, // Xóa _id để tạo mới
+      createdAt: undefined, // Xóa thời gian tạo
+      updatedAt: undefined, // Xóa thời gian cập nhật
+      __v: undefined, // Xóa version
+      isNew: true // Đánh dấu là bản mới
+    }
+
+    setSelectedTemplate(duplicatedTemplate)
+    setOpenForm(true)
+  }
+
   const handleConfirmDelete = async () => {
     const toastID = toast.loading('Đang xóa đơn....')
 
@@ -69,11 +91,14 @@ export default function FormTemplatePage() {
           autoClose: 3000
         })
 
+        setSelectedTemplate(null)
+        setOpenDelete(false)
+
         fetchFormTemplates()
       },
       err => {
         toast.update(toastID, {
-          render: err.message || 'Đã xóa đơn thành công',
+          render: err.message || 'Đã có lỗi xảy ra',
           type: 'error',
           isLoading: false,
           autoClose: 3000
@@ -123,6 +148,11 @@ export default function FormTemplatePage() {
                 <Tooltip title='Xem PDF'>
                   <IconButton onClick={() => handleViewPDF(template)} color='primary'>
                     <PdfIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title='Nhân bản'>
+                  <IconButton onClick={() => handleDuplicate(template)} color='primary'>
+                    <CopyIcon />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title='Sửa'>

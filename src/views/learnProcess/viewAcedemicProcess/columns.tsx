@@ -7,8 +7,6 @@ import { IconButton, Tooltip } from '@mui/material'
 import type { LearnProcessType } from '@/types/management/learnProcessType'
 import Iconify from '@/components/iconify'
 import { useAcedemicProcessStore } from '@/stores/acedemicProcess.store'
-import { useCommitmentStore } from '@/stores/commitment.store'
-import { useAuth } from '@/hooks/useAuth'
 
 type AcedemicProcessWithAction = LearnProcessType & {
   stt?: number
@@ -18,8 +16,6 @@ type AcedemicProcessWithAction = LearnProcessType & {
 const columnHelper = createColumnHelper<AcedemicProcessWithAction>()
 
 export const useColumns = () => {
-  const { user } = useAuth()
-
   const {
     setAcedemicProcess,
     toogleUpdateAcedemicProcess,
@@ -28,13 +24,6 @@ export const useColumns = () => {
     toogleViewByCategory,
     setSession
   } = useAcedemicProcessStore()
-
-  const {
-    toogleViewCommnitmentByCategory,
-    setAcedemicProcessCommiment,
-    toogleViewCommnitmentByCategoryOfCVHT,
-    setAcedemicProcessCommimentOfCVHT
-  } = useCommitmentStore()
 
   const handleOpenImport = useCallback(
     (acedemicProcess: LearnProcessType) => {
@@ -83,29 +72,6 @@ export const useColumns = () => {
                 <Iconify icon='mingcute:information-fill' color='#2092ec' />
               </IconButton>
             </Tooltip>
-            {user?.role.name === 'CVHT' ? (
-              <Tooltip title='Xem danh sách đơn cam kết' arrow>
-                <IconButton
-                  onClick={() => {
-                    toogleViewCommnitmentByCategoryOfCVHT()
-                    setAcedemicProcessCommimentOfCVHT(infor.row.original)
-                  }}
-                >
-                  <Iconify icon='hugeicons:files-01' color='#8e44ad' />
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <Tooltip title='Xem danh sách đơn cam kết' arrow>
-                <IconButton
-                  onClick={() => {
-                    toogleViewCommnitmentByCategory()
-                    setAcedemicProcessCommiment(infor.row.original)
-                  }}
-                >
-                  <Iconify icon='hugeicons:files-01' color='#8e44ad' />
-                </IconButton>
-              </Tooltip>
-            )}
             <Tooltip title='Import danh sách xử lý học tập' arrow>
               <IconButton
                 onClick={() => {
@@ -141,12 +107,7 @@ export const useColumns = () => {
       })
     ],
     [
-      user?.role.name,
       handleOpenViewByCategory,
-      toogleViewCommnitmentByCategoryOfCVHT,
-      setAcedemicProcessCommimentOfCVHT,
-      toogleViewCommnitmentByCategory,
-      setAcedemicProcessCommiment,
       handleOpenImport,
       setAcedemicProcess,
       toogleUpdateAcedemicProcess,

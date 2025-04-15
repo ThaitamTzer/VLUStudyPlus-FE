@@ -108,11 +108,14 @@ export default function ImportModal(props: ImportModalProps) {
       },
       err => {
         setLoading(false)
+        setIsProcessing(false)
+        setIsCompleted(false)
+        toogleProgress()
         toast.update(toastID, {
           render: err.message,
           type: 'error',
           isLoading: false,
-          autoClose: 2000,
+          autoClose: 5000,
           closeButton: true
         })
       }

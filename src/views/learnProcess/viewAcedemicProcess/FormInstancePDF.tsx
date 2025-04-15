@@ -2,15 +2,16 @@
 
 import { useMemo } from 'react'
 
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
-import { Document, Font, Page, StyleSheet, Text, View, PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton } from '@mui/material'
+import { Document, Font, Page, StyleSheet, Text, View, PDFDownloadLink, PDFViewer, Image } from '@react-pdf/renderer'
 
-import type { FormTemplateType } from '@/types/management/formTemplateType'
+import type { FormInstanceType } from '@/types/management/formInstanceType'
 
-interface FormTemplatePDFProps {
-  template: FormTemplateType
+interface FormInstancePDFProps {
+  instance: FormInstanceType
   open: boolean
   onClose: () => void
+  nameOfForm: string
 }
 
 // Đăng ký font Times New Roman
@@ -144,7 +145,11 @@ const styles = StyleSheet.create({
   }
 })
 
-const FormTemplate = ({ data }: { data: FormTemplateType }) => {
+const FormInstance = ({ data }: { data: FormInstanceType }) => {
+  // Debug dữ liệu
+  console.log('FormInstance received data:', data)
+  console.log('FormInstance responses:', data.responses)
+
   // Hàm nhóm các trường theo row
   const groupFieldsByRow = (fields: any[]) => {
     const rows: Record<number, any[]> = {}
@@ -170,17 +175,46 @@ const FormTemplate = ({ data }: { data: FormTemplateType }) => {
       .map(rowKey => rows[rowKey])
   }
 
+  // Lấy giá trị đã nhập của một field
+  const getFieldValue = (fieldKey: string) => {
+    if (!data.responses) return ''
+
+    const value = data.responses[fieldKey]
+
+    if (value === null || value === undefined) return ''
+
+    return value
+  }
+
+  // Lấy giá trị đã nhập cho field signature
+  const getSignatureValue = (fieldKey: string) => {
+    if (!data.responses) return null
+
+    const value = data.responses[fieldKey]
+
+    if (!value) return null
+
+    // Signature có thể có cấu trúc { name, image }
+    if (typeof value === 'object' && value !== null) {
+      return value.image || null
+    }
+
+    return value
+  }
+
   // Lọc ra các section chứa chữ ký
-  const signatureSections = data.sections.filter(section => section.fields.some(field => field.type === 'signature'))
+  const signatureSections = data?.templateId?.sections?.filter(section =>
+    section.fields.some(field => field.type === 'signature')
+  )
 
   return (
-    <Document title={data.title}>
+    <Document title={data?.templateId?.title}>
       <Page size='A4' style={styles.page}>
         <>
           <Text style={styles.title}>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</Text>
           <Text style={styles.subtitle}>Độc lập – Tự do – Hạnh phúc</Text>
 
-          {data.documentCode && (
+          {data?.templateId?.documentCode && (
             <View
               style={{
                 border: '1px solid #000',
@@ -196,7 +230,7 @@ const FormTemplate = ({ data }: { data: FormTemplateType }) => {
                   fontSize: 12
                 }}
               >
-                {data.documentCode}
+                {data?.templateId?.documentCode}
               </Text>
             </View>
           )}
@@ -210,8 +244,8 @@ const FormTemplate = ({ data }: { data: FormTemplateType }) => {
               gap: 0
             }}
           >
-            <Text style={styles.header}>{data.title.toUpperCase()}</Text>
-            {data.description && (
+            <Text style={styles.header}>{data?.templateId?.title?.toUpperCase()}</Text>
+            {data?.templateId?.description && (
               <Text
                 style={{
                   fontFamily: 'Times_new_roman',
@@ -220,7 +254,7 @@ const FormTemplate = ({ data }: { data: FormTemplateType }) => {
                   fontStyle: 'italic'
                 }}
               >
-                ({data.description})
+                ({data?.templateId?.description})
               </Text>
             )}
           </View>
@@ -231,7 +265,7 @@ const FormTemplate = ({ data }: { data: FormTemplateType }) => {
           >
             <Text style={styles.textBold}>Kính gửi: </Text>
             <View style={{ display: 'flex', flexDirection: 'column' }}>
-              {data.recipient.map((recipient: string, index: number) => (
+              {data?.templateId?.recipient?.map((recipient: string, index: number) => (
                 <Text key={index} style={[styles.text, { fontWeight: 'bold' }]}>
                   {recipient}
                 </Text>
@@ -241,8 +275,8 @@ const FormTemplate = ({ data }: { data: FormTemplateType }) => {
 
           <View style={{ margin: '10px 0' }}></View>
           {/* Các phần của đơn */}
-          {data.sections
-            .filter(section => !section.fields.some(field => field.type === 'signature'))
+          {data?.templateId?.sections
+            ?.filter(section => !section.fields.some(field => field.type === 'signature'))
             .map((section, secIndex: number) => (
               <View key={secIndex} style={{ marginBottom: 3, display: 'flex', flexDirection: 'column' }}>
                 {/* Nhóm các field theo row */}
@@ -258,9 +292,8 @@ const FormTemplate = ({ data }: { data: FormTemplateType }) => {
                   >
                     {/* Hiển thị các field trong row */}
                     {rowFields.map((field, fieldIndex) => {
-                      // Tính toán độ rộng dựa trên số cột trong row
-                      // Nếu có 1 cột, chiếm 100%, 2 cột mỗi cái 48%, 3 cột mỗi cái 31%
-                      // const fieldWidth = rowFields.length === 1 ? '100%' : rowFields.length === 2 ? '80%' : '33%'
+                      // Lấy giá trị đã nhập
+                      const fieldValue = getFieldValue(field.key)
 
                       return (
                         <View
@@ -280,90 +313,119 @@ const FormTemplate = ({ data }: { data: FormTemplateType }) => {
                                 { flexGrow: field.type === 'textarea' ? 0 : field.type === 'array' ? 0 : 1 }
                               ]}
                             >
-                              {field.label}
+                              {field.type !== 'checkbox' ? field.label : ''}
                             </Text>
                             {field.type !== 'checkbox' && <Text style={[styles.fieldLabel]}>:</Text>}
                           </View>
 
-                          {field.type !== 'shortText' &&
-                            field.type !== 'checkbox' &&
-                            field.type !== 'textarea' &&
-                            field.type !== 'array' && (
-                              <View
-                                style={{
-                                  marginBottom: 4,
-                                  marginLeft: 3,
-                                  marginRight: 5,
-                                  display: 'flex',
-                                  flexGrow: 1,
-                                  width: '10%',
-                                  flexDirection: 'row',
-                                  alignItems: 'center',
-                                  borderBottom: '1px dotted #000'
-                                }}
-                              ></View>
-                            )}
-                          {field.type === 'textarea' && (
-                            <>
-                              {Array.from({ length: 3 }).map((_, index) => (
-                                <View
-                                  key={index}
-                                  style={{
-                                    width: '99%',
-                                    margin: '10px 0',
-                                    marginRight: 10,
-                                    display: 'flex',
-                                    flexGrow: 1,
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    borderBottom: '1px dotted #000'
-                                  }}
-                                ></View>
-                              ))}
-                            </>
+                          {/* Hiển thị giá trị đã nhập */}
+
+                          {field.type === 'text' && (
+                            <Text
+                              style={{
+                                marginLeft: 5,
+                                fontSize: 11,
+                                fontFamily: 'Times_new_roman'
+                              }}
+                            >
+                              {fieldValue}
+                            </Text>
                           )}
-                          {field.type === 'array' && (
+                          {field.type === 'shortText' && (
+                            <Text
+                              style={{
+                                marginLeft: 5,
+                                fontSize: 11,
+                                fontFamily: 'Times_new_roman'
+                              }}
+                            >
+                              {fieldValue}
+                            </Text>
+                          )}
+
+                          {field.type === 'number' && (
+                            <Text
+                              style={{
+                                marginLeft: 5,
+                                fontSize: 11,
+                                fontFamily: 'Times_new_roman'
+                              }}
+                            >
+                              {fieldValue}
+                            </Text>
+                          )}
+
+                          {field.type === 'date' && (
+                            <Text
+                              style={{
+                                marginLeft: 5,
+                                fontSize: 11,
+                                fontFamily: 'Times_new_roman'
+                              }}
+                            >
+                              {fieldValue}
+                            </Text>
+                          )}
+
+                          {field.type === 'checkbox' && (
+                            <Text
+                              style={{
+                                marginLeft: 5,
+                                fontSize: 11,
+                                fontFamily: 'Times_new_roman'
+                              }}
+                            >
+                              {fieldValue === true || fieldValue === 'true' ? field.label : ''}
+                            </Text>
+                          )}
+
+                          {field.type === 'textarea' && (
+                            <Text
+                              style={{
+                                marginTop: 5,
+                                fontSize: 11,
+                                fontFamily: 'Times_new_roman'
+                              }}
+                            >
+                              - {fieldValue}
+                            </Text>
+                          )}
+
+                          {field.type === 'array' && fieldValue && (
                             <View
                               style={{
                                 display: 'flex',
                                 flexDirection: 'row',
                                 width: '100%',
-                                gap: 15
+                                gap: 15,
+                                marginTop: 5
                               }}
                             >
-                              <View style={{ display: 'flex', flexDirection: 'column', width: '50%' }}>
-                                {Array.from({ length: 7 }).map((_, index) => (
-                                  <View
-                                    key={index}
+                              <View style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                                {Array.isArray(fieldValue) ? (
+                                  fieldValue.map((item, idx) => (
+                                    <Text
+                                      key={idx}
+                                      style={{
+                                        fontSize: 11,
+                                        fontFamily: 'Times_new_roman',
+                                        marginBottom: 3
+                                      }}
+                                    >
+                                      - {item}
+                                    </Text>
+                                  ))
+                                ) : (
+                                  <Text
                                     style={{
-                                      width: '100%',
-                                      margin: '10px 0',
-                                      marginRight: 10,
-                                      display: 'flex',
-                                      flexGrow: 1,
-                                      flexDirection: 'row',
-                                      alignItems: 'center',
-                                      borderBottom: '1px dotted #000'
+                                      fontSize: 11,
+                                      fontFamily: 'Times_new_roman',
+                                      marginBottom: 3
                                     }}
-                                  ></View>
-                                ))}
-                              </View>
-                              <View style={{ display: 'flex', flexDirection: 'column', width: '50%' }}>
-                                {Array.from({ length: 7 }).map((_, index) => (
-                                  <View
-                                    key={index}
-                                    style={{
-                                      width: '100%',
-                                      margin: '10px 0',
-                                      marginRight: 10,
-                                      display: 'flex',
-                                      flexGrow: 1,
-                                      flexDirection: 'row',
-                                      alignItems: 'center',
-                                      borderBottom: '1px dotted #000'
-                                    }}
-                                  ></View>
-                                ))}
+                                  >
+                                    - {fieldValue}
+                                  </Text>
+                                )}
                               </View>
                             </View>
                           )}
@@ -386,7 +448,7 @@ const FormTemplate = ({ data }: { data: FormTemplateType }) => {
               marginTop: 10
             }}
           >
-            {signatureSections.map((section, index) => (
+            {signatureSections?.map((section, index) => (
               <View key={index} style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
                 {groupFieldsByRow(section.fields).map((rowFields, rowIndex) => (
                   <View
@@ -398,12 +460,40 @@ const FormTemplate = ({ data }: { data: FormTemplateType }) => {
                       width: '100%'
                     }}
                   >
-                    {rowFields.map((field, fieldIndex) => (
-                      <View key={fieldIndex} style={{ display: 'flex', flexDirection: 'column', width: '48%' }}>
-                        <Text style={styles.signatureTitle}>{field.label}</Text>
-                        <Text style={styles.signaturePlaceholder}>(Ký và ghi rõ họ tên)</Text>
-                      </View>
-                    ))}
+                    {rowFields.map((field, fieldIndex) => {
+                      const signatureValue = getSignatureValue(field.key)
+
+                      const signatureName =
+                        field.type === 'signature' &&
+                        typeof data.responses[field.key] === 'object' &&
+                        data.responses[field.key] !== null
+                          ? data.responses[field.key].name
+                          : ''
+
+                      return (
+                        <View key={fieldIndex} style={{ display: 'flex', flexDirection: 'column', width: '48%' }}>
+                          <Text style={styles.signatureTitle}>{field.label}</Text>
+
+                          {signatureValue ? (
+                            <Image
+                              src={signatureValue}
+                              style={{
+                                width: '40%',
+                                height: 'auto',
+                                maxHeight: 100,
+                                alignSelf: 'center',
+                                marginTop: 10,
+                                marginBottom: 10
+                              }}
+                            />
+                          ) : (
+                            <Text style={styles.signaturePlaceholder}>
+                              {signatureName ? `${signatureName}` : '(Ký và ghi rõ họ tên)'}
+                            </Text>
+                          )}
+                        </View>
+                      )
+                    })}
                   </View>
                 ))}
               </View>
@@ -415,25 +505,29 @@ const FormTemplate = ({ data }: { data: FormTemplateType }) => {
   )
 }
 
-export default function FormTemplatePDF({ template, open, onClose }: FormTemplatePDFProps) {
-  const templateData = useMemo(() => template, [template])
+export default function FormInstancePDF({ instance, open, onClose, nameOfForm }: FormInstancePDFProps) {
+  const instanceData = useMemo(() => instance, [instance])
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth='lg' fullWidth>
-      <DialogTitle>Xem trước mẫu đơn</DialogTitle>
+      <DialogTitle>Đơn của {nameOfForm}</DialogTitle>
       <DialogContent>
         <Box sx={{ height: '70vh', mt: 2 }}>
-          <PDFViewer width='100%' height='100%' style={{ border: 'none' }}>
-            <FormTemplate data={templateData} />
-          </PDFViewer>
+          {instanceData ? (
+            <PDFViewer width='100%' height='100%' style={{ border: 'none' }}>
+              <FormInstance data={instanceData} />
+            </PDFViewer>
+          ) : (
+            <Skeleton variant='rectangular' width='100%' height='100%' animation='wave' />
+          )}
         </Box>
       </DialogContent>
       <DialogActions>
         <Box sx={{ display: 'flex', gap: 2 }}>
           <Button onClick={onClose}>Đóng</Button>
           <PDFDownloadLink
-            document={<FormTemplate data={templateData} />}
-            fileName={`${templateData.title}.pdf`}
+            document={<FormInstance data={instanceData} />}
+            fileName={`${instanceData?.templateId?.title}.pdf`}
             style={{
               textDecoration: 'none'
             }}

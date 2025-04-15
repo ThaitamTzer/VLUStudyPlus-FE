@@ -55,6 +55,9 @@ export default function TrainingProgramPage() {
     toogleCreateTrainingProgram()
   }, [toogleCreateTrainingProgram])
 
+  console.log('openImportProgramLoading', openImportProgramLoading)
+  console.log('isComplete', isComplete)
+
   return (
     <>
       <PageHeader title='Quản lý khung chương trình đào tạo' />
@@ -307,6 +310,7 @@ export default function TrainingProgramPage() {
         isCompleted={isComplete}
         isProcessing={isProgress}
         onClose={toogleImportProgramLoading}
+        autoCloseDelay={2000}
       />
     </>
   )

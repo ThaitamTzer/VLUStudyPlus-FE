@@ -28,8 +28,13 @@ export default function ViewTrainingProgramByFrame() {
 
   const id = trainingProgram?._id || ''
 
-  const { data, isLoading, mutate } = useSWR(id ? `/api/training-program/view-training-program/${id}` : null, () =>
-    trainingProgramService.getTrainingProgramByFrame(id)
+  const { data, isLoading, mutate } = useSWR(
+    id ? `/api/training-program/view-training-program/${id}` : null,
+    () => trainingProgramService.getTrainingProgramByFrame(id),
+    {
+      revalidateOnMount: true,
+      revalidateOnFocus: true
+    }
   )
 
   const handleOpenCreateCate1 = useCallback(() => {

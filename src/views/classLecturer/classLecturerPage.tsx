@@ -89,7 +89,7 @@ const ClassCard = ({ item }: { item: ClassLecturer }) => {
 export default function ClassLecturerPage() {
   const { data, mutate } = useSWR('/api/class/view-list-class-of-CVHT', classLecturerService.getList)
   const { classCode } = useClassStudentStore()
-  const { loading } = useUploadStore()
+  const { loading, resetProgress } = useUploadStore()
 
   return (
     <>
@@ -117,7 +117,7 @@ export default function ClassLecturerPage() {
         </TabPanel>
       </AddModal>
       <PreviewImport />
-      <ProgressModal open={loading} isCompleted={!loading} isProcessing={loading} />
+      <ProgressModal open={loading} isCompleted={!loading} isProcessing={loading} onClose={resetProgress} />
     </>
   )
 }

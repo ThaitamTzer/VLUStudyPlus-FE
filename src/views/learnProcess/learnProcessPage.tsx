@@ -92,40 +92,6 @@ const NotesPanel = () => {
                 alignItems: 'center',
                 p: 1.5,
                 borderRadius: 2,
-                bgcolor: 'rgba(142, 68, 173, 0.08)',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-3px)',
-                  boxShadow: '0 4px 12px 0 rgba(142, 68, 173, 0.2)'
-                }
-              }}
-            >
-              <Box
-                sx={{
-                  mr: 2,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  bgcolor: 'rgba(142, 68, 173, 0.2)',
-                  p: 1,
-                  borderRadius: '50%'
-                }}
-              >
-                <Iconify icon='hugeicons:files-01' color='#8e44ad' fontSize={24} />
-              </Box>
-              <Typography variant='body2' sx={{ fontWeight: 600 }}>
-                <strong>Xem danh sách đơn cam kết</strong>
-              </Typography>
-            </Box>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={4}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                p: 1.5,
-                borderRadius: 2,
                 bgcolor: 'rgba(46, 204, 113, 0.08)',
                 transition: 'all 0.3s ease',
                 '&:hover': {
@@ -276,7 +242,7 @@ export default function LearnProcessPage() {
     setAcedemicProcess,
     isCompleted,
     isProcessing,
-    toogleProgress,
+    setProgress,
     toogleImportResultModal
   } = useAcedemicProcessStore()
 
@@ -422,7 +388,8 @@ export default function LearnProcessPage() {
         isCompleted={isCompleted}
         isProcessing={isProcessing}
         openEnded={toogleImportResultModal}
-        onClose={toogleProgress}
+        onClose={() => setProgress(false)}
+        autoCloseDelay={2000}
       />
       <AlertDelete
         countdown

@@ -30,7 +30,8 @@ const HistoryModal = ({ open, onClose, id }: HistoryModalProps) => {
     `/api/edit-history/get-edit-history/${id}`,
     () => changeHistoryService.getChangeHistoryById(id),
     {
-      revalidateOnMount: true
+      revalidateOnMount: true,
+      revalidateOnFocus: true
     }
   )
 

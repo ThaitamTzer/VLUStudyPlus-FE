@@ -38,7 +38,7 @@ const schema = v.object({
     v.maxLength(255, 'Tên kết quả không được quá 255 ký tự')
   ),
   commitment: v.boolean(),
-  formTemplateId: v.string()
+  formTemplateId: v.optional(v.string())
 })
 
 type FormData = InferInput<typeof schema>

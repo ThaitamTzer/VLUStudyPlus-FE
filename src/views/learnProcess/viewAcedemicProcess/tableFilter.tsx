@@ -78,9 +78,9 @@ export default function TableFilter(props: TableFilterProps) {
             select
             fullWidth
             defaultValue=''
-            label='Lọc theo CVHT đã xử lý'
+            label='Lọc theo trạng thái xử lý'
             onChange={e => {
-              setFilterField('status')
+              setFilterField('statusOfProcessing')
               setFilterValue(e.target.value)
               setPage(1)
             }}
@@ -94,8 +94,10 @@ export default function TableFilter(props: TableFilterProps) {
             }}
           >
             <MenuItem value=''>Tất cả</MenuItem>
-            <MenuItem value='true'>Đã xử lý</MenuItem>
-            <MenuItem value='false'>Chưa xử lý</MenuItem>
+            <MenuItem value='Chưa xử lý'>Vừa tạo</MenuItem>
+            <MenuItem value='Hoàn thành'>Hoàn thành</MenuItem>
+            <MenuItem value='Cần làm đơn'>Cần làm đơn</MenuItem>
+            <MenuItem value='Đã làm đơn'>Đã làm đơn</MenuItem>
           </CustomTextField>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>

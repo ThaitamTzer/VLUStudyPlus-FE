@@ -188,6 +188,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           <MenuItem href='/type-process' icon={<Iconify icon='material-symbols:problem-outline-rounded' />}>
             Loại xử lý
           </MenuItem>
+          <MenuItem href='/form-template' icon={<Iconify icon='icon-park-outline:doc-detail' />}>
+            Mẫu đơn cam kết
+          </MenuItem>
           <MenuItem href='/process-result' icon={<Iconify icon='carbon:result' />}>
             Kết quả xử lý
           </MenuItem>
@@ -222,9 +225,6 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         <SubMenu label='XỬ LÝ HỌC TẬP' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
           <MenuItem href='/learning-processing' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
             Kỳ XLHV
-          </MenuItem>
-          <MenuItem href='/form-template' icon={<Iconify icon='icon-park-outline:doc-detail' />}>
-            Đơn cam kết
           </MenuItem>
         </SubMenu>
         <SubMenu label='SINH VIÊN' icon={<Iconify icon='ph:student' />}>

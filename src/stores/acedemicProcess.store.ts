@@ -45,6 +45,7 @@ type Actions = {
   toogleViewDetail: () => void
   toogleManualAddFromViewByCate: () => void
   toogleProgress: () => void
+  setProgress: (progress: boolean) => void
   toogleEditViewAcedemicProcess: () => void
   setProcessing: (processing: ProcessingType | null) => void
   setListAcedemicProcess: (listAcedemicProcess: LearnProcessType[]) => void
@@ -109,6 +110,7 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
   toogleManualAddFromViewByCate: () =>
     set(state => ({ openManualAddFromViewByCate: !state.openManualAddFromViewByCate })),
   toogleProgress: () => set(state => ({ openProgress: !state.openProgress })),
+  setProgress: progress => set({ openProgress: progress }),
   toogleEditViewAcedemicProcess: () =>
     set(state => ({ openEditViewAcedemicProcess: !state.openEditViewAcedemicProcess })),
   setProcessing: processing => set({ processing }),

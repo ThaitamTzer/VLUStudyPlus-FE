@@ -156,10 +156,12 @@ export type ProcessingType = {
   resultHandlingBefore: string
   createdAt: string | Date
   updatedAt: string | Date
+  statusOfProcessing: string
   CVHTHandle?: {
     _id: string
     processingResultName: string
     commitment: boolean
+    formTemplateId: string
   }
   CVHTNote?: string
   handlerId?: string

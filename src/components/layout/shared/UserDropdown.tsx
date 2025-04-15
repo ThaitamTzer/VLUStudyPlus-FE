@@ -80,7 +80,7 @@ const UserDropdown = () => {
       {!hidden ? (
         <Stack justifyContent='end' alignItems='end' ml={2}>
           <Typography variant='h6' color='text.primary'>
-            {user?.userId + ' -' || ''} {user?.userName} {'- ' + user?.classCode || ''}
+            {user?.userId + ' -' || ''} {user?.userName} {user?.classCode ? '- ' + user?.classCode : ''}
           </Typography>
           <Typography variant='caption' color='text.secondary'>
             {user?.mail}

@@ -14,7 +14,7 @@ type ProgressModalProps = {
   pauseAt?: number
   processingMessage?: string
   completedMessage?: string
-  onClose?: () => void
+  onClose: () => void
   autoCloseDelay?: number
   openEnded?: () => void
 }
@@ -34,14 +34,17 @@ export default function ProgressModal({
   const [progress, setProgress] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
 
-  // Giai đoạn 1: Tăng từ 0 đến pauseAt
+  // Reset when modal is closed
+  useEffect(() => {
+    setProgress(0)
+    setIsPaused(false)
+  }, [open])
+
+  // Phase 1: Increase progress to pauseAt
   useEffect(() => {
     let timer: NodeJS.Timeout
 
     if (open && isProcessing && !isCompleted) {
-      setProgress(0)
-      setIsPaused(false)
-
       timer = setInterval(() => {
         setProgress(prev => {
           const next = prev + Math.floor(Math.random() * 3) + 1
@@ -61,19 +64,16 @@ export default function ProgressModal({
     return () => clearInterval(timer)
   }, [open, isProcessing, isCompleted, pauseAt])
 
-  // Giai đoạn 2: Khi đã completed, tiếp tục tăng đến 100%
+  // Phase 2: Complete to 100%
   useEffect(() => {
     let completeTimer: NodeJS.Timeout
 
-    if (isCompleted) {
+    if (isCompleted && progress < 100) {
       completeTimer = setInterval(() => {
         setProgress(prev => {
-          const increment = Math.floor(Math.random() * 3) + 1
-          const next = Math.min(prev + increment, 100)
+          const next = Math.min(prev + Math.floor(Math.random() * 3) + 1, 100)
 
-          if (next === 100) {
-            clearInterval(completeTimer)
-          }
+          if (next === 100) clearInterval(completeTimer)
 
           return next
         })
@@ -81,36 +81,25 @@ export default function ProgressModal({
     }
 
     return () => clearInterval(completeTimer)
-  }, [isCompleted])
+  }, [isCompleted, progress])
 
-  // Đảm bảo luôn đạt 100% khi hoàn thành
+  // Ensure 100% progress when completed
   useEffect(() => {
     if (isCompleted && progress < 100) {
       setProgress(100)
     }
   }, [isCompleted, progress])
 
-  // Auto close khi đạt 100%
   useEffect(() => {
-    if (progress === 100 && isCompleted && !isError) {
-      // Gọi callback mở modal khác trước
-      openEnded?.()
-
-      // Sau đó đóng modal hiện tại sau một khoảng thời gian
-      const closeTimeout = setTimeout(() => {
-        onClose?.()
+    if (open && isCompleted && progress === 100) {
+      const timeout = setTimeout(() => {
+        onClose()
+        openEnded?.()
       }, autoCloseDelay)
 
-      return () => clearTimeout(closeTimeout)
+      return () => clearTimeout(timeout)
     }
-  }, [progress, isCompleted, onClose, autoCloseDelay, openEnded, isError])
-
-  useEffect(() => {
-    if (!open) {
-      setProgress(0)
-      setIsPaused(false)
-    }
-  }, [open])
+  }, [open, isCompleted, progress, onClose, autoCloseDelay, openEnded])
 
   return (
     <Dialog open={open} maxWidth='md' fullWidth>

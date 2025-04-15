@@ -17,7 +17,7 @@ type NotificantionActionProps = {
 }
 
 export const NotificantionAction = (props: NotificantionActionProps) => {
-  const { acedemicProcess, tooogleSendEmail, toogleSendEmailRemind, data } = props
+  const { acedemicProcess, toogleSendEmailRemind, data } = props
 
   const id = acedemicProcess?._id || ''
 
@@ -27,7 +27,7 @@ export const NotificantionAction = (props: NotificantionActionProps) => {
 
   return (
     <div className='flex gap-2'>
-      {!acedemicProcess?.isNotification ? (
+      {/* {!acedemicProcess?.isNotification ? (
         <Button
           disabled={data?.pagination.totalItems === 0}
           onClick={tooogleSendEmail}
@@ -37,32 +37,32 @@ export const NotificantionAction = (props: NotificantionActionProps) => {
         >
           Thông báo XLHV GV-SV
         </Button>
-      ) : (
-        <>
-          {!isLoading && numberOfMail && numberOfMail?.numberRemindProcess > 0 && (
-            <Button
-              disabled={data?.pagination.totalItems === 0}
-              variant='contained'
-              onClick={toogleSendEmailRemind}
-              startIcon={<Iconify icon='fluent-emoji-flat:bell' />}
-              className='max-sm:is-full'
-            >
-              Nhắc nhở XLHV GV-SV
-            </Button>
-          )}
+      ) : ( */}
+      <>
+        {!isLoading && numberOfMail && numberOfMail?.numberRemindProcess > 0 && (
+          <Button
+            disabled={data?.pagination.totalItems === 0}
+            variant='contained'
+            onClick={toogleSendEmailRemind}
+            startIcon={<Iconify icon='fluent-emoji-flat:bell' />}
+            className='max-sm:is-full'
+          >
+            Nhắc nhở XLHV GV-SV
+          </Button>
+        )}
 
-          {numberOfMail && numberOfMail?.numberRemindCommitment > 0 && (
-            <Button
-              disabled={data?.pagination.totalItems === 0}
-              variant='contained'
-              startIcon={<Iconify icon='fluent-emoji-flat:bell' />}
-              className='max-sm:is-full'
-            >
-              Nhắc nhở SV làm đơn
-            </Button>
-          )}
-        </>
-      )}
+        {numberOfMail && numberOfMail?.numberRemindCommitment > 0 && (
+          <Button
+            disabled={data?.pagination.totalItems === 0}
+            variant='contained'
+            startIcon={<Iconify icon='fluent-emoji-flat:bell' />}
+            className='max-sm:is-full'
+          >
+            Nhắc nhở SV làm đơn
+          </Button>
+        )}
+      </>
+      {/* )} */}
     </div>
   )
 }

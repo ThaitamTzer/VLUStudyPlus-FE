@@ -1,7 +1,7 @@
 'use client'
 import { useCallback, useState } from 'react'
 
-import { Button, Divider, Typography } from '@mui/material'
+import { Button } from '@mui/material'
 
 import { toast } from 'react-toastify'
 
@@ -93,12 +93,6 @@ export default function SendMailModal({ id, mutate }: { id: string; mutate: Keye
           </p>
         </div>
       )}
-      <Divider sx={{ my: 2 }} />
-      <Typography variant='h6'>
-        <strong className='text-red-700'>Lưu ý: </strong> Việc gửi mail này sẽ gửi đến{' '}
-        <strong>Cán bộ giảng viên</strong> phụ trách lớp niên chế của các sinh viên bị xử lý và các{' '}
-        <strong>sinh viên</strong> có trong đợt xử lý này. Bạn có chắc chắn muốn gửi mail không?
-      </Typography>
     </CustomDialog>
   )
 }

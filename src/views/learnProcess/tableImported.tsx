@@ -51,11 +51,11 @@ export default function TableImported(prop: TableImportedProps) {
         header: 'Mã SV',
         cell: info => info.getValue()
       }),
-      columnHelper.accessor('firstName', {
+      columnHelper.accessor('lastName', {
         header: 'Họ',
         cell: info => info.getValue()
       }),
-      columnHelper.accessor('lastName', {
+      columnHelper.accessor('firstName', {
         header: 'Tên',
         cell: info => info.getValue()
       }),

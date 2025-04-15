@@ -22,15 +22,24 @@ import useSWR from 'swr'
 
 import studentAcedemicProcessService from '@/services/studentAcedemicProcess.service'
 import PageHeader from '@/components/page-header'
-import { useStudentAcedemicProcessStore } from '@/stores/studentAcedemicProcess.store'
 import CustomIconButton from '@/@core/components/mui/IconButton'
 import Iconify from '@/components/iconify'
 import type { ProcessingType } from '@/types/management/learnProcessType'
 import StudentViewDetailCommitmentForm from './studentViewDetailCommitmentForm'
 import AddCommitmentFormProcess from './addCommitmentFormProcess'
+import CreateFormModal from '../form-instance/CreateFormModal'
+import formInstanceService from '@/services/formInstance.service'
+import type { FormInstanceType } from '@/types/management/formInstanceType'
+import FormInstancePDF from '../learnProcess/viewAcedemicProcess/FormInstancePDF'
 
 export default function StudentAcedemicProcessPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [openCreateFormModal, setOpenCreateFormModal] = useState(false)
+  const [formTemplateId, setFormTemplateId] = useState<string | null>(null)
+  const [processId, setProcessId] = useState<string | null>(null)
+  const [formInstance, setFormInstance] = useState<FormInstanceType | null>(null)
+  const [openFormViewer, setOpenFormViewer] = useState(false)
+  const [student, setStudent] = useState<ProcessingType | null>(null)
 
   const {
     data: studentData,
@@ -44,16 +53,6 @@ export default function StudentAcedemicProcessPage() {
     }
   )
 
-  const { setProcessObj, toogleStudentViewDetailCommitmentForm } = useStudentAcedemicProcessStore()
-
-  const handleOpenViewDetailCommitmentForm = useCallback(
-    (processObj: ProcessingType) => {
-      setProcessObj(processObj)
-      toogleStudentViewDetailCommitmentForm()
-    },
-    [setProcessObj, toogleStudentViewDetailCommitmentForm]
-  )
-
   const handleToggleAccordion = (id: string) => {
     setExpandedId(expandedId === id ? null : id)
   }
@@ -65,6 +64,75 @@ export default function StudentAcedemicProcessPage() {
 
     return <Chip label='Chưa xử lý' color='default' icon={<Iconify icon='mdi:clock-outline' />} />
   }
+
+  const renderStatusOfProcessing = (status: string, student: ProcessingType) => {
+    switch (status) {
+      case 'Hoàn thành':
+        return <Chip label='Hoàn thành' color='success' />
+
+      case 'Cần làm đơn':
+        return (
+          <>
+            <Chip label='Cần làm đơn' color='error' />
+            <Tooltip title='Tạo đơn' arrow>
+              <CustomIconButton
+                size='small'
+                variant='contained'
+                color='primary'
+                sx={{
+                  ml: 1
+                }}
+                onClick={() => {
+                  handleOpenCreateFormModal(student?.CVHTHandle?.formTemplateId || '', student?._id || '')
+                }}
+              >
+                <Iconify icon='mdi:plus' />
+              </CustomIconButton>
+            </Tooltip>
+          </>
+        )
+      case 'Đã làm đơn':
+        return (
+          <>
+            <Chip label='Đã làm đơn' color='success' />
+            <Tooltip title='Xem đơn' arrow>
+              <CustomIconButton
+                size='small'
+                variant='contained'
+                color='primary'
+                onClick={() => handleViewDetailForm(student?._id || '', student || null)}
+                sx={{ ml: 1 }}
+              >
+                <Iconify icon='mdi:file-eye-outline' />
+              </CustomIconButton>
+            </Tooltip>
+          </>
+        )
+      default:
+        return <Chip label='Vừa tạo' color='warning' />
+    }
+  }
+
+  const handleOpenCreateFormModal = useCallback(
+    (id: string, processId: string) => {
+      setFormTemplateId(id)
+      setOpenCreateFormModal(true)
+      setProcessId(processId)
+    },
+    [setOpenCreateFormModal, setFormTemplateId, setProcessId]
+  )
+
+  const handleViewDetailForm = useCallback(async (id: string, student: ProcessingType) => {
+    const formDetail = await formInstanceService.getFormDetail_Student(id)
+
+    setFormInstance(formDetail)
+    setOpenFormViewer(true)
+    setStudent(student)
+  }, [])
+
+  const handleCloseFormViewer = useCallback(() => {
+    setOpenFormViewer(false)
+  }, [])
 
   return (
     <>
@@ -122,31 +190,54 @@ export default function StudentAcedemicProcessPage() {
                       />
                     </Stack>
                   }
-                  action={
-                    <Stack direction='row' spacing={1}>
-                      <Tooltip title='Xem chi tiết' arrow>
-                        <CustomIconButton
-                          variant='contained'
-                          color='primary'
-                          onClick={() => {
-                            handleOpenViewDetailCommitmentForm(student)
-                          }}
-                        >
-                          <Iconify icon='mdi:file-document-outline' />
-                        </CustomIconButton>
-                      </Tooltip>
-                    </Stack>
-                  }
+
+                  // action={
+                  //   <Stack direction='row' spacing={1}>
+                  //     <Tooltip title='Xem chi tiết' arrow>
+                  //       <CustomIconButton
+                  //         variant='contained'
+                  //         color='primary'
+                  //         onClick={() => {
+                  //           handleOpenViewDetailCommitmentForm(student)
+                  //         }}
+                  //       >
+                  //         <Iconify icon='mdi:file-document-outline' />
+                  //       </CustomIconButton>
+                  //     </Tooltip>
+                  //   </Stack>
+                  // }
                 />
                 <CardContent>
                   <Stack spacing={2}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <Typography variant='body1'>
-                        <Box component='span' sx={{ fontWeight: 'bold', mr: 1 }}>
-                          Lý do XLHT {student.reasonHandling?.note}:
-                        </Box>
-                        {renderProcessingStatus(student)}
-                      </Typography>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          gap: 2,
+                          flexDirection: 'column',
+                          width: '80%'
+                        }}
+                      >
+                        <Typography variant='body1'>
+                          <Box component='span' sx={{ fontWeight: 'bold', mr: 1 }}>
+                            Lý do XLHT {student.reasonHandling?.note}:
+                          </Box>
+                          {renderProcessingStatus(student)}
+                        </Typography>
+
+                        <Typography variant='body1'>
+                          <Box component='span' sx={{ fontWeight: 'bold', mr: 1 }}>
+                            Trạng thái xử lý:
+                          </Box>
+                          {renderStatusOfProcessing(student.statusOfProcessing, student)}
+                        </Typography>
+                        <Typography variant='body1'>
+                          <Box component='span' sx={{ fontWeight: 'bold', mr: 1 }}>
+                            CVHT ghi nhận tình trạng xử lý:
+                          </Box>
+                          {student.CVHTHandle?.processingResultName || 'CVHT chưa ghi nhận'}
+                        </Typography>
+                      </Box>
 
                       <Button
                         endIcon={<Iconify icon={expandedId === student._id ? 'mdi:chevron-up' : 'mdi:chevron-down'} />}
@@ -163,8 +254,8 @@ export default function StudentAcedemicProcessPage() {
                         sx={{
                           p: 2,
                           mt: 1,
-                          backgroundColor: 'grey.50',
-                          borderRadius: 2
+                          borderRadius: 2,
+                          backgroundColor: 'background.default'
                         }}
                       >
                         <Stack spacing={2}>
@@ -172,6 +263,25 @@ export default function StudentAcedemicProcessPage() {
                             <Typography variant='body1' sx={{ fontWeight: 'bold', color: 'primary.main' }}>
                               Thông tin xử lý học tập
                             </Typography>
+
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Iconify icon='mdi:account' color='primary.main' />
+                              <Typography variant='body2'>
+                                <Box component='span' sx={{ fontWeight: 'bold' }}>
+                                  Người xử lý:{' '}
+                                </Box>
+                                {student.handlerName || '-'}
+                              </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Iconify icon='mdi:note-text' color='primary.main' />
+                              <Typography variant='body2'>
+                                <Box component='span' sx={{ fontWeight: 'bold' }}>
+                                  Ghi chú CVHT:{' '}
+                                </Box>
+                                {student.CVHTNote || '-'}
+                              </Typography>
+                            </Box>
 
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                               <Iconify icon='mdi:account-group' color='primary.main' />
@@ -187,21 +297,18 @@ export default function StudentAcedemicProcessPage() {
                               <Iconify icon='mdi:calendar-clock' color='primary.main' />
                               <Typography variant='body2'>
                                 <Box component='span' sx={{ fontWeight: 'bold' }}>
-                                  Đợt xử lý:{' '}
+                                  XLHT - {student.processingHandle.note} (UIS - XLHT theo quy chế):{' '}
                                 </Box>
                                 {student.processingHandle?.statusProcess}
-                                {student.processingHandle?.note && ` (${student.processingHandle.note})`}
                               </Typography>
                             </Box>
-
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                               <Iconify icon='mdi:alert-circle' color='primary.main' />
                               <Typography variant='body2'>
                                 <Box component='span' sx={{ fontWeight: 'bold' }}>
-                                  Lý do XLHT:{' '}
+                                  Đếm số lần bị XLHT qua 10 học kỳ (Từ HK201 đến {student.countWarning.note}):{' '}
                                 </Box>
-                                {student.reasonHandling?.reason}
-                                {student.reasonHandling?.note && ` (${student.reasonHandling.note})`}
+                                {student.countWarning.academicWarningsCount}
                               </Typography>
                             </Box>
                           </Box>
@@ -374,6 +481,22 @@ export default function StudentAcedemicProcessPage() {
 
       <AddCommitmentFormProcess mutate={mutate} />
       <StudentViewDetailCommitmentForm />
+      <CreateFormModal
+        id={formTemplateId || ''}
+        idProcess={processId || ''}
+        open={openCreateFormModal}
+        onClose={() => setOpenCreateFormModal(false)}
+        mutate={mutate}
+      />
+
+      {formInstance && (
+        <FormInstancePDF
+          instance={formInstance}
+          open={openFormViewer}
+          onClose={handleCloseFormViewer}
+          nameOfForm={student?.lastName + ' ' + student?.firstName}
+        />
+      )}
     </>
   )
 }

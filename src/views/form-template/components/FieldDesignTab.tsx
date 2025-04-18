@@ -26,6 +26,7 @@ interface FieldDesignTabProps {
   onRemoveContentField: (sectionIndex: number, fieldIndex: number) => void
   onAddContentSection: () => void
   fieldTypes: { value: string; label: string }[]
+  onFieldChange: (sectionIndex: number, fieldIndex: number, field: Field) => void
 }
 
 export default function FieldDesignTab({
@@ -35,7 +36,8 @@ export default function FieldDesignTab({
   onAddContentField,
   onRemoveContentField,
   onAddContentSection,
-  fieldTypes
+  fieldTypes,
+  onFieldChange
 }: FieldDesignTabProps) {
   // Lọc ra các section không chứa chữ ký
   const otherSections = sections.filter(section => !section.fields.some(field => field.type === 'signature'))
@@ -102,33 +104,16 @@ export default function FieldDesignTab({
                                   <TextField
                                     label='Nhãn trường'
                                     value={field.label}
-                                    onChange={e =>
-                                      onSectionChange(sectionIndex, 'fields', [
-                                        ...section.fields.slice(0, originalIndex),
-                                        { ...field, label: e.target.value },
-                                        ...section.fields.slice(originalIndex + 1)
-                                      ])
-                                    }
+                                    onChange={e => {
+                                      const updatedField = { ...field, label: e.target.value }
+
+                                      onFieldChange(sectionIndex, originalIndex, updatedField)
+                                    }}
                                     fullWidth
                                     size='small'
                                   />
                                 </Grid>
-                                <Grid item xs={12} md={6}>
-                                  <TextField
-                                    label='Khóa'
-                                    value={field.key}
-                                    onChange={e =>
-                                      onSectionChange(sectionIndex, 'fields', [
-                                        ...section.fields.slice(0, originalIndex),
-                                        { ...field, key: e.target.value },
-                                        ...section.fields.slice(originalIndex + 1)
-                                      ])
-                                    }
-                                    fullWidth
-                                    size='small'
-                                  />
-                                </Grid>
-                                <Grid item xs={12} md={6}>
+                                <Grid item xs={12}>
                                   <FormControl fullWidth size='small'>
                                     <InputLabel>Loại</InputLabel>
                                     <Select

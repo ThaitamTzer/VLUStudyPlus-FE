@@ -27,7 +27,10 @@ const SIGNATURE_TYPES = [
   { value: 'rectorSignature', label: 'TL. HIỆU TRƯỞNG - TRƯỞNG PHÒNG ĐÀO TẠO' },
   { value: 'facultyBoardSignature', label: 'BAN CHỦ NHIỆM KHOA' },
   { value: 'applicantSignature', label: 'Người làm đơn' },
-  { value: 'parentSignature', label: 'Xác nhận của phụ huynh SV' }
+  { value: 'parentSignature', label: 'Xác nhận của phụ huynh SV' },
+  { value: 'deanSignature', label: 'HIỆU TRƯỞNG VLU' },
+  { value: 'deanSignatureVLU', label: 'HIỆU TRƯỞNG VLU' },
+  { value: 'cvhtSignature', label: 'CVHT' }
 ]
 
 interface FormTemplateFormProps {
@@ -192,6 +195,21 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
     handleChange('sections', newSections)
   }
 
+  const generateKey = (label: string) => {
+    // Tách chuỗi thành các từ và lấy tối đa 4 từ đầu tiên
+    const words = label
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, 'd')
+      .split(/[^a-z0-9]+/)
+      .filter(word => word.length > 0)
+      .slice(0, 4)
+      .join('_')
+
+    return words
+  }
+
   const addContentField = (sectionIndex: number, direction: 'right' | 'down' = 'down', currentField?: Field) => {
     const newSections = [...formData.sections]
     const fields = newSections[sectionIndex].fields
@@ -203,7 +221,7 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
     // Thêm field mới với vị trí đã tính toán
     const newField = {
       label: '',
-      key: '',
+      key: generateKey(''),
       type: 'text',
       row,
       column,
@@ -223,10 +241,12 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
     const lastField = currentField || fields[fields.length - 1]
     const { row, column } = findNextPosition(sectionIndex, direction, lastField.row, lastField.column)
 
+    const signatureLabel = SIGNATURE_TYPES[0].label
+
     // Thêm field mới với vị trí đã tính toán
     const newField = {
-      label: SIGNATURE_TYPES[0].label,
-      key: SIGNATURE_TYPES[0].value,
+      label: signatureLabel,
+      key: generateKey(signatureLabel),
       type: 'signature',
       signatureType: SIGNATURE_TYPES[0].value,
       row,
@@ -252,6 +272,25 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
     const section = newSections[sectionIndex]
 
     section.fields = section.fields.filter((_: Field, i: number) => i !== fieldIndex)
+    handleChange('sections', newSections)
+  }
+
+  const handleFieldChange = (sectionIndex: number, fieldIndex: number, updatedField: Field) => {
+    const newSections = [...formData.sections]
+    const section = newSections[sectionIndex]
+
+    // Cập nhật key tự động dựa trên label
+    const fieldWithGeneratedKey = {
+      ...updatedField,
+      key: generateKey(updatedField.label)
+    }
+
+    section.fields = [
+      ...section.fields.slice(0, fieldIndex),
+      fieldWithGeneratedKey,
+      ...section.fields.slice(fieldIndex + 1)
+    ]
+
     handleChange('sections', newSections)
   }
 
@@ -358,6 +397,7 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
             onRemoveContentField={removeContentField}
             onAddContentSection={addContentSection}
             fieldTypes={FIELD_TYPES}
+            onFieldChange={handleFieldChange}
           />
         )}
 

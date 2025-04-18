@@ -68,7 +68,24 @@ export default function StudentAcedemicProcessPage() {
   const renderStatusOfProcessing = (status: string, student: ProcessingType) => {
     switch (status) {
       case 'Hoàn thành':
-        return <Chip label='Hoàn thành' color='success' />
+        return (
+          <>
+            <Chip label='Hoàn thành' color='success' />
+            {student.CVHTHandle?.commitment && (
+              <Tooltip title='Xem đơn' arrow>
+                <CustomIconButton
+                  size='small'
+                  variant='contained'
+                  color='primary'
+                  onClick={() => handleViewDetailForm(student?._id || '', student || null)}
+                  sx={{ ml: 1 }}
+                >
+                  <Iconify icon='mdi:file-eye-outline' />
+                </CustomIconButton>
+              </Tooltip>
+            )}
+          </>
+        )
 
       case 'Cần làm đơn':
         return (

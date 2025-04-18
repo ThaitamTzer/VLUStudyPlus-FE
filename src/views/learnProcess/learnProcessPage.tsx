@@ -33,10 +33,10 @@ import { useColumns } from './viewAcedemicProcess/columns'
 import ViewCommitmentForms from '../commitmentForms/viewCommitmentForm'
 import ViewCommitmentFormsOfCVHT from '../commitmentForms/viewCommitmentFormOfCVHT'
 import Iconify from '@/components/iconify'
+import TanstackTable from '@/components/TanstackTable'
 
 // import { useAbility } from '@/hooks/useAbility'
 
-const TableTypeProcess = dynamic(() => import('../type-process/list'), { ssr: false })
 const AddAcedemicProcess = dynamic(() => import('./addAcedemicProcess'), { ssr: false })
 const UpdateAcedemicProcess = dynamic(() => import('./updateAcedemicProcess'), { ssr: false })
 const AlertDelete = dynamic(() => import('@/components/alertModal'), { ssr: false })
@@ -324,7 +324,7 @@ export default function LearnProcessPage() {
   const renderTable = useMemo(
     () => (
       <>
-        <TableTypeProcess table={table} loading={isLoading} />
+        <TanstackTable table={table} loading={isLoading} minWidth={1100} />
         <TablePagination
           component={() => <TablePaginationComponent table={table as Table<unknown>} />}
           count={table.getFilteredRowModel().rows.length}
@@ -335,7 +335,7 @@ export default function LearnProcessPage() {
       </>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [table, isLoading, data]
+    [table, isLoading, data, globalFilter]
   )
 
   return (
@@ -373,6 +373,7 @@ export default function LearnProcessPage() {
             {/* )} */}
           </div>
         </div>
+
         {isLoading ? <Skeleton variant='rectangular' height={500} animation='wave' /> : renderTable}
       </Card>
       <AddAcedemicProcess mutate={mutate} />

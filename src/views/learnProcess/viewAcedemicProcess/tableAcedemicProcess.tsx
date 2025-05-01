@@ -20,7 +20,7 @@ import type { ListProcessingType, ProcessingType } from '@/types/management/lear
 import Iconify from '@/components/iconify'
 import CustomIconButton from '@/@core/components/mui/IconButton'
 import formInstanceService from '@/services/formInstance.service'
-import FormInstancePDF from './FormInstancePDF'
+import FormInstancePDF from '../../form-instance/FormInstancePDF'
 import type { FormInstanceType } from '@/types/management/formInstanceType'
 
 type TableAcedemicProcessProps = {

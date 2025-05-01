@@ -12,6 +12,13 @@ interface FormInstancePDFProps {
   open: boolean
   onClose: () => void
   nameOfForm: string
+  isStudent?: boolean
+  isLecturer?: boolean
+  onUpdate?: () => void
+  onDelete?: () => void
+  onApprove?: () => void
+  onReject?: () => void
+  onSign?: () => void
 }
 
 // Đăng ký font Times New Roman
@@ -203,18 +210,18 @@ const FormInstance = ({ data }: { data: FormInstanceType }) => {
   }
 
   // Lọc ra các section chứa chữ ký
-  const signatureSections = data?.templateId?.sections?.filter(section =>
+  const signatureSections = data?.templateSnapshot?.sections?.filter(section =>
     section.fields.some(field => field.type === 'signature')
   )
 
   return (
-    <Document title={data?.templateId?.title}>
+    <Document title={data?.templateSnapshot?.title}>
       <Page size='A4' style={styles.page}>
         <>
           <Text style={styles.title}>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</Text>
           <Text style={styles.subtitle}>Độc lập – Tự do – Hạnh phúc</Text>
 
-          {data?.templateId?.documentCode && (
+          {data?.templateSnapshot?.documentCode && (
             <View
               style={{
                 border: '1px solid #000',
@@ -230,7 +237,7 @@ const FormInstance = ({ data }: { data: FormInstanceType }) => {
                   fontSize: 12
                 }}
               >
-                {data?.templateId?.documentCode}
+                {data?.templateSnapshot?.documentCode}
               </Text>
             </View>
           )}
@@ -244,8 +251,8 @@ const FormInstance = ({ data }: { data: FormInstanceType }) => {
               gap: 0
             }}
           >
-            <Text style={styles.header}>{data?.templateId?.title?.toUpperCase()}</Text>
-            {data?.templateId?.description && (
+            <Text style={styles.header}>{data?.templateSnapshot?.title?.toUpperCase()}</Text>
+            {data?.templateSnapshot?.description && (
               <Text
                 style={{
                   fontFamily: 'Times_new_roman',
@@ -254,7 +261,7 @@ const FormInstance = ({ data }: { data: FormInstanceType }) => {
                   fontStyle: 'italic'
                 }}
               >
-                ({data?.templateId?.description})
+                ({data?.templateSnapshot?.description})
               </Text>
             )}
           </View>
@@ -265,7 +272,7 @@ const FormInstance = ({ data }: { data: FormInstanceType }) => {
           >
             <Text style={styles.textBold}>Kính gửi: </Text>
             <View style={{ display: 'flex', flexDirection: 'column' }}>
-              {data?.templateId?.recipient?.map((recipient: string, index: number) => (
+              {data?.templateSnapshot?.recipient?.map((recipient: string, index: number) => (
                 <Text key={index} style={[styles.text, { fontWeight: 'bold' }]}>
                   {recipient}
                 </Text>
@@ -275,7 +282,7 @@ const FormInstance = ({ data }: { data: FormInstanceType }) => {
 
           <View style={{ margin: '10px 0' }}></View>
           {/* Các phần của đơn */}
-          {data?.templateId?.sections
+          {data?.templateSnapshot?.sections
             ?.filter(section => !section.fields.some(field => field.type === 'signature'))
             .map((section, secIndex: number) => (
               <View key={secIndex} style={{ marginBottom: 3, display: 'flex', flexDirection: 'column' }}>
@@ -394,39 +401,21 @@ const FormInstance = ({ data }: { data: FormInstanceType }) => {
                           {field.type === 'array' && fieldValue && (
                             <View
                               style={{
-                                display: 'flex',
                                 flexDirection: 'row',
                                 width: '100%',
-                                gap: 15,
-                                marginTop: 5
+                                maxHeight: 300,
+                                flexWrap: 'wrap'
                               }}
                             >
-                              <View style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                                {Array.isArray(fieldValue) ? (
-                                  fieldValue.map((item, idx) => (
-                                    <Text
-                                      key={idx}
-                                      style={{
-                                        fontSize: 11,
-                                        fontFamily: 'Times_new_roman',
-                                        marginBottom: 3
-                                      }}
-                                    >
-                                      - {item}
-                                    </Text>
-                                  ))
-                                ) : (
-                                  <Text
-                                    style={{
-                                      fontSize: 11,
-                                      fontFamily: 'Times_new_roman',
-                                      marginBottom: 3
-                                    }}
-                                  >
-                                    - {fieldValue}
-                                  </Text>
-                                )}
-                              </View>
+                              {(() => {
+                                const items = Array.isArray(fieldValue) ? fieldValue : [fieldValue]
+
+                                return items.map((item, i) => (
+                                  <View key={i} style={{ width: '50%', paddingRight: 10 }}>
+                                    <Text style={{ fontSize: 12, marginBottom: 4 }}>{item}</Text>
+                                  </View>
+                                ))
+                              })()}
                             </View>
                           )}
                         </View>
@@ -505,7 +494,19 @@ const FormInstance = ({ data }: { data: FormInstanceType }) => {
   )
 }
 
-export default function FormInstancePDF({ instance, open, onClose, nameOfForm }: FormInstancePDFProps) {
+export default function FormInstancePDF({
+  instance,
+  open,
+  onClose,
+  nameOfForm,
+  isStudent,
+  isLecturer,
+  onUpdate,
+  onDelete,
+  onApprove,
+  onReject,
+  onSign
+}: FormInstancePDFProps) {
   const instanceData = useMemo(() => instance, [instance])
 
   return (
@@ -524,10 +525,35 @@ export default function FormInstancePDF({ instance, open, onClose, nameOfForm }:
       </DialogContent>
       <DialogActions>
         <Box sx={{ display: 'flex', gap: 2 }}>
+          {isStudent && (
+            <Button onClick={onUpdate} variant='contained' color='warning'>
+              Cập nhật đơn
+            </Button>
+          )}
+          {isStudent && (
+            <Button onClick={onDelete} variant='contained' color='error'>
+              Xóa đơn
+            </Button>
+          )}
+          {isLecturer && (
+            <Button onClick={onApprove} variant='contained' color='success'>
+              Duyệt đơn
+            </Button>
+          )}
+          {isLecturer && (
+            <Button onClick={onReject} variant='contained' color='error'>
+              Từ chối đơn
+            </Button>
+          )}
+          {isLecturer && (
+            <Button onClick={onSign} variant='contained' color='success'>
+              Ký đơn
+            </Button>
+          )}
           <Button onClick={onClose}>Đóng</Button>
           <PDFDownloadLink
             document={<FormInstance data={instanceData} />}
-            fileName={`${instanceData?.templateId?.title}.pdf`}
+            fileName={`${instanceData?.templateSnapshot?.title}.pdf`}
             style={{
               textDecoration: 'none'
             }}

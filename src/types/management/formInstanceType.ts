@@ -16,7 +16,8 @@ export type SectionType = {
 
 export type FormInstanceType = {
   _id: string
-  templateId: {
+  templateId: string
+  templateSnapshot: {
     _id: string
     title: string
     documentCode: string
@@ -25,7 +26,6 @@ export type FormInstanceType = {
     sections: SectionType[]
     createdAt: string
     updatedAt: string
-    __v: number
   }
   createdBy: string
   academicProcessingId: string

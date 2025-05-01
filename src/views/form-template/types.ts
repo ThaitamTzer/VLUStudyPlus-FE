@@ -6,6 +6,11 @@ export interface Field {
   column: number
   required: boolean
   signatureType?: string
+  minLength?: number
+  maxLength?: number
+  min?: number
+  max?: number
+  pattern?: string
 }
 
 export interface Section {

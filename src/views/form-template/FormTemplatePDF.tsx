@@ -399,9 +399,12 @@ const FormTemplate = ({ data }: { data: FormTemplateType }) => {
                     }}
                   >
                     {rowFields.map((field, fieldIndex) => (
-                      <View key={fieldIndex} style={{ display: 'flex', flexDirection: 'column', width: '48%' }}>
+                      <View
+                        key={fieldIndex}
+                        style={{ display: 'flex', flexDirection: 'column', width: '50%', border: '1px solid #000' }}
+                      >
                         <Text style={styles.signatureTitle}>{field.label}</Text>
-                        <Text style={styles.signaturePlaceholder}>(Ký và ghi rõ họ tên)</Text>
+                        <Text style={styles.signaturePlaceholder}></Text>
                       </View>
                     ))}
                   </View>

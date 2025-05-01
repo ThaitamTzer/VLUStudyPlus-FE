@@ -109,7 +109,7 @@ const formInstanceService = {
     errorCallBack?: (err: any) => void
   ) => {
     try {
-      return await axiosUpload.post(`/api/form-instance/insert-signature-for-student/${id}`, data).then(res => {
+      return await axiosUpload.patch(`/api/form-instance/insert-signature-for-student/${id}`, data).then(res => {
         if (successCallBack) {
           successCallBack(res.data)
         }

@@ -184,7 +184,7 @@ export default function SignatureTab({
               )
             })}
 
-            <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+            {/* <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
               <Tooltip title='Thêm chữ ký mới bên dưới'>
                 <IconButton
                   size='small'
@@ -200,7 +200,7 @@ export default function SignatureTab({
                   <AddIcon fontSize='small' />
                 </IconButton>
               </Tooltip>
-            </Box>
+            </Box> */}
           </Paper>
         )
       })}

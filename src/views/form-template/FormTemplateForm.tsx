@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 import { Button, DialogActions, DialogContent, DialogTitle, Tab, Tabs } from '@mui/material'
 
@@ -13,14 +13,15 @@ import SignatureTab from './components/SignatureTab'
 import formTemplateService from '@/services/formTemplate.service'
 
 const FIELD_TYPES = [
-  { value: 'text', label: 'Chữ' },
-  { value: 'shortText', label: 'Chữ ngắn' },
-  { value: 'longText', label: 'Chữ dài' },
-  { value: 'number', label: 'Số' },
+  { value: 'text', label: 'Chữ', minLength: 3, maxLength: 255 },
+  { value: 'phone', label: 'Số điện thoại', minLength: 10, maxLength: 10 },
+  { value: 'shortText', label: 'Chữ ngắn', minLength: 3, maxLength: 100 },
+  { value: 'longText', label: 'Chữ dài', minLength: 3, maxLength: 255 },
+  { value: 'number', label: 'Số', min: 1, max: 100 },
   { value: 'array', label: 'Danh sách' },
   { value: 'date', label: 'Ngày' },
   { value: 'checkbox', label: 'Checkbox' },
-  { value: 'textarea', label: 'Mô tả' }
+  { value: 'textarea', label: 'Mô tả', minLength: 10, maxLength: 1000 }
 ]
 
 const SIGNATURE_TYPES = [
@@ -30,7 +31,7 @@ const SIGNATURE_TYPES = [
   { value: 'parentSignature', label: 'Xác nhận của phụ huynh SV' },
   { value: 'deanSignature', label: 'HIỆU TRƯỞNG VLU' },
   { value: 'deanSignatureVLU', label: 'HIỆU TRƯỞNG VLU' },
-  { value: 'cvhtSignature', label: 'CVHT' }
+  { value: 'cvhtSignature', label: 'CỐ VẤN HỌC TẬP' }
 ]
 
 interface FormTemplateFormProps {
@@ -48,21 +49,7 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
       documentCode: 'Số:……………………..',
       recipient: [''],
       description: '',
-      sections: [
-        {
-          sectionTitle: 'contentSection1',
-          fields: [
-            {
-              label: '',
-              key: '',
-              type: 'text',
-              row: 1,
-              column: 1,
-              required: true
-            }
-          ]
-        }
-      ]
+      sections: []
     }
   )
 
@@ -72,12 +59,12 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
     }
   }, [template])
 
-  const handleChange = (field: keyof FormTemplate, value: any) => {
+  const handleChange = useCallback((field: keyof FormTemplate, value: any) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }))
-  }
+  }, [])
 
   const handleRecipientChange = (index: number, value: string) => {
     const newRecipients = [...formData.recipient]
@@ -218,14 +205,22 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
     const lastField = currentField || fields[fields.length - 1]
     const { row, column } = findNextPosition(sectionIndex, direction, lastField.row, lastField.column)
 
-    // Thêm field mới với vị trí đã tính toán
+    // Lấy giá trị mặc định từ fieldTypes cho tất cả trường
+    const defaultFieldType = FIELD_TYPES.find(type => type.value === currentField?.type)
+
+    // Thêm field mới với vị trí đã tính toán và các giá trị mặc định
     const newField = {
       label: '',
       key: generateKey(''),
       type: 'text',
       row,
       column,
-      required: true
+      required: true,
+      minLength: defaultFieldType?.minLength,
+      maxLength: defaultFieldType?.maxLength,
+      min: defaultFieldType?.min,
+      max: defaultFieldType?.max,
+      pattern: ''
     }
 
     fields.push(newField)
@@ -279,10 +274,17 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
     const newSections = [...formData.sections]
     const section = newSections[sectionIndex]
 
-    // Cập nhật key tự động dựa trên label
+    // Lấy giá trị mặc định từ fieldTypes khi thay đổi loại trường
+    const defaultValues = FIELD_TYPES.find(type => type.value === updatedField.type)
+
+    // Cập nhật key tự động dựa trên label và thêm các giá trị mặc định
     const fieldWithGeneratedKey = {
       ...updatedField,
-      key: generateKey(updatedField.label)
+      key: generateKey(updatedField.label),
+      minLength: updatedField.minLength || defaultValues?.minLength,
+      maxLength: updatedField.maxLength || defaultValues?.maxLength,
+      min: updatedField.min || defaultValues?.min,
+      max: updatedField.max || defaultValues?.max
     }
 
     section.fields = [
@@ -296,12 +298,35 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
 
   const handleSubmit = async () => {
     try {
+      // Chuẩn bị dữ liệu để gửi đi
+      const formDataToSubmit = {
+        ...formData,
+        sections: formData.sections.map(section => ({
+          ...section,
+          fields: section.fields.map(field => {
+            // Tạo object mới chỉ với các trường có giá trị
+            const cleanedField: any = {
+              ...field
+            }
+
+            // Xóa các trường undefined
+            if (cleanedField.minLength === undefined) delete cleanedField.minLength
+            if (cleanedField.maxLength === undefined) delete cleanedField.maxLength
+            if (cleanedField.min === undefined) delete cleanedField.min
+            if (cleanedField.max === undefined) delete cleanedField.max
+            if (cleanedField.pattern === undefined) delete cleanedField.pattern
+
+            return cleanedField
+          })
+        }))
+      }
+
       if (template && !template.isNew) {
         const toastID = toast.loading('Đang cập nhật đơn....')
 
         await formTemplateService.updateFormTemplate(
           template._id,
-          formData,
+          formDataToSubmit,
           () => {
             toast.update(toastID, {
               render: 'Đã cập nhật đơn thành công',
@@ -326,7 +351,7 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
         const toastID = toast.loading('Đang tạo đơn....')
 
         await formTemplateService.createFormTemplate(
-          formData,
+          formDataToSubmit,
           () => {
             toast.update(toastID, {
               render: 'Đã tạo đơn thành công',
@@ -356,7 +381,11 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
   return (
     <>
       <DialogTitle sx={{ pb: 0 }}>
-        {template?.isNew ? 'Tạo bản sao mới' : template ? 'Chỉnh sửa mẫu đơn' : 'Thêm mẫu đơn mới'}
+        {template?.isNew
+          ? 'Tạo bản sao mới'
+          : template
+            ? 'Chỉnh sửa mẫu đơn' + ' ' + template.title
+            : 'Thêm mẫu đơn mới'}
       </DialogTitle>
       <DialogContent>
         <Tabs

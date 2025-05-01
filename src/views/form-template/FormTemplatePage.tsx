@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import {
   Box,
@@ -50,6 +50,11 @@ export default function FormTemplatePage() {
   const handleEdit = (template: any) => {
     setSelectedTemplate(template)
     setOpenForm(true)
+  }
+
+  const onCloseForm = () => {
+    setSelectedTemplate(null)
+    setOpenForm(false)
   }
 
   const handleDelete = (template: any) => {
@@ -106,6 +111,8 @@ export default function FormTemplatePage() {
       }
     )
   }
+
+  const memoizedSelectedTemplate = useMemo(() => selectedTemplate, [selectedTemplate])
 
   return (
     <Box sx={{ p: 3 }}>
@@ -173,17 +180,21 @@ export default function FormTemplatePage() {
 
       {/* Dialog xem chi tiết */}
       <Dialog open={openDetail} onClose={() => setOpenDetail(false)} maxWidth='md' fullWidth>
-        <DialogContent>{selectedTemplate && <FormTemplateDetail template={selectedTemplate} />}</DialogContent>
+        <DialogContent>
+          {memoizedSelectedTemplate && <FormTemplateDetail template={memoizedSelectedTemplate} />}
+        </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDetail(false)}>Đóng</Button>
         </DialogActions>
       </Dialog>
 
-      {/* Dialog form thêm/sửa */}
-      <Dialog open={openForm} onClose={() => setOpenForm(false)} maxWidth='lg' fullWidth>
-        <DialogContent>
-          <FormTemplateForm template={selectedTemplate} onClose={() => setOpenForm(false)} />
-        </DialogContent>
+      {/* Dialog form thêm/sửa: unmount nội dung khi đóng để reset formData */}
+      <Dialog open={openForm} onClose={onCloseForm} maxWidth='lg' fullWidth TransitionProps={{ unmountOnExit: true }}>
+        <FormTemplateForm
+          key={memoizedSelectedTemplate?._id || (openForm ? 'new' + Date.now() : 'new')}
+          template={memoizedSelectedTemplate}
+          onClose={onCloseForm}
+        />
       </Dialog>
 
       {/* Dialog xác nhận xóa */}
@@ -191,7 +202,7 @@ export default function FormTemplatePage() {
         <DialogTitle>Xác nhận xóa</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Bạn có chắc chắn muốn xóa mẫu đơn &quot;{selectedTemplate?.title}&quot;?
+            Bạn có chắc chắn muốn xóa mẫu đơn &quot;{memoizedSelectedTemplate?.title}&quot;?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

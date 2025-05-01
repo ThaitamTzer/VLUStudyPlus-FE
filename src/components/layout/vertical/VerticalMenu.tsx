@@ -188,11 +188,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           <MenuItem href='/type-process' icon={<Iconify icon='material-symbols:problem-outline-rounded' />}>
             Loại xử lý
           </MenuItem>
-          <MenuItem href='/form-template' icon={<Iconify icon='icon-park-outline:doc-detail' />}>
-            Mẫu đơn cam kết
-          </MenuItem>
           <MenuItem href='/process-result' icon={<Iconify icon='carbon:result' />}>
             Kết quả xử lý
+          </MenuItem>
+          <MenuItem href='/form-template' icon={<Iconify icon='icon-park-outline:doc-detail' />}>
+            Mẫu đơn cam kết
           </MenuItem>
         </SubMenu>
         <SubMenu label='NGƯỜI DÙNG' icon={<Iconify icon='solar:users-group-rounded-linear' />}>
@@ -205,16 +205,16 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             Vai trò
           </MenuItem>
           <MenuItem href='/lecturer-management' icon={<Iconify icon='clarity:employee-group-line' />}>
-            Cbnv-Gv
+            CBGVNV
           </MenuItem>
           <MenuItem href='/student-management' icon={<Iconify icon='ph:student' />}>
             Sinh viên
           </MenuItem>
         </SubMenu>
         <MenuItem href='/class-management' icon={<Iconify icon='ph:chalkboard-teacher' />}>
-          PHÂN CÔNG LỚP
+          LỚP NIÊN CHẾ
         </MenuItem>
-        <SubMenu label='LỚP NIÊN CHẾ' icon={<Iconify icon='fluent:class-24-regular' />}>
+        <SubMenu label='LỚP - CVHT' icon={<Iconify icon='fluent:class-24-regular' />}>
           <MenuItem href='/classLecturer' icon={<Iconify icon='fluent:class-24-regular' />}>
             Lớp học
           </MenuItem>
@@ -222,21 +222,27 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             Sinh viên
           </MenuItem>
         </SubMenu>
-        <SubMenu label='XỬ LÝ HỌC TẬP' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
+        <MenuItem href='/learning-processing' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
+          XỬ LÝ HỌC TẬP
+        </MenuItem>
+        {/* <SubMenu label='XỬ LÝ HỌC TẬP' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
           <MenuItem href='/learning-processing' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
             Kỳ XLHV
           </MenuItem>
-        </SubMenu>
+        </SubMenu> */}
         <SubMenu label='SINH VIÊN' icon={<Iconify icon='ph:student' />}>
           <MenuItem href='/student-acedemic-process' icon={<Iconify icon='carbon:result' />}>
             Xử lý học vụ
           </MenuItem>
         </SubMenu>
-        <SubMenu label='CTĐT' icon={<Iconify icon='solar:book-bookmark-linear' />}>
+        <MenuItem href='/training-program' icon={<Iconify icon='solar:book-bookmark-linear' />}>
+          KHUNG CTĐT
+        </MenuItem>
+        {/* <SubMenu label='CTĐT' icon={<Iconify icon='solar:book-bookmark-linear' />}>
           <MenuItem href='/training-program' icon={<Iconify icon='solar:book-bookmark-linear' />}>
             Khung CTĐT
           </MenuItem>
-        </SubMenu>
+        </SubMenu> */}
         {/* <SubMenu
           label='dashboards'
           icon={<i className='tabler-smart-home' />}

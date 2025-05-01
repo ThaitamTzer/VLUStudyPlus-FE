@@ -82,8 +82,16 @@ const UserDropdown = () => {
           <Typography variant='h6' color='text.primary'>
             {user?.userId + ' -' || ''} {user?.userName} {user?.classCode ? '- ' + user?.classCode : ''}
           </Typography>
-          <Typography variant='caption' color='text.secondary'>
-            {user?.mail}
+          <Typography
+            variant='caption'
+            color='text.secondary'
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1
+            }}
+          >
+            <p>{user?.role.name}</p> - {user?.mail}
           </Typography>
         </Stack>
       ) : (

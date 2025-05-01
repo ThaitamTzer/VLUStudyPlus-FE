@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 import type { KeyedMutator } from 'swr'
 import useSWR from 'swr'
@@ -19,10 +19,19 @@ import {
   FormControlLabel,
   Checkbox,
   IconButton,
-  Paper
+  Paper,
+  Tooltip,
+  Stepper,
+  Step,
+  StepLabel
 } from '@mui/material'
 
 import { toast } from 'react-toastify'
+import { useForm, Controller } from 'react-hook-form'
+import { valibotResolver } from '@hookform/resolvers/valibot'
+import * as v from 'valibot'
+
+import SignatureCanvas from 'react-signature-canvas'
 
 import formInstanceService from '@/services/formInstance.service'
 import formTemplateService from '@/services/formTemplate.service'
@@ -31,6 +40,37 @@ import { CustomDialog } from '@/components/CustomDialog'
 
 import type { FormTemplateType, FieldType } from '@/types/management/formTemplateType'
 import Iconify from '@/components/iconify'
+import CustomTextField from '@/@core/components/mui/TextField'
+import CustomIconButton from '@/@core/components/mui/IconButton'
+
+// Mở rộng FieldType để thêm các thuộc tính validation
+interface ExtendedFieldType extends FieldType {
+  minLength?: number
+  maxLength?: number
+  min?: number
+  max?: number
+  pattern?: string
+}
+
+interface FormFieldValue {
+  text: string
+  email: string
+  number: number
+  select: string
+  textarea: string
+  checkbox: boolean
+  array: string[]
+  signature: {
+    name: string
+    image: string | null
+  }
+}
+
+type FormFieldType = keyof FormFieldValue
+
+interface FormValues {
+  [key: string]: FormFieldValue[FormFieldType]
+}
 
 type CreateFormModalProps = {
   id: string
@@ -42,100 +82,137 @@ type CreateFormModalProps = {
 
 export default function CreateFormModal(props: CreateFormModalProps) {
   const { id, idProcess, mutate, onClose, open } = props
-  const [formValues, setFormValues] = useState<Record<string, any>>({})
-  const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [validationSchema, setValidationSchema] = useState<any>(null)
+  const [activeStep, setActiveStep] = useState(0)
+  const [formData, setFormData] = useState<any>(null)
+  const sigCanvas = useRef<SignatureCanvas>(null)
+  const steps = ['Điền thông tin', 'Ký tên']
 
   const { data: formTemplateData } = useSWR<FormTemplateType>(id ? `/api/form-template/${id}` : null, () =>
     formTemplateService.getFormTemplateById(id)
   )
 
-  console.log(formTemplateData)
+  // Tạo schema validation dựa trên các trường trong form template
+  useEffect(() => {
+    if (formTemplateData) {
+      const schemaFields: Record<string, any> = {}
 
-  const handleFieldChange = (key: string, value: any) => {
-    setFormValues(prev => ({
-      ...prev,
-      [key]: value
-    }))
+      formTemplateData.sections.forEach(section => {
+        section.fields.forEach(field => {
+          const extendedField = field as ExtendedFieldType
 
-    // Xóa lỗi khi người dùng nhập lại
-    if (errors[key]) {
-      setErrors(prev => {
-        const newErrors = { ...prev }
+          // Tạo validation rules dựa trên loại trường và các thuộc tính validation
+          let fieldSchema: any = v.string()
 
-        delete newErrors[key]
+          // Thêm validation cho trường bắt buộc
+          if (field.required) {
+            fieldSchema = v.pipe(fieldSchema, v.nonEmpty(`${field.label} là trường bắt buộc`))
+          }
 
-        return newErrors
+          // Thêm validation dựa trên loại trường
+          switch (field.type) {
+            case 'text':
+            case 'shortText':
+            case 'longText':
+            case 'textarea':
+              if (extendedField.minLength) {
+                fieldSchema = v.pipe(
+                  fieldSchema,
+                  v.minLength(
+                    extendedField.minLength,
+                    `${field.label} phải có ít nhất ${extendedField.minLength} ký tự`
+                  )
+                )
+              }
+
+              if (extendedField.maxLength) {
+                fieldSchema = v.pipe(
+                  fieldSchema,
+                  v.maxLength(
+                    extendedField.maxLength,
+                    `${field.label} không được vượt quá ${extendedField.maxLength} ký tự`
+                  )
+                )
+              }
+
+              break
+            case 'number':
+              fieldSchema = v.pipe(v.number('Vui lòng nhập vào số'), v.transform(Number))
+
+              if (extendedField.min !== undefined) {
+                fieldSchema = v.pipe(
+                  fieldSchema,
+                  v.minValue(extendedField.min, `${field.label} phải lớn hơn hoặc bằng ${extendedField.min}`)
+                )
+              }
+
+              if (extendedField.max !== undefined) {
+                fieldSchema = v.pipe(
+                  fieldSchema,
+                  v.maxValue(extendedField.max, `${field.label} phải nhỏ hơn hoặc bằng ${extendedField.max}`)
+                )
+              }
+
+              break
+            case 'array':
+              fieldSchema = v.array(v.string())
+
+              if (field.required) {
+                fieldSchema = v.pipe(fieldSchema, v.nonEmpty(`${field.label} là trường bắt buộc`))
+              }
+
+              break
+            case 'signature':
+              fieldSchema = v.object({
+                name: field.required ? v.pipe(v.string(), v.nonEmpty(`${field.label} là trường bắt buộc`)) : v.string(),
+                image: v.optional(v.nullable(v.string(), null))
+              })
+              break
+            case 'checkbox':
+              fieldSchema = v.boolean()
+              break
+            default:
+              // Mặc định là string
+              break
+          }
+
+          schemaFields[field.key] = fieldSchema
+        })
       })
+
+      setValidationSchema(v.object(schemaFields))
     }
-  }
+  }, [formTemplateData])
 
-  // Xử lý đặc biệt cho trường chữ ký
-  const handleSignatureChange = (key: string, name: string) => {
-    setFormValues(prev => ({
-      ...prev,
-      [key]: {
-        name: name,
-        image: null
+  // Khởi tạo form với react-hook-form
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+    reset
+  } = useForm<FormValues>({
+    mode: 'all',
+    resolver: validationSchema ? valibotResolver(validationSchema) : undefined,
+    defaultValues: {}
+  })
+
+  // Reset form khi đóng modal
+  useEffect(() => {
+    if (!open) {
+      reset()
+      setActiveStep(0)
+
+      if (sigCanvas.current) {
+        sigCanvas.current.clear()
       }
-    }))
-
-    if (errors[key]) {
-      setErrors(prev => {
-        const newErrors = { ...prev }
-
-        delete newErrors[key]
-
-        return newErrors
-      })
     }
-  }
-
-  // Hàm xử lý thay đổi trường trong mảng
-  const handleArrayFieldChange = (arrayKey: string, index: number, value: any) => {
-    setFormValues(prev => {
-      const arrayValues = [...(prev[arrayKey] || [])]
-
-      arrayValues[index] = value
-
-      return {
-        ...prev,
-        [arrayKey]: arrayValues
-      }
-    })
-  }
-
-  // Thêm mục mới vào mảng
-  const handleAddArrayItem = (arrayKey: string) => {
-    setFormValues(prev => {
-      const arrayValues = [...(prev[arrayKey] || [])]
-
-      arrayValues.push('')
-
-      return {
-        ...prev,
-        [arrayKey]: arrayValues
-      }
-    })
-  }
-
-  // Xóa mục khỏi mảng
-  const handleRemoveArrayItem = (arrayKey: string, index: number) => {
-    setFormValues(prev => {
-      const arrayValues = [...(prev[arrayKey] || [])]
-
-      arrayValues.splice(index, 1)
-
-      return {
-        ...prev,
-        [arrayKey]: arrayValues
-      }
-    })
-  }
+  }, [open, reset])
 
   // Xử lý trước khi gửi form - đảm bảo các trường chữ ký có định dạng đúng
-  const prepareFormDataBeforeSubmit = () => {
-    const formData = { ...formValues }
+  const prepareFormDataBeforeSubmit = (data: any) => {
+    const formData = { ...data }
 
     // Kiểm tra và đảm bảo tất cả các trường signature có định dạng đúng
     formTemplateData?.sections.forEach(section => {
@@ -157,10 +234,7 @@ export default function CreateFormModal(props: CreateFormModalProps) {
             }
           }
         } else if (field.type === 'array') {
-          // Nếu là mảng thì sẽ chuyển thành chuỗi và phân tách bởi dấu phẩy
-          if (Array.isArray(formData[field.key])) {
-            formData[field.key] = formData[field.key].join(',')
-          }
+          formData[field.key] = formData[field.key].map((item: string) => item.trim())
         }
       })
     })
@@ -168,34 +242,87 @@ export default function CreateFormModal(props: CreateFormModalProps) {
     return formData
   }
 
-  const handleSubmit = async () => {
-    // if (!validateForm()) return
+  const handleNextStep = async (data: FormValues) => {
+    const formDataPrepared = prepareFormDataBeforeSubmit(data)
+
+    setFormData(formDataPrepared)
+    setActiveStep(1)
+  }
+
+  const handleBack = () => {
+    setActiveStep(0)
+  }
+
+  const handleClear = () => {
+    if (sigCanvas.current) {
+      sigCanvas.current.clear()
+    }
+  }
+
+  const onSubmit = async () => {
+    if (!formData) {
+      return toast.error('Vui lòng điền thông tin đơn trước', { autoClose: 3000 })
+    }
+
+    if (!sigCanvas.current || sigCanvas.current.isEmpty()) {
+      return toast.error('Chữ ký không được để trống', { autoClose: 3000 })
+    }
 
     setIsSubmitting(true)
 
-    const formDataPrepared = prepareFormDataBeforeSubmit()
-
-    const data = {
-      templateId: formTemplateData?._id,
-      responses: formDataPrepared
-    }
-
     const toastID = toast.loading('Đang tạo đơn...')
 
+    // Tạo đơn trước
     await formInstanceService.createForm(
       idProcess,
-      data,
-      () => {
+      {
+        templateId: formTemplateData?._id,
+        responses: formData
+      },
+      async res => {
         toast.update(toastID, {
-          render: 'Đã tạo đơn thành công',
+          render: 'Đã tạo đơn thành công, đang ký tên...',
           type: 'success',
-          isLoading: false,
-          autoClose: 3000
+          isLoading: true,
+          autoClose: 2000
         })
 
-        mutate()
-        setIsSubmitting(false)
-        onClose()
+        // Sau khi tạo đơn thành công, thêm chữ ký
+        const dataUrl = sigCanvas.current?.toDataURL('image/png')
+
+        if (dataUrl) {
+          const blob = await (await fetch(dataUrl)).blob()
+          const file = new File([blob], 'signature.png', { type: 'image/png' })
+          const formData = new FormData()
+
+          formData.append('insertSignature', file)
+          formData.append('keyInsert', 'applicantSignature')
+
+          await formInstanceService.inSertSignature(
+            res._id,
+            formData,
+            () => {
+              toast.update(toastID, {
+                render: 'Đã tạo đơn và ký tên thành công',
+                type: 'success',
+                isLoading: false,
+                autoClose: 3000
+              })
+              mutate()
+              setIsSubmitting(false)
+              onClose()
+            },
+            error => {
+              toast.update(toastID, {
+                render: error.message || 'Không thể ký tên',
+                type: 'error',
+                isLoading: false,
+                autoClose: 3000
+              })
+              setIsSubmitting(false)
+            }
+          )
+        }
       },
       error => {
         toast.update(toastID, {
@@ -204,241 +331,407 @@ export default function CreateFormModal(props: CreateFormModalProps) {
           isLoading: false,
           autoClose: 3000
         })
-
         setIsSubmitting(false)
       }
     )
   }
 
   const renderField = (field: FieldType) => {
-    // Bỏ qua các trường có kiểu là signature
-
     switch (field.type) {
       case 'text':
       case 'email':
+        return (
+          <Controller
+            key={field.key}
+            name={field.key}
+            control={control}
+            defaultValue=''
+            render={({ field: { onChange, value } }) => (
+              <CustomTextField
+                fullWidth
+                id={field.key}
+                name={field.key}
+                label={field.label}
+                type={field.type}
+                value={(value as string) || ''}
+                onChange={onChange}
+                {...((errors as any)[field.key] && { error: true, helperText: (errors as any)[field.key].message })}
+                required={field.required}
+                margin='normal'
+                size='small'
+              />
+            )}
+          />
+        )
       case 'number':
         return (
-          <TextField
+          <Controller
             key={field.key}
-            fullWidth
-            id={field.key}
             name={field.key}
-            label={field.label}
-            type={field.type}
-            value={formValues[field.key] || ''}
-            onChange={e => handleFieldChange(field.key, e.target.value)}
-            error={!!errors[field.key]}
-            helperText={errors[field.key]}
-            required={field.required}
-            margin='normal'
-            size='small'
+            control={control}
+            defaultValue={0}
+            render={({ field: { onChange, value } }) => (
+              <CustomTextField
+                fullWidth
+                id={field.key}
+                name={field.key}
+                label={field.label}
+                type={field.type}
+                value={value === undefined || value === null ? '' : value}
+                onChange={e => onChange(e.target.value === '' ? null : Number(e.target.value))}
+                {...((errors as any)[field.key] && { error: true, helperText: (errors as any)[field.key].message })}
+                required={field.required}
+                margin='normal'
+                size='small'
+              />
+            )}
           />
         )
       case 'select':
         return (
-          <FormControl
+          <Controller
             key={field.key}
-            fullWidth
-            error={!!errors[field.key]}
-            required={field.required}
-            margin='normal'
-            size='small'
-          >
-            <InputLabel id={`${field.key}-label`}>{field.label}</InputLabel>
-            <Select
-              labelId={`${field.key}-label`}
-              id={field.key}
-              value={formValues[field.key] || ''}
-              label={field.label}
-              onChange={e => handleFieldChange(field.key, e.target.value)}
-            >
-              <MenuItem value=''>
-                <em>Chọn</em>
-              </MenuItem>
-              {/* Nơi này có thể được cập nhật với các tùy chọn thực tế khi có dữ liệu */}
-              <MenuItem value='option1'>Tùy chọn 1</MenuItem>
-              <MenuItem value='option2'>Tùy chọn 2</MenuItem>
-              <MenuItem value='option3'>Tùy chọn 3</MenuItem>
-            </Select>
-            {errors[field.key] && <FormHelperText>{errors[field.key]}</FormHelperText>}
-          </FormControl>
+            name={field.key}
+            control={control}
+            defaultValue=''
+            render={({ field: { onChange, value } }) => (
+              <FormControl
+                fullWidth
+                error={!!(errors as any)[field.key]}
+                required={field.required}
+                margin='normal'
+                size='small'
+              >
+                <InputLabel id={`${field.key}-label`}>{field.label}</InputLabel>
+                <Select
+                  labelId={`${field.key}-label`}
+                  id={field.key}
+                  value={(value as string) || ''}
+                  label={field.label}
+                  onChange={onChange}
+                >
+                  <MenuItem value=''>
+                    <em>Chọn</em>
+                  </MenuItem>
+                  {/* Nơi này có thể được cập nhật với các tùy chọn thực tế khi có dữ liệu */}
+                  <MenuItem value='option1'>Tùy chọn 1</MenuItem>
+                  <MenuItem value='option2'>Tùy chọn 2</MenuItem>
+                  <MenuItem value='option3'>Tùy chọn 3</MenuItem>
+                </Select>
+                {(errors as any)[field.key] && <FormHelperText>{(errors as any)[field.key].message}</FormHelperText>}
+              </FormControl>
+            )}
+          />
         )
       case 'textarea':
         return (
-          <TextField
+          <Controller
             key={field.key}
-            fullWidth
-            id={field.key}
             name={field.key}
-            label={field.label}
-            multiline
-            rows={4}
-            value={formValues[field.key] || ''}
-            onChange={e => handleFieldChange(field.key, e.target.value)}
-            error={!!errors[field.key]}
-            helperText={errors[field.key]}
-            required={field.required}
-            margin='normal'
-            size='small'
+            control={control}
+            defaultValue=''
+            render={({ field: { onChange, value } }) => (
+              <TextField
+                fullWidth
+                id={field.key}
+                name={field.key}
+                label={field.label}
+                multiline
+                rows={4}
+                value={(value as string) || ''}
+                onChange={onChange}
+                error={!!(errors as any)[field.key]}
+                helperText={(errors as any)[field.key]?.message}
+                required={field.required}
+                margin='normal'
+                size='small'
+              />
+            )}
           />
         )
       case 'checkbox':
         return (
-          <FormControlLabel
+          <Controller
             key={field.key}
-            control={
-              <Checkbox
-                checked={formValues[field.key] || false}
-                onChange={e => handleFieldChange(field.key, e.target.checked)}
+            name={field.key}
+            control={control}
+            defaultValue={false}
+            render={({ field: { onChange, value } }) => (
+              <FormControlLabel
+                control={<Checkbox checked={(value as boolean) || false} onChange={onChange} />}
+                label={field.label}
               />
-            }
-            label={field.label}
+            )}
           />
         )
 
       case 'array':
-        const arrayValues = formValues[field.key] || []
-
         return (
-          <Box key={field.key} sx={{ width: '100%' }}>
-            <Typography variant='subtitle2' sx={{ mb: 1 }}>
-              {field.label}
-              {field.required && (
-                <Box component='span' sx={{ color: 'error.main' }}>
-                  {' '}
-                  *
-                </Box>
-              )}
-            </Typography>
+          <Controller
+            key={field.key}
+            name={field.key}
+            control={control}
+            defaultValue={[]}
+            render={({ field: { onChange, value } }) => {
+              const arrayValues = (value as string[]) || []
 
-            {arrayValues.length > 0 ? (
-              <Paper variant='outlined' sx={{ p: 2, mb: 2 }}>
-                {arrayValues.map((value: string, index: number) => (
-                  <Stack key={index} direction='row' spacing={2} sx={{ mb: 1 }}>
-                    <TextField
-                      fullWidth
+              return (
+                <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+                  <Typography variant='subtitle2' sx={{ mb: 1, width: '100%' }}>
+                    {field.label}
+                    {field.required && (
+                      <Box component='span' sx={{ color: 'error.main' }}>
+                        {' '}
+                        *
+                      </Box>
+                    )}
+                  </Typography>
+
+                  {arrayValues.length > 0 ? (
+                    <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+                      {arrayValues.map((item: string, index: number) => (
+                        <Box key={index} sx={{ width: '100%', p: 2, mb: 2 }}>
+                          <TextField
+                            fullWidth
+                            size='small'
+                            multiline
+                            rows={6}
+                            value={item}
+                            onChange={e => {
+                              const newArray = [...arrayValues]
+
+                              newArray[index] = e.target.value
+                              onChange(newArray)
+                              setValue(field.key, newArray)
+                            }}
+                            placeholder={`Mục ${index + 1}`}
+                          />
+                          <IconButton
+                            color='error'
+                            onClick={() => {
+                              const newArray = [...arrayValues]
+
+                              newArray.splice(index, 1)
+                              onChange(newArray)
+                            }}
+                            size='small'
+                            sx={{ ml: 'auto' }}
+                          >
+                            <Iconify icon='mdi:delete' />
+                          </IconButton>
+                        </Box>
+                      ))}
+                      <Tooltip title='Thêm mục'>
+                        <CustomIconButton
+                          onClick={() => {
+                            const newArray = [...arrayValues, '']
+
+                            onChange(newArray)
+                          }}
+                          variant='contained'
+                          size='small'
+                          sx={{ mb: 2, width: '100%', display: arrayValues.length > 1 ? 'none' : 'block' }}
+                        >
+                          <Iconify icon='mdi:plus' />
+                        </CustomIconButton>
+                      </Tooltip>
+                    </Box>
+                  ) : (errors as any)[field.key] ? (
+                    <Typography color='error.main' variant='caption' sx={{ mb: 1, display: 'block', width: '100%' }}>
+                      {(errors as any)[field.key].message}
+                    </Typography>
+                  ) : null}
+                  {arrayValues.length < 1 && (
+                    <Button
+                      startIcon={<Iconify icon='mdi:plus' />}
+                      onClick={() => {
+                        const newArray = [...arrayValues, '']
+
+                        onChange(newArray)
+                      }}
+                      variant='outlined'
                       size='small'
-                      multiline
-                      rows={4}
-                      value={value}
-                      onChange={e => handleArrayFieldChange(field.key, index, e.target.value)}
-                      placeholder={`Mục ${index + 1}`}
-                    />
-                    <IconButton color='error' onClick={() => handleRemoveArrayItem(field.key, index)} size='small'>
-                      <Iconify icon='mdi:delete' />
-                    </IconButton>
-                  </Stack>
-                ))}
-              </Paper>
-            ) : errors[field.key] ? (
-              <Typography color='error.main' variant='caption' sx={{ mb: 1, display: 'block' }}>
-                {errors[field.key]}
-              </Typography>
-            ) : null}
-
-            <Button
-              startIcon={<Iconify icon='mdi:plus' />}
-              onClick={() => handleAddArrayItem(field.key)}
-              variant='outlined'
-              size='small'
-              sx={{ mb: 2 }}
-            >
-              Thêm {field.label.toLowerCase()}
-            </Button>
-          </Box>
+                      sx={{ mb: 2, width: '100%' }}
+                    >
+                      Thêm {field.label.toLowerCase()}
+                    </Button>
+                  )}
+                </Box>
+              )
+            }}
+          />
         )
       case 'signature':
         return (
-          <Box key={field.key} sx={{ mt: 2, mb: 2, width: '100%' }}>
-            <Typography variant='subtitle2' gutterBottom>
-              {field.label}
-              {field.required && (
-                <Box component='span' sx={{ color: 'error.main' }}>
-                  {' '}
-                  *
+          <Controller
+            key={field.key}
+            name={field.key}
+            control={control}
+            defaultValue={{ name: '', image: null }}
+            render={({ field: { onChange, value } }) => {
+              const signatureValue = value as { name: string; image: string | null }
+
+              return (
+                <Box sx={{ mt: 2, mb: 2, width: '100%' }}>
+                  <Typography variant='subtitle2' gutterBottom>
+                    {field.label}
+                    {field.required && (
+                      <Box component='span' sx={{ color: 'error.main' }}>
+                        {' '}
+                        *
+                      </Box>
+                    )}
+                  </Typography>
+                  <Paper variant='outlined' sx={{ p: 2 }}>
+                    <Typography variant='body2' color='text.secondary' gutterBottom>
+                      Nhập tên người ký
+                    </Typography>
+                    <CustomTextField
+                      fullWidth
+                      size='small'
+                      placeholder='Nhập tên người ký'
+                      value={signatureValue?.name || ''}
+                      onChange={e => {
+                        onChange({ ...signatureValue, name: e.target.value })
+                      }}
+                      error={!!(errors as any)[field.key]}
+                      helperText={(errors as any)[field.key]?.name?.message}
+                      sx={{ mb: 1 }}
+                    />
+                    <Typography variant='caption' color='text.secondary'>
+                      Chữ ký điện tử sẽ được thêm sau khi gửi đơn
+                    </Typography>
+                  </Paper>
                 </Box>
-              )}
-            </Typography>
-            <Paper variant='outlined' sx={{ p: 2 }}>
-              <Typography variant='body2' color='text.secondary' gutterBottom>
-                Nhập tên người ký
-              </Typography>
-              <TextField
-                fullWidth
-                size='small'
-                placeholder='Nhập tên người ký'
-                value={formValues[field.key]?.name || ''}
-                onChange={e => handleSignatureChange(field.key, e.target.value)}
-                error={!!errors[field.key]}
-                helperText={errors[field.key]}
-                sx={{ mb: 1 }}
-              />
-              <Typography variant='caption' color='text.secondary'>
-                Chữ ký điện tử sẽ được thêm sau khi gửi đơn
-              </Typography>
-            </Paper>
-          </Box>
+              )
+            }}
+          />
         )
       default:
         return (
-          <TextField
+          <Controller
             key={field.key}
-            fullWidth
-            id={field.key}
             name={field.key}
-            label={field.label}
-            value={formValues[field.key] || ''}
-            onChange={e => handleFieldChange(field.key, e.target.value)}
-            error={!!errors[field.key]}
-            helperText={errors[field.key]}
-            required={field.required}
-            margin='normal'
-            size='small'
+            control={control}
+            defaultValue=''
+            render={({ field: { onChange, value } }) => (
+              <TextField
+                fullWidth
+                id={field.key}
+                name={field.key}
+                label={field.label}
+                value={(value as string) || ''}
+                onChange={onChange}
+                error={!!(errors as any)[field.key]}
+                helperText={(errors as any)[field.key]?.message}
+                required={field.required}
+                margin='normal'
+                size='small'
+              />
+            )}
           />
         )
     }
   }
 
-  return (
-    <CustomDialog open={open} onClose={onClose} title={formTemplateData?.title || 'Tạo đơn'} closeOutside maxWidth='md'>
-      <Box sx={{ p: 2 }}>
-        {formTemplateData ? (
-          <>
-            <Typography variant='body2' color='text.secondary' gutterBottom>
-              {formTemplateData.description}
-            </Typography>
-
-            <Divider sx={{ my: 2 }} />
-
-            <Box component='form' noValidate autoComplete='off'>
-              {formTemplateData.sections.map(section => (
-                <Box key={section._id}>
-                  <Grid container>
-                    {section.fields.map(field => (
-                      <Grid item xs={12} key={field._id}>
-                        {renderField(field)}
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Box>
-              ))}
-
-              <Stack direction='row' spacing={2} justifyContent='flex-end' sx={{ mt: 3 }}>
-                <Button variant='outlined' onClick={onClose} disabled={isSubmitting}>
-                  Hủy
-                </Button>
-                <Button variant='contained' onClick={handleSubmit} disabled={isSubmitting}>
-                  {isSubmitting ? 'Đang gửi...' : 'Gửi đơn'}
-                </Button>
-              </Stack>
-            </Box>
-          </>
-        ) : (
-          <Box sx={{ textAlign: 'center', py: 3 }}>
-            <Typography>Đang tải thông tin đơn...</Typography>
-          </Box>
-        )}
+  const renderSignatureStep = () => {
+    return (
+      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Typography variant='h6' gutterBottom>
+          Ký tên
+        </Typography>
+        <Typography variant='body2' color='text.secondary' gutterBottom>
+          Vui lòng ký tên vào ô bên dưới
+        </Typography>
+        <Box sx={{ my: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <SignatureCanvas
+            ref={sigCanvas}
+            penColor='black'
+            minWidth={2}
+            canvasProps={{
+              width: 300,
+              height: 150,
+              className: 'sigCanvas border border-black border-dashed'
+            }}
+          />
+        </Box>
+        <Button variant='outlined' color='error' sx={{ mb: 2 }} onClick={handleClear} disabled={isSubmitting}>
+          Xóa chữ ký
+        </Button>
       </Box>
+    )
+  }
+
+  return (
+    <CustomDialog
+      open={open}
+      onClose={onClose}
+      title={formTemplateData?.title || 'Tạo đơn'}
+      closeOutside
+      maxWidth='md'
+      actions={
+        <Stack direction='row' spacing={2} justifyContent='flex-end' sx={{ mt: 3 }}>
+          {activeStep > 0 && (
+            <Button variant='outlined' onClick={handleBack} disabled={isSubmitting}>
+              Quay lại
+            </Button>
+          )}
+          <Button variant='outlined' onClick={onClose} disabled={isSubmitting}>
+            Hủy
+          </Button>
+          {activeStep === 0 ? (
+            <Button variant='contained' onClick={handleSubmit(handleNextStep)} disabled={isSubmitting}>
+              Tiếp theo
+            </Button>
+          ) : (
+            <Button variant='contained' onClick={onSubmit} disabled={isSubmitting}>
+              {isSubmitting ? 'Đang gửi...' : 'Gửi đơn'}
+            </Button>
+          )}
+        </Stack>
+      }
+    >
+      <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 3 }}>
+        {steps.map(label => (
+          <Step key={label}>
+            <StepLabel>{label}</StepLabel>
+          </Step>
+        ))}
+      </Stepper>
+
+      {activeStep === 0 ? (
+        <Box sx={{ p: 2 }}>
+          {formTemplateData ? (
+            <>
+              <Typography variant='body2' color='text.secondary' gutterBottom>
+                {formTemplateData.description}
+              </Typography>
+
+              <Divider sx={{ my: 2 }} />
+
+              <Box component='form' noValidate autoComplete='off'>
+                {formTemplateData.sections.map(section => (
+                  <Box key={section._id}>
+                    <Grid container>
+                      {section.fields.map(field => (
+                        <Grid item xs={12} key={field._id}>
+                          {renderField(field)}
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </Box>
+                ))}
+              </Box>
+            </>
+          ) : (
+            <Box sx={{ textAlign: 'center', py: 3 }}>
+              <Typography>Đang tải thông tin đơn...</Typography>
+            </Box>
+          )}
+        </Box>
+      ) : (
+        renderSignatureStep()
+      )}
     </CustomDialog>
   )
 }

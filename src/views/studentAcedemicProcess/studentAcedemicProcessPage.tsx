@@ -20,17 +20,21 @@ import {
 
 import useSWR from 'swr'
 
+import { toast } from 'react-toastify'
+
 import studentAcedemicProcessService from '@/services/studentAcedemicProcess.service'
 import PageHeader from '@/components/page-header'
 import CustomIconButton from '@/@core/components/mui/IconButton'
 import Iconify from '@/components/iconify'
 import type { ProcessingType } from '@/types/management/learnProcessType'
-import StudentViewDetailCommitmentForm from './studentViewDetailCommitmentForm'
+
+// import StudentViewDetailCommitmentForm from './studentViewDetailCommitmentForm'
 import AddCommitmentFormProcess from './addCommitmentFormProcess'
 import CreateFormModal from '../form-instance/CreateFormModal'
 import formInstanceService from '@/services/formInstance.service'
 import type { FormInstanceType } from '@/types/management/formInstanceType'
-import FormInstancePDF from '../learnProcess/viewAcedemicProcess/FormInstancePDF'
+import FormInstancePDF from '../form-instance/FormInstancePDF'
+import DeleteFormModal from '../form-instance/DeleteFormModal'
 
 export default function StudentAcedemicProcessPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null)
@@ -40,6 +44,7 @@ export default function StudentAcedemicProcessPage() {
   const [formInstance, setFormInstance] = useState<FormInstanceType | null>(null)
   const [openFormViewer, setOpenFormViewer] = useState(false)
   const [student, setStudent] = useState<ProcessingType | null>(null)
+  const [openDeleteFormModal, setOpenDeleteFormModal] = useState(false)
 
   const {
     data: studentData,
@@ -139,6 +144,11 @@ export default function StudentAcedemicProcessPage() {
     [setOpenCreateFormModal, setFormTemplateId, setProcessId]
   )
 
+  const handleOpenDeleteFormModal = useCallback((id: string) => {
+    setOpenDeleteFormModal(true)
+    setFormTemplateId(id)
+  }, [])
+
   const handleViewDetailForm = useCallback(async (id: string, student: ProcessingType) => {
     const formDetail = await formInstanceService.getFormDetail_Student(id)
 
@@ -146,6 +156,34 @@ export default function StudentAcedemicProcessPage() {
     setOpenFormViewer(true)
     setStudent(student)
   }, [])
+
+  const handleDeleteForm = useCallback(
+    async (id: string) => {
+      const toastID = toast.loading('Đang xóa đơn...')
+
+      await formInstanceService.deleleForm(
+        id,
+        () => {
+          toast.update(toastID, {
+            render: 'Đã xóa đơn thành công',
+            type: 'success',
+            isLoading: false,
+            autoClose: 3000
+          })
+          mutate()
+        },
+        () => {
+          toast.update(toastID, {
+            render: 'Đã xóa đơn thất bại',
+            type: 'error',
+            isLoading: false,
+            autoClose: 3000
+          })
+        }
+      )
+    },
+    [mutate]
+  )
 
   const handleCloseFormViewer = useCallback(() => {
     setOpenFormViewer(false)
@@ -455,7 +493,7 @@ export default function StudentAcedemicProcessPage() {
                             <Grid item xs={6}>
                               <Typography variant='body2'>
                                 <Box component='span' sx={{ fontWeight: 'bold' }}>
-                                  SĐT Lớp trưởng:{' '}
+                                  SĐTLH:{' '}
                                 </Box>
                                 {student.sdtlh || '-'}
                               </Typography>
@@ -497,7 +535,7 @@ export default function StudentAcedemicProcessPage() {
       )}
 
       <AddCommitmentFormProcess mutate={mutate} />
-      <StudentViewDetailCommitmentForm />
+      {/* <StudentViewDetailCommitmentForm /> */}
       <CreateFormModal
         id={formTemplateId || ''}
         idProcess={processId || ''}
@@ -512,8 +550,17 @@ export default function StudentAcedemicProcessPage() {
           open={openFormViewer}
           onClose={handleCloseFormViewer}
           nameOfForm={student?.lastName + ' ' + student?.firstName}
+          isStudent
+          onDelete={() => handleOpenDeleteFormModal(formInstance._id)}
         />
       )}
+      <DeleteFormModal
+        open={openDeleteFormModal}
+        onClose={() => setOpenDeleteFormModal(false)}
+        onDelete={() => handleDeleteForm(formInstance?._id || '')}
+        title='Xóa đơn'
+        description='Bạn có chắc chắn muốn xóa đơn này không?'
+      />
     </>
   )
 }

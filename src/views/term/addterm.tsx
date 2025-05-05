@@ -230,6 +230,7 @@ export default function AddTerm(props: AddTermProps) {
                       showMonthDropdown
                       minDate={minDate}
                       maxDate={maxDate}
+                      popperPlacement='top'
                       placeholderText='Ngày bắt đầu'
                       disabled={!academicYear}
                       customInput={
@@ -279,6 +280,7 @@ export default function AddTerm(props: AddTermProps) {
                       showMonthDropdown
                       minDate={minDate}
                       maxDate={maxDate}
+                      popperPlacement='top'
                       placeholderText='Ngày kết thúc'
                       disabled={!academicYear}
                       customInput={

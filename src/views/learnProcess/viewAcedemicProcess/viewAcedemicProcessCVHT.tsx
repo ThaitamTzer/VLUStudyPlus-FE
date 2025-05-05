@@ -25,7 +25,6 @@ import DebouncedInput from '@/components/debouncedInput'
 import TablePaginationCustomNoURL from '@/components/table/TablePaginationNoURL'
 import { useShare } from '@/hooks/useShare'
 import { NotificantionAction } from './notificationAction'
-import SendMailModalRemindCommitment from './sendMailModalRemindCommitment'
 
 const TableFilter = dynamic(() => import('./tableFilter'), { ssr: false })
 const TableAcedemicProcess = dynamic(() => import('./tableAcedemicProcess'), { ssr: false })
@@ -35,15 +34,12 @@ const ManualAddAcedemicProcess = dynamic(() => import('../manualAddAcedemicProce
 // const ViewDetailAcedecmicProcess = dynamic(() => import('./viewDetailAcedemicProcess'), { ssr: false })
 
 const UpdateAcedemicProcessStatus = dynamic(() => import('../updateAcedemicProcessStatus'), { ssr: false })
-const SendMailModal = dynamic(() => import('./sendMailModal'), { ssr: false })
+
+// const SendMailModal = dynamic(() => import('./sendMailModal'), { ssr: false })
 const SendMailModalRemind = dynamic(() => import('./sendMailModalRemind'), { ssr: false })
 
-export default function ViewAcedemicProcess() {
+export default function ViewAcedemicProcessCVHT() {
   const {
-    openViewByCategory,
-    toogleViewByCategory,
-    session,
-    setSession,
     toogleManualAddFromViewByCate,
     openManualAddFromViewByCate,
     toogleEditViewAcedemicProcess,
@@ -53,17 +49,17 @@ export default function ViewAcedemicProcess() {
     processing,
     toogleViewDetailAcademicProcess,
     toogleUpdateAcedemicProcessStatus,
-    tooogleSendEmail,
     toogleSendEmailRemind,
-    toogleSendEmailRemindCommitment,
+    toogleViewByCategoryCVHT,
     sessionCVHT,
-    setSessionCVHT
+    setSessionCVHT,
+    openViewByCategoryCVHT,
+    toogleSendEmailRemindCommitment
   } = useAcedemicProcessStore()
 
   const { cohorOptions } = useShare()
 
-  const id = useMemo(() => session?._id || sessionCVHT?._id, [session, sessionCVHT])
-
+  const id = useMemo(() => sessionCVHT?._id, [sessionCVHT])
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
   const [filterField, setFilterField] = useState('')
@@ -73,10 +69,19 @@ export default function ViewAcedemicProcess() {
   const [searchKey, setSearchKey] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const fetcher = [`/api/acedemicProcess/${id}`, page, limit, filterField, filterValue, sortField, sortOrder, searchKey]
+  const fetcher = [
+    `/api/acedemicProcessCVHT/${id}`,
+    page,
+    limit,
+    filterField,
+    filterValue,
+    sortField,
+    sortOrder,
+    searchKey
+  ]
 
   const { data, isLoading, mutate } = useSWR(id ? fetcher : null, () =>
-    learnProcessService.viewProcessByCategory(
+    learnProcessService.viewProcessByCategoryCVHT(
       id as string,
       page,
       limit,
@@ -129,7 +134,7 @@ export default function ViewAcedemicProcess() {
   }, [processing, mutate, toogleDeleteViewAcedemicProcess, id])
 
   const handleClose = () => {
-    toogleViewByCategory()
+    toogleViewByCategoryCVHT()
     setPage(1)
     setLimit(10)
     setFilterField('')
@@ -137,13 +142,12 @@ export default function ViewAcedemicProcess() {
     setSortField('')
     setSortOrder('asc')
     setSearchKey('')
-    setSession(null)
     setSessionCVHT(null)
   }
 
   return (
     <>
-      <Dialog open={openViewByCategory} maxWidth='xl' onClose={handleClose} fullScreen>
+      <Dialog open={openViewByCategoryCVHT} maxWidth='xl' onClose={handleClose} fullScreen>
         <DialogTitle>
           <IconButton
             onClick={handleClose}
@@ -161,7 +165,7 @@ export default function ViewAcedemicProcess() {
               textTransform: 'uppercase'
             }}
           >
-            Danh sách {session?.title}
+            Danh sách {sessionCVHT?.title}
           </Typography>
         </DialogTitle>
         <DialogContent>
@@ -198,9 +202,8 @@ export default function ViewAcedemicProcess() {
                   className='max-sm:is-full sm:is-[300px]'
                 />
                 <NotificantionAction
-                  acedemicProcess={session}
+                  acedemicProcess={sessionCVHT}
                   data={data}
-                  tooogleSendEmail={tooogleSendEmail}
                   toogleSendEmailRemind={toogleSendEmailRemind}
                   toogleManualAddFromViewByCate={toogleManualAddFromViewByCate}
                   toogleSendEmailRemindCommitment={toogleSendEmailRemindCommitment}
@@ -250,9 +253,8 @@ export default function ViewAcedemicProcess() {
         onClose={toogleManualAddFromViewByCate}
         open={openManualAddFromViewByCate}
       />
-      <SendMailModal id={session?._id || ''} mutate={mutate} />
-      <SendMailModalRemind id={session?._id || ''} />
-      <SendMailModalRemindCommitment id={session?._id || sessionCVHT?._id || ''} />
+      {/* <SendMailModal id={sessionCVHT?._id || ''} mutate={mutate} /> */}
+      <SendMailModalRemind id={sessionCVHT?._id || ''} />
       <AlertDelete
         open={openDeleteViewAcedemicProcess}
         onClose={toogleDeleteViewAcedemicProcess}

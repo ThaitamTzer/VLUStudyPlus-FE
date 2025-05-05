@@ -189,7 +189,7 @@ export default function FormTemplatePage() {
       </Dialog>
 
       {/* Dialog form thêm/sửa: unmount nội dung khi đóng để reset formData */}
-      <Dialog open={openForm} onClose={onCloseForm} maxWidth='lg' fullWidth TransitionProps={{ unmountOnExit: true }}>
+      <Dialog open={openForm} maxWidth='lg' fullWidth TransitionProps={{ unmountOnExit: true }}>
         <FormTemplateForm
           key={memoizedSelectedTemplate?._id || (openForm ? 'new' + Date.now() : 'new')}
           template={memoizedSelectedTemplate}

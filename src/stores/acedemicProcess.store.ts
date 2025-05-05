@@ -25,9 +25,12 @@ type States = {
   openUpdateAcedemicProcessStatus: boolean
   openSendEmail: boolean
   openSendEmailRemind: boolean
+  openSendEmailRemindCommitment: boolean
   isProcessing: boolean
   isCompleted: boolean
   session: LearnProcessType | null
+  sessionCVHT: LearnProcessType | null
+  openViewByCategoryCVHT: boolean
 }
 
 type Actions = {
@@ -42,6 +45,7 @@ type Actions = {
   setDuplicateRows: (duplicateRows: MissingInfoRows[]) => void
   toogleManualAdd: () => void
   toogleViewByCategory: () => void
+  toogleViewByCategoryCVHT: () => void
   toogleViewDetail: () => void
   toogleManualAddFromViewByCate: () => void
   toogleProgress: () => void
@@ -54,9 +58,11 @@ type Actions = {
   toogleUpdateAcedemicProcessStatus: () => void
   tooogleSendEmail: () => void
   toogleSendEmailRemind: () => void
+  toogleSendEmailRemindCommitment: () => void
   setIsProcessing: (isProcessing: boolean) => void
   setIsCompleted: (isCompleted: boolean) => void
   setSession: (session: LearnProcessType | null) => void
+  setSessionCVHT: (sessionCVHT: LearnProcessType | null) => void
 }
 
 export const useAcedemicProcessStore = create<States & Actions>(set => ({
@@ -82,10 +88,14 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
   openUpdateAcedemicProcessStatus: false,
   openSendEmail: false,
   openSendEmailRemind: false,
+  openSendEmailRemindCommitment: false,
   isProcessing: false,
   isCompleted: false,
   session: null,
+  sessionCVHT: null,
+  openViewByCategoryCVHT: false,
   setSession: session => set({ session }),
+  setSessionCVHT: sessionCVHT => set({ sessionCVHT }),
   setIsProcessing: isProcessing => set({ isProcessing }),
   setIsCompleted: isCompleted => set({ isCompleted }),
   toogleSendEmailRemind: () => set(state => ({ openSendEmailRemind: !state.openSendEmailRemind })),
@@ -106,6 +116,7 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
   toogleImportResultModal: () => set(state => ({ openImportResultModal: !state.openImportResultModal })),
   toogleManualAdd: () => set(state => ({ openManualAdd: !state.openManualAdd })),
   toogleViewByCategory: () => set(state => ({ openViewByCategory: !state.openViewByCategory })),
+  toogleViewByCategoryCVHT: () => set(state => ({ openViewByCategoryCVHT: !state.openViewByCategoryCVHT })),
   toogleViewDetail: () => set(state => ({ openViewDetail: !state.openViewDetail })),
   toogleManualAddFromViewByCate: () =>
     set(state => ({ openManualAddFromViewByCate: !state.openManualAddFromViewByCate })),
@@ -115,5 +126,7 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
     set(state => ({ openEditViewAcedemicProcess: !state.openEditViewAcedemicProcess })),
   setProcessing: processing => set({ processing }),
   toogleDeleteViewAcedemicProcess: () =>
-    set(state => ({ openDeleteViewAcedemicProcess: !state.openDeleteViewAcedemicProcess }))
+    set(state => ({ openDeleteViewAcedemicProcess: !state.openDeleteViewAcedemicProcess })),
+  toogleSendEmailRemindCommitment: () =>
+    set(state => ({ openSendEmailRemindCommitment: !state.openSendEmailRemindCommitment }))
 }))

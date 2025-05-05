@@ -34,7 +34,8 @@ export default function ClassListFilter({
   const {
     toogleOpenEditClassfilterModal,
     toogleOpenDeleteClassfilterModal,
-    toogleOpenViewDetailfilterModal,
+
+    // toogleOpenViewDetailfilterModal,
     setClassFilter
   } = useClassStore()
 
@@ -77,7 +78,7 @@ export default function ClassListFilter({
                 <TableCell size='small'>{lecturer.lectureId.classes.map(c => c.classId).join(', ')}</TableCell>
                 <TableCell width={1} size='small'>
                   <RowAction>
-                    <MenuItem
+                    {/* <MenuItem
                       onClick={() => {
                         setClassFilter(lecturer)
                         toogleOpenViewDetailfilterModal()
@@ -85,7 +86,7 @@ export default function ClassListFilter({
                     >
                       <Iconify icon='solar:eye-linear' className='mr-2' />
                       Xem chi tiết
-                    </MenuItem>
+                    </MenuItem> */}
                     <MenuItem
                       onClick={() => {
                         setClassFilter(lecturer)

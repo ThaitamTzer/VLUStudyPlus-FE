@@ -214,6 +214,36 @@ const learnProcessService = {
     return res.data as ListProcessingType
   },
 
+  viewProcessByCategoryCVHT: async (
+    id: string,
+    page?: number,
+    limit?: number,
+    filterField?: string,
+    filterValue?: string,
+    sortField?: string,
+    sortOrder?: string,
+    searchKey?: string
+  ) => {
+    const params = {
+      ...(page && { page }),
+      ...(limit && { limit }),
+      ...(filterField && { filterField }),
+      ...(filterValue && { filterValue }),
+      ...(sortField && { sortField }),
+      ...(sortOrder && { sortOrder }),
+      ...(searchKey && { searchKey })
+    }
+
+    const res = await axiosClient.get(
+      `/api/academic-processing/view-list-academicProcessing-of-category-CVHT?id=${id}`,
+      {
+        params
+      }
+    )
+
+    return res.data as ListProcessingType
+  },
+
   viewDetailProcess: async (id: string) => {
     const res = await axiosClient.get(`/api/academic-processing/view-academicProcessing/${id}`)
 

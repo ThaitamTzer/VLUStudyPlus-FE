@@ -63,18 +63,18 @@ export default function ManualAddClass({ mutate }: ManualAddClassProps) {
   const { cohorOptions } = useShare()
 
   useEffect(() => {
-    if (lecturersData?.lecturers) {
+    if (!lecturersData?.lecturers) return
+
+    setLecturers(prev => {
       const newLecturers = lecturersData.lecturers.filter(
-        newLecturer => !lecturers.some(existing => existing._id === newLecturer._id)
+        newLecturer => !prev.some(existing => existing._id === newLecturer._id)
       )
 
-      if (newLecturers.length > 0) {
-        setLecturers(prev => [...prev, ...newLecturers])
-      }
+      return newLecturers.length > 0 ? [...prev, ...newLecturers] : prev
+    })
 
-      setTotalItems(lecturersData.pagination.totalItems)
-    }
-  }, [lecturersData, lecturers])
+    setTotalItems(lecturersData.pagination.totalItems)
+  }, [lecturersData])
 
   const {
     control,
@@ -253,7 +253,12 @@ export default function ManualAddClass({ mutate }: ManualAddClassProps) {
                   const inputValue = e.target.value.replace(/^0+/, '')
 
                   // Chuyển đổi sang số (nếu chuỗi rỗng thì đặt thành 0 hoặc giá trị khác theo yêu cầu)
-                  const numericValue = inputValue === '' ? 0 : Number(inputValue)
+                  let numericValue = inputValue === '' ? 0 : Number(inputValue)
+
+                  // Không cho phép nhập số âm
+                  if (numericValue < 0) {
+                    numericValue = 0
+                  }
 
                   onChange(numericValue)
                 }}

@@ -23,7 +23,8 @@ import {
   Tooltip,
   Stepper,
   Step,
-  StepLabel
+  StepLabel,
+  Skeleton
 } from '@mui/material'
 
 import { toast } from 'react-toastify'
@@ -725,7 +726,8 @@ export default function CreateFormModal(props: CreateFormModalProps) {
             </>
           ) : (
             <Box sx={{ textAlign: 'center', py: 3 }}>
-              <Typography>Đang tải thông tin đơn...</Typography>
+              <Skeleton variant='text' width={210} height={40} sx={{ mb: 2 }} />
+              <Skeleton variant='rectangular' width='100%' height={118} />
             </Box>
           )}
         </Box>

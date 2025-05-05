@@ -171,6 +171,9 @@ export default function StudentAcedemicProcessPage() {
             autoClose: 3000
           })
           mutate()
+          setOpenDeleteFormModal(false)
+          setOpenFormViewer(false)
+          setFormInstance(null)
         },
         () => {
           toast.update(toastID, {

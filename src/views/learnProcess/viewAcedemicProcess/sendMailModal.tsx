@@ -25,8 +25,6 @@ export default function SendMailModal({ id, mutate }: { id: string; mutate: Keye
   )
 
   const onSendMail = async () => {
-    // send mail
-
     if (!id) return toast.error('Đã có lỗi xảy ra, vui lòng thử lại sau!')
 
     setLoading(true)
@@ -36,6 +34,7 @@ export default function SendMailModal({ id, mutate }: { id: string; mutate: Keye
     await mailService.sendMail(
       id,
       () => {
+        fetcher('/api/learnProcess')
         tooogleSendEmail()
         toast.update(toastId, {
           render: 'Gửi mail thành công',
@@ -44,13 +43,12 @@ export default function SendMailModal({ id, mutate }: { id: string; mutate: Keye
           autoClose: 2000
         })
         mutate()
-        fetcher('/api/learnProcess')
         setLoading(false)
       },
       err => {
         setLoading(false)
         toast.update(toastId, {
-          render: err.message,
+          render: err.message || 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
           type: 'error',
           isLoading: false,
           autoClose: 2000

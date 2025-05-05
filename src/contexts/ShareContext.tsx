@@ -2,7 +2,7 @@
 
 import { createContext, useState } from 'react'
 
-import { usePathname } from 'next/navigation'
+// import { usePathname } from 'next/navigation'
 
 import useSWR from 'swr'
 
@@ -100,7 +100,8 @@ type Props = {
 
 const ShareProvider = ({ children }: Props) => {
   const { user } = useAuth()
-  const pathName = usePathname()
+
+  // const pathName = usePathname()
 
   const [typeProcess, setProcessType] = useState<TypeProcessType[]>([])
   const [studentOptions, setStudentOptions] = useState<Student[]>([])
@@ -214,9 +215,9 @@ const ShareProvider = ({ children }: Props) => {
   return (
     <ShareContext.Provider value={value}>
       {children}
-      {pathName ? (
+      {/* {pathName ? (
         <script defer src='https://app.fastbots.ai/embed.js' data-bot-id='cm8pwtq9w09x3n8luvnk4dfe9'></script>
-      ) : null}
+      ) : null} */}
     </ShareContext.Provider>
   )
 }

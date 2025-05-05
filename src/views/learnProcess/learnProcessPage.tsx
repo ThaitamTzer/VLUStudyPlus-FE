@@ -45,6 +45,10 @@ const ImportResult = dynamic(() => import('./importResult'), { ssr: false })
 const ManualAddAcedemicProcess = dynamic(() => import('./manualAddAcedemicProcess'), { ssr: false })
 const ViewAcedemicProcess = dynamic(() => import('./viewAcedemicProcess/viewAcedemicProcess'), { ssr: false })
 
+const ViewAcedemicProcessCVHT = dynamic(() => import('./viewAcedemicProcess/viewAcedemicProcessCVHT'), {
+  ssr: false
+})
+
 // Component hiển thị ghi chú
 const NotesPanel = () => {
   return (
@@ -243,6 +247,8 @@ export default function LearnProcessPage() {
     isCompleted,
     isProcessing,
     setProgress,
+    setSession,
+    session,
     toogleImportResultModal
   } = useAcedemicProcessStore()
 
@@ -250,10 +256,11 @@ export default function LearnProcessPage() {
     revalidateOnFocus: false,
     onSuccess: data => {
       if (data) {
-        const found = data.find(item => item._id === acedemicProcess?._id)
+        const found = data.find(item => item._id === acedemicProcess?._id || session?._id)
 
         if (found) {
           setAcedemicProcess(found)
+          setSession(found)
         }
       }
     }
@@ -324,7 +331,7 @@ export default function LearnProcessPage() {
   const renderTable = useMemo(
     () => (
       <>
-        <TanstackTable table={table} loading={isLoading} minWidth={1100} />
+        <TanstackTable table={table} loading={isLoading} minWidth={1000} />
         <TablePagination
           component={() => <TablePaginationComponent table={table as Table<unknown>} />}
           count={table.getFilteredRowModel().rows.length}
@@ -382,6 +389,7 @@ export default function LearnProcessPage() {
       <ImportModal mutate={mutate} />
       <ImportResult />
       <ViewAcedemicProcess />
+      <ViewAcedemicProcessCVHT />
       <ViewCommitmentForms />
       <ViewCommitmentFormsOfCVHT />
       <ProgressModal

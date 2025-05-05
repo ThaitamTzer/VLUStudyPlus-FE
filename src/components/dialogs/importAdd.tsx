@@ -177,7 +177,7 @@ export default function ImportAdd(props: ImportAddProps) {
                 Hủy
               </Button>
               <LoadingButton loading={loading} variant='contained' color='success' onClick={onSubmit}>
-                Thêm
+                Import
               </LoadingButton>
               {checkFile && (
                 <Button variant='outlined' color='info' onClick={handleCheckFile}>

@@ -31,7 +31,7 @@ const SIGNATURE_TYPES = [
   { value: 'parentSignature', label: 'Xác nhận của phụ huynh SV' },
   { value: 'deanSignature', label: 'HIỆU TRƯỞNG VLU' },
   { value: 'deanSignatureVLU', label: 'HIỆU TRƯỞNG VLU' },
-  { value: 'cvhtSignature', label: 'CỐ VẤN HỌC TẬP' }
+  { value: 'cvhtSignature', label: 'Cố vấn học tập' }
 ]
 
 interface FormTemplateFormProps {

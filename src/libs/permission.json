@@ -561,7 +561,7 @@
   },
   {
     "id": 56,
-    "namePermission": "Xem tiến trình học vụ của tôi",
+    "namePermission": "Xem XLHT của SV",
     "action": "readmyprocess",
     "subject": "academic",
     "color": {

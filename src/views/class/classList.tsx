@@ -34,7 +34,8 @@ export default function ClassList({
   const {
     toogleOpenEditClassModal,
     toogleOpenDeleteClassModal,
-    toogleOpenViewDetailModal,
+
+    // toogleOpenViewDetailModal,
     setClass,
     toogleOpenViewListStudentModal
   } = useClassStore()
@@ -98,7 +99,7 @@ export default function ClassList({
                 <TableCell size='small'>{c.numberStudent}</TableCell>
                 <TableCell width={1} size='small'>
                   <RowAction>
-                    <MenuItem
+                    {/* <MenuItem
                       onClick={() => {
                         setClass(c)
                         toogleOpenViewDetailModal()
@@ -106,7 +107,7 @@ export default function ClassList({
                     >
                       <Iconify icon='solar:eye-linear' className='mr-2' />
                       Xem chi tiết
-                    </MenuItem>
+                    </MenuItem> */}
                     <MenuItem
                       onClick={() => {
                         setClass(c)

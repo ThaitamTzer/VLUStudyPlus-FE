@@ -7,6 +7,7 @@ import { IconButton, Tooltip } from '@mui/material'
 import type { LearnProcessType } from '@/types/management/learnProcessType'
 import Iconify from '@/components/iconify'
 import { useAcedemicProcessStore } from '@/stores/acedemicProcess.store'
+import { useAuth } from '@/hooks/useAuth'
 
 type AcedemicProcessWithAction = LearnProcessType & {
   stt?: number
@@ -22,8 +23,12 @@ export const useColumns = () => {
     toogleDeleteAcedemicProcess,
     toogleImportModal,
     toogleViewByCategory,
-    setSession
+    setSession,
+    toogleViewByCategoryCVHT,
+    setSessionCVHT
   } = useAcedemicProcessStore()
+
+  const { user } = useAuth()
 
   const handleOpenImport = useCallback(
     (acedemicProcess: LearnProcessType) => {
@@ -40,6 +45,16 @@ export const useColumns = () => {
     },
     [setSession, toogleViewByCategory]
   )
+
+  const handleOpenViewByCategoryCVHT = useCallback(
+    (sessionCVHT: LearnProcessType) => {
+      setSessionCVHT(sessionCVHT)
+      toogleViewByCategoryCVHT()
+    },
+    [setSessionCVHT, toogleViewByCategoryCVHT]
+  )
+
+  const isCVHT = user?.role?.name === 'CVHT'
 
   return useMemo<ColumnDef<AcedemicProcessWithAction, any>[]>(
     () => [
@@ -63,15 +78,27 @@ export const useColumns = () => {
         },
         cell: infor => (
           <>
-            <Tooltip title='Xem danh sách xử lý học tập' arrow>
-              <IconButton
-                onClick={() => {
-                  handleOpenViewByCategory(infor.row.original)
-                }}
-              >
-                <Iconify icon='mingcute:information-fill' color='#2092ec' />
-              </IconButton>
-            </Tooltip>
+            {!isCVHT ? (
+              <Tooltip title='Xem danh sách xử lý học tập' arrow>
+                <IconButton
+                  onClick={() => {
+                    handleOpenViewByCategory(infor.row.original)
+                  }}
+                >
+                  <Iconify icon='mingcute:information-fill' color='#2092ec' />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title='Xem danh sách xử lý học tập' arrow>
+                <IconButton
+                  onClick={() => {
+                    handleOpenViewByCategoryCVHT(infor.row.original)
+                  }}
+                >
+                  <Iconify icon='mingcute:information-fill' color='#2092ec' />
+                </IconButton>
+              </Tooltip>
+            )}
             <Tooltip title='Import danh sách xử lý học tập' arrow>
               <IconButton
                 onClick={() => {
@@ -111,7 +138,9 @@ export const useColumns = () => {
       handleOpenImport,
       setAcedemicProcess,
       toogleUpdateAcedemicProcess,
-      toogleDeleteAcedemicProcess
+      toogleDeleteAcedemicProcess,
+      isCVHT,
+      handleOpenViewByCategoryCVHT
     ]
   )
 }

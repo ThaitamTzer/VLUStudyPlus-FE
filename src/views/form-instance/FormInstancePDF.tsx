@@ -140,7 +140,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontStyle: 'italic',
     textAlign: 'center',
-    marginTop: 50,
     marginBottom: 5
   },
   dateText: {
@@ -153,10 +152,6 @@ const styles = StyleSheet.create({
 })
 
 const FormInstance = ({ data }: { data: FormInstanceType }) => {
-  // Debug dữ liệu
-  console.log('FormInstance received data:', data)
-  console.log('FormInstance responses:', data.responses)
-
   // Hàm nhóm các trường theo row
   const groupFieldsByRow = (fields: any[]) => {
     const rows: Record<number, any[]> = {}
@@ -213,6 +208,15 @@ const FormInstance = ({ data }: { data: FormInstanceType }) => {
   const signatureSections = data?.templateSnapshot?.sections?.filter(section =>
     section.fields.some(field => field.type === 'signature')
   )
+
+  const getDate = (data: any) => {
+    const date = new Date(data)
+    const day = date.getDate()
+    const month = date.getMonth() + 1
+    const year = date.getFullYear()
+
+    return `ngày ${day} tháng ${month} năm ${year}`
+  }
 
   return (
     <Document title={data?.templateSnapshot?.title}>
@@ -349,7 +353,17 @@ const FormInstance = ({ data }: { data: FormInstanceType }) => {
                               {fieldValue}
                             </Text>
                           )}
-
+                          {field.type === 'phone' && (
+                            <Text
+                              style={{
+                                marginLeft: 5,
+                                fontSize: 11,
+                                fontFamily: 'Times_new_roman'
+                              }}
+                            >
+                              {fieldValue}
+                            </Text>
+                          )}
                           {field.type === 'number' && (
                             <Text
                               style={{
@@ -377,7 +391,6 @@ const FormInstance = ({ data }: { data: FormInstanceType }) => {
                           {field.type === 'checkbox' && (
                             <Text
                               style={{
-                                marginLeft: 5,
                                 fontSize: 11,
                                 fontFamily: 'Times_new_roman'
                               }}
@@ -412,7 +425,7 @@ const FormInstance = ({ data }: { data: FormInstanceType }) => {
 
                                 return items.map((item, i) => (
                                   <View key={i} style={{ width: '50%', paddingRight: 10 }}>
-                                    <Text style={{ fontSize: 12, marginBottom: 4 }}>{item}</Text>
+                                    <Text style={{ fontSize: 11, marginBottom: 4 }}>{item}</Text>
                                   </View>
                                 ))
                               })()}
@@ -427,7 +440,7 @@ const FormInstance = ({ data }: { data: FormInstanceType }) => {
             ))}
 
           {/* Phần ngày tháng */}
-          <Text style={styles.dateText}>TP. Hồ Chí Minh, ngày ......... tháng ......... năm .........</Text>
+          <Text style={styles.dateText}>TP. Hồ Chí Minh, {getDate(data?.createdAt)}</Text>
 
           {/* Phần chữ ký */}
           <View
@@ -462,24 +475,24 @@ const FormInstance = ({ data }: { data: FormInstanceType }) => {
                       return (
                         <View key={fieldIndex} style={{ display: 'flex', flexDirection: 'column', width: '48%' }}>
                           <Text style={styles.signatureTitle}>{field.label}</Text>
-
                           {signatureValue ? (
-                            <Image
-                              src={signatureValue}
-                              style={{
-                                width: '40%',
-                                height: 'auto',
-                                maxHeight: 100,
-                                alignSelf: 'center',
-                                marginTop: 10,
-                                marginBottom: 10
-                              }}
-                            />
+                            <>
+                              <Image
+                                src={signatureValue}
+                                style={{
+                                  width: '40%',
+                                  alignSelf: 'center',
+                                  maxHeight: 50,
+                                  minHeight: 50
+                                }}
+                              />
+                            </>
                           ) : (
-                            <Text style={styles.signaturePlaceholder}>
-                              {signatureName ? `${signatureName}` : '(Ký và ghi rõ họ tên)'}
-                            </Text>
+                            <View style={{ height: 50 }}></View>
                           )}
+                          <Text style={styles.signaturePlaceholder}>
+                            {signatureName ? `${signatureName}` : '(Ký và ghi rõ họ tên)'}
+                          </Text>
                         </View>
                       )
                     })}

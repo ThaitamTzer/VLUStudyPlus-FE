@@ -65,7 +65,7 @@ export default function ViewListStudentByClass() {
   const id = classRoom?.classId || ''
 
   const { data, isLoading } = useSWR(
-    `/api/student/view-list-student-for-class/${id}`,
+    id ? `/api/student/view-list-student-for-class/${id}` : null,
     () => classService.getListStudentByClass(id),
     {
       revalidateOnMount: true
@@ -149,7 +149,7 @@ export default function ViewListStudentByClass() {
         maxWidth='lg'
         fullWidth
       >
-        <TanstackTable table={table} loading={isLoading} title='Không tìm thấy sinh viên nào' />
+        <TanstackTable minWidth={900} table={table} loading={isLoading} title='Không tìm thấy sinh viên nào' />
         <TablePagination
           component={() => <TablePaginationComponent table={table as Table<unknown>} />}
           count={table.getFilteredRowModel().rows.length}

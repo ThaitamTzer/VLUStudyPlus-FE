@@ -100,31 +100,6 @@ export default function TableFilter(props: TableFilterProps) {
             <MenuItem value='Đã làm đơn'>Đã làm đơn</MenuItem>
           </CustomTextField>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <CustomTextField
-            select
-            fullWidth
-            defaultValue=''
-            label='Lọc theo trạng thái làm đơn'
-            onChange={e => {
-              setFilterField('commitment')
-              setFilterValue(e.target.value)
-              setPage(1)
-            }}
-            SelectProps={{
-              displayEmpty: true,
-              MenuProps: {
-                sx: {
-                  maxHeight: 300
-                }
-              }
-            }}
-          >
-            <MenuItem value=''>Tất cả</MenuItem>
-            <MenuItem value='true'>Đã làm đơn</MenuItem>
-            <MenuItem value='false'>Chưa làm đơn</MenuItem>
-          </CustomTextField>
-        </Grid>
       </Grid>
     </CardContent>
   )

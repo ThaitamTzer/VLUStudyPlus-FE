@@ -185,9 +185,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           >
             Ngành
           </MenuItem>
-          <MenuItem href='/type-process' icon={<Iconify icon='material-symbols:problem-outline-rounded' />}>
+          {/* <MenuItem href='/type-process' icon={<Iconify icon='material-symbols:problem-outline-rounded' />}>
             Loại xử lý
-          </MenuItem>
+          </MenuItem> */}
           <MenuItem href='/process-result' icon={<Iconify icon='carbon:result' />}>
             Kết quả xử lý
           </MenuItem>

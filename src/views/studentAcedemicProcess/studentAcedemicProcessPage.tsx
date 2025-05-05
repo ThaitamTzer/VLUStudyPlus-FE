@@ -35,6 +35,7 @@ import formInstanceService from '@/services/formInstance.service'
 import type { FormInstanceType } from '@/types/management/formInstanceType'
 import FormInstancePDF from '../form-instance/FormInstancePDF'
 import DeleteFormModal from '../form-instance/DeleteFormModal'
+import UpdateFormModal from '../form-instance/UpdateFormModal'
 
 export default function StudentAcedemicProcessPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null)
@@ -45,6 +46,7 @@ export default function StudentAcedemicProcessPage() {
   const [openFormViewer, setOpenFormViewer] = useState(false)
   const [student, setStudent] = useState<ProcessingType | null>(null)
   const [openDeleteFormModal, setOpenDeleteFormModal] = useState(false)
+  const [openUpdateFormModal, setOpenUpdateFormModal] = useState(false)
 
   const {
     data: studentData,
@@ -55,6 +57,17 @@ export default function StudentAcedemicProcessPage() {
     studentAcedemicProcessService.getStudentAcedemicProcess,
     {
       revalidateOnMount: true
+    }
+  )
+
+  const { mutate: mutateFormInstance, isLoading: isLoadingFormInstance } = useSWR(
+    student?._id ? `/api/form-instance/${student?._id}` : null,
+    () => formInstanceService.getFormDetail_Student(student?._id || ''),
+    {
+      revalidateOnMount: true,
+      onSuccess: data => {
+        setFormInstance(data)
+      }
     }
   )
 
@@ -82,7 +95,9 @@ export default function StudentAcedemicProcessPage() {
                   size='small'
                   variant='contained'
                   color='primary'
-                  onClick={() => handleViewDetailForm(student?._id || '', student || null)}
+                  onClick={() =>
+                    handleViewDetailForm(student?._id || '', student || null, student?.CVHTHandle?.formTemplateId || '')
+                  }
                   sx={{ ml: 1 }}
                 >
                   <Iconify icon='mdi:file-eye-outline' />
@@ -111,6 +126,19 @@ export default function StudentAcedemicProcessPage() {
                 <Iconify icon='mdi:plus' />
               </CustomIconButton>
             </Tooltip>
+            <Tooltip title='Xem đơn' arrow>
+              <CustomIconButton
+                size='small'
+                variant='contained'
+                color='primary'
+                onClick={() =>
+                  handleViewDetailForm(student?._id || '', student || null, student?.CVHTHandle?.formTemplateId || '')
+                }
+                sx={{ ml: 1 }}
+              >
+                <Iconify icon='mdi:file-eye-outline' />
+              </CustomIconButton>
+            </Tooltip>
           </>
         )
       case 'Đã làm đơn':
@@ -122,7 +150,9 @@ export default function StudentAcedemicProcessPage() {
                 size='small'
                 variant='contained'
                 color='primary'
-                onClick={() => handleViewDetailForm(student?._id || '', student || null)}
+                onClick={() =>
+                  handleViewDetailForm(student?._id || '', student || null, student?.CVHTHandle?.formTemplateId || '')
+                }
                 sx={{ ml: 1 }}
               >
                 <Iconify icon='mdi:file-eye-outline' />
@@ -149,12 +179,14 @@ export default function StudentAcedemicProcessPage() {
     setFormTemplateId(id)
   }, [])
 
-  const handleViewDetailForm = useCallback(async (id: string, student: ProcessingType) => {
-    const formDetail = await formInstanceService.getFormDetail_Student(id)
-
-    setFormInstance(formDetail)
+  const handleViewDetailForm = useCallback(async (id: string, student: ProcessingType, formTemplateId: string) => {
     setOpenFormViewer(true)
     setStudent(student)
+    setFormTemplateId(formTemplateId)
+  }, [])
+
+  const handleUpdateForm = useCallback(async () => {
+    setOpenUpdateFormModal(true)
   }, [])
 
   const handleDeleteForm = useCallback(
@@ -547,6 +579,13 @@ export default function StudentAcedemicProcessPage() {
         mutate={mutate}
       />
 
+      <UpdateFormModal
+        id={formTemplateId || ''}
+        open={openUpdateFormModal}
+        onClose={() => setOpenUpdateFormModal(false)}
+        mutate={mutateFormInstance}
+        formInstance={formInstance}
+      />
       {formInstance && (
         <FormInstancePDF
           instance={formInstance}
@@ -555,6 +594,8 @@ export default function StudentAcedemicProcessPage() {
           nameOfForm={student?.lastName + ' ' + student?.firstName}
           isStudent
           onDelete={() => handleOpenDeleteFormModal(formInstance._id)}
+          onUpdate={handleUpdateForm}
+          isLoading={isLoadingFormInstance}
         />
       )}
       <DeleteFormModal

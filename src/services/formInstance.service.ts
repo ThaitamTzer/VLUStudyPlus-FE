@@ -9,6 +9,12 @@ const formInstanceService = {
     return res.data as FormInstanceType
   },
 
+  getFormDetail_CVHT: async (id: string) => {
+    const res = await axiosClient.get(`/api/form-instance/detail-CVHT/${id}`)
+
+    return res.data as FormInstanceType
+  },
+
   getFormDetail_Student: async (id: string) => {
     const res = await axiosClient.get(`/api/form-instance/detail-SV/${id}`)
 

@@ -223,6 +223,7 @@ export default function ViewAcedemicProcessCVHT() {
               toogleDeleteViewAcedemicProcess={toogleDeleteViewAcedemicProcess}
               toogleViewDetailAcedemicProcess={toogleViewDetailAcademicProcess}
               toogleOpenUpdateAcedemicProcessStatus={toogleUpdateAcedemicProcessStatus}
+              mutateListAcedemicProcessCVHT={mutate}
             />
             <TablePagination
               component={() => (

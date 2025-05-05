@@ -42,6 +42,7 @@ import formTemplateService from '@/services/formTemplate.service'
 import { CustomDialog } from '@/components/CustomDialog'
 
 import type { FormTemplateType, FieldType } from '@/types/management/formTemplateType'
+import type { FormInstanceType } from '@/types/management/formInstanceType'
 import Iconify from '@/components/iconify'
 import CustomTextField from '@/@core/components/mui/TextField'
 import CustomIconButton from '@/@core/components/mui/IconButton'
@@ -75,16 +76,16 @@ interface FormValues {
   [key: string]: FormFieldValue[FormFieldType]
 }
 
-type CreateFormModalProps = {
+type UpdateFormModalProps = {
   id: string
-  idProcess: string
   open: boolean
   onClose: () => void
   mutate: KeyedMutator<any>
+  formInstance: FormInstanceType | null
 }
 
-export default function CreateFormModal(props: CreateFormModalProps) {
-  const { id, idProcess, mutate, onClose, open } = props
+export default function UpdateFormModal(props: UpdateFormModalProps) {
+  const { id, mutate, onClose, open, formInstance } = props
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [validationSchema, setValidationSchema] = useState<any>(null)
   const [activeStep, setActiveStep] = useState(0)
@@ -96,12 +97,12 @@ export default function CreateFormModal(props: CreateFormModalProps) {
     formTemplateService.getFormTemplateById(id)
   )
 
-  console.log('id', id)
   console.log('formTemplateData', formTemplateData)
+  console.log('formInstance', formInstance)
 
   // Tạo schema validation dựa trên các trường trong form template
   useEffect(() => {
-    if (formTemplateData) {
+    if (formTemplateData && formInstance) {
       const schemaFields: Record<string, any> = {}
 
       formTemplateData.sections.forEach(section => {
@@ -189,7 +190,7 @@ export default function CreateFormModal(props: CreateFormModalProps) {
 
       setValidationSchema(v.object(schemaFields))
     }
-  }, [formTemplateData])
+  }, [formTemplateData, formInstance])
 
   // Khởi tạo form với react-hook-form
   const {
@@ -201,7 +202,7 @@ export default function CreateFormModal(props: CreateFormModalProps) {
   } = useForm<FormValues>({
     mode: 'all',
     resolver: validationSchema ? valibotResolver(validationSchema) : undefined,
-    defaultValues: {}
+    defaultValues: formInstance?.responses || {}
   })
 
   // Reset form khi đóng modal
@@ -215,6 +216,15 @@ export default function CreateFormModal(props: CreateFormModalProps) {
       }
     }
   }, [open, reset])
+
+  // Cập nhật giá trị form khi formInstance thay đổi
+  useEffect(() => {
+    if (formInstance?.responses) {
+      Object.entries(formInstance.responses).forEach(([key, value]) => {
+        setValue(key, value as any)
+      })
+    }
+  }, [formInstance, setValue])
 
   // Xử lý trước khi gửi form - đảm bảo các trường chữ ký có định dạng đúng
   const prepareFormDataBeforeSubmit = (data: any) => {
@@ -276,24 +286,24 @@ export default function CreateFormModal(props: CreateFormModalProps) {
 
     setIsSubmitting(true)
 
-    const toastID = toast.loading('Đang tạo đơn...')
+    const toastID = toast.loading('Đang cập nhật đơn...')
 
-    // Tạo đơn trước
-    await formInstanceService.createForm(
-      idProcess,
+    // Cập nhật đơn trước
+    await formInstanceService.updateForm(
+      formInstance?._id || '',
       {
         templateId: formTemplateData?._id,
         responses: formData
       },
       async res => {
         toast.update(toastID, {
-          render: 'Đã tạo đơn thành công, đang ký tên...',
+          render: 'Đã cập nhật đơn thành công, đang ký tên...',
           type: 'success',
           isLoading: true,
           autoClose: 2000
         })
 
-        // Sau khi tạo đơn thành công, thêm chữ ký
+        // Sau khi cập nhật đơn thành công, thêm chữ ký
         const dataUrl = sigCanvas.current?.toDataURL('image/png')
 
         if (dataUrl) {
@@ -309,7 +319,7 @@ export default function CreateFormModal(props: CreateFormModalProps) {
             formData,
             () => {
               toast.update(toastID, {
-                render: 'Đã tạo đơn và ký tên thành công',
+                render: 'Đã cập nhật đơn và ký tên thành công',
                 type: 'success',
                 isLoading: false,
                 autoClose: 3000
@@ -332,7 +342,7 @@ export default function CreateFormModal(props: CreateFormModalProps) {
       },
       error => {
         toast.update(toastID, {
-          render: error.message || 'Không thể tạo đơn',
+          render: error.message || 'Không thể cập nhật đơn',
           type: 'error',
           isLoading: false,
           autoClose: 3000
@@ -672,7 +682,7 @@ export default function CreateFormModal(props: CreateFormModalProps) {
     <CustomDialog
       open={open}
       onClose={onClose}
-      title={formTemplateData?.title || 'Tạo đơn'}
+      title={formTemplateData?.title || 'Cập nhật đơn'}
       closeOutside
       maxWidth='md'
       actions={
@@ -691,7 +701,7 @@ export default function CreateFormModal(props: CreateFormModalProps) {
             </Button>
           ) : (
             <Button variant='contained' onClick={onSubmit} disabled={isSubmitting}>
-              {isSubmitting ? 'Đang gửi...' : 'Gửi đơn'}
+              {isSubmitting ? 'Đang cập nhật...' : 'Cập nhật đơn'}
             </Button>
           )}
         </Stack>

@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback, useState } from 'react'
 
 import {
@@ -13,6 +15,9 @@ import {
   Badge
 } from '@mui/material'
 
+import type { KeyedMutator } from 'swr'
+import useSWR from 'swr'
+
 import StyledTableRow from '@/components/table/StyledTableRow'
 import TableLoading from '@/components/table/TableLoading'
 import TableNoData from '@/components/table/TableNotFound'
@@ -22,6 +27,9 @@ import CustomIconButton from '@/@core/components/mui/IconButton'
 import formInstanceService from '@/services/formInstance.service'
 import FormInstancePDF from '../../form-instance/FormInstancePDF'
 import type { FormInstanceType } from '@/types/management/formInstanceType'
+import ApproveFormModal from '@/views/form-instance/ApproveFormModal'
+import { useAuth } from '@/hooks/useAuth'
+import RejectFormModal from '@/views/form-instance/RejectFormModal'
 
 type TableAcedemicProcessProps = {
   data: ListProcessingType | undefined
@@ -36,6 +44,8 @@ type TableAcedemicProcessProps = {
   setProcessing: (processing: ProcessingType) => void
   toogleViewDetailAcedemicProcess: () => void
   toogleOpenUpdateAcedemicProcessStatus: () => void
+  mutateListAcedemicProcessBCNK?: KeyedMutator<any>
+  mutateListAcedemicProcessCVHT?: KeyedMutator<any>
 }
 
 export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
@@ -49,11 +59,41 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
     handleSort,
     toogleDeleteViewAcedemicProcess,
     setProcessing,
-    toogleOpenUpdateAcedemicProcessStatus
+    toogleOpenUpdateAcedemicProcessStatus,
+    mutateListAcedemicProcessBCNK,
+    mutateListAcedemicProcessCVHT
   } = props
 
   const [openFormViewer, setOpenFormViewer] = useState(false)
   const [formInstance, setFormInstance] = useState<FormInstanceType | null>(null)
+  const [formInstanceBCNK, setFormInstanceBCNK] = useState<FormInstanceType | null>(null)
+  const [openApproveFormModal, setOpenApproveFormModal] = useState(false)
+  const [openRejectFormModal, setOpenRejectFormModal] = useState(false)
+  const [studentId, setStudentId] = useState<string>('')
+
+  const { mutate: mutateCVHT } = useSWR(
+    studentId ? `form-instance-detail-CVHT-${studentId}` : null,
+    () => formInstanceService.getFormDetail_CVHT(studentId),
+    {
+      onSuccess: data => {
+        setFormInstance(data)
+      }
+    }
+  )
+
+  const { mutate: mutateBCNK } = useSWR(
+    studentId ? `form-instance-detail-BCNK-${studentId}` : null,
+    () => formInstanceService.getFormDetail_BCNK(studentId),
+    {
+      onSuccess: data => {
+        setFormInstanceBCNK(data)
+      }
+    }
+  )
+
+  const isCVHT = useAuth().user?.role.name === 'CVHT'
+  const isBCNK = useAuth().user?.role.name === 'BCN Khoa'
+
   const [nameOfForm, setNameOfForm] = useState<string>('')
 
   const renderStudent = (student: ProcessingType) => {
@@ -77,9 +117,22 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
     switch (status) {
       case 'Hoàn thành':
         return (
-          <Badge sx={{ backgroundColor: 'success.main', color: 'white', padding: '5px 10px', borderRadius: '5px' }}>
-            Hoàn thành
-          </Badge>
+          <>
+            <Badge sx={{ backgroundColor: 'success.main', color: 'white', padding: '5px 10px', borderRadius: '5px' }}>
+              Hoàn thành
+            </Badge>
+            <Tooltip title='Xem đơn' arrow>
+              <CustomIconButton
+                size='small'
+                color='info'
+                variant='contained'
+                sx={{ ml: 1 }}
+                onClick={() => handleViewDetailForm(student._id, student.lastName + ' ' + student.firstName)}
+              >
+                <Iconify icon='mdi:file-document-outline' />
+              </CustomIconButton>
+            </Tooltip>
+          </>
         )
 
       case 'Cần làm đơn':
@@ -118,10 +171,7 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
 
   const handleViewDetailForm = useCallback(async (id: string, nameOfForm: string) => {
     try {
-      // Lấy chi tiết form instance từ API
-      const formDetail = await formInstanceService.getFormDetail_BCNK(id)
-
-      setFormInstance(formDetail)
+      setStudentId(id)
       setNameOfForm(nameOfForm)
       setOpenFormViewer(true)
     } catch (error) {
@@ -131,7 +181,23 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
 
   const handleCloseFormViewer = useCallback(() => {
     setOpenFormViewer(false)
+    setStudentId('')
   }, [])
+
+  const handleCloseApproveFormModal = useCallback(() => {
+    setOpenApproveFormModal(false)
+    setStudentId('')
+    mutateListAcedemicProcessCVHT?.()
+    mutateListAcedemicProcessBCNK?.()
+  }, [mutateListAcedemicProcessCVHT, mutateListAcedemicProcessBCNK])
+
+  const handleCloseRejectFormModal = useCallback(() => {
+    setOpenFormViewer(false)
+    setOpenRejectFormModal(false)
+    setStudentId('')
+    mutateListAcedemicProcessCVHT?.()
+    mutateListAcedemicProcessBCNK?.()
+  }, [mutateListAcedemicProcessCVHT, mutateListAcedemicProcessBCNK])
 
   return (
     <>
@@ -596,8 +662,41 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
           open={openFormViewer}
           onClose={handleCloseFormViewer}
           nameOfForm={nameOfForm}
+          isLecturer
+          onApprove={() => setOpenApproveFormModal(true)}
+          onReject={() => setOpenRejectFormModal(true)}
         />
       )}
+      {formInstanceBCNK && (
+        <FormInstancePDF
+          instance={formInstanceBCNK}
+          open={openFormViewer}
+          onClose={handleCloseFormViewer}
+          nameOfForm={nameOfForm}
+          isLecturer
+          onApprove={() => setOpenApproveFormModal(true)}
+          onReject={() => setOpenRejectFormModal(true)}
+        />
+      )}
+
+      <ApproveFormModal
+        open={openApproveFormModal}
+        onClose={handleCloseApproveFormModal}
+        formInstance={formInstance}
+        mutate={mutateCVHT}
+        mutateBCNK={mutateBCNK}
+        isCVHT={isCVHT}
+        isBCNK={isBCNK}
+      />
+
+      <RejectFormModal
+        open={openRejectFormModal}
+        onClose={handleCloseRejectFormModal}
+        formInstance={formInstance || formInstanceBCNK}
+        mutate={mutateCVHT}
+        mutateBCNK={mutateBCNK}
+        isBCNK={isBCNK}
+      />
     </>
   )
 }

@@ -19,6 +19,9 @@ interface FormInstancePDFProps {
   onApprove?: () => void
   onReject?: () => void
   onSign?: () => void
+  isLoading?: boolean
+  toogleApproveFormModalCVHT?: () => void
+  toogleApproveFormModalBCNK?: () => void
 }
 
 // Đăng ký font Times New Roman
@@ -518,7 +521,7 @@ export default function FormInstancePDF({
   onDelete,
   onApprove,
   onReject,
-  onSign
+  isLoading
 }: FormInstancePDFProps) {
   const instanceData = useMemo(() => instance, [instance])
 
@@ -527,23 +530,23 @@ export default function FormInstancePDF({
       <DialogTitle>Đơn của {nameOfForm}</DialogTitle>
       <DialogContent>
         <Box sx={{ height: '70vh', mt: 2 }}>
-          {instanceData ? (
+          {isLoading ? (
+            <Skeleton variant='rectangular' width='100%' height='100%' animation='wave' />
+          ) : (
             <PDFViewer width='100%' height='100%' style={{ border: 'none' }}>
               <FormInstance data={instanceData} />
             </PDFViewer>
-          ) : (
-            <Skeleton variant='rectangular' width='100%' height='100%' animation='wave' />
           )}
         </Box>
       </DialogContent>
       <DialogActions>
         <Box sx={{ display: 'flex', gap: 2 }}>
-          {isStudent && (
+          {isStudent && instanceData.approved.approveStatus === 'pending' && (
             <Button onClick={onUpdate} variant='contained' color='warning'>
               Cập nhật đơn
             </Button>
           )}
-          {isStudent && (
+          {isStudent && instanceData.approved.approveStatus === 'pending' && (
             <Button onClick={onDelete} variant='contained' color='error'>
               Xóa đơn
             </Button>
@@ -558,12 +561,9 @@ export default function FormInstancePDF({
               Từ chối đơn
             </Button>
           )}
-          {isLecturer && (
-            <Button onClick={onSign} variant='contained' color='success'>
-              Ký đơn
-            </Button>
-          )}
-          <Button onClick={onClose}>Đóng</Button>
+          <Button onClick={onClose} variant='outlined'>
+            Đóng
+          </Button>
           <PDFDownloadLink
             document={<FormInstance data={instanceData} />}
             fileName={`${instanceData?.templateSnapshot?.title}.pdf`}

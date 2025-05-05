@@ -541,25 +541,45 @@ export default function FormInstancePDF({
       </DialogContent>
       <DialogActions>
         <Box sx={{ display: 'flex', gap: 2 }}>
-          {isStudent && instanceData.approved.approveStatus === 'pending' && (
-            <Button onClick={onUpdate} variant='contained' color='warning'>
-              Cập nhật đơn
-            </Button>
+          {isStudent && instanceData.approved.approveStatus === 'rejected' && (
+            <>
+              <Button onClick={onUpdate} variant='contained' color='warning'>
+                Cập nhật đơn
+              </Button>
+              <Button onClick={onDelete} variant='contained' color='error'>
+                Xóa đơn
+              </Button>
+            </>
+          )}
+          {isLecturer && instanceData.approved.approveStatus === 'rejected' && (
+            <>
+              <Button onClick={onApprove} variant='contained' color='success'>
+                Duyệt đơn
+              </Button>
+              <Button onClick={onReject} variant='contained' color='error'>
+                Từ chối đơn
+              </Button>
+            </>
           )}
           {isStudent && instanceData.approved.approveStatus === 'pending' && (
-            <Button onClick={onDelete} variant='contained' color='error'>
-              Xóa đơn
-            </Button>
+            <>
+              <Button onClick={onUpdate} variant='contained' color='warning'>
+                Cập nhật đơn
+              </Button>
+              <Button onClick={onDelete} variant='contained' color='error'>
+                Xóa đơn
+              </Button>
+            </>
           )}
-          {isLecturer && (
-            <Button onClick={onApprove} variant='contained' color='success'>
-              Duyệt đơn
-            </Button>
-          )}
-          {isLecturer && (
-            <Button onClick={onReject} variant='contained' color='error'>
-              Từ chối đơn
-            </Button>
+          {isLecturer && instanceData.approved.approveStatus === 'pending' && (
+            <>
+              <Button onClick={onApprove} variant='contained' color='success'>
+                Duyệt đơn
+              </Button>
+              <Button onClick={onReject} variant='contained' color='error'>
+                Từ chối đơn
+              </Button>
+            </>
           )}
           <Button onClick={onClose} variant='outlined'>
             Đóng

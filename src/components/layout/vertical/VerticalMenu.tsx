@@ -233,12 +233,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           </SubMenu>
         )}
 
-        {user?.role.name === 'CVHT' ||
-          (user?.role.name === 'BCN Khoa' && (
-            <MenuItem href='/learning-processing' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
-              XỬ LÝ HỌC TẬP
-            </MenuItem>
-          ))}
+        {(user?.role.name === 'CVHT' || user?.role.name === 'BCN Khoa') && (
+          <MenuItem href='/learning-processing' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
+            XỬ LÝ HỌC TẬP
+          </MenuItem>
+        )}
         {/* <SubMenu label='XỬ LÝ HỌC TẬP' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
           <MenuItem href='/learning-processing' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
             Kỳ XLHV

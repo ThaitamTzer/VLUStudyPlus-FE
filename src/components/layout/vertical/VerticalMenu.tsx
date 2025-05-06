@@ -26,6 +26,7 @@ import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 
 import { menuClasses } from '@menu/utils/menuClasses'
 import Iconify from '@/components/iconify'
+import { useAuth } from '@/hooks/useAuth'
 
 // import menuItemStyles from '@/configs/menuItemStyles'
 
@@ -51,6 +52,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   // Hooks
   const theme = useTheme()
   const verticalNavOptions = useVerticalNav()
+  const { user } = useAuth()
 
   // Vars
   const { isBreakpointReached, transitionDuration, isHovered, isCollapsed, isPopoutWhenCollapsed } = verticalNavOptions
@@ -160,84 +162,101 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         >
           TRANG CHỦ
         </MenuItem>
-        <SubMenu label='DANH MỤC' icon={<Iconify icon='solar:widget-2-linear' />}>
-          <MenuItem
-            href='/term-management'
-            icon={<Iconify icon='solar:calendar-mark-linear' />}
-            exactMatch={false}
-            activeUrl='/term-management'
-          >
-            Học kỳ
-          </MenuItem>
-          <MenuItem
-            href='/cohort-management'
-            icon={<Iconify icon='hugeicons:students' />}
-            exactMatch={false}
-            activeUrl='/cohort-management'
-          >
-            Niên khóa
-          </MenuItem>
-          <MenuItem
-            href='/major-management'
-            icon={<Iconify icon='ph:certificate' />}
-            exactMatch={false}
-            activeUrl='/major-management'
-          >
-            Ngành
-          </MenuItem>
-          {/* <MenuItem href='/type-process' icon={<Iconify icon='material-symbols:problem-outline-rounded' />}>
+        {user?.role.name === 'BCN Khoa' && (
+          <SubMenu label='DANH MỤC' icon={<Iconify icon='solar:widget-2-linear' />}>
+            <MenuItem
+              href='/term-management'
+              icon={<Iconify icon='solar:calendar-mark-linear' />}
+              exactMatch={false}
+              activeUrl='/term-management'
+            >
+              Học kỳ
+            </MenuItem>
+            <MenuItem
+              href='/cohort-management'
+              icon={<Iconify icon='hugeicons:students' />}
+              exactMatch={false}
+              activeUrl='/cohort-management'
+            >
+              Niên khóa
+            </MenuItem>
+            <MenuItem
+              href='/major-management'
+              icon={<Iconify icon='ph:certificate' />}
+              exactMatch={false}
+              activeUrl='/major-management'
+            >
+              Ngành
+            </MenuItem>
+            {/* <MenuItem href='/type-process' icon={<Iconify icon='material-symbols:problem-outline-rounded' />}>
             Loại xử lý
           </MenuItem> */}
-          <MenuItem href='/process-result' icon={<Iconify icon='carbon:result' />}>
-            Kết quả xử lý
+            <MenuItem href='/process-result' icon={<Iconify icon='carbon:result' />}>
+              Kết quả xử lý
+            </MenuItem>
+            <MenuItem href='/form-template' icon={<Iconify icon='icon-park-outline:doc-detail' />}>
+              Mẫu đơn cam kết
+            </MenuItem>
+          </SubMenu>
+        )}
+        {user?.role.name === 'BCN Khoa' && (
+          <SubMenu label='NGƯỜI DÙNG' icon={<Iconify icon='solar:users-group-rounded-linear' />}>
+            <MenuItem
+              href='/role-management'
+              icon={<Iconify icon='solar:shield-user-linear' />}
+              exactMatch={false}
+              activeUrl='/role-management'
+            >
+              Vai trò
+            </MenuItem>
+            <MenuItem href='/lecturer-management' icon={<Iconify icon='clarity:employee-group-line' />}>
+              CBGVNV
+            </MenuItem>
+            <MenuItem href='/student-management' icon={<Iconify icon='ph:student' />}>
+              Sinh viên
+            </MenuItem>
+          </SubMenu>
+        )}
+        {user?.role.name === 'BCN Khoa' && (
+          <MenuItem href='/class-management' icon={<Iconify icon='ph:chalkboard-teacher' />}>
+            LỚP NIÊN CHẾ
           </MenuItem>
-          <MenuItem href='/form-template' icon={<Iconify icon='icon-park-outline:doc-detail' />}>
-            Mẫu đơn cam kết
-          </MenuItem>
-        </SubMenu>
-        <SubMenu label='NGƯỜI DÙNG' icon={<Iconify icon='solar:users-group-rounded-linear' />}>
-          <MenuItem
-            href='/role-management'
-            icon={<Iconify icon='solar:shield-user-linear' />}
-            exactMatch={false}
-            activeUrl='/role-management'
-          >
-            Vai trò
-          </MenuItem>
-          <MenuItem href='/lecturer-management' icon={<Iconify icon='clarity:employee-group-line' />}>
-            CBGVNV
-          </MenuItem>
-          <MenuItem href='/student-management' icon={<Iconify icon='ph:student' />}>
-            Sinh viên
-          </MenuItem>
-        </SubMenu>
-        <MenuItem href='/class-management' icon={<Iconify icon='ph:chalkboard-teacher' />}>
-          LỚP NIÊN CHẾ
-        </MenuItem>
-        <SubMenu label='LỚP - CVHT' icon={<Iconify icon='fluent:class-24-regular' />}>
-          <MenuItem href='/classLecturer' icon={<Iconify icon='fluent:class-24-regular' />}>
-            Lớp học
-          </MenuItem>
-          <MenuItem href='/classStudent' icon={<Iconify icon='hugeicons:students' />}>
-            Sinh viên
-          </MenuItem>
-        </SubMenu>
-        <MenuItem href='/learning-processing' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
-          XỬ LÝ HỌC TẬP
-        </MenuItem>
+        )}
+        {user?.role.name === 'CVHT' && (
+          <SubMenu label='LỚP - CVHT' icon={<Iconify icon='fluent:class-24-regular' />}>
+            <MenuItem href='/classLecturer' icon={<Iconify icon='fluent:class-24-regular' />}>
+              Lớp học
+            </MenuItem>
+            <MenuItem href='/classStudent' icon={<Iconify icon='hugeicons:students' />}>
+              Sinh viên
+            </MenuItem>
+          </SubMenu>
+        )}
+
+        {user?.role.name === 'CVHT' ||
+          (user?.role.name === 'BCN Khoa' && (
+            <MenuItem href='/learning-processing' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
+              XỬ LÝ HỌC TẬP
+            </MenuItem>
+          ))}
         {/* <SubMenu label='XỬ LÝ HỌC TẬP' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
           <MenuItem href='/learning-processing' icon={<Iconify icon='fluent:task-list-square-person-20-regular' />}>
             Kỳ XLHV
           </MenuItem>
         </SubMenu> */}
-        <SubMenu label='SINH VIÊN' icon={<Iconify icon='ph:student' />}>
-          <MenuItem href='/student-acedemic-process' icon={<Iconify icon='carbon:result' />}>
-            Xử lý học vụ
-          </MenuItem>
-        </SubMenu>
-        <MenuItem href='/training-program' icon={<Iconify icon='solar:book-bookmark-linear' />}>
-          KHUNG CTĐT
-        </MenuItem>
+        {user?.role.name === 'Sinh viên' && (
+          <SubMenu label='SINH VIÊN' icon={<Iconify icon='ph:student' />}>
+            <MenuItem href='/student-acedemic-process' icon={<Iconify icon='carbon:result' />}>
+              Xử lý học vụ
+            </MenuItem>
+          </SubMenu>
+        )}
+        {user?.role.name === 'CVHT' ||
+          (user?.role.name === 'BCN Khoa' && (
+            <MenuItem href='/training-program' icon={<Iconify icon='solar:book-bookmark-linear' />}>
+              KHUNG CTĐT
+            </MenuItem>
+          ))}
         {/* <SubMenu label='CTĐT' icon={<Iconify icon='solar:book-bookmark-linear' />}>
           <MenuItem href='/training-program' icon={<Iconify icon='solar:book-bookmark-linear' />}>
             Khung CTĐT

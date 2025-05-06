@@ -126,19 +126,6 @@ export default function StudentAcedemicProcessPage() {
                 <Iconify icon='mdi:plus' />
               </CustomIconButton>
             </Tooltip>
-            <Tooltip title='Xem đơn' arrow>
-              <CustomIconButton
-                size='small'
-                variant='contained'
-                color='primary'
-                onClick={() =>
-                  handleViewDetailForm(student?._id || '', student || null, student?.CVHTHandle?.formTemplateId || '')
-                }
-                sx={{ ml: 1 }}
-              >
-                <Iconify icon='mdi:file-eye-outline' />
-              </CustomIconButton>
-            </Tooltip>
           </>
         )
       case 'Đã làm đơn':

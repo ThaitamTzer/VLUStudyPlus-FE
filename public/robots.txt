@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Sitemap: https://vlustudyplus.io.vn/sitemap.xml
+
+# Disallow admin and private routes
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /static/

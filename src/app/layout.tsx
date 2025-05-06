@@ -11,9 +11,11 @@ import '@/app/globals.css'
 import '@assets/iconify-icons/generated-icons.css'
 
 export const metadata = {
-  title: 'VLUStudyPlus',
+  title: 'VLUStudyPlus - Hệ thống xử lý học vụ Đại học Văn Lang',
   description:
-    'VLUStudyPlus là phần mềm quản lý, theo dõi và hỗ trợ học tập cho sinh viên trường Đại học Văn Lang. Phần mềm giúp sinh viên quản lý thời gian, theo dõi tiến độ học tập, hỗ trợ việc học tập và nghiên cứu, cũng như giúp sinh viên tìm kiếm thông tin về các khóa học, giáo viên, lịch học, lịch thi, điểm thi, và nhiều thông tin khác.'
+    'VLUStudyPlus - Hệ thống xử lý học vụ trực tuyến của trường Đại học Văn Lang. Hỗ trợ sinh viên quản lý học tập, theo dõi tiến độ, đăng ký môn học, xem điểm thi, lịch học và các thông tin học vụ quan trọng khác.',
+  keywords:
+    'xử lý học vụ, đại học văn lang, vlustudyplus, quản lý học tập, đăng ký môn học, điểm thi, lịch học, sinh viên văn lang'
 }
 
 const RootLayout = ({ children }: ChildrenType) => {

@@ -250,12 +250,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             </MenuItem>
           </SubMenu>
         )}
-        {user?.role.name === 'CVHT' ||
-          (user?.role.name === 'BCN Khoa' && (
-            <MenuItem href='/training-program' icon={<Iconify icon='solar:book-bookmark-linear' />}>
-              KHUNG CTĐT
-            </MenuItem>
-          ))}
+        {(user?.role.name === 'CVHT' || user?.role.name === 'BCN Khoa') && (
+          <MenuItem href='/training-program' icon={<Iconify icon='solar:book-bookmark-linear' />}>
+            KHUNG CTĐT
+          </MenuItem>
+        )}
         {/* <SubMenu label='CTĐT' icon={<Iconify icon='solar:book-bookmark-linear' />}>
           <MenuItem href='/training-program' icon={<Iconify icon='solar:book-bookmark-linear' />}>
             Khung CTĐT

@@ -267,22 +267,6 @@ export default function StudentAcedemicProcessPage() {
                       />
                     </Stack>
                   }
-
-                  // action={
-                  //   <Stack direction='row' spacing={1}>
-                  //     <Tooltip title='Xem chi tiết' arrow>
-                  //       <CustomIconButton
-                  //         variant='contained'
-                  //         color='primary'
-                  //         onClick={() => {
-                  //           handleOpenViewDetailCommitmentForm(student)
-                  //         }}
-                  //       >
-                  //         <Iconify icon='mdi:file-document-outline' />
-                  //       </CustomIconButton>
-                  //     </Tooltip>
-                  //   </Stack>
-                  // }
                 />
                 <CardContent>
                   <Stack spacing={2}>

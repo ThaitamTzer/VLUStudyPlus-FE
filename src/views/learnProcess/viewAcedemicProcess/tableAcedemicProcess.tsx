@@ -295,6 +295,15 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                   Người xử lý
                 </TableSortLabel>
               </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sortField === 'groupedByInstruction'}
+                  direction={sortOrder === 'desc' ? 'desc' : 'asc'}
+                  onClick={() => handleSort('groupedByInstruction')}
+                >
+                  Phân loại đối tượng
+                </TableSortLabel>
+              </TableCell>
               <TableCell width={200}>
                 <TableSortLabel
                   active={sortField === 'processingHandle'}
@@ -538,6 +547,7 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                   <TableCell width={200}>{d.CVHTHandle?.processingResultName || '-'}</TableCell>
                   <TableCell width={200}>{d.CVHTNote || '-'}</TableCell>
                   <TableCell width={10}>{d.handlerName || '-'}</TableCell>
+                  <TableCell width={10}>{d.groupedByInstruction || '-'}</TableCell>
                   <TableCell>{d.processingHandle?.statusProcess || '-'}</TableCell>
                   <TableCell width={200}>{d.reasonHandling?.reason || '-'}</TableCell>
                   <TableCell>

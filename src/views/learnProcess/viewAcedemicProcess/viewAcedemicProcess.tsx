@@ -105,8 +105,8 @@ export default function ViewAcedemicProcess() {
     await learnProcessService.deleteProcess(
       processing._id,
       () => {
-        setLoading(false)
         mutate()
+        setLoading(false)
         fetching(`/api/notification/get-number-notification/${id}`)
         toogleDeleteViewAcedemicProcess()
         toast.update(toastId, {

@@ -4,6 +4,8 @@ import React, { useState } from 'react'
 
 import { useSearchParams, useRouter } from 'next/navigation'
 
+import dynamic from 'next/dynamic'
+
 import { vi } from 'date-fns/locale'
 import { registerLocale } from 'react-datepicker'
 import {
@@ -28,12 +30,13 @@ import TablePaginationCustom from '@/components/table/TablePagination'
 import TermList from './termlist'
 import CustomTextField from '@/@core/components/mui/TextField'
 
+const AddTerm = dynamic(() => import('./addterm'), { ssr: false })
+const UpdateTerm = dynamic(() => import('./updateterm'), { ssr: false })
+const AlertDelete = dynamic(() => import('./alert'), { ssr: false })
+const ViewTerm = dynamic(() => import('./viewterm'), { ssr: false })
+
 import Iconify from '@/components/iconify'
 import TermFilter from './termfilter'
-import AddTerm from './addterm'
-import UpdateTerm from './updateterm'
-import AlertDelete from './alert'
-import ViewTerm from './viewterm'
 
 // const getTermYears = () => {
 //   const currentYear = new Date().getFullYear()
@@ -83,11 +86,12 @@ export default function TermPage() {
   const startDate = searchParams.get('startDate') || ''
   const endDate = searchParams.get('endDate') || ''
   const academicYear = searchParams.get('academicYear') || ''
+  const searchKey = searchParams.get('searchKey') || ''
 
-  const fetcher = ['api/term', page, limit, filterField, filterValue, startDate, endDate, academicYear]
+  const fetcher = ['api/term', page, limit, filterField, filterValue, startDate, endDate, academicYear, searchKey]
 
   const { data, mutate, isLoading } = useSWR(fetcher, () =>
-    termService.getAll(page, limit, filterField, filterValue, startDate, endDate, academicYear)
+    termService.getAll(page, limit, filterField, filterValue, startDate, endDate, academicYear, searchKey)
   )
 
   const onChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
@@ -100,6 +104,7 @@ export default function TermPage() {
     params.set('startDate', startDate)
     params.set('endDate', endDate)
     params.set('academicYear', academicYear)
+    params.set('searchKey', searchKey)
     router.push(`?${params.toString()}`, {
       scroll: false
     })
@@ -127,6 +132,7 @@ export default function TermPage() {
     params.set('startDate', startDate)
     params.set('endDate', endDate)
     params.set('academicYear', academicYear)
+    params.set('searchKey', searchKey)
     router.push(`?${params.toString()}`)
     handleFilterClose()
   }
@@ -144,6 +150,7 @@ export default function TermPage() {
     params.set('startDate', startDate)
     params.set('endDate', endDate)
     params.set('academicYear', academicYear)
+    params.set('searchKey', searchKey)
     router.push(`?${params.toString()}`)
   }
 
@@ -178,6 +185,7 @@ export default function TermPage() {
               params.set('startDate', startDate)
               params.set('endDate', endDate)
               params.set('academicYear', academicYear)
+              params.set('searchKey', searchKey)
               router.push(`?${params.toString()}`)
             }}
           >
@@ -186,6 +194,18 @@ export default function TermPage() {
             <MenuItem value='50'>50</MenuItem>
           </CustomTextField>
           <div className='flex flex-col sm:flex-row max-sm:is-full items-start sm:items-center gap-4'>
+            <CustomTextField
+              size='small'
+              value={searchKey}
+              onChange={e => {
+                const params = new URLSearchParams()
+
+                params.set('page', '1')
+                params.set('limit', limit.toString())
+                params.set('searchKey', e.target.value)
+                router.push(`?${params.toString()}`)
+              }}
+            />
             <Button
               startIcon={<i className='tabler-plus' />}
               onClick={toogleAddTerm}
@@ -278,6 +298,7 @@ export default function TermPage() {
               limit={limit}
               total={data?.pagination.totalItems || 0}
               data={data?.terms || []}
+              searchKey={searchKey}
             />
           )}
           count={data?.pagination.totalItems || 0}

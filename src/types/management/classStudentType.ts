@@ -51,6 +51,7 @@ export type ClassStudentType = {
   }
   avatar: string
   isBlock: boolean
+  isActive: boolean
   createdAt: string | Date
   updatedAt: string | Date
 }

@@ -1,5 +1,7 @@
 'use client'
 
+import { useCallback } from 'react'
+
 import { useRouter } from 'next/navigation'
 
 import { Card, CardContent, CardHeader, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material'
@@ -17,10 +19,21 @@ import PreviewImport from '../classStudent/importResult'
 import AddModal from '../classStudent/addModal'
 import ManualAddStudent from '../classStudent/manualAddStudent'
 import ProgressModal from '../../components/dialogs/progressModal'
+import { useGradeStore } from '@/stores/grade/grade.store'
+import ModalViewGradeByClass from '../grade/ModalViewGradeByClass'
 
 const ClassCard = ({ item }: { item: ClassLecturer }) => {
   const router = useRouter()
   const { setOpenAddModal, setClassCode } = useClassStudentStore()
+  const { toogleViewGrade, setIdClass } = useGradeStore()
+
+  const handleViewGrade = useCallback(
+    (classId: string) => {
+      toogleViewGrade()
+      setIdClass(classId)
+    },
+    [toogleViewGrade, setIdClass]
+  )
 
   return (
     <Grid item xs={12} sm={6} md={4} key={item._id}>
@@ -33,6 +46,15 @@ const ClassCard = ({ item }: { item: ClassLecturer }) => {
           action={
             <>
               <Stack spacing={1} direction='row'>
+                <Tooltip title='Xem danh sách điểm'>
+                  <IconButton size='small' onClick={() => handleViewGrade(item._id)}>
+                    <Iconify
+                      icon='tabler-chart-bar'
+                      className='text-purple-700
+                    '
+                    />
+                  </IconButton>
+                </Tooltip>
                 <Tooltip title='Xem danh sách sinh viên'>
                   <IconButton
                     size='small'
@@ -44,7 +66,7 @@ const ClassCard = ({ item }: { item: ClassLecturer }) => {
                       router.push(`/classStudent?${param.toString()}`)
                     }}
                   >
-                    <Iconify icon='solar:eye-outline' className='text-black' />
+                    <Iconify icon='solar:eye-outline' className='text-blue-700' />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title='Thêm sinh viên'>
@@ -55,7 +77,7 @@ const ClassCard = ({ item }: { item: ClassLecturer }) => {
                       setClassCode(item.classId)
                     }}
                   >
-                    <Iconify icon='mynaui:plus-solid' className='text-black' />
+                    <Iconify icon='mynaui:plus-solid' className='text-green-700' />
                   </IconButton>
                 </Tooltip>
               </Stack>
@@ -118,6 +140,7 @@ export default function ClassLecturerPage() {
       </AddModal>
       <PreviewImport />
       <ProgressModal open={loading} isCompleted={!loading} isProcessing={loading} onClose={resetProgress} />
+      <ModalViewGradeByClass />
     </>
   )
 }

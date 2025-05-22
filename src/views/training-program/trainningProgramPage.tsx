@@ -60,7 +60,7 @@ export default function TrainingProgramPage() {
 
   return (
     <>
-      <PageHeader title='Quản lý khung chương trình đào tạo' />
+      <PageHeader title='Danh sách khung chương trình đào tạo' />
       <Card sx={{ mt: 4, mb: 4, borderRadius: 2, boxShadow: '0 4px 12px 0 rgba(0,0,0,0.05)' }}>
         <Box sx={{ p: 2 }}>
           <Grid container spacing={2}>

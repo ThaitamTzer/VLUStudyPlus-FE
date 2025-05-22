@@ -218,6 +218,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           </SubMenu>
         )}
         {user?.role.name === 'BCN Khoa' && (
+          <MenuItem href='/lecturer-management' icon={<Iconify icon='clarity:employee-group-line' />}>
+            CBGVNV
+          </MenuItem>
+        )}
+        {user?.role.name === 'BCN Khoa' && (
           <MenuItem href='/class-management' icon={<Iconify icon='ph:chalkboard-teacher' />}>
             LỚP NIÊN CHẾ
           </MenuItem>
@@ -247,6 +252,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           <SubMenu label='SINH VIÊN' icon={<Iconify icon='ph:student' />}>
             <MenuItem href='/student-acedemic-process' icon={<Iconify icon='carbon:result' />}>
               Xử lý học vụ
+            </MenuItem>
+            <MenuItem href='/student-grade' icon={<Iconify icon='carbon:result-draft' />}>
+              Kết quả học tập
             </MenuItem>
           </SubMenu>
         )}

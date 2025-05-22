@@ -1,0 +1,15 @@
+import dynamic from 'next/dynamic'
+
+import type { Metadata } from 'next'
+
+const StudentGradePage = dynamic(() => import('@/views/student-grade/StudentGradePage'), {
+  ssr: false
+})
+
+export const metadata: Metadata = {
+  title: 'Kết quả môn học'
+}
+
+export default function Page() {
+  return <StudentGradePage />
+}

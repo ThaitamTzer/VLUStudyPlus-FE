@@ -10,7 +10,8 @@ const termService = {
     filterValue?: string,
     startDate?: string,
     endDate?: string,
-    academicYear?: string
+    academicYear?: string,
+    searchKey?: string
   ): Promise<TermType> => {
     const params = {
       ...(page && { page }),
@@ -19,7 +20,8 @@ const termService = {
       ...(filterValue && { filterValue }),
       ...(startDate && { startDate }),
       ...(endDate && { endDate }),
-      ...(academicYear && { academicYear })
+      ...(academicYear && { academicYear }),
+      ...(searchKey && { searchKey })
     }
 
     const res = await axiosClient.get('/api/term/view-list-term', { params })

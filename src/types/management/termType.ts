@@ -5,6 +5,7 @@ export type Term = {
   academicYear: string
   startDate: string | Date
   endDate: string | Date
+  status: string
 }
 
 export type TermType = {

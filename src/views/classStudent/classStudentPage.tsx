@@ -1,8 +1,12 @@
 'use client'
 
+import { useCallback } from 'react'
+
 import { useSearchParams, useRouter } from 'next/navigation'
 
-import { Button, Card, CardContent, Grid, MenuItem, TablePagination } from '@mui/material'
+import dynamic from 'next/dynamic'
+
+import { Button, Card, CardContent, Grid, MenuItem } from '@mui/material'
 
 import useSWR from 'swr'
 
@@ -11,22 +15,26 @@ import { TabPanel } from '@mui/lab'
 import classStudentService from '@/services/classStudent.service'
 
 import PageHeader from '@/components/page-header'
-import ClassStudentList from './list'
-import TablePaginationCustom from '@/components/table/TablePagination'
 import CustomTextField from '@/@core/components/mui/TextField'
 import classLecturerService from '@/services/classLecturer.service'
 import DebouncedInput from '@/components/debouncedInput'
-import ImportStudent from './importAdd'
 import { useClassStudentStore } from '@/stores/classStudent/classStudent.store'
-import PreviewImport from './importResult'
-import AddModal from './addModal'
-import ManualAddStudent from './manualAddStudent'
-import UpdateAddStudent from './updateStudent'
-import ProgressModal from '../../components/dialogs/progressModal'
+import gradeService from '@/services/grade.service'
+
+const ImportStudent = dynamic(() => import('./importAdd'), { ssr: false })
+const PreviewImport = dynamic(() => import('./importResult'), { ssr: false })
+const AddModal = dynamic(() => import('./addModal'), { ssr: false })
+const ManualAddStudent = dynamic(() => import('./manualAddStudent'), { ssr: false })
+const UpdateAddStudent = dynamic(() => import('./updateStudent'), { ssr: false })
+const ProgressModal = dynamic(() => import('../../components/dialogs/progressModal'), { ssr: false })
+const UpdateGradeByLec = dynamic(() => import('../grade/UpdateGradeByLec'), { ssr: false })
+const ViewGradeDetailByLec = dynamic(() => import('../grade/ViewGradeDetailByLec'), { ssr: false })
+const ClassStudentList = dynamic(() => import('./list'), { ssr: false })
+const GradeList = dynamic(() => import('../grade/listGrade'), { ssr: false })
+const ModalUpdateGradeByLec = dynamic(() => import('../grade/ModalUpdateGradeByLec'), { ssr: false })
 
 export default function ClassStudentPage() {
   const { setOpenAddModal, openProgress, isCompleted, isProcessing, toogleProgress } = useClassStudentStore()
-
   const router = useRouter()
 
   const searchParams = useSearchParams()
@@ -36,6 +44,17 @@ export default function ClassStudentPage() {
   const sortField = searchParams.get('sortField') || ''
   const sortOrder = searchParams.get('sortOrder') || ''
   const searchKey = searchParams.get('searchKey') || ''
+
+  const typeList = searchParams.get('typeList') || ''
+
+  const idClass = searchParams.get('idClass') || ''
+  const pageGrade = Number(searchParams.get('pageGrade')) || 1
+  const limitGrade = Number(searchParams.get('limitGrade')) || 10
+  const filterFieldGrade = searchParams.get('filterFieldGrade') || ''
+  const filterValueGrade = searchParams.get('filterValueGrade') || ''
+  const sortFieldGrade = searchParams.get('sortFieldGrade') || ''
+  const sortOrderGrade = searchParams.get('sortOrderGrade') || ''
+  const searchKeyGrade = searchParams.get('searchKeyGrade') || ''
 
   const handleSort = (field: string) => {
     const isAsc = sortField === field && sortOrder === 'asc'
@@ -48,6 +67,14 @@ export default function ClassStudentPage() {
     params.set('limit', limit.toString())
     params.set('sortField', field)
     params.set('sortOrder', newSortOrder)
+
+    if (typeList === 'grade') {
+      params.set('idClass', idClass || '')
+      params.set('pageGrade', '1')
+      params.set('limitGrade', limitGrade.toString())
+      params.set('classCode', classCode)
+      params.set('typeList', 'grade')
+    }
 
     if (searchKey) {
       params.set('searchKey', searchKey)
@@ -70,6 +97,87 @@ export default function ClassStudentPage() {
 
   const { data: classOption } = useSWR('classOption', classLecturerService.getList)
 
+  const fetcherGrade = [
+    '/api/grade/view-grade-GV',
+    idClass,
+    pageGrade,
+    limitGrade,
+    filterFieldGrade,
+    filterValueGrade,
+    sortFieldGrade,
+    sortOrderGrade,
+    searchKeyGrade
+  ]
+
+  const {
+    data: gradeData,
+    isLoading: isLoadingGrade,
+    mutate: mutateGrade
+  } = useSWR(
+    idClass ? fetcherGrade : null,
+    () =>
+      gradeService.getGradeByClassCode(
+        idClass,
+        pageGrade,
+        limitGrade,
+        filterFieldGrade,
+        filterValueGrade,
+        sortFieldGrade,
+        sortOrderGrade,
+        searchKeyGrade
+      ),
+    {
+      revalidateOnFocus: false,
+      revalidateOnMount: true
+    }
+  )
+
+  const handleViewGrade = useCallback(() => {
+    if (typeList !== 'grade') {
+      const params = new URLSearchParams()
+      const classCodetoId = classOption?.find(option => option.classId === classCode)?._id || ''
+
+      params.set('idClass', classCodetoId)
+      params.set('pageGrade', '1')
+      params.set('limitGrade', '10')
+      params.set('classCode', classCode)
+      params.set('typeList', 'grade')
+      router.push(`?${params.toString()}`, {
+        scroll: false
+      })
+    } else {
+      const params = new URLSearchParams()
+
+      params.set('classCode', classCode)
+      params.set('typeList', '')
+      router.push(`?${params.toString()}`, {
+        scroll: false
+      })
+    }
+  }, [classCode, router, typeList, classOption])
+
+  const handleClassChange = (selectedClassId: string) => {
+    const selectedClass = classOption?.find(option => option.classId === selectedClassId)
+    const params = new URLSearchParams()
+
+    if (typeList === 'grade') {
+      params.set('idClass', selectedClass?._id || '')
+      params.set('pageGrade', '1')
+      params.set('limitGrade', limitGrade.toString())
+      params.set('classCode', selectedClassId)
+      params.set('typeList', 'grade')
+    } else {
+      params.set('classCode', selectedClassId)
+      params.set('page', '1')
+      params.set('limit', limit.toString())
+      params.set('typeList', 'student')
+    }
+
+    router.push(`?${params.toString()}`, {
+      scroll: false
+    })
+  }
+
   return (
     <>
       <PageHeader title='Danh sách sinh viên' />
@@ -90,17 +198,7 @@ export default function ClassStudentPage() {
                     }
                   }
                 }}
-                onChange={e => {
-                  const params = new URLSearchParams()
-
-                  params.set('page', '1')
-                  params.set('limit', limit.toString())
-                  params.set('classCode', e.target.value)
-
-                  router.push(`?${params.toString()}`, {
-                    scroll: false
-                  })
-                }}
+                onChange={e => handleClassChange(e.target.value)}
               >
                 <MenuItem value=''>Chọn một lớp để xem</MenuItem>
                 {classOption?.map(option => (
@@ -145,13 +243,22 @@ export default function ClassStudentPage() {
               onChange={value => {
                 const params = new URLSearchParams()
 
+                if (typeList === 'grade') {
+                  params.set('idClass', idClass || '')
+                  params.set('pageGrade', '1')
+                  params.set('limitGrade', limitGrade.toString())
+                  params.set('classCode', classCode)
+                  params.set('typeList', 'grade')
+                  params.set('searchKeyGrade', value as string)
+                }
+
                 params.set('classCode', classCode)
                 params.set('page', '1')
                 params.set('limit', limit.toString())
                 params.set('sortField', sortField)
                 params.set('sortOrder', sortOrder)
 
-                if (value) {
+                if (value && typeList !== 'grade') {
                   params.set('searchKey', value as string)
                 }
 
@@ -160,61 +267,56 @@ export default function ClassStudentPage() {
               placeholder='Tìm kiếm'
               className='max-sm:is-full sm:is-[300px]'
             />
+            {typeList !== 'grade' && (
+              <Button
+                onClick={() => setOpenAddModal(true)}
+                variant='contained'
+                startIcon={<i className='tabler-plus' />}
+                className='max-sm:is-full'
+              >
+                Thêm sinh viên
+              </Button>
+            )}
             <Button
-              onClick={() => setOpenAddModal(true)}
+              onClick={handleViewGrade}
               variant='contained'
-              startIcon={<i className='tabler-plus' />}
+              sx={{ backgroundColor: '#7F55B1', color: '#fff' }}
+              startIcon={<i className='tabler-chart-bar' />}
               className='max-sm:is-full'
             >
-              Thêm sinh viên
+              {typeList === 'grade' ? 'Bảng sinh viên' : 'Bảng kết quả'}
             </Button>
           </div>
         </div>
-        <ClassStudentList
-          data={data?.students}
-          loading={isLoading}
-          total={data?.pagination.totalItems || 0}
-          limit={limit}
-          page={page}
-          sortField={sortField}
-          sortOrder={sortOrder}
-          handleSort={handleSort}
-        />
-        <TablePagination
-          component={() => (
-            <TablePaginationCustom
-              data={data?.students || []}
+        {typeList === 'grade' ? (
+          <>
+            <GradeList
+              data={gradeData?.data || []}
               page={page}
               limit={limit}
-              total={data?.pagination.totalItems || 0}
               sortField={sortField}
               sortOrder={sortOrder}
+              handleSort={handleSort}
+              total={gradeData?.pagination.totalItems || 0}
               searchKey={searchKey}
               classCode={classCode}
+              loading={isLoadingGrade}
             />
-          )}
-          count={data?.pagination.totalItems || 0}
-          page={page - 1}
-          rowsPerPage={limit}
-          rowsPerPageOptions={[10, 25, 50]}
-          onPageChange={(_, newPage) => {
-            const params = new URLSearchParams()
-
-            params.set('classCode', classCode)
-            params.set('page', (newPage + 1).toString())
-            params.set('limit', limit.toString())
-            params.set('sortField', sortField)
-            params.set('sortOrder', sortOrder)
-
-            if (searchKey) {
-              params.set('searchKey', searchKey)
-            }
-
-            router.replace(`?${params.toString()}`, {
-              scroll: false
-            })
-          }}
-        />
+          </>
+        ) : (
+          <ClassStudentList
+            data={data?.students}
+            loading={isLoading}
+            total={data?.pagination.totalItems || 0}
+            limit={limit}
+            page={page}
+            sortField={sortField}
+            sortOrder={sortOrder}
+            handleSort={handleSort}
+            searchKey={searchKey}
+            classCode={classCode}
+          />
+        )}
       </Card>
       <ProgressModal
         open={openProgress}
@@ -232,6 +334,9 @@ export default function ClassStudentPage() {
       </AddModal>
       <UpdateAddStudent mutate={mutate} />
       <PreviewImport />
+      <UpdateGradeByLec mutate={mutateGrade} />
+      <ViewGradeDetailByLec />
+      <ModalUpdateGradeByLec />
     </>
   )
 }

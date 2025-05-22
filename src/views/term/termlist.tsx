@@ -1,4 +1,4 @@
-import { IconButton, Table, TableBody, TableCell, TableContainer, TableHead, Tooltip } from '@mui/material'
+import { Chip, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, Tooltip } from '@mui/material'
 
 import TableNoData from '@/components/table/TableNotFound'
 import StyledTableRow from '@/components/table/StyledTableRow'
@@ -46,7 +46,8 @@ export default function TermList(props: TermListProps) {
             <TableCell>Tên viết tắt</TableCell>
             <TableCell>Năm học</TableCell>
             <TableCell>Ngày bắt đầu</TableCell>
-            <TableCell colSpan={2}>Ngày kết thúc</TableCell>
+            <TableCell>Ngày kết thúc</TableCell>
+            <TableCell colSpan={2}>Trạng thái</TableCell>
           </StyledTableRow>
         </TableHead>
         <TableBody>
@@ -61,6 +62,9 @@ export default function TermList(props: TermListProps) {
                 <TableCell size='small'>{row.academicYear}</TableCell>
                 <TableCell size='small'>{fDate(row.startDate, 'dd/MM/yyyy')}</TableCell>
                 <TableCell size='small'>{fDate(row.endDate, 'dd/MM/yyyy')}</TableCell>
+                <TableCell size='small'>
+                  <Chip size='small' label={row.status} color={row.status === 'Đã kết thúc' ? 'success' : 'error'} />
+                </TableCell>
                 <TableCell
                   sx={{
                     width: 'fit-content'
@@ -75,7 +79,12 @@ export default function TermList(props: TermListProps) {
                         toogleViewTerm()
                       }}
                     >
-                      <Iconify icon='solar:eye-outline' />
+                      <Iconify
+                        icon='solar:eye-bold-duotone'
+                        style={{
+                          color: 'var(--primary-color)'
+                        }}
+                      />
                     </IconButton>
                   </Tooltip>
                   <RowAction term={row} />

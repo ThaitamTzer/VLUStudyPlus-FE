@@ -4,6 +4,7 @@ import type { CompareBeforeImportType } from '@/types/management/compareBeforImp
 import type {
   ResCreateFrame,
   TrainingProgramByFrame,
+  TrainingProgramByFrameData,
   TrainingProgramListType
 } from '@/types/management/trainningProgramType'
 
@@ -349,6 +350,12 @@ const trainingProgramService = {
 
       return Promise.reject(error)
     }
+  },
+
+  getTrainingProgramByCohortId: async (cohortId: string) => {
+    const res = await axiosClient.get(`/api/training-program/get-program-with-cohort/${cohortId}`)
+
+    return res.data as TrainingProgramByFrameData
   }
 }
 

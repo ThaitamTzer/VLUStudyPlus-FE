@@ -20,6 +20,7 @@ interface CategorySectionProps {
   idCate3: string
   mutate: KeyedMutator<any>
   renderAddSubjectButton?: () => React.ReactNode
+  action?: 'view' | 'edit'
 }
 
 const CategorySection: React.FC<CategorySectionProps> = ({
@@ -30,7 +31,8 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   idCate2,
   idCate3,
   mutate,
-  renderAddSubjectButton
+  renderAddSubjectButton,
+  action = 'view'
 }) => {
   const [isEditing, setIsEditing] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
@@ -82,25 +84,29 @@ const CategorySection: React.FC<CategorySectionProps> = ({
         <TableCell align='right' sx={{ backgroundColor: '#578FCA7a' }}>
           {category.credits}
         </TableCell>
-        <TableCell colSpan={8} align='right' sx={{ backgroundColor: '#578FCA7a' }}>
-          {renderAddSubjectButton && renderAddSubjectButton()}
-          {level < 3 && (
-            <Tooltip title={`Thêm danh mục cấp ${level + 1}`}>
-              <IconButton size='small' onClick={() => onAddCategory(category._id, idCate1)}>
-                <CategoryIcon fontSize='small' />
-              </IconButton>
-            </Tooltip>
+        <TableCell colSpan={action === 'edit' ? 8 : 7} align='right' sx={{ backgroundColor: '#578FCA7a' }}>
+          {action === 'edit' && (
+            <>
+              {renderAddSubjectButton && renderAddSubjectButton()}
+              {level < 3 && (
+                <Tooltip title={`Thêm danh mục cấp ${level + 1}`}>
+                  <IconButton size='small' onClick={() => onAddCategory(category._id, idCate1)}>
+                    <CategoryIcon fontSize='small' />
+                  </IconButton>
+                </Tooltip>
+              )}
+              <Tooltip title='Chỉnh sửa'>
+                <IconButton size='small' onClick={handleEdit}>
+                  <EditIcon fontSize='small' />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title='Xóa'>
+                <IconButton size='small' onClick={handleOpenDeleteModal}>
+                  <DeleteIcon fontSize='small' />
+                </IconButton>
+              </Tooltip>
+            </>
           )}
-          <Tooltip title='Chỉnh sửa'>
-            <IconButton size='small' onClick={handleEdit}>
-              <EditIcon fontSize='small' />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title='Xóa'>
-            <IconButton size='small' onClick={handleOpenDeleteModal}>
-              <DeleteIcon fontSize='small' />
-            </IconButton>
-          </Tooltip>
         </TableCell>
       </TableRow>
 

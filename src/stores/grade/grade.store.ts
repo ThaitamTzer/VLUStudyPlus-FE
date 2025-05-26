@@ -2,6 +2,7 @@ import { create } from 'zustand'
 
 import type { ClassStudentType } from '@/types/management/classStudentType'
 import type { GradeType, TermGradesType } from '@/types/management/gradeTypes'
+import type { ClassLecturer } from '@/types/management/classLecturerType'
 
 type States = {
   openUpdateGrade: boolean
@@ -11,12 +12,14 @@ type States = {
   gradeDetail: GradeType | null
   idGrade: string
   idClass: string
+  cohortId: string
   openViewGrade: boolean
   termGrade: TermGradesType | null
 
   openImportGradeStudent: boolean
   openUpdateGradeStudent: boolean
   termGradeUpdate: TermGradesType | null
+  classLecturer: ClassLecturer | null
 }
 
 type Actions = {
@@ -29,7 +32,8 @@ type Actions = {
   toogleViewGrade: () => void
   setIdClass: (idClass: string) => void
   setTermGrade: (termGrade: TermGradesType) => void
-
+  setCohortId: (cohortId: string) => void
+  setClassLecturer: (classLecturer: ClassLecturer) => void
   toogleImportGradeStudent: () => void
   toogleUpdateGradeStudent: () => void
   setTermGradeUpdate: (termGradeUpdate: TermGradesType) => void
@@ -48,6 +52,8 @@ export const useGradeStore = create<States & Actions>(set => ({
   openImportGradeStudent: false,
   openUpdateGradeStudent: false,
   termGradeUpdate: null,
+  cohortId: '',
+  classLecturer: null,
   toogleUpdateGrade: () => set(state => ({ openUpdateGrade: !state.openUpdateGrade })),
   setStudent: (student: ClassStudentType) => set({ student }),
   toogleViewGradeDetail: () => set(state => ({ openViewGradeDetail: !state.openViewGradeDetail })),
@@ -57,7 +63,9 @@ export const useGradeStore = create<States & Actions>(set => ({
   toogleViewGrade: () => set(state => ({ openViewGrade: !state.openViewGrade })),
   setIdClass: (idClass: string) => set({ idClass }),
   setTermGrade: (termGrade: TermGradesType) => set({ termGrade }),
+  setCohortId: (cohortId: string) => set({ cohortId }),
   toogleImportGradeStudent: () => set(state => ({ openImportGradeStudent: !state.openImportGradeStudent })),
   toogleUpdateGradeStudent: () => set(state => ({ openUpdateGradeStudent: !state.openUpdateGradeStudent })),
-  setTermGradeUpdate: (termGradeUpdate: TermGradesType) => set({ termGradeUpdate })
+  setTermGradeUpdate: (termGradeUpdate: TermGradesType) => set({ termGradeUpdate }),
+  setClassLecturer: (classLecturer: ClassLecturer) => set({ classLecturer })
 }))

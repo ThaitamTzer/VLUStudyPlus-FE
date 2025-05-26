@@ -71,7 +71,13 @@ export default function ViewTrainingProgramByFrame() {
               </Button>
             </div>
           </div>
-          <FlatTrainingProgramTable data={data || []} isLoading={isLoading} mutate={mutate} programId={id} />
+          <FlatTrainingProgramTable
+            action='edit'
+            data={data || []}
+            isLoading={isLoading}
+            mutate={mutate}
+            programId={id}
+          />
         </Card>
       </CustomDialog>
     ),

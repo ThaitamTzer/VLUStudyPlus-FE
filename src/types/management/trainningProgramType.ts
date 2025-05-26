@@ -75,6 +75,10 @@ export type Categories = {
   parentId?: string
 }
 
+export type TrainingProgramByFrameData = {
+  data: TrainingProgramByFrame[]
+}
+
 export type TrainingProgramByFrame = {
   _id: string
   trainingProgramSessionId: string

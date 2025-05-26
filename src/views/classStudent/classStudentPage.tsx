@@ -115,17 +115,7 @@ export default function ClassStudentPage() {
     mutate: mutateGrade
   } = useSWR(
     idClass ? fetcherGrade : null,
-    () =>
-      gradeService.getGradeByClassCode(
-        idClass,
-        pageGrade,
-        limitGrade,
-        filterFieldGrade,
-        filterValueGrade,
-        sortFieldGrade,
-        sortOrderGrade,
-        searchKeyGrade
-      ),
+    () => gradeService.getGradeByClassCode(idClass, filterFieldGrade, filterValueGrade, sortFieldGrade, sortOrderGrade),
     {
       revalidateOnFocus: false,
       revalidateOnMount: true

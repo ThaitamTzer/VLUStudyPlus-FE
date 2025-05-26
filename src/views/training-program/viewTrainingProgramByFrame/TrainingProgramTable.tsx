@@ -25,9 +25,20 @@ interface FlatTrainingProgramTableProps {
   isLoading?: boolean
   mutate: KeyedMutator<any>
   programId?: string
+  action?: 'view' | 'edit'
+  extendHeader?: React.ReactNode
+  extendBody?: React.ReactNode
 }
 
-const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ data, isLoading, mutate, programId }) => {
+const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({
+  data,
+  isLoading,
+  mutate,
+  programId,
+  action = 'view',
+  extendBody = null,
+  extendHeader = null
+}) => {
   const {
     programData,
     editingNewCategory,
@@ -63,13 +74,16 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
           idCate1={idCate1 || ''}
           idCate2={idCate2 || ''}
           idCate3={idCate3 || ''}
-          renderAddSubjectButton={() => (
-            <Tooltip title='Thêm môn học'>
-              <IconButton size='small' onClick={() => handleAddSubject(category._id)} sx={{ ml: 1 }}>
-                <SubjectIcon fontSize='small' />
-              </IconButton>
-            </Tooltip>
-          )}
+          action={action}
+          renderAddSubjectButton={() =>
+            action === 'edit' ? (
+              <Tooltip title='Thêm môn học'>
+                <IconButton size='small' onClick={() => handleAddSubject(category._id)} sx={{ ml: 1 }}>
+                  <SubjectIcon fontSize='small' />
+                </IconButton>
+              </Tooltip>
+            ) : null
+          }
         />
 
         {/* New category being added under this category */}
@@ -82,6 +96,7 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
             idCate2={editingNewCategory.parentId || ''}
             mutate={mutate}
             onCancel={handleCancelCategory}
+            action={action}
           />
         )}
 
@@ -89,6 +104,7 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
         {editingNewSubject && editingNewSubject.categoryId === category._id && (
           <SubjectRow
             subject={editingNewSubject.subject}
+            action={action}
             level={level + 1}
             isEditing={true}
             onSave={handleSaveSubject}
@@ -116,6 +132,7 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
             idCate2={idCate2 || ''}
             idCate3={idCate3 || ''}
             mutate={mutate}
+            action={action}
           />
         ))}
 
@@ -131,7 +148,7 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
     <>
       <TableContainer>
         <Table aria-label='training program table' size='small' sx={{ minWidth: 1000 }}>
-          <TrainingProgramHeader />
+          <TrainingProgramHeader action={action} extendHeader={extendHeader} />
           <TableBody>
             {programData?.map(program => {
               return (
@@ -139,9 +156,10 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
                   {/* Program header */}
                   <ProgramRow
                     program={program}
-                    onAddSubject={handleAddTopLevelSubject}
-                    onAddCategory={handleAddTopLevelCategory}
+                    onAddSubject={action === 'edit' ? handleAddTopLevelSubject : () => {}}
+                    onAddCategory={action === 'edit' ? handleAddTopLevelCategory : () => {}}
                     mutate={mutate}
+                    action={action}
                   />
 
                   {/* New category being added to this program */}
@@ -194,6 +212,7 @@ const FlatTrainingProgramTable: React.FC<FlatTrainingProgramTableProps> = ({ dat
                   {program.categories?.map(category =>
                     renderCategoryWithEditingSubject(category, 2, program._id, category._id)
                   )}
+                  {extendBody}
                 </React.Fragment>
               )
             })}

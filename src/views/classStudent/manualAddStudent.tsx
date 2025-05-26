@@ -96,7 +96,8 @@ export default function ManualAddStudent({ mutate }: { mutate: KeyedMutator<any>
         toast.update(toastId, {
           render: err.message,
           type: 'error',
-          isLoading: false
+          isLoading: false,
+          autoClose: 2000
         })
         setLoading(false)
       }

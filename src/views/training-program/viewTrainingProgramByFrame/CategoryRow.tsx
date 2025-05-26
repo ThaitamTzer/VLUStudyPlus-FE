@@ -36,6 +36,7 @@ interface CategoryRowProps {
   mutate: KeyedMutator<any>
   idCate1: string
   idCate2?: string
+  action?: 'view' | 'edit'
 }
 
 const CategoryRow: React.FC<CategoryRowProps> = ({
@@ -45,7 +46,8 @@ const CategoryRow: React.FC<CategoryRowProps> = ({
   onCancel,
   mutate,
   idCate1,
-  idCate2
+  idCate2,
+  action = 'view'
 }) => {
   const { settings } = useSettings()
   const [loading, setLoading] = useState<boolean>(false)
@@ -220,20 +222,22 @@ const CategoryRow: React.FC<CategoryRowProps> = ({
             )}
           />
         </TableCell>
-        <TableCell
-          colSpan={8}
-          align='right'
-          sx={{
-            backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
-          }}
-        >
-          <IconButton size='small' onClick={onAddCategory} disabled={loading}>
-            <SaveIcon fontSize='small' />
-          </IconButton>
-          <IconButton size='small' onClick={onCancel} disabled={loading}>
-            <CancelIcon fontSize='small' />
-          </IconButton>
-        </TableCell>
+        {action === 'edit' && (
+          <TableCell
+            colSpan={8}
+            align='right'
+            sx={{
+              backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
+            }}
+          >
+            <IconButton size='small' onClick={onAddCategory} disabled={loading}>
+              <SaveIcon fontSize='small' />
+            </IconButton>
+            <IconButton size='small' onClick={onCancel} disabled={loading}>
+              <CancelIcon fontSize='small' />
+            </IconButton>
+          </TableCell>
+        )}
       </TableRow>
     )
   }

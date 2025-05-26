@@ -1,14 +1,41 @@
+export type StudentType = {
+  _id: string
+  userId: string
+  cohortId: string
+  userName: string
+  mail: string
+  isActive: boolean
+}
+export type TermType = { _id: string; termName: string; abbreviatName: string; academicYear: string }
+
+export type GradeOfSubjectType = {
+  subjectId: {
+    _id: string
+    courseName: string
+    credits: number
+  }
+  grade: number
+  status: string
+  _id: string
+}
+
+export type TermGradeType = {
+  term: TermType
+  gradeOfSubject: GradeOfSubjectType[]
+  _id: string
+}
+
 export type GradeType = {
   _id: string
-  studentId: {
-    _id: string
-    userId: string
-    cohortId: string
-    userName: string
-    mail: string
-  }
+  studentId: StudentType
+  majorOfStudent: null
   TCTL_CD: number
   TCTL_SV: number
+  TCN: number
+  isActive: boolean
+  termGrades: TermGradeType[]
+  createdAt: string | Date
+  updatedAt: string | Date
 }
 
 export type GradeTypeByClassCode = {

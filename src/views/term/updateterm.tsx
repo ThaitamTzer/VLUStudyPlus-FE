@@ -150,7 +150,7 @@ export default function UpdateTerm(props: UpdateTermProps) {
     >
       <form onSubmit={onSubmit} autoComplete='off'>
         <DialogTitle>
-          <Typography variant='h3'>Thêm học kỳ</Typography>
+          <Typography variant='h3'>Cập nhật học kỳ</Typography>
         </DialogTitle>
         <IconButton
           sx={{

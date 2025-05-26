@@ -20,9 +20,10 @@ interface ProgramRowProps {
   onAddSubject: (programId: string) => void
   onAddCategory: (programId: string) => void
   mutate: KeyedMutator<any>
+  action?: 'view' | 'edit'
 }
 
-const ProgramRow: React.FC<ProgramRowProps> = ({ program, onAddCategory, onAddSubject, mutate }) => {
+const ProgramRow: React.FC<ProgramRowProps> = ({ program, onAddCategory, onAddSubject, mutate, action = 'view' }) => {
   const { settings } = useSettings()
   const { toogleUpdateCategory1, setProgramId } = useTrainingProgramStore()
   const [openUpdateModal, setOpenUpdateModal] = useState(false)
@@ -61,33 +62,35 @@ const ProgramRow: React.FC<ProgramRowProps> = ({ program, onAddCategory, onAddSu
         </TableCell>
         <TableCell align='right'>{program.credits}</TableCell>
         <TableCell colSpan={7} sx={{ textAlign: 'right' }}></TableCell>
-        <TableCell sx={{ textAlign: 'right' }}>
-          <Tooltip title='Thêm môn học'>
-            <IconButton
-              size='small'
-              onClick={() => {
-                onAddSubject(program._id)
-              }}
-            >
-              <SubjectIcon fontSize='small' />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title='Thêm danh mục cấp 2'>
-            <IconButton size='small' onClick={() => onAddCategory(program._id)}>
-              <CategoryIcon fontSize='small' />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title='Cập nhật danh mục'>
-            <IconButton size='small' onClick={() => handleOpenUpdateCate1(program._id)}>
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title='Xóa danh mục'>
-            <IconButton size='small' onClick={handleOpenDeleteModal}>
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        </TableCell>
+        {action === 'edit' && (
+          <TableCell sx={{ textAlign: 'right' }}>
+            <Tooltip title='Thêm môn học'>
+              <IconButton
+                size='small'
+                onClick={() => {
+                  onAddSubject(program._id)
+                }}
+              >
+                <SubjectIcon fontSize='small' />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Thêm danh mục cấp 2'>
+              <IconButton size='small' onClick={() => onAddCategory(program._id)}>
+                <CategoryIcon fontSize='small' />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Cập nhật danh mục'>
+              <IconButton size='small' onClick={() => handleOpenUpdateCate1(program._id)}>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Xóa danh mục'>
+              <IconButton size='small' onClick={handleOpenDeleteModal}>
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          </TableCell>
+        )}
       </TableRow>
 
       <UpdateCategory1Modal

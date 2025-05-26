@@ -1,100 +1,121 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 
-import { useRouter, useSearchParams } from 'next/navigation'
+import Image from 'next/image'
 
 import useSWR from 'swr'
 
-import { Button } from '@mui/material'
+import { Button, CircularProgress } from '@mui/material'
 
 import { useGradeStore } from '@/stores/grade/grade.store'
 import { CustomDialog } from '@/components/CustomDialog'
 import gradeService from '@/services/grade.service'
-import GradeList from './listGrade'
+import trainingProgramService from '@/services/trainingprogram.service'
+import GradeTrainingProgramTable from './GradeTrainingProgramTable'
+import LoadingSkeleton from './Loading'
+
+// import GradeStatistics from './GradeStatistics'
 
 export default function ModalViewGradeByClass() {
-  const { openViewGrade, idClass, toogleViewGrade, setIdClass } = useGradeStore()
-  const router = useRouter()
+  const { openViewGrade, toogleViewGrade, setCohortId, cohortId, idClass, setIdClass, classLecturer } = useGradeStore()
+  const [showGrade, setShowGrade] = useState<boolean>(false)
 
-  const searchParams = useSearchParams()
-  const page = Number(searchParams.get('page')) || 1
-  const limit = Number(searchParams.get('limit')) || 10
-  const filterField = searchParams.get('filterField') || ''
-  const filterValue = searchParams.get('filterValue') || ''
-  const sortField = searchParams.get('sortField') || ''
-  const sortOrder = searchParams.get('sortOrder') || ''
-  const searchKey = searchParams.get('searchKey') || ''
+  const fetchGrade = [`/api/grade/view-grade-GV/${idClass}`, idClass]
 
-  const handleSort = useCallback(
-    (field: string) => {
-      const isAsc = sortField === field && sortOrder === 'asc'
-      const newSortOrder = isAsc ? 'desc' : 'asc'
+  const fetchTrainingProgram = [`/api/training-program/get-program-with-cohort/${cohortId}`, cohortId]
 
-      const params = new URLSearchParams()
-
-      params.set('classCode', idClass)
-      params.set('page', page.toString())
-      params.set('limit', limit.toString())
-      params.set('sortField', field)
-      params.set('sortOrder', newSortOrder)
-
-      if (searchKey) {
-        params.set('searchKey', searchKey)
+  const {
+    data: trainingProgramData,
+    isLoading: isLoadingTrainingProgram,
+    mutate
+  } = useSWR(
+    cohortId ? fetchTrainingProgram : null,
+    () => trainingProgramService.getTrainingProgramByCohortId(cohortId),
+    {
+      revalidateOnFocus: false,
+      onSuccess: () => {
+        setShowGrade(true)
       }
-
-      router.push(`?${params.toString()}`, {
-        scroll: false
-      })
-    },
-    [idClass, page, limit, sortField, sortOrder, searchKey, router]
+    }
   )
 
-  const fetchGrade = [
-    `/api/grade/view-grade-GV/${idClass}`,
-    idClass,
-    page,
-    limit,
-    filterField,
-    filterValue,
-    sortField,
-    sortOrder,
-    searchKey
-  ]
-
-  const { data, isLoading } = useSWR(fetchGrade, () =>
-    gradeService.getGradeByClassCode(idClass, page, limit, filterField, filterValue, sortField, sortOrder, searchKey)
+  const { data: gradeData, isLoading: isLoadingGrade } = useSWR(
+    showGrade && idClass ? fetchGrade : null,
+    () => gradeService.getGradeByClassCode(idClass),
+    {
+      revalidateOnFocus: false
+    }
   )
 
   const handleClose = useCallback(() => {
     toogleViewGrade()
     setIdClass('')
-  }, [setIdClass, toogleViewGrade])
+    setCohortId('')
+    setShowGrade(false)
+  }, [setIdClass, toogleViewGrade, setCohortId, setShowGrade])
 
   return (
     <CustomDialog
       open={openViewGrade}
-      title='Danh sách điểm'
+      title={`Danh sách kết quả học tập lớp ${classLecturer?.classId}`}
       onClose={handleClose}
-      maxWidth='lg'
+      fullScreen
       actions={
         <Button variant='contained' color='primary' onClick={handleClose}>
           Đóng
         </Button>
       }
     >
-      <GradeList
-        data={data?.data || []}
-        loading={isLoading}
-        page={page}
-        limit={limit}
-        sortField={sortField}
-        sortOrder={sortOrder}
-        handleSort={handleSort}
-        searchKey={searchKey}
-        classCode={idClass}
-        total={data?.pagination.totalItems || 0}
-      />
+      {isLoadingTrainingProgram && (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            padding: '20px',
+            alignItems: 'center'
+          }}
+        >
+          <CircularProgress sx={{ mb: 3 }} />
+          <p>Đang lấy dữ liệu từ Chương trình đào tạo...</p>
+        </div>
+      )}
+      {!isLoadingTrainingProgram && !trainingProgramData && (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            padding: '20px',
+            alignItems: 'center',
+            gap: '20px'
+          }}
+        >
+          <p style={{ fontSize: '18px', fontWeight: 'bold' }}>Không tìm thấy Chương trình đào tạo cho lớp này</p>
+
+          <Image
+            src={'/images/dataNotfound.jpg'}
+            alt='no-data'
+            style={{ borderRadius: '10px', objectFit: 'cover' }}
+            width={300}
+            height={300}
+          />
+        </div>
+      )}
+
+      {isLoadingGrade && <LoadingSkeleton />}
+
+      {trainingProgramData && gradeData && (
+        <>
+          {/* <GradeStatistics gradeData={gradeData?.data || []} /> */}
+          <GradeTrainingProgramTable
+            trainingProgramData={trainingProgramData?.data || []}
+            gradeData={gradeData?.data || []}
+            mutate={mutate}
+          />
+        </>
+      )}
     </CustomDialog>
   )
 }

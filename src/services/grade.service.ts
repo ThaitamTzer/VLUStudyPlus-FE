@@ -3,26 +3,20 @@ import type { GradeTypeByClassCode, GradeTypeById } from '@/types/management/gra
 
 const gradeService = {
   getGradeByClassCode: async (
-    classCode: string,
-    page?: number,
-    limit?: number,
+    classId: string,
     filterField?: string,
     filterValue?: string,
     sortField?: string,
-    sortOrder?: string,
-    searchKey?: string
+    sortOrder?: string
   ) => {
     const params = {
-      ...(page && { page: page }),
-      ...(limit && { limit: limit }),
       ...(filterField && { filterField: filterField }),
       ...(filterValue && { filterValue: filterValue }),
       ...(sortField && { sortField: sortField }),
-      ...(sortOrder && { sortOrder: sortOrder }),
-      ...(searchKey && { searchKey: searchKey })
+      ...(sortOrder && { sortOrder: sortOrder })
     }
 
-    const response = await axiosClient.get(`/api/grade/view-grade-GV/${classCode}`, { params })
+    const response = await axiosClient.get(`/api/grade/view-grade-GV/${classId}`, { params })
 
     return response.data as GradeTypeByClassCode
   },

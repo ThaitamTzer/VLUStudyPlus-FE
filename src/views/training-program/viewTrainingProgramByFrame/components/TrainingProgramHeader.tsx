@@ -1,10 +1,30 @@
+import { useMemo } from 'react'
+
 import { TableCell, TableHead } from '@mui/material'
 
 import { useSettings } from '@/@core/hooks/useSettings'
 import StyledTableRow from '@/components/table/StyledTableRow'
 
-const TrainingProgramHeader = () => {
+const TrainingProgramHeader = ({
+  action,
+  extendHeader
+}: {
+  action?: 'view' | 'edit'
+  extendHeader?: React.ReactNode
+}) => {
   const { settings } = useSettings()
+
+  const renderAction = useMemo(() => {
+    if (action === 'edit') {
+      return (
+        <TableCell width={200} sx={{ fontWeight: 'bold' }}>
+          Hành động
+        </TableCell>
+      )
+    }
+
+    return null
+  }, [action])
 
   return (
     <TableHead>
@@ -39,9 +59,8 @@ const TrainingProgramHeader = () => {
         <TableCell width={100} sx={{ fontWeight: 'bold' }}>
           HKTK
         </TableCell>
-        <TableCell width={200} sx={{ fontWeight: 'bold' }}>
-          Hành động
-        </TableCell>
+        {renderAction}
+        {extendHeader}
       </StyledTableRow>
     </TableHead>
   )

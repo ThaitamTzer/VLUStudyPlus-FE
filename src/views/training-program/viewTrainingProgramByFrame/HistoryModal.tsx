@@ -27,10 +27,10 @@ interface HistoryModalProps {
 
 const HistoryModal = ({ open, onClose, id }: HistoryModalProps) => {
   const { data: history } = useSWR(
-    `/api/edit-history/get-edit-history/${id}`,
+    id ? `/api/edit-history/get-edit-history/${id}` : null,
     () => changeHistoryService.getChangeHistoryById(id),
     {
-      revalidateOnMount: true,
+      revalidateOnMount: false,
       revalidateOnFocus: true
     }
   )

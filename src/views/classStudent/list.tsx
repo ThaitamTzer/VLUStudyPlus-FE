@@ -122,7 +122,7 @@ export default function ClassStudentList(props: ClassStudentListProps) {
                   direction={sortOrder === 'desc' ? 'desc' : 'asc'}
                   onClick={() => handleSort('isActive')}
                 >
-                  Tình trạng học tập
+                  Tình trạng
                 </TableSortLabel>
               </TableCell>
               <TableCell colSpan={2}>
@@ -149,7 +149,7 @@ export default function ClassStudentList(props: ClassStudentListProps) {
                   <TableCell size='small'>{student.cohortId}</TableCell>
                   <TableCell size='small'>{fDate(student.dateOfBirth, 'dd/MM/yyyy')}</TableCell>
                   <TableCell size='small'>
-                    {!student.isActive ? (
+                    {student.isActive ? (
                       <Chip label='Còn học' color='success' size='small' />
                     ) : (
                       <Chip label='Nghỉ học' color='error' size='small' />

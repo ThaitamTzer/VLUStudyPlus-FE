@@ -45,8 +45,50 @@ type StatCardProps = {
   color: 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success'
 }
 
+const EmptyState = ({ toogleImportGradeStudent }: { toogleImportGradeStudent: () => void }) => {
+  const theme = useTheme()
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '60vh',
+        textAlign: 'center',
+        p: 3
+      }}
+    >
+      <SchoolIcon sx={{ fontSize: 80, color: theme.palette.grey[400], mb: 2 }} />
+      <Typography variant='h5' color='text.secondary' gutterBottom>
+        Chưa có dữ liệu điểm
+      </Typography>
+      <Typography variant='body1' color='text.secondary' sx={{ maxWidth: 400, mb: 3 }}>
+        Hiện tại chưa có dữ liệu điểm nào được nhập. Vui lòng nhập điểm để xem thông tin chi tiết.
+      </Typography>
+      <Button
+        variant='contained'
+        startIcon={<AddIcon />}
+        onClick={toogleImportGradeStudent}
+        sx={{
+          borderRadius: 2,
+          textTransform: 'none',
+          px: 3,
+          py: 1
+        }}
+      >
+        Nhập điểm
+      </Button>
+    </Box>
+  )
+}
+
 export default function StudentGradePage() {
-  const { data, isLoading, mutate } = useSWR('api/grade/view-grade-SV', gradeService.getGradeStudent)
+  const { data, isLoading, mutate } = useSWR('api/grade/view-grade-SV', gradeService.getGradeStudent, {
+    errorRetryCount: 4,
+    shouldRetryOnError: false
+  })
 
   const theme = useTheme()
 
@@ -69,6 +111,16 @@ export default function StudentGradePage() {
       <Box display='flex' justifyContent='center' alignItems='center' minHeight='60vh'>
         <CircularProgress />
       </Box>
+    )
+  }
+
+  if (!data?.termGrades || data.termGrades.length === 0) {
+    return (
+      <>
+        <PageHeader title='Kết quả môn học' />
+        <EmptyState toogleImportGradeStudent={handleOpenImportGrade} />
+        <ImportGradeModal mutate={mutate} />
+      </>
     )
   }
 

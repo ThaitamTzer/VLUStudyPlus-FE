@@ -142,6 +142,7 @@ interface SubjectRowProps {
   idCate2: string
   idCate3: string
   mutate?: KeyedMutator<any>
+  action?: 'view' | 'edit'
 }
 
 // Hàm helper để so sánh và chỉ lấy dữ liệu đã thay đổi
@@ -170,7 +171,8 @@ const SubjectRow: React.FC<SubjectRowProps> = ({
   idCate1,
   idCate2,
   idCate3,
-  mutate
+  mutate,
+  action = 'view'
 }) => {
   const {
     control,
@@ -474,20 +476,22 @@ const SubjectRow: React.FC<SubjectRowProps> = ({
       <TableCell>{subject.prerequisites}</TableCell>
       <TableCell>{subject.preConditions}</TableCell>
       <TableCell>{subject.implementationSemester}</TableCell>
-      <TableCell>
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Tooltip title='Cập nhật môn học' arrow>
-            <IconButton size='small' color='primary' onClick={handleUpdate}>
-              <Iconify icon='eva:edit-fill' />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title='Xóa môn học' arrow>
-            <IconButton size='small' color='error' onClick={() => handleDelete(subject)}>
-              <Iconify icon='eva:trash-2-outline' />
-            </IconButton>
-          </Tooltip>
-        </div>
-      </TableCell>
+      {action === 'edit' && (
+        <TableCell>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Tooltip title='Cập nhật môn học' arrow>
+              <IconButton size='small' color='primary' onClick={handleUpdate}>
+                <Iconify icon='eva:edit-fill' />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Xóa môn học' arrow>
+              <IconButton size='small' color='error' onClick={() => handleDelete(subject)}>
+                <Iconify icon='eva:trash-2-outline' />
+              </IconButton>
+            </Tooltip>
+          </div>
+        </TableCell>
+      )}
     </AnimatedTableRow>
   )
 }

@@ -1,5 +1,3 @@
-import { useCallback } from 'react'
-
 import { useRouter } from 'next/navigation'
 
 import {
@@ -26,7 +24,6 @@ import TableNoData from '@/components/table/TableNotFound'
 import IsBlock from '../student/isBlock'
 import Iconify from '@/components/iconify'
 import { useClassStudentStore } from '@/stores/classStudent/classStudent.store'
-import { useGradeStore } from '@/stores/grade/grade.store'
 import TablePaginationCustom from '@/components/table/TablePagination'
 
 type ClassStudentListProps = {
@@ -66,15 +63,6 @@ const UserInfor = (data: ClassStudentType) => {
 export default function ClassStudentList(props: ClassStudentListProps) {
   const { data, loading, total, limit, page, handleSort, sortField, sortOrder, searchKey, classCode } = props
   const { toogleUpdateStudent } = useClassStudentStore()
-  const { toogleUpdateGrade, setStudent } = useGradeStore()
-
-  const handleUpdateGrade = useCallback(
-    (student: ClassStudentType) => {
-      toogleUpdateGrade()
-      setStudent(student)
-    },
-    [toogleUpdateGrade, setStudent]
-  )
 
   const router = useRouter()
 
@@ -164,11 +152,6 @@ export default function ClassStudentList(props: ClassStudentListProps) {
                       <Iconify icon='solar:eye-linear' />
                     </IconButton>
                   </Tooltip> */}
-                    <Tooltip title='Cập nhật điểm'>
-                      <IconButton size='medium' onClick={() => handleUpdateGrade(student)}>
-                        <Iconify icon='flowbite:edit-solid' style={{ color: '#129990' }} />
-                      </IconButton>
-                    </Tooltip>
                     <Tooltip title='Chỉnh sửa thông tin' onClick={() => toogleUpdateStudent(student)}>
                       <IconButton size='medium'>
                         <Iconify icon='mdi:account-edit' style={{ color: '#FF9B45' }} />

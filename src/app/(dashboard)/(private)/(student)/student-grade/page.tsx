@@ -7,7 +7,7 @@ const StudentGradePage = dynamic(() => import('@/views/student-grade/StudentGrad
 })
 
 export const metadata: Metadata = {
-  title: 'Kết quả môn học'
+  title: 'Kết quả học tập'
 }
 
 export default function Page() {

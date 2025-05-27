@@ -23,6 +23,7 @@ export type TermGradeType = {
   term: TermType
   gradeOfSubject: GradeOfSubjectType[]
   _id: string
+  advise: string
 }
 
 export type GradeType = {
@@ -68,6 +69,7 @@ export type TermGradesType = {
   }
   gradeOfSubject: GradeOfSubject[]
   _id: string
+  advise: string
 }
 
 export type GradeTypeById = {

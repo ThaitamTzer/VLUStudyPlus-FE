@@ -10,33 +10,32 @@ import {
   Typography,
   Grid,
   CircularProgress,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Chip,
   LinearProgress,
   Tooltip,
   IconButton,
   useTheme,
   Button,
-  Stack
+  Alert
 } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SchoolIcon from '@mui/icons-material/School'
 import GradeIcon from '@mui/icons-material/Grade'
 import CreditScoreIcon from '@mui/icons-material/CreditScore'
 import InfoIcon from '@mui/icons-material/Info'
-import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
+
+import trainingProgramService from '@/services/trainingprogram.service'
 
 import gradeService from '@/services/grade.service'
 import PageHeader from '@/components/page-header'
 import ImportGradeModal from './ImportGradeModal'
 import { useGradeStore } from '@/stores/grade/grade.store'
 import ModalUpdateGrade from './UpdateGradeModal'
-import type { TermGradesType } from '@/types/management/gradeTypes'
+import ViewAdviseHistoryModal from './ViewAdviseHistoryModal'
+import { useAuth } from '@/hooks/useAuth'
+import StudentGradeTrainingTable from './StudentGradeTrainingTable'
+import { useShare } from '@/hooks/useShare'
 
 type StatCardProps = {
   icon: React.ElementType
@@ -85,51 +84,68 @@ const EmptyState = ({ toogleImportGradeStudent }: { toogleImportGradeStudent: ()
 }
 
 export default function StudentGradePage() {
-  const { data, isLoading, mutate } = useSWR('api/grade/view-grade-SV', gradeService.getGradeStudent, {
+  const theme = useTheme()
+  const { user } = useAuth()
+  const { cohorOptions } = useShare()
+
+  const cohortId = cohorOptions.find(cohort => cohort.cohortId === user?.cohortId)?._id
+
+  const { data, isLoading, mutate, error } = useSWR('api/grade/view-grade-SV', gradeService.getGradeStudent, {
     errorRetryCount: 4,
     shouldRetryOnError: false
   })
 
-  const theme = useTheme()
+  const { data: trainingProgramData } = useSWR(
+    cohortId ? ['trainingProgramForStudent', cohortId] : null,
+    () => trainingProgramService.getTrainingProgramByCohortId(cohortId || ''),
+    {
+      revalidateOnFocus: false
+    }
+  )
 
-  const { toogleImportGradeStudent, toogleUpdateGradeStudent, setTermGradeUpdate } = useGradeStore()
+  console.log('trainingProgramData', trainingProgramData)
+
+  const { toogleImportGradeStudent } = useGradeStore()
 
   const handleOpenImportGrade = useCallback(() => {
     toogleImportGradeStudent()
   }, [toogleImportGradeStudent])
 
-  const handleOpenUpdateGrade = useCallback(
-    (termGrade: TermGradesType) => {
-      toogleUpdateGradeStudent()
-      setTermGradeUpdate(termGrade)
-    },
-    [toogleUpdateGradeStudent, setTermGradeUpdate]
-  )
-
   if (isLoading) {
     return (
-      <Box display='flex' justifyContent='center' alignItems='center' minHeight='60vh'>
-        <CircularProgress />
-      </Box>
+      <>
+        <PageHeader title='Kết quả học tập' />
+        <Box display='flex' justifyContent='center' alignItems='center' minHeight='60vh'>
+          <CircularProgress size={60} thickness={4} />
+        </Box>
+      </>
+    )
+  }
+
+  if (error) {
+    return (
+      <>
+        <PageHeader title='Kết quả học tập' />
+        <Box sx={{ p: 3 }}>
+          <Alert severity='error' sx={{ mb: 2 }}>
+            Không thể tải dữ liệu điểm. Vui lòng thử lại sau.
+          </Alert>
+          <Button variant='contained' onClick={() => mutate()} startIcon={<RefreshIcon />}>
+            Thử lại
+          </Button>
+        </Box>
+      </>
     )
   }
 
   if (!data?.termGrades || data.termGrades.length === 0) {
     return (
       <>
-        <PageHeader title='Kết quả môn học' />
+        <PageHeader title='Kết quả học tập' />
         <EmptyState toogleImportGradeStudent={handleOpenImportGrade} />
         <ImportGradeModal mutate={mutate} />
       </>
     )
-  }
-
-  const getGradeColor = (grade: number) => {
-    if (grade >= 8.5) return 'success'
-    if (grade >= 7) return 'info'
-    if (grade >= 5.5) return 'warning'
-
-    return 'error'
   }
 
   const calculateGPA = () => {
@@ -200,27 +216,9 @@ export default function StudentGradePage() {
 
   return (
     <>
-      <PageHeader title='Kết quả môn học' />
+      <PageHeader title='Kết quả học tập' />
 
       <Box sx={{ p: 3 }}>
-        <Stack direction='row' justifyContent='flex-end' mb={3}>
-          <Button
-            variant='contained'
-            startIcon={<AddIcon />}
-            onClick={() => {
-              handleOpenImportGrade()
-            }}
-            sx={{
-              borderRadius: 2,
-              textTransform: 'none',
-              px: 3,
-              py: 1
-            }}
-          >
-            Nhập điểm
-          </Button>
-        </Stack>
-
         <Grid container spacing={3}>
           {/* Thông tin tổng quan */}
           <Grid item xs={12}>
@@ -288,107 +286,14 @@ export default function StudentGradePage() {
             </Card>
           </Grid>
 
-          {/* Chi tiết từng học kỳ */}
           <Grid item xs={12}>
-            {data?.termGrades.map(termGrade => (
-              <Accordion
-                key={termGrade._id}
-                sx={{
-                  mb: 2,
-                  '&:before': { display: 'none' },
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                  borderRadius: '8px !important',
-                  overflow: 'hidden'
-                }}
-              >
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  sx={{
-                    backgroundColor: theme.palette.primary.main + '08',
-                    '&:hover': {
-                      backgroundColor: theme.palette.primary.main + '12'
-                    }
-                  }}
-                >
-                  <Box display='flex' alignItems='center' justifyContent='space-between' width='100%'>
-                    <Box display='flex' alignItems='center' gap={2}>
-                      <TrendingUpIcon color='primary' />
-                      <Box>
-                        <Typography variant='h6' fontWeight='bold'>
-                          {termGrade.term.termName}
-                        </Typography>
-                        <Typography variant='body2' color='text.secondary'>
-                          {termGrade.term.academicYear}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <Button
-                      variant='outlined'
-                      startIcon={<RefreshIcon />}
-                      onClick={e => {
-                        e.stopPropagation()
-                        handleOpenUpdateGrade(termGrade)
-                      }}
-                      sx={{
-                        borderRadius: 2,
-                        textTransform: 'none',
-                        px: 2
-                      }}
-                    >
-                      Cập nhật
-                    </Button>
-                  </Box>
-                </AccordionSummary>
-                <AccordionDetails sx={{ p: 2 }}>
-                  <Grid container spacing={2}>
-                    {termGrade.gradeOfSubject.map(subject => (
-                      <Grid item xs={12} key={subject._id}>
-                        <Card
-                          variant='outlined'
-                          sx={{
-                            transition: 'all 0.2s',
-                            '&:hover': {
-                              transform: 'translateY(-2px)',
-                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                            }
-                          }}
-                        >
-                          <CardContent>
-                            <Grid container spacing={2} alignItems='center'>
-                              <Grid item xs={12} md={6}>
-                                <Typography variant='subtitle1' fontWeight='bold'>
-                                  {subject.subjectId.courseName}
-                                </Typography>
-                                <Typography variant='body2' color='text.secondary'>
-                                  Số tín chỉ: {subject.subjectId.credits}
-                                </Typography>
-                              </Grid>
-                              <Grid item xs={12} md={6} sx={{ textAlign: 'right' }}>
-                                <Chip
-                                  label={`Điểm: ${subject.grade}`}
-                                  color={getGradeColor(subject.grade)}
-                                  sx={{
-                                    fontSize: '1rem',
-                                    padding: '20px 10px',
-                                    fontWeight: 'bold',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                                  }}
-                                />
-                              </Grid>
-                            </Grid>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </AccordionDetails>
-              </Accordion>
-            ))}
+            <StudentGradeTrainingTable trainingProgramData={trainingProgramData?.data || []} gradeData={data} />
           </Grid>
         </Grid>
       </Box>
       <ImportGradeModal mutate={mutate} />
       <ModalUpdateGrade mutate={mutate} />
+      <ViewAdviseHistoryModal />
     </>
   )
 }

@@ -119,6 +119,30 @@ const gradeService = {
 
       return Promise.reject(error)
     }
+  },
+
+  updateAdvise: async (
+    gradeId: string,
+    termId: string,
+    data: { advise: string },
+    successCallback?: (res: any) => void,
+    errorCallback?: (err: any) => void
+  ) => {
+    try {
+      return await axiosClient.put(`/api/grade/update-advise/${gradeId}/${termId}`, data).then(res => {
+        if (successCallback) {
+          successCallback(res.data)
+        }
+
+        return res.data
+      })
+    } catch (error) {
+      if (errorCallback) {
+        errorCallback(error)
+      }
+
+      return Promise.reject(error)
+    }
   }
 }
 

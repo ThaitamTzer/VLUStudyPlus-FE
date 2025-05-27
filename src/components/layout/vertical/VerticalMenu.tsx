@@ -258,9 +258,6 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             </MenuItem>
           </SubMenu>
         )}
-        <MenuItem href='/grade-result' icon={<Iconify icon='carbon:result-draft' />}>
-          KẾT QUẢ HỌC TẬP
-        </MenuItem>
         {(user?.role.name === 'CVHT' || user?.role.name === 'BCN Khoa') && (
           <MenuItem href='/training-program' icon={<Iconify icon='solar:book-bookmark-linear' />}>
             KHUNG CTĐT

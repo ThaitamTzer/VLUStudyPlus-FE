@@ -1,13 +1,10 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useState, useEffect, useMemo } from 'react'
 
-import { Grid, Box, Button, CircularProgress, Typography, Chip, IconButton } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
-import DeleteIcon from '@mui/icons-material/Delete'
+import { Grid, Box, Button, Typography, Card, CardContent, Divider, Chip } from '@mui/material'
 
 import type { KeyedMutator } from 'swr'
-import useSWR from 'swr'
 
 import * as v from 'valibot'
 import type { InferInput } from 'valibot'
@@ -20,194 +17,42 @@ import { toast } from 'react-toastify'
 
 import { LoadingButton } from '@mui/lab'
 
+import useSWR from 'swr'
+
 import { CustomDialog } from '@/components/CustomDialog'
 import { useGradeStore } from '@/stores/grade/grade.store'
 import CustomTextField from '@/@core/components/mui/TextField'
+import gradeService from '@/services/grade.service'
 import termService from '@/services/term.service'
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
-import trainingProgramService from '@/services/trainingprogram.service'
-import type { TrainingProgramByFrame } from '@/types/management/trainningProgramType'
-import gradeService from '@/services/grade.service'
-import { useAuth } from '@/hooks/useAuth'
 
-const termGradesSchema = v.object({
+const gradeSchema = v.object({
   term: v.pipe(v.string(), v.nonEmpty('Mã học kỳ không được để trống')),
-  gradeOfSubject: v.pipe(
-    v.array(
-      v.object({
-        subjectId: v.pipe(v.string(), v.nonEmpty('Mã môn học không được để trống')),
-        grade: v.pipe(
-          v.number('Điểm phải là số'),
-          v.minValue(0, 'Điểm không được âm'),
-          v.maxValue(10, 'Điểm không được lớn hơn 10')
-        )
-      })
-    ),
-    v.minLength(1, 'Không được để trống môn học và điểm')
+  grade: v.pipe(
+    v.number('Điểm phải là số'),
+    v.minValue(0, 'Điểm không được âm'),
+    v.maxValue(10, 'Điểm không được lớn hơn 10')
   )
 })
 
-type GradeSchema = InferInput<typeof termGradesSchema>
+type GradeSchema = InferInput<typeof gradeSchema>
 
 export default function ModalUpdateGrade({ mutate }: { mutate: KeyedMutator<any> }) {
-  const { openUpdateGradeStudent, toogleUpdateGradeStudent, termGradeUpdate } = useGradeStore()
-  const { user } = useAuth()
-
-  const saveTermGrade = useMemo(() => {
-    return termGradeUpdate
-  }, [termGradeUpdate])
-
+  const { openUpdateGradeStudent, toogleUpdateGradeStudent, termGradeUpdate, subject, subjectId } = useGradeStore()
+  const [isLoading, setIsLoading] = useState(false)
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [idTrainingProgram, setIdTrainingProgram] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [subjects, setSubjects] = useState<any[]>([])
-
-  const [pageTrainingProgram, setPageTrainingProgram] = useState(1)
-
-  const { data: trainingPrograms, isLoading: isLoadingTrainingPrograms } = useSWR(
-    ['trainingPrograms', pageTrainingProgram, 10, '', '', ''],
-    () => trainingProgramService.getAll(pageTrainingProgram, 10, '', '', ''),
-    {
-      revalidateOnFocus: false,
-      revalidateOnMount: true
-    }
-  )
-
-  const processSubjects = useCallback((data: TrainingProgramByFrame[]) => {
-    if (!data) return []
-
-    const allSubjects = data?.flatMap((item: TrainingProgramByFrame) =>
-      item.categories.flatMap((category: any) => category.subjects)
-    )
-
-    const allSubjectsFromCategoriesC3 = data?.flatMap((item: TrainingProgramByFrame) =>
-      item.categories.flatMap((category: any) => category.categoriesC3?.flatMap((c3: any) => c3.subjects))
-    )
-
-    const processedSubjects = allSubjects?.map((subject: any) => ({
-      ...subject,
-      categoryName: subject.categoryName || 'Không có danh mục'
-    }))
-
-    const processedSubjectsFromCategoriesC3 = allSubjectsFromCategoriesC3?.map((subject: any) => ({
-      ...subject,
-      categoryName: subject.categoryName || 'Không có danh mục'
-    }))
-
-    return [...(processedSubjects || []), ...(processedSubjectsFromCategoriesC3 || [])]
-  }, [])
-
-  const handleGetIdTrainingProgram = useCallback(() => {
-    if (user && trainingPrograms?.data) {
-      const cohortId = user.cohortId
-
-      const idTrainingProgram = trainingPrograms?.data.find((item: any) => item.cohortId.cohortId === cohortId)?._id
-
-      if (idTrainingProgram) {
-        setIdTrainingProgram(idTrainingProgram)
-      }
-    }
-  }, [user, trainingPrograms])
-
-  useEffect(() => {
-    handleGetIdTrainingProgram()
-  }, [handleGetIdTrainingProgram])
 
   const { data: terms, isLoading: isLoadingTerms } = useSWR(
-    ['terms', page, 10, '', '', '', searchTerm],
-    () => termService.getAll(page, 10, '', '', '', '', '', searchTerm),
+    ['termsOptions', page, 10, '', '', '', ''],
+    () => termService.getAll(page, 10, '', '', '', '', '', ''),
     {
       onSuccess: data => {
         setTotal(data.pagination.totalItems)
       },
-      revalidateOnFocus: false,
       revalidateOnMount: true
     }
   )
-
-  const { isLoading: isLoadingTrainingProgram } = useSWR(
-    idTrainingProgram ? ['trainingProgram', idTrainingProgram] : null,
-    () => trainingProgramService.getTrainingProgramByFrame(idTrainingProgram),
-    {
-      onSuccess: data => {
-        const processedSubjects = processSubjects(data)
-
-        setSubjects(processedSubjects)
-      },
-      revalidateOnFocus: false,
-      revalidateOnMount: true
-    }
-  )
-
-  const {
-    control,
-    handleSubmit,
-    watch,
-    setValue,
-    reset,
-    formState: { errors, isValid }
-  } = useForm<GradeSchema>({
-    mode: 'all',
-    resolver: valibotResolver(termGradesSchema),
-    defaultValues: {
-      term: termGradeUpdate?.term._id || '',
-      gradeOfSubject:
-        termGradeUpdate?.gradeOfSubject.map((subject: any) => ({
-          subjectId: subject.subjectId || '',
-          grade: subject.grade || 0
-        })) || []
-    }
-  })
-
-  useEffect(() => {
-    if (idTrainingProgram) {
-      trainingProgramService.getTrainingProgramByFrame(idTrainingProgram).then(res => {
-        const processedSubjects = processSubjects(res)
-
-        setSubjects(processedSubjects)
-      })
-    }
-  }, [idTrainingProgram, processSubjects])
-
-  // Sau đó, chỉ reset form khi đã có termGradeUpdate và subjects đã load xong
-  useEffect(() => {
-    if (saveTermGrade && subjects.length > 0) {
-      reset({
-        term: saveTermGrade?.term?._id || '',
-        gradeOfSubject:
-          saveTermGrade?.gradeOfSubject.map(subject => ({
-            subjectId: subject.subjectId._id || '',
-            grade: subject.grade || 0
-          })) || []
-      })
-    }
-  }, [saveTermGrade, subjects, reset])
-
-  const gradeOfSubject = watch('gradeOfSubject')
-
-  const handleClose = useCallback(() => {
-    toogleUpdateGradeStudent()
-    setSearchTerm('')
-    setPage(1)
-    setPageTrainingProgram(1)
-    reset()
-  }, [toogleUpdateGradeStudent, reset])
-
-  const addSubject = () => {
-    const currentSubjects = watch('gradeOfSubject')
-
-    setValue('gradeOfSubject', [...currentSubjects, { subjectId: '', grade: 0 }])
-  }
-
-  const removeSubject = (index: number) => {
-    const currentSubjects = watch('gradeOfSubject')
-    const updatedSubjects = [...currentSubjects]
-
-    updatedSubjects.splice(index, 1)
-    setValue('gradeOfSubject', updatedSubjects)
-  }
 
   const handleScroll = (event: React.SyntheticEvent) => {
     const listboxNode = event.currentTarget
@@ -222,35 +67,94 @@ export default function ModalUpdateGrade({ mutate }: { mutate: KeyedMutator<any>
     }
   }
 
+  // Tìm điểm hiện tại của môn học
+  const currentGradeOfSubject = useMemo(() => {
+    if (!termGradeUpdate || !subjectId) return null
+
+    return termGradeUpdate.gradeOfSubject.find(gradeSubject => gradeSubject.subjectId._id === subjectId)
+  }, [termGradeUpdate, subjectId])
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid }
+  } = useForm<GradeSchema>({
+    mode: 'all',
+    resolver: valibotResolver(gradeSchema),
+    defaultValues: {
+      term: '',
+      grade: 0
+    }
+  })
+
+  // Set điểm hiện tại khi modal mở
+  useEffect(() => {
+    if (openUpdateGradeStudent && currentGradeOfSubject) {
+      reset({
+        term: termGradeUpdate?.term._id || '',
+        grade: currentGradeOfSubject.grade || 0
+      })
+    }
+  }, [openUpdateGradeStudent, currentGradeOfSubject, reset, termGradeUpdate?.term._id])
+
+  const handleClose = useCallback(() => {
+    toogleUpdateGradeStudent()
+    reset()
+  }, [toogleUpdateGradeStudent, reset])
+
   const onSubmit = handleSubmit(data => {
-    const dataFormat = {
-      termGrades: [
-        {
-          term: data.term,
-          gradeOfSubject: data.gradeOfSubject
-        }
-      ]
+    if (!termGradeUpdate || !subjectId) {
+      toast.error('Không tìm thấy thông tin điểm cần cập nhật')
+
+      return
     }
 
     const toastId = toast.loading('Đang cập nhật điểm...')
 
     setIsLoading(true)
 
+    // Tạo bản sao của toàn bộ gradeOfSubject từ học kỳ hiện tại
+    const updatedGradeOfSubject = termGradeUpdate.gradeOfSubject.map(gradeSubject => {
+      // Nếu là môn học đang được cập nhật, thay đổi điểm
+      if (gradeSubject.subjectId._id === subjectId) {
+        return {
+          subjectId: gradeSubject.subjectId._id,
+          grade: data.grade
+        }
+      }
+
+      // Các môn khác giữ nguyên điểm cũ
+      return {
+        subjectId: gradeSubject.subjectId._id,
+        grade: gradeSubject.grade
+      }
+    })
+
+    // Tạo data cập nhật với toàn bộ dữ liệu môn học trong học kỳ
+
+    const submitData = {
+      termGrades: [
+        {
+          term: data.term,
+          gradeOfSubject: updatedGradeOfSubject
+        }
+      ]
+    }
+
     gradeService.updateGradeStudent(
-      termGradeUpdate?._id || '',
-      dataFormat,
+      termGradeUpdate._id,
+      submitData,
       () => {
         setIsLoading(false)
+        mutate()
+        handleClose()
         toast.update(toastId, {
           render: 'Cập nhật điểm thành công',
           type: 'success',
           isLoading: false,
           autoClose: 3000
         })
-
-        mutate()
-
-        handleClose()
       },
       err => {
         setIsLoading(false)
@@ -268,8 +172,8 @@ export default function ModalUpdateGrade({ mutate }: { mutate: KeyedMutator<any>
     <CustomDialog
       open={openUpdateGradeStudent}
       onClose={handleClose}
-      title={`Cập nhật điểm`}
-      maxWidth='md'
+      title={`Cập nhật điểm môn học`}
+      maxWidth='sm'
       fullWidth
       onSubmit={onSubmit}
       actions={
@@ -278,157 +182,173 @@ export default function ModalUpdateGrade({ mutate }: { mutate: KeyedMutator<any>
             Đóng
           </Button>
           <LoadingButton disabled={!isValid} loading={isLoading} type='submit' variant='contained' color='primary'>
-            Lưu
+            Cập nhật điểm
           </LoadingButton>
         </>
       }
     >
       <Grid container spacing={3}>
-        {(isLoadingTrainingPrograms || isLoadingTrainingProgram) && (
+        {/* Thông tin môn học */}
+        {subject && (
           <Grid item xs={12}>
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-              <Typography variant='h6'>Đang tải dữ liệu môn học...</Typography>
-              <CircularProgress sx={{ ml: 2 }} />
-            </Box>
+            <Card variant='outlined' sx={{ mb: 2 }}>
+              <CardContent>
+                <Typography variant='h6' gutterBottom>
+                  📚 Thông tin môn học
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <Typography variant='body1'>
+                    <strong>Mã môn:</strong> {subject.courseCode}
+                  </Typography>
+                  <Typography variant='body1'>
+                    <strong>Tên môn:</strong> {subject.courseName}
+                  </Typography>
+                  <Typography variant='body1'>
+                    <strong>Số tín chỉ:</strong> {subject.credits}
+                  </Typography>
+                </Box>
+              </CardContent>
+            </Card>
           </Grid>
         )}
-        {!isLoadingTrainingProgram && !isLoadingTrainingPrograms && (
-          <>
-            <Grid item xs={12}>
-              <Controller
-                control={control}
-                name='term'
-                render={({ field }) => (
-                  <CustomAutocomplete
-                    {...field}
-                    options={terms?.terms || []}
-                    getOptionLabel={option => option.termName || ''}
-                    isOptionEqualToValue={(option, value) => option._id === value._id}
-                    renderOption={(props, option) => (
-                      <li {...props}>
-                        {option.termName} -{' '}
-                        <Chip
-                          label={option.status}
-                          size='small'
-                          color={option.status === 'Đã kết thúc' ? 'success' : 'default'}
-                        />
-                      </li>
-                    )}
-                    onChange={(_, value) => {
-                      if (value) {
-                        field.onChange(value._id)
-                      } else {
-                        field.onChange('')
-                      }
-                    }}
-                    value={terms?.terms.find(term => term._id === field.value) || null}
-                    renderInput={params => (
-                      <CustomTextField
-                        {...params}
-                        label='Học kỳ'
-                        {...(errors.term && {
-                          error: true,
-                          helperText: errors.term.message?.toString()
-                        })}
-                      />
-                    )}
-                    ListboxProps={{
-                      onScroll: handleScroll
-                    }}
-                    loading={isLoadingTerms}
-                    noOptionsText='Không tìm thấy học kỳ'
-                    filterOptions={(options, state) => {
-                      const filtered = options?.filter(option =>
-                        option.termName.toLowerCase().includes(state.inputValue.toLowerCase())
-                      )
 
-                      return filtered
-                    }}
+        {/* Thông tin học kỳ */}
+        {termGradeUpdate && (
+          <Grid item xs={12}>
+            <Card variant='outlined' sx={{ mb: 2 }}>
+              <CardContent>
+                <Typography variant='h6' gutterBottom>
+                  📅 Thông tin học kỳ
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <Typography variant='body1'>
+                  <strong>Học kỳ:</strong> {termGradeUpdate.term.abbreviatName}
+                </Typography>
+
+                {/* Hiển thị các môn học khác trong cùng học kỳ */}
+                {termGradeUpdate.gradeOfSubject.length > 1 && (
+                  <>
+                    <Typography variant='body2' sx={{ mt: 2, mb: 1, fontWeight: 600 }}>
+                      📋 Các môn học khác trong học kỳ này (sẽ được giữ nguyên):
+                    </Typography>
+                    {termGradeUpdate.gradeOfSubject
+                      .filter(gradeSubject => gradeSubject.subjectId._id !== subjectId)
+                      .map((gradeSubject, index) => (
+                        <Box
+                          key={index}
+                          sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 0.5 }}
+                        >
+                          <Typography variant='body2' color='text.secondary'>
+                            • {gradeSubject.subjectId.courseName}
+                          </Typography>
+                          <Chip
+                            label={`Điểm: ${gradeSubject.grade}`}
+                            size='small'
+                            variant='outlined'
+                            color={
+                              gradeSubject.grade >= 8
+                                ? 'success'
+                                : gradeSubject.grade >= 6.5
+                                  ? 'warning'
+                                  : gradeSubject.grade < 5
+                                    ? 'error'
+                                    : 'default'
+                            }
+                          />
+                        </Box>
+                      ))}
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
+
+        {/* Nhập mã học kỳ */}
+        <Grid item xs={12}>
+          <Controller
+            control={control}
+            name='term'
+            render={({ field }) => (
+              <CustomAutocomplete
+                {...field}
+                options={terms?.terms || []}
+                getOptionLabel={option => option.abbreviatName || ''}
+                isOptionEqualToValue={(option, value) => option._id === value._id}
+                renderOption={(props, option) => (
+                  <li {...props}>
+                    {option.abbreviatName} -{' '}
+                    <Chip
+                      label={option.status}
+                      size='small'
+                      color={option.status === 'Đã kết thúc' ? 'success' : 'default'}
+                    />
+                  </li>
+                )}
+                onChange={(_, value) => {
+                  if (value) {
+                    field.onChange(value._id)
+                  } else {
+                    field.onChange('')
+                  }
+                }}
+                value={terms?.terms.find(term => term._id === field.value) || null}
+                renderInput={params => (
+                  <CustomTextField
+                    {...params}
+                    label='Chọn học kỳ'
+                    {...(errors.term && {
+                      error: true,
+                      helperText: errors.term.message?.toString()
+                    })}
                   />
                 )}
+                ListboxProps={{
+                  onScroll: handleScroll
+                }}
+                loading={isLoadingTerms}
+                noOptionsText='Không tìm thấy học kỳ'
+                filterOptions={(options, state) => {
+                  const filtered = options?.filter(option =>
+                    option.termName.toLowerCase().includes(state.inputValue.toLowerCase())
+                  )
+
+                  return filtered
+                }}
               />
-            </Grid>
+            )}
+          />
+        </Grid>
 
-            {gradeOfSubject.map((subject, index) => (
-              <Grid item xs={12} key={index}>
-                <Grid container spacing={2} alignItems='end'>
-                  <Grid item xs={12} md={6}>
-                    <Controller
-                      control={control}
-                      name={`gradeOfSubject.${index}.subjectId`}
-                      render={({ field }) => (
-                        <CustomAutocomplete
-                          {...field}
-                          options={subjects || []}
-                          getOptionLabel={option => `${option.courseCode} - ${option.courseName}`}
-                          onChange={(_, value) => {
-                            if (value) {
-                              field.onChange(value?._id || '')
-                            } else {
-                              field.onChange('')
-                            }
-                          }}
-                          value={subjects?.find(subject => subject?._id === field.value) || null}
-                          renderInput={params => <CustomTextField {...params} label='Môn học' />}
-                          noOptionsText='Không tìm thấy môn học'
-                          filterOptions={(options, state) => {
-                            const searchTerm = state.inputValue.toLowerCase()
+        {/* Nhập điểm mới */}
+        <Grid item xs={12}>
+          <Controller
+            control={control}
+            name='grade'
+            render={({ field }) => (
+              <CustomTextField
+                {...field}
+                {...(errors.grade && {
+                  error: true,
+                  helperText: errors.grade.message?.toString()
+                })}
+                type='number'
+                onChange={e => {
+                  const value = e.target.value === '' ? '' : parseFloat(e.target.value)
 
-                            return (
-                              options?.filter(
-                                option =>
-                                  option?.courseCode?.toLowerCase().includes(searchTerm) ||
-                                  option?.courseName?.toLowerCase().includes(searchTerm)
-                              ) || []
-                            )
-                          }}
-                        />
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <Controller
-                      control={control}
-                      name={`gradeOfSubject.${index}.grade`}
-                      render={({ field }) => (
-                        <CustomTextField
-                          {...field}
-                          {...(errors.gradeOfSubject?.[index]?.grade && {
-                            error: true,
-                            helperText: errors.gradeOfSubject?.[index]?.grade.message?.toString()
-                          })}
-                          type='number'
-                          onChange={e => {
-                            const value = e.target.value === '' ? '' : parseFloat(e.target.value)
-
-                            if (value === '' || !isNaN(value)) {
-                              field.onChange(value)
-                            }
-                          }}
-                          value={field.value}
-                          label='Điểm'
-                          fullWidth
-                          inputProps={{ min: 0, max: 10, step: 0.1 }}
-                        />
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={2}>
-                    <IconButton color='error' onClick={() => removeSubject(index)} sx={{ mt: 1 }}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Grid>
-                </Grid>
-              </Grid>
-            ))}
-
-            <Grid item xs={12}>
-              <Button variant='contained' onClick={addSubject} startIcon={<AddIcon />}>
-                Thêm môn học
-              </Button>
-            </Grid>
-          </>
-        )}
+                  if (value === '' || !isNaN(value)) {
+                    field.onChange(value)
+                  }
+                }}
+                value={field.value}
+                label={`Điểm số hiện tại: ${currentGradeOfSubject?.grade || 0} → Điểm mới (0 - 10)`}
+                fullWidth
+                inputProps={{ min: 0, max: 10, step: 0.1 }}
+              />
+            )}
+          />
+        </Grid>
       </Grid>
     </CustomDialog>
   )

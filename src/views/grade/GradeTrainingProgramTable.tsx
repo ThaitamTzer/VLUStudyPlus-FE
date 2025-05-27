@@ -1,43 +1,149 @@
 'use client'
 
-import React from 'react'
+import { Fragment, memo, useCallback, useMemo, useState } from 'react'
 
-import {
-  Table,
-  TableBody,
-  TableContainer,
-  TableCell,
-  TableHead,
-  TableRow,
-  Typography,
-  Chip,
-  Box,
-  Stack,
-  Paper
-} from '@mui/material'
-import type { KeyedMutator } from 'swr'
+import { Table, TableBody, TableContainer, Chip, Paper, Button, Box, Skeleton } from '@mui/material'
 
 import type { TrainingProgramByFrame, Categories, Subjects } from '@/types/management/trainningProgramType'
-import type { GradeType } from '@/types/management/gradeTypes'
+import type { GradeType, StudentType } from '@/types/management/gradeTypes'
 import TableNoData from '@/components/table/TableNotFound'
-import { useSettings } from '@/@core/hooks/useSettings'
-import StyledTableRow from '@/components/table/StyledTableRow'
+import CustomIconButton from '@/@core/components/mui/IconButton'
+import Iconify from '@/components/iconify'
+import { CategoryRow, ProgramRow, SubjectRow } from './component/TableComppnent'
+import { TableHeader } from './component/TableHeader'
+import { useGradeStore } from '@/stores/grade/grade.store'
 
 interface GradeTrainingProgramTableProps {
   trainingProgramData: TrainingProgramByFrame[]
   gradeData: GradeType[]
-  mutate?: KeyedMutator<any>
 }
 
 interface GradeInfo {
   [studentId: string]: { grade: number; status: string }
 }
 
-const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({ trainingProgramData, gradeData }) => {
-  const { settings } = useSettings()
+const ITEMS_PER_PAGE = 50 // Phân trang để tối ưu hiệu suất
 
-  // Tạo map điểm số theo subjectId và studentId
-  const gradesMap = React.useMemo(() => {
+const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({ trainingProgramData, gradeData }) => {
+  const {
+    toogleUpdateGrade,
+    setSubjectId,
+    setStudentId,
+    setSubject,
+    setStudentGrade,
+    toogleUpdateExistingGrade,
+    setCurrentTermGrade,
+    setCurrentGradeSubjectIndex,
+    setIsUpdatingExisting,
+    setCurrentGradeId,
+    setCurrentTermGradeId,
+    toogleUpdateAdvise,
+    setCurrentAdviseGradeId,
+    setCurrentAdviseTermId,
+    setCurrentAdvise
+  } = useGradeStore()
+
+  const [currentPage, setCurrentPage] = useState(0)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleUpdateGrade = useCallback(
+    (subjectId: string, studentId: string, subject: Subjects, student: StudentType) => {
+      toogleUpdateGrade()
+      setSubjectId(subjectId)
+      setStudentId(studentId)
+      setSubject(subject)
+      setStudentGrade(student)
+    },
+    [toogleUpdateGrade, setSubjectId, setStudentId, setSubject, setStudentGrade]
+  )
+
+  // Handle click vào điểm hiện có để cập nhật
+  const handleUpdateExistingGrade = useCallback(
+    (subjectId: string, studentId: string, subject: Subjects, student: StudentType) => {
+      // Tìm student data trong gradeData
+      const studentGradeData = gradeData.find(grade => grade.studentId._id === studentId)
+
+      if (!studentGradeData) {
+        console.error('Không tìm thấy dữ liệu điểm của sinh viên')
+
+        return
+      }
+
+      // Tìm termGrade chứa subjectId
+      let foundTermGrade = null
+      let foundGradeSubjectIndex = -1
+
+      for (const termGrade of studentGradeData.termGrades) {
+        const gradeSubjectIndex = termGrade.gradeOfSubject.findIndex(
+          gradeSubject => gradeSubject.subjectId._id === subjectId
+        )
+
+        if (gradeSubjectIndex !== -1) {
+          foundTermGrade = termGrade
+          foundGradeSubjectIndex = gradeSubjectIndex
+          break
+        }
+      }
+
+      if (foundTermGrade && foundGradeSubjectIndex !== -1) {
+        // Set thông tin cần thiết vào store
+        setSubjectId(subjectId)
+        setStudentId(studentId)
+        setSubject(subject)
+        setStudentGrade(student)
+        setCurrentTermGrade(foundTermGrade)
+        setCurrentGradeSubjectIndex(foundGradeSubjectIndex)
+        setCurrentGradeId(studentGradeData._id) // Set gradeId
+        setCurrentTermGradeId(foundTermGrade._id) // Set termGradeId
+        setIsUpdatingExisting(true)
+        toogleUpdateExistingGrade()
+      } else {
+        console.error('Không tìm thấy termGrade chứa môn học này')
+      }
+    },
+    [
+      gradeData,
+      setSubjectId,
+      setStudentId,
+      setSubject,
+      setStudentGrade,
+      setCurrentTermGrade,
+      setCurrentGradeSubjectIndex,
+      setIsUpdatingExisting,
+      toogleUpdateExistingGrade,
+      setCurrentGradeId,
+      setCurrentTermGradeId
+    ]
+  )
+
+  // Handle update advise
+  const handleUpdateAdvise = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (student: StudentType, gradeId: string, _termGrades: any[]) => {
+      setStudentGrade(student)
+      setCurrentAdviseGradeId(gradeId)
+
+      // Reset other states - will be set when user selects a term
+      setCurrentAdviseTermId('')
+      setCurrentAdvise('')
+      setCurrentTermGrade(null as any)
+
+      toogleUpdateAdvise()
+    },
+    [
+      setStudentGrade,
+      setCurrentAdviseGradeId,
+      setCurrentAdviseTermId,
+      setCurrentAdvise,
+      setCurrentTermGrade,
+      toogleUpdateAdvise
+    ]
+  )
+
+  // Tạo map điểm số theo subjectId và studentId với memoization tối ưu
+  const gradesMap = useMemo(() => {
+    if (!gradeData?.length) return new Map<string, GradeInfo>()
+
     const map = new Map<string, GradeInfo>()
 
     gradeData.forEach(studentGrade => {
@@ -62,293 +168,244 @@ const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({ t
     return map
   }, [gradeData])
 
-  const renderGradeCell = (grade: number | undefined, status: string | undefined) => {
-    if (grade === undefined) return '-'
+  // Memoized render grade cell với performance optimization
+  const renderGradeCell = useCallback(
+    (
+      grade: number | undefined,
+      status: string | undefined,
+      key: string,
+      subject: Subjects,
+      subjectId: string,
+      studentId: string,
+      student: StudentType
+    ) => {
+      if (grade === undefined)
+        return (
+          <CustomIconButton
+            size='small'
+            className='text-green-700'
+            key={key}
+            onClick={() => {
+              handleUpdateGrade(subjectId, studentId, subject, student)
+            }}
+          >
+            <Iconify icon='tabler:edit' />
+          </CustomIconButton>
+        )
 
-    let color: 'success' | 'warning' | 'error' | 'default' = 'default'
+      let color: 'success' | 'warning' | 'error' | 'default' = 'default'
 
-    if (grade >= 8) color = 'success'
-    else if (grade >= 6.5) color = 'warning'
-    else if (grade < 5) color = 'error'
+      if (grade >= 8) color = 'success'
+      else if (grade >= 6.5) color = 'warning'
+      else if (grade < 5) color = 'error'
 
-    return <Chip label={grade} color={color} size='small' variant={status === 'x' ? 'filled' : 'outlined'} />
-  }
-
-  const UserInfo = (student: GradeType['studentId']) => (
-    <Stack direction='row' spacing={2} alignItems='center'>
-      <Box>
-        <Typography color={settings.mode === 'dark' ? 'white' : 'black'} fontWeight='medium'>
-          {student.userId}
-        </Typography>
-        <Typography variant='caption' color={settings.mode === 'dark' ? 'white' : 'black'}>
-          {student.userName}
-        </Typography>
-      </Box>
-    </Stack>
+      return (
+        <Chip
+          label={grade}
+          color={color}
+          size='small'
+          variant={status === 'x' ? 'filled' : 'filled'}
+          onClick={() => handleUpdateExistingGrade(subjectId, studentId, subject, student)}
+          sx={{
+            cursor: 'pointer',
+            '&:hover': {
+              opacity: 0.8,
+              transform: 'scale(1.05)'
+            },
+            transition: 'all 0.2s ease'
+          }}
+        />
+      )
+    },
+    [handleUpdateGrade, handleUpdateExistingGrade]
   )
 
-  // Component cho hàng chương trình
-  const ProgramRow = ({ program }: { program: TrainingProgramByFrame }) => {
-    return (
-      <TableRow
-        sx={{
-          backgroundColor: settings.mode === 'dark' ? '#4D55CC' : '#578FCA',
-          position: 'sticky'
-        }}
-      >
-        <TableCell
-          sx={{
-            position: 'sticky',
-            left: 0,
-            zIndex: 9,
-            backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', pl: 1 }}>
-            <Typography variant='subtitle1' fontWeight='bold' color={settings.mode === 'dark' ? 'white' : 'black'}>
-              {program.titleN} {program.titleV}
-            </Typography>
-          </Box>
-        </TableCell>
-        <TableCell
-          colSpan={4 + gradeData.length}
-          sx={{
-            position: 'sticky',
-            left: 0,
-            zIndex: 6
-          }}
-        ></TableCell>
-      </TableRow>
-    )
-  }
+  // Memoized categories renderer để tránh re-render không cần thiết
+  const renderCategories = useCallback(
+    (categories: Categories[], level: number) => {
+      return categories.map(category => {
+        return (
+          <Fragment key={category._id}>
+            <CategoryRow category={category} level={level} gradeData={gradeData} />
 
-  // Component cho hàng danh mục
-  const CategoryRow = ({ category, level }: { category: Categories; level: number }) => {
-    return (
-      <TableRow
-        sx={{
-          paddingLeft: `${level * 9}px`,
-          backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
-        }}
-      >
-        <TableCell
-          sx={{
-            position: 'sticky',
-            left: 0,
-            zIndex: 6,
-            backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', pl: level * 2 + 1 }}>
-            <Typography variant='subtitle2' fontWeight='medium'>
-              {category.titleN} {category.titleV}
-            </Typography>
-          </Box>
-        </TableCell>
-        <TableCell
-          align='center'
-          sx={{
-            position: 'sticky',
-            left: 430.5,
-            zIndex: 6,
-            overflow: 'hidden',
-            backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
-          }}
-        >
-          <Typography variant='body2'>{category.credits || ''}</Typography>
-        </TableCell>
-        <TableCell
-          colSpan={2 + gradeData.length}
-          sx={{
-            position: 'sticky',
-            left: 430.5,
-            zIndex: 5,
-            overflow: 'hidden'
-          }}
-        ></TableCell>
-      </TableRow>
-    )
-  }
+            {/* Subjects trong category */}
+            {category.subjects?.map(subject => (
+              <SubjectRow
+                key={subject._id}
+                subject={subject}
+                level={level + 1}
+                gradesMap={gradesMap}
+                gradeData={gradeData}
+                renderGradeCell={renderGradeCell}
+              />
+            ))}
 
-  // Component cho hàng môn học
-  const SubjectRow = ({ subject, level }: { subject: Subjects; level: number }) => {
-    const subjectGrades = gradesMap.get(subject._id) || {}
+            {/* Subcategories */}
+            {category.categoriesC3 && renderCategories(category.categoriesC3, level + 1)}
+          </Fragment>
+        )
+      })
+    },
+    [gradeData, gradesMap, renderGradeCell]
+  )
 
-    return (
-      <TableRow hover>
-        <TableCell
-          sx={{
-            position: 'sticky',
-            left: 0,
-            zIndex: 6,
-            backgroundColor: theme => theme.palette.background.paper
-          }}
-        >
-          <Box sx={{ pl: level * 2 + 1 }}>
-            <Typography variant='body2' fontWeight='medium'>
-              {subject.courseName}
-            </Typography>
-          </Box>
-        </TableCell>
-        <TableCell
-          align='center'
-          sx={{
-            position: 'sticky',
-            left: 430.5,
-            zIndex: 6,
-            backgroundColor: theme => theme.palette.background.paper
-          }}
-        >
-          <Typography variant='body2'>{subject.credits}</Typography>
-        </TableCell>
-        <TableCell
-          sx={{
-            position: 'sticky',
-            left: 480.5,
-            zIndex: 6,
-            overflow: 'hidden',
-            backgroundColor: theme => theme.palette.background.paper
-          }}
-        >
-          <Typography variant='body2' color='text.secondary'>
-            {subject.courseCode || '-'}
-          </Typography>
-        </TableCell>
-        <TableCell
-          sx={{
-            position: 'sticky',
-            left: 604.5,
-            zIndex: 6,
-            overflow: 'hidden',
-            boxShadow: '10px 0 10px -10px rgba(0, 0, 0, 0.3)',
-            backgroundColor: theme => theme.palette.background.paper
-          }}
-        >
-          <Typography variant='body2' color='text.secondary'>
-            {subject.prerequisites || '-'}
-          </Typography>
-        </TableCell>
-        {gradeData.map(student => {
-          const studentGrade = subjectGrades[student.studentId._id]
+  // Flatten data cho virtualization
+  const flattenedData = useMemo(() => {
+    const result: any[] = []
 
-          return (
-            <TableCell key={`${subject._id}-${student._id}`} align='center'>
-              {renderGradeCell(studentGrade?.grade, studentGrade?.status)}
-            </TableCell>
-          )
-        })}
-      </TableRow>
-    )
-  }
+    trainingProgramData.forEach(program => {
+      result.push({ type: 'program', data: program })
 
-  // Hàm đệ quy để render categories
-  const renderCategories = (categories: Categories[], level: number) => {
-    return categories.map(category => {
-      return (
-        <React.Fragment key={category._id}>
-          <CategoryRow category={category} level={level} />
+      // Subjects trực tiếp trong program
+      program.subjects?.forEach(subject => {
+        result.push({ type: 'subject', data: subject, level: 1 })
+      })
 
-          {/* Subjects trong category */}
-          {category.subjects?.map(subject => <SubjectRow key={subject._id} subject={subject} level={level + 1} />)}
+      // Categories trong program
+      const addCategoriesRecursively = (categories: Categories[], level: number) => {
+        categories.forEach(category => {
+          result.push({ type: 'category', data: category, level })
 
-          {/* Subcategories */}
-          {category.categoriesC3 && renderCategories(category.categoriesC3, level + 1)}
-        </React.Fragment>
-      )
+          category.subjects?.forEach(subject => {
+            result.push({ type: 'subject', data: subject, level: level + 1 })
+          })
+
+          if (category.categoriesC3) {
+            addCategoriesRecursively(category.categoriesC3, level + 1)
+          }
+        })
+      }
+
+      if (program.categories) {
+        addCategoriesRecursively(program.categories, 1)
+      }
     })
-  }
+
+    return result
+  }, [trainingProgramData])
+
+  // Pagination data
+  const paginatedData = useMemo(() => {
+    const startIndex = currentPage * ITEMS_PER_PAGE
+    const endIndex = startIndex + ITEMS_PER_PAGE
+
+    return flattenedData.slice(startIndex, endIndex)
+  }, [flattenedData, currentPage])
+
+  const totalPages = Math.ceil(flattenedData.length / ITEMS_PER_PAGE)
+
+  const handleNextPage = useCallback(() => {
+    if (currentPage < totalPages - 1) {
+      setIsLoading(true)
+
+      // Simulate loading delay for smooth UX
+      setTimeout(() => {
+        setCurrentPage(prev => prev + 1)
+        setIsLoading(false)
+      }, 100)
+    }
+  }, [currentPage, totalPages])
+
+  const handlePrevPage = useCallback(() => {
+    if (currentPage > 0) {
+      setIsLoading(true)
+      setTimeout(() => {
+        setCurrentPage(prev => prev - 1)
+        setIsLoading(false)
+      }, 100)
+    }
+  }, [currentPage])
+
+  // Skeleton loading component
+  const renderSkeleton = () => (
+    <>
+      {Array.from({ length: 10 }).map((_, index) => (
+        <tr key={index}>
+          <td style={{ padding: '8px' }}>
+            <Skeleton variant='text' width='80%' height={20} />
+          </td>
+          <td style={{ padding: '8px' }}>
+            <Skeleton variant='text' width='60%' height={20} />
+          </td>
+          <td style={{ padding: '8px' }}>
+            <Skeleton variant='text' width='70%' height={20} />
+          </td>
+          <td style={{ padding: '8px' }}>
+            <Skeleton variant='text' width='50%' height={20} />
+          </td>
+          {gradeData.map((_, idx) => (
+            <td key={idx} style={{ padding: '8px' }}>
+              <Skeleton variant='circular' width={24} height={24} />
+            </td>
+          ))}
+        </tr>
+      ))}
+    </>
+  )
 
   return (
-    <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 180px)' }}>
-      <Table stickyHeader aria-label='training program table' size='small' sx={{ minWidth: 1200 }}>
-        <TableHead>
-          <StyledTableRow>
-            <TableCell
-              sx={{
-                minWidth: 430,
-                backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
-                textTransform: 'uppercase',
-                position: 'sticky',
-                left: 0,
-                zIndex: 9
-              }}
-            >
-              Tên môn học / Danh mục
-            </TableCell>
-            <TableCell
-              sx={{
-                minWidth: 50,
-                backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
-                textTransform: 'uppercase',
-                position: 'sticky',
-                left: 430.5,
-                zIndex: 9
-              }}
-            >
-              TC
-            </TableCell>
-            <TableCell
-              sx={{
-                minWidth: 120,
-                backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
-                textTransform: 'uppercase',
-                position: 'sticky',
-                left: 480.5,
-                zIndex: 9
-              }}
-            >
-              Mã MH
-            </TableCell>
-            <TableCell
-              sx={{
-                minWidth: 100,
-                backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
-                textTransform: 'uppercase',
-                position: 'sticky',
-                left: 604,
-                zIndex: 9,
-                boxShadow: '10px 0 10px -10px rgba(0, 0, 0, 0.3)'
-              }}
-            >
-              ĐKTQ
-            </TableCell>
-            {gradeData.map(student => (
-              <TableCell
-                key={student._id}
-                sx={{
-                  minWidth: 120,
-                  backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
-                  textTransform: 'uppercase',
-                  zIndex: 8
-                }}
-                align='center'
-              >
-                {UserInfo(student.studentId)}
-              </TableCell>
-            ))}
-          </StyledTableRow>
-        </TableHead>
-        <TableBody>
-          {trainingProgramData.map(program => {
-            return (
-              <React.Fragment key={program._id}>
-                <ProgramRow program={program} />
+    <>
+      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          Trang {currentPage + 1} / {totalPages} - Tổng: {flattenedData.length} mục
+        </div>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button onClick={handlePrevPage} disabled={currentPage === 0 || isLoading} variant='outlined' size='small'>
+            Trước
+          </Button>
+          <Button
+            onClick={handleNextPage}
+            disabled={currentPage >= totalPages - 1 || isLoading}
+            variant='outlined'
+            size='small'
+          >
+            Sau
+          </Button>
+        </Box>
+      </Box>
 
-                {/* Subjects trực tiếp trong program */}
-                {program.subjects?.map(subject => <SubjectRow key={subject._id} subject={subject} level={1} />)}
-
-                {/* Categories trong program */}
-                {program.categories && renderCategories(program.categories, 1)}
-              </React.Fragment>
-            )
-          })}
-          {trainingProgramData.length === 0 && (
-            <TableNoData notFound={true} title='Không có dữ liệu chương trình đào tạo' />
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+      <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 180px)' }}>
+        <Table stickyHeader aria-label='training program table' size='small' sx={{ minWidth: 1200 }}>
+          <TableHeader gradeData={gradeData} onUpdateAdvise={handleUpdateAdvise} />
+          <TableBody>
+            {isLoading
+              ? renderSkeleton()
+              : paginatedData.map(item => {
+                  switch (item.type) {
+                    case 'program':
+                      return <ProgramRow key={item.data._id} program={item.data} gradeData={gradeData} />
+                    case 'category':
+                      return (
+                        <CategoryRow
+                          key={item.data._id}
+                          category={item.data}
+                          level={item.level}
+                          gradeData={gradeData}
+                        />
+                      )
+                    case 'subject':
+                      return (
+                        <SubjectRow
+                          key={item.data._id}
+                          subject={item.data}
+                          level={item.level}
+                          gradesMap={gradesMap}
+                          gradeData={gradeData}
+                          renderGradeCell={renderGradeCell}
+                        />
+                      )
+                    default:
+                      return null
+                  }
+                })}
+            {flattenedData.length === 0 && (
+              <TableNoData notFound={true} title='Không có dữ liệu chương trình đào tạo' />
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
   )
 }
 
-export default GradeTrainingProgramTable
+export default memo(GradeTrainingProgramTable)

@@ -20,12 +20,12 @@ import { LoadingButton } from '@mui/lab'
 import { CustomDialog } from '@/components/CustomDialog'
 import { useGradeStore } from '@/stores/grade/grade.store'
 import CustomTextField from '@/@core/components/mui/TextField'
-import termService from '@/services/term.service'
-import gradeService from '@/services/grade.service'
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
+import gradeService from '@/services/grade.service'
+import termService from '@/services/term.service'
 
 const gradeSchema = v.object({
-  term: v.pipe(v.string(), v.nonEmpty('Mã học kỳ không được để trống')),
+  term: v.pipe(v.string(), v.nonEmpty('Học kỳ không được để trống')),
   grade: v.pipe(
     v.number('Điểm phải là số'),
     v.minValue(0, 'Điểm không được âm'),
@@ -35,12 +35,30 @@ const gradeSchema = v.object({
 
 type GradeSchema = InferInput<typeof gradeSchema>
 
-function UpdateGradeByLec() {
-  const { openUpdateGrade, toogleUpdateGrade, studentId, subject, studentGrade, idClass } = useGradeStore()
+function UpdateExistingGradeByLec() {
+  const {
+    openUpdateExistingGrade,
+    toogleUpdateExistingGrade,
+    subject,
+    studentGrade,
+    idClass,
+    currentTermGrade,
+    currentGradeSubjectIndex,
+    setCurrentTermGrade,
+    setCurrentGradeSubjectIndex,
+    setIsUpdatingExisting,
+    currentGradeId,
+    currentTermGradeId,
+    setCurrentGradeId,
+    setCurrentTermGradeId
+  } = useGradeStore()
+
+  const [isLoading, setIsLoading] = useState(false)
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+
+  const currentGradeOfSubject = currentTermGrade?.gradeOfSubject[currentGradeSubjectIndex]
 
   const { data: terms, isLoading: isLoadingTerms } = useSWR(
     ['terms', page, 10, '', '', '', searchTerm],
@@ -66,58 +84,70 @@ function UpdateGradeByLec() {
     }
   })
 
-  // Reset search when modal opens
+  // Set initial values when modal opens
   useEffect(() => {
-    if (openUpdateGrade) {
-      setSearchTerm('')
-      setPage(1)
-      reset()
+    if (openUpdateExistingGrade && currentGradeOfSubject && currentTermGrade) {
+      reset({
+        term: currentTermGrade.term._id,
+        grade: currentGradeOfSubject.grade || 0
+      })
     }
-  }, [openUpdateGrade, reset])
+  }, [openUpdateExistingGrade, currentGradeOfSubject, currentTermGrade, reset])
 
   const handleClose = useCallback(() => {
-    toogleUpdateGrade()
-    reset() // Reset form when closing
-    setSearchTerm('') // Clear search term
-    setPage(1) // Reset page
-  }, [toogleUpdateGrade, reset])
-
-  const handleScroll = (event: React.SyntheticEvent) => {
-    const listboxNode = event.currentTarget
-
-    if (
-      listboxNode.scrollTop + listboxNode.clientHeight >= listboxNode.scrollHeight - 1 &&
-      !isLoadingTerms &&
-      terms?.terms.length &&
-      terms?.terms.length < total
-    ) {
-      setPage(prev => prev + 1)
-    }
-  }
+    toogleUpdateExistingGrade()
+    setCurrentTermGrade(null as any)
+    setCurrentGradeSubjectIndex(-1)
+    setIsUpdatingExisting(false)
+    setCurrentGradeId('')
+    setCurrentTermGradeId('')
+    setSearchTerm('')
+    setPage(1)
+    reset()
+  }, [
+    toogleUpdateExistingGrade,
+    setCurrentTermGrade,
+    setCurrentGradeSubjectIndex,
+    setIsUpdatingExisting,
+    setCurrentGradeId,
+    setCurrentTermGradeId,
+    reset
+  ])
 
   const onSubmit = handleSubmit(data => {
+    if (!currentTermGrade || currentGradeSubjectIndex === -1 || !currentGradeId || !currentTermGradeId) {
+      toast.error('Không tìm thấy thông tin điểm cần cập nhật')
+
+      return
+    }
+
+    // Tạo bản copy của termGrade hiện tại và cập nhật điểm mới
+    const updatedGradeOfSubject = [...currentTermGrade.gradeOfSubject]
+
+    updatedGradeOfSubject[currentGradeSubjectIndex] = {
+      ...updatedGradeOfSubject[currentGradeSubjectIndex],
+      grade: data.grade
+    }
+
     const dataFormat = {
       termGrades: [
         {
-          term: data.term,
-          gradeOfSubject: [
-            {
-              subjectId: subject?._id,
-              grade: data.grade
-            }
-          ]
+          term: data.term, // Sử dụng học kỳ từ form
+          gradeOfSubject: updatedGradeOfSubject.map(grade => ({
+            subjectId: grade.subjectId._id,
+            grade: grade.grade
+          }))
         }
       ]
     }
-
-    console.log(dataFormat)
 
     const toastId = toast.loading('Đang cập nhật điểm...')
 
     setIsLoading(true)
 
-    gradeService.importGrades(
-      studentId,
+    gradeService.updateGrade(
+      currentGradeId, // gradeId từ store
+      currentTermGradeId, // termGradeId từ store
       dataFormat,
       () => {
         setIsLoading(false)
@@ -144,9 +174,9 @@ function UpdateGradeByLec() {
 
   return (
     <CustomDialog
-      open={openUpdateGrade}
+      open={openUpdateExistingGrade}
       onClose={handleClose}
-      title={`Nhập điểm cho ${studentGrade?.userName} - ${subject?.courseName}`}
+      title={`Cập nhật điểm ${subject?.courseName} - ${studentGrade?.userName}`}
       maxWidth='md'
       fullWidth
       onSubmit={onSubmit}
@@ -156,7 +186,7 @@ function UpdateGradeByLec() {
             Đóng
           </Button>
           <LoadingButton disabled={!isValid} loading={isLoading} type='submit' variant='contained' color='primary'>
-            Lưu
+            Cập nhật
           </LoadingButton>
         </>
       }
@@ -165,7 +195,7 @@ function UpdateGradeByLec() {
       <Card sx={{ mb: 3, boxShadow: 3 }}>
         <CardContent>
           <Typography variant='h6' gutterBottom color='primary'>
-            Thông tin nhập điểm
+            Thông tin cập nhật điểm
           </Typography>
 
           <Grid container spacing={2}>
@@ -196,6 +226,42 @@ function UpdateGradeByLec() {
                 </Typography>
               </Box>
             </Grid>
+
+            <Grid item xs={12}>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant='subtitle2' color='text.secondary'>
+                  Học kỳ:
+                </Typography>
+                <Typography variant='body1' fontWeight='medium'>
+                  {currentTermGrade?.term?.termName || 'Chưa xác định'}
+                </Typography>
+                <Typography variant='body2' color='text.secondary'>
+                  Mã HK: {currentTermGrade?.term?.abbreviatName || 'Chưa xác định'} | Năm học:{' '}
+                  {currentTermGrade?.term?.academicYear || 'Chưa xác định'}
+                </Typography>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant='subtitle2' color='text.secondary'>
+                  Điểm hiện tại:
+                </Typography>
+                <Chip
+                  label={currentGradeOfSubject?.grade || 0}
+                  color={
+                    (currentGradeOfSubject?.grade || 0) >= 8
+                      ? 'success'
+                      : (currentGradeOfSubject?.grade || 0) >= 6.5
+                        ? 'warning'
+                        : (currentGradeOfSubject?.grade || 0) < 5
+                          ? 'error'
+                          : 'default'
+                  }
+                  size='medium'
+                />
+              </Box>
+            </Grid>
           </Grid>
         </CardContent>
       </Card>
@@ -203,14 +269,14 @@ function UpdateGradeByLec() {
       <Divider sx={{ mb: 3 }} />
 
       <Typography variant='h6' gutterBottom>
-        Nhập điểm số
+        Cập nhật điểm số
       </Typography>
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
           <Controller
             control={control}
-            name={`term`}
+            name='term'
             render={({ field }) => (
               <CustomAutocomplete
                 {...field}
@@ -230,10 +296,10 @@ function UpdateGradeByLec() {
                 onChange={(_, value) => {
                   if (value) {
                     field.onChange(value._id)
-                    setSearchTerm('') // Clear search term when option is selected
+                    setSearchTerm('')
                   } else {
                     field.onChange('')
-                    setSearchTerm('') // Clear search term when value is cleared
+                    setSearchTerm('')
                   }
                 }}
                 value={terms?.terms.find(term => term._id === field.value) || null}
@@ -251,11 +317,10 @@ function UpdateGradeByLec() {
                       setSearchTerm(value)
 
                       if (!value) {
-                        setPage(1) // Reset page when clearing search
+                        setPage(1)
                       }
                     }}
                     onFocus={() => {
-                      // When focusing on empty field, show all options
                       if (!field.value) {
                         setSearchTerm('')
                         setPage(1)
@@ -264,12 +329,22 @@ function UpdateGradeByLec() {
                   />
                 )}
                 ListboxProps={{
-                  onScroll: handleScroll
+                  onScroll: (event: React.SyntheticEvent) => {
+                    const listboxNode = event.currentTarget
+
+                    if (
+                      listboxNode.scrollTop + listboxNode.clientHeight >= listboxNode.scrollHeight - 1 &&
+                      !isLoadingTerms &&
+                      terms?.terms.length &&
+                      terms.terms.length < total
+                    ) {
+                      setPage(prev => prev + 1)
+                    }
+                  }
                 }}
                 loading={isLoadingTerms}
                 noOptionsText='Không tìm thấy học kỳ'
                 filterOptions={(options, state) => {
-                  // If there's no input value, return all options
                   if (!state.inputValue) {
                     return options || []
                   }
@@ -293,7 +368,7 @@ function UpdateGradeByLec() {
             render={({ field }) => (
               <CustomTextField
                 {...field}
-                label='Điểm số'
+                label='Điểm số mới'
                 type='number'
                 fullWidth
                 onChange={e => {
@@ -319,4 +394,4 @@ function UpdateGradeByLec() {
   )
 }
 
-export default memo(UpdateGradeByLec)
+export default memo(UpdateExistingGradeByLec)

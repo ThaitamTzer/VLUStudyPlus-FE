@@ -38,7 +38,7 @@ export const ClassCard = ({ item }: { item: ClassLecturer }) => {
           action={
             <>
               <Stack spacing={1} direction='row'>
-                <Tooltip title='Xem danh sách điểm'>
+                <Tooltip title='Xem kết quả học tập'>
                   <IconButton size='small' onClick={() => handleViewGrade(item._id, item.cohortId, item)}>
                     <Iconify
                       icon='tabler-chart-bar'
@@ -89,7 +89,7 @@ export const ClassCard = ({ item }: { item: ClassLecturer }) => {
                 {item.statusImport ? (
                   <strong className='text-green-500'> Đã thêm</strong>
                 ) : (
-                  <strong className='text-gray-900'> Chưa thêm</strong>
+                  <strong className=''> Chưa thêm</strong>
                 )}
               </Typography>
             </Grid>

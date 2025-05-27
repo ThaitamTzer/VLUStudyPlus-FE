@@ -1,8 +1,15 @@
 import { create } from 'zustand'
 
 import type { ClassStudentType } from '@/types/management/classStudentType'
-import type { GradeType, TermGradesType } from '@/types/management/gradeTypes'
+import type {
+  GradeType,
+  StudentType,
+  TermGradesType,
+  TermGradeType,
+  GradeTypeById
+} from '@/types/management/gradeTypes'
 import type { ClassLecturer } from '@/types/management/classLecturerType'
+import type { Subjects } from '@/types/management/trainningProgramType'
 
 type States = {
   openUpdateGrade: boolean
@@ -20,6 +27,29 @@ type States = {
   openUpdateGradeStudent: boolean
   termGradeUpdate: TermGradesType | null
   classLecturer: ClassLecturer | null
+
+  subjectId: string
+  studentId: string
+  subject: Subjects | null
+  studentGrade: StudentType | null
+
+  // For updating existing grade
+  openUpdateExistingGrade: boolean
+  currentTermGrade: TermGradeType | null
+  currentGradeSubjectIndex: number
+  isUpdatingExisting: boolean
+  currentGradeId: string
+  currentTermGradeId: string
+
+  // For updating advise
+  openUpdateAdvise: boolean
+  currentAdviseGradeId: string
+  currentAdviseTermId: string
+  currentAdvise: string
+
+  // For viewing advise history
+  openViewAdviseHistory: boolean
+  currentStudentGradeData: GradeTypeById | null
 }
 
 type Actions = {
@@ -37,6 +67,28 @@ type Actions = {
   toogleImportGradeStudent: () => void
   toogleUpdateGradeStudent: () => void
   setTermGradeUpdate: (termGradeUpdate: TermGradesType) => void
+  setSubjectId: (subjectId: string) => void
+  setStudentId: (studentId: string) => void
+  setSubject: (subject: Subjects) => void
+  setStudentGrade: (student: StudentType) => void
+
+  // For updating existing grade
+  toogleUpdateExistingGrade: () => void
+  setCurrentTermGrade: (termGrade: TermGradeType) => void
+  setCurrentGradeSubjectIndex: (index: number) => void
+  setIsUpdatingExisting: (isUpdating: boolean) => void
+  setCurrentGradeId: (gradeId: string) => void
+  setCurrentTermGradeId: (termGradeId: string) => void
+
+  // For updating advise
+  toogleUpdateAdvise: () => void
+  setCurrentAdviseGradeId: (gradeId: string) => void
+  setCurrentAdviseTermId: (termId: string) => void
+  setCurrentAdvise: (advise: string) => void
+
+  // For viewing advise history
+  toogleViewAdviseHistory: () => void
+  setCurrentStudentGradeData: (gradeData: GradeTypeById) => void
 }
 
 export const useGradeStore = create<States & Actions>(set => ({
@@ -54,6 +106,29 @@ export const useGradeStore = create<States & Actions>(set => ({
   termGradeUpdate: null,
   cohortId: '',
   classLecturer: null,
+  subjectId: '',
+  studentId: '',
+  subject: null,
+  studentGrade: null,
+
+  // For updating existing grade
+  openUpdateExistingGrade: false,
+  currentTermGrade: null,
+  currentGradeSubjectIndex: -1,
+  isUpdatingExisting: false,
+  currentGradeId: '',
+  currentTermGradeId: '',
+
+  // For updating advise
+  openUpdateAdvise: false,
+  currentAdviseGradeId: '',
+  currentAdviseTermId: '',
+  currentAdvise: '',
+
+  // For viewing advise history
+  openViewAdviseHistory: false,
+  currentStudentGradeData: null,
+
   toogleUpdateGrade: () => set(state => ({ openUpdateGrade: !state.openUpdateGrade })),
   setStudent: (student: ClassStudentType) => set({ student }),
   toogleViewGradeDetail: () => set(state => ({ openViewGradeDetail: !state.openViewGradeDetail })),
@@ -67,5 +142,27 @@ export const useGradeStore = create<States & Actions>(set => ({
   toogleImportGradeStudent: () => set(state => ({ openImportGradeStudent: !state.openImportGradeStudent })),
   toogleUpdateGradeStudent: () => set(state => ({ openUpdateGradeStudent: !state.openUpdateGradeStudent })),
   setTermGradeUpdate: (termGradeUpdate: TermGradesType) => set({ termGradeUpdate }),
-  setClassLecturer: (classLecturer: ClassLecturer) => set({ classLecturer })
+  setClassLecturer: (classLecturer: ClassLecturer) => set({ classLecturer }),
+  setSubjectId: (subjectId: string) => set({ subjectId }),
+  setStudentId: (studentId: string) => set({ studentId }),
+  setSubject: (subject: Subjects) => set({ subject }),
+  setStudentGrade: (studentGrade: StudentType) => set({ studentGrade }),
+
+  // For updating existing grade
+  toogleUpdateExistingGrade: () => set(state => ({ openUpdateExistingGrade: !state.openUpdateExistingGrade })),
+  setCurrentTermGrade: (currentTermGrade: TermGradeType) => set({ currentTermGrade }),
+  setCurrentGradeSubjectIndex: (currentGradeSubjectIndex: number) => set({ currentGradeSubjectIndex }),
+  setIsUpdatingExisting: (isUpdatingExisting: boolean) => set({ isUpdatingExisting }),
+  setCurrentGradeId: (currentGradeId: string) => set({ currentGradeId }),
+  setCurrentTermGradeId: (currentTermGradeId: string) => set({ currentTermGradeId }),
+
+  // For updating advise
+  toogleUpdateAdvise: () => set(state => ({ openUpdateAdvise: !state.openUpdateAdvise })),
+  setCurrentAdviseGradeId: (currentAdviseGradeId: string) => set({ currentAdviseGradeId }),
+  setCurrentAdviseTermId: (currentAdviseTermId: string) => set({ currentAdviseTermId }),
+  setCurrentAdvise: (currentAdvise: string) => set({ currentAdvise }),
+
+  // For viewing advise history
+  toogleViewAdviseHistory: () => set(state => ({ openViewAdviseHistory: !state.openViewAdviseHistory })),
+  setCurrentStudentGradeData: (gradeData: GradeTypeById) => set({ currentStudentGradeData: gradeData })
 }))

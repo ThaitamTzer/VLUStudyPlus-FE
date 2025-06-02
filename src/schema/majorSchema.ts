@@ -14,5 +14,23 @@ export const schema = v.object({
     v.nonEmpty('Tên ngành không được để trống'),
     v.minLength(3, 'Tên ngành phải có ít nhất 3 ký tự'),
     v.maxLength(100, 'Tên ngành không được quá 100 ký tự')
+  ),
+  typeMajor: v.pipe(
+    v.string(),
+    v.trim(),
+    v.nonEmpty('Loại ngành không được để trống'),
+    v.minLength(1, 'Loại ngành phải có ít nhất 1 ký tự'),
+    v.maxLength(100, 'Loại ngành không được quá 100 ký tự')
   )
 })
+
+export const typeMajorOptions = [
+  {
+    label: 'Chương trình tiêu chuẩn',
+    value: 'CTTC'
+  },
+  {
+    label: 'Chương trình đặc biệt',
+    value: 'CTDB'
+  }
+]

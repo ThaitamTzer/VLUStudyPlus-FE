@@ -2,7 +2,9 @@
 
 import { Fragment, memo, useCallback, useMemo, useState } from 'react'
 
-import { Table, TableBody, TableContainer, Chip, Paper, Button, Box, Skeleton } from '@mui/material'
+import { Table, TableBody, TableContainer, Chip, Paper, Button, Box, Skeleton, TextField } from '@mui/material'
+
+import { useDebounce } from 'react-use'
 
 import type { TrainingProgramByFrame, Categories, Subjects } from '@/types/management/trainningProgramType'
 import type { GradeType, StudentType } from '@/types/management/gradeTypes'
@@ -45,6 +47,31 @@ const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({ t
 
   const [currentPage, setCurrentPage] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
+
+  // State cho tìm kiếm sinh viên
+  const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+
+  // Debounce giá trị tìm kiếm để tối ưu hiệu suất
+  useDebounce(
+    () => {
+      setDebouncedSearchTerm(searchTerm.trim().toLowerCase())
+    },
+    300,
+    [searchTerm]
+  )
+
+  // Lọc dữ liệu sinh viên dựa trên từ khóa tìm kiếm
+  const filteredGradeData = useMemo(() => {
+    if (!debouncedSearchTerm) return gradeData
+
+    return gradeData.filter(student => {
+      const id = student.studentId.userId.toLowerCase()
+      const name = student.studentId.userName.toLowerCase()
+
+      return id.includes(debouncedSearchTerm) || name.includes(debouncedSearchTerm)
+    })
+  }, [gradeData, debouncedSearchTerm])
 
   const handleUpdateGrade = useCallback(
     (subjectId: string, studentId: string, subject: Subjects, student: StudentType) => {
@@ -333,7 +360,7 @@ const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({ t
           <td style={{ padding: '8px' }}>
             <Skeleton variant='text' width='50%' height={20} />
           </td>
-          {gradeData.map((_, idx) => (
+          {filteredGradeData.map((_, idx) => (
             <td key={idx} style={{ padding: '8px' }}>
               <Skeleton variant='circular' width={24} height={24} />
             </td>
@@ -346,6 +373,13 @@ const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({ t
   return (
     <>
       <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <TextField
+          size='small'
+          placeholder='Tìm kiếm sinh viên...'
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          sx={{ width: 300 }}
+        />
         <div>
           Trang {currentPage + 1} / {totalPages} - Tổng: {flattenedData.length} mục
         </div>
@@ -366,21 +400,21 @@ const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({ t
 
       <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 180px)' }}>
         <Table stickyHeader aria-label='training program table' size='small' sx={{ minWidth: 1200 }}>
-          <TableHeader gradeData={gradeData} onUpdateAdvise={handleUpdateAdvise} />
+          <TableHeader gradeData={filteredGradeData} onUpdateAdvise={handleUpdateAdvise} />
           <TableBody>
             {isLoading
               ? renderSkeleton()
               : paginatedData.map(item => {
                   switch (item.type) {
                     case 'program':
-                      return <ProgramRow key={item.data._id} program={item.data} gradeData={gradeData} />
+                      return <ProgramRow key={item.data._id} program={item.data} gradeData={filteredGradeData} />
                     case 'category':
                       return (
                         <CategoryRow
                           key={item.data._id}
                           category={item.data}
                           level={item.level}
-                          gradeData={gradeData}
+                          gradeData={filteredGradeData}
                         />
                       )
                     case 'subject':
@@ -390,7 +424,7 @@ const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({ t
                           subject={item.data}
                           level={item.level}
                           gradesMap={gradesMap}
-                          gradeData={gradeData}
+                          gradeData={filteredGradeData}
                           renderGradeCell={renderGradeCell}
                         />
                       )

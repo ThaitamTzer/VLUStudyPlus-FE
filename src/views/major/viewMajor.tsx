@@ -4,17 +4,28 @@ import { useEffect } from 'react'
 import { Dialog, DialogContent, DialogTitle, Typography, IconButton, Grid } from '@mui/material'
 import { valibotResolver } from '@hookform/resolvers/valibot'
 import type { InferInput } from 'valibot'
-import { Controller, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
+import useSWR from 'swr'
 
 import { useMajorStore } from '@/stores/major/major'
 import Iconify from '@/components/iconify'
-import CustomTextField from '@/@core/components/mui/TextField'
 import { schema } from '@/schema/majorSchema'
+import majorService from '@/services/major.service'
+import AddConcentration from './addConcentration'
+import { MajorInfo, ConcentrationList } from './components'
 
 type FormData = InferInput<typeof schema>
 
 export default function ViewMajor() {
-  const { openViewMajor, toogleViewMajor, major } = useMajorStore()
+  const { openViewMajor, toogleViewMajor, major, toogleAddConcentration } = useMajorStore()
+
+  const {
+    data: concentrations,
+    isLoading,
+    mutate
+  } = useSWR(major ? `/api/major/view-list-concentration/${major._id}` : null, () =>
+    majorService.getConcerntrationByMajor(major?._id || '')
+  )
 
   const {
     control,
@@ -39,55 +50,44 @@ export default function ViewMajor() {
     reset()
   }
 
+  const handleAddConcentration = () => {
+    toogleAddConcentration()
+  }
+
+  const handleUpdate = () => {
+    mutate()
+  }
+
   return (
-    <Dialog open={openViewMajor} onClose={handleClose} fullWidth maxWidth='sm'>
-      <DialogTitle>
-        <Typography variant='h4'>Chi tiết chuyên ngành</Typography>
-      </DialogTitle>
-      <IconButton
-        sx={{
-          position: 'absolute',
-          top: 8,
-          right: 8
-        }}
-        onClick={handleClose}
-      >
-        <Iconify icon='material-symbols:close-rounded' />
-      </IconButton>
-      <DialogContent>
-        <Grid container spacing={4}>
-          <Grid item xs={12}>
-            <Controller
-              name='majorId'
-              control={control}
-              render={({ field }) => (
-                <CustomTextField
-                  {...field}
-                  fullWidth
-                  disabled
-                  label='Mã chuyên ngành'
-                  {...(errors.majorId && { error: true, helperText: errors.majorId.message })}
-                />
-              )}
+    <>
+      <Dialog open={openViewMajor} onClose={handleClose} fullWidth maxWidth='md'>
+        <DialogTitle>
+          <Typography variant='h4'>Chi tiết ngành</Typography>
+        </DialogTitle>
+        <IconButton
+          sx={{
+            position: 'absolute',
+            top: 8,
+            right: 8
+          }}
+          onClick={handleClose}
+        >
+          <Iconify icon='material-symbols:close-rounded' />
+        </IconButton>
+        <DialogContent>
+          <Grid container spacing={4}>
+            <MajorInfo control={control} errors={errors} />
+
+            <ConcentrationList
+              concentrations={concentrations || []}
+              isLoading={isLoading}
+              onAddConcentration={handleAddConcentration}
+              onUpdate={handleUpdate}
             />
           </Grid>
-          <Grid item xs={12}>
-            <Controller
-              name='majorName'
-              control={control}
-              render={({ field }) => (
-                <CustomTextField
-                  {...field}
-                  disabled
-                  fullWidth
-                  label='Tên chuyên ngành'
-                  {...(errors.majorName && { error: true, helperText: errors.majorName.message })}
-                />
-              )}
-            />
-          </Grid>
-        </Grid>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+      <AddConcentration />
+    </>
   )
 }

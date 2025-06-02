@@ -1,7 +1,17 @@
 'use client'
 import { useEffect, useState } from 'react'
 
-import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Typography, IconButton, Grid } from '@mui/material'
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
+  Typography,
+  IconButton,
+  Grid,
+  MenuItem
+} from '@mui/material'
 import { LoadingButton } from '@mui/lab'
 import { valibotResolver } from '@hookform/resolvers/valibot'
 import type { KeyedMutator } from 'swr'
@@ -15,6 +25,7 @@ import { useMajorStore } from '@/stores/major/major'
 import Iconify from '@/components/iconify'
 import CustomTextField from '@/@core/components/mui/TextField'
 import majorService from '@/services/major.service'
+import { typeMajorOptions } from '@/schema/majorSchema'
 
 type UpdateMajorProps = {
   mutate: KeyedMutator<any>
@@ -27,6 +38,13 @@ const schema = v.object({
     v.nonEmpty('Tên chuyên ngành không được để trống'),
     v.minLength(3, 'Tên chuyên ngành phải có ít nhất 3 ký tự'),
     v.maxLength(255, 'Tên chuyên ngành không được quá 255 ký tự')
+  ),
+  typeMajor: v.pipe(
+    v.string(),
+    v.trim(),
+    v.nonEmpty('Loại ngành không được để trống'),
+    v.minLength(1, 'Loại ngành phải có ít nhất 1 ký tự'),
+    v.maxLength(100, 'Loại ngành không được quá 100 ký tự')
   )
 })
 
@@ -47,7 +65,8 @@ export default function UpdateMajor({ mutate }: UpdateMajorProps) {
     resolver: valibotResolver(schema),
     mode: 'all',
     defaultValues: {
-      majorName: ''
+      majorName: '',
+      typeMajor: ''
     }
   })
 
@@ -122,6 +141,27 @@ export default function UpdateMajor({ mutate }: UpdateMajorProps) {
                     label='Tên chuyên ngành'
                     {...(errors.majorName && { error: true, helperText: errors.majorName.message })}
                   />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Controller
+                name='typeMajor'
+                control={control}
+                render={({ field }) => (
+                  <CustomTextField
+                    {...field}
+                    fullWidth
+                    label='Loại ngành'
+                    {...(errors.typeMajor && { error: true, helperText: errors.typeMajor.message })}
+                    select
+                  >
+                    {typeMajorOptions.map(option => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </CustomTextField>
                 )}
               />
             </Grid>

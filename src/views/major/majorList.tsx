@@ -1,8 +1,7 @@
-import { IconButton, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, Tooltip } from '@mui/material'
+import { IconButton, Table, TableBody, TableCell, TableContainer, TableHead, Tooltip } from '@mui/material'
 
 import type { Major } from '@/types/management/majorType'
 import TableNoData from '@/components/table/TableNotFound'
-import RowAction from '@/components/rowAction'
 import Iconify from '@/components/iconify'
 
 import { useMajorStore } from '@/stores/major/major'
@@ -37,7 +36,8 @@ export default function MajorList({ page, limit, majors, total, loading }: Major
           >
             <TableCell>STT</TableCell>
             <TableCell>Mã ngành</TableCell>
-            <TableCell colSpan={2}>Tên ngành</TableCell>
+            <TableCell>Tên ngành</TableCell>
+            <TableCell colSpan={2}>Chương trình</TableCell>
           </StyledTableRow>
         </TableHead>
         <TableBody>
@@ -51,37 +51,47 @@ export default function MajorList({ page, limit, majors, total, loading }: Major
                 </TableCell>
                 <TableCell size='small'>{major.majorId}</TableCell>
                 <TableCell size='small'>{major.majorName}</TableCell>
+                <TableCell size='small'>{major.typeMajor}</TableCell>
                 <TableCell size='small' align='right'>
                   <Tooltip title='Xem chi tiết'>
                     <IconButton
+                      sx={{
+                        color: 'primary.main'
+                      }}
                       onClick={() => {
                         setMajor(major)
                         toogleViewMajor()
                       }}
                     >
-                      <Iconify icon='solar:eye-bold-duotone' />
+                      <Iconify icon='solar:info-circle-bold' />
                     </IconButton>
                   </Tooltip>
-                  <RowAction>
-                    <MenuItem
+                  <Tooltip title='Cập nhật'>
+                    <IconButton
+                      sx={{
+                        color: 'warning.main'
+                      }}
                       onClick={() => {
                         setMajor(major)
                         toogleUpdateMajor()
                       }}
                     >
                       <Iconify icon='solar:pen-2-linear' />
-                      Sửa
-                    </MenuItem>
-                    <MenuItem
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title='Xóa'>
+                    <IconButton
+                      sx={{
+                        color: 'error.main'
+                      }}
                       onClick={() => {
                         setMajor(major)
                         toogleDeleteMajor()
                       }}
                     >
                       <Iconify icon='solar:trash-bin-2-linear' />
-                      Xóa
-                    </MenuItem>
-                  </RowAction>
+                    </IconButton>
+                  </Tooltip>
                 </TableCell>
               </StyledTableRow>
             )

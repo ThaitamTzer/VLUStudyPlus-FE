@@ -2,7 +2,17 @@
 
 import { useState } from 'react'
 
-import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Typography, IconButton, Grid } from '@mui/material'
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
+  Typography,
+  IconButton,
+  Grid,
+  MenuItem
+} from '@mui/material'
 
 import { LoadingButton } from '@mui/lab'
 
@@ -18,7 +28,7 @@ import { toast } from 'react-toastify'
 
 import { useMajorStore } from '@/stores/major/major'
 import Iconify from '@/components/iconify'
-import { schema } from '@/schema/majorSchema'
+import { schema, typeMajorOptions } from '@/schema/majorSchema'
 import CustomTextField from '@/@core/components/mui/TextField'
 
 import majorService from '@/services/major.service'
@@ -44,7 +54,8 @@ export default function AddMajor({ mutate }: AddMajorProps) {
     mode: 'all',
     defaultValues: {
       majorName: '',
-      majorId: ''
+      majorId: '',
+      typeMajor: ''
     }
   })
 
@@ -75,7 +86,6 @@ export default function AddMajor({ mutate }: AddMajorProps) {
             toast.error('Thêm ngành thất bại')
         }
 
-        console.log(err)
         setLoading(false)
       }
     )
@@ -125,6 +135,27 @@ export default function AddMajor({ mutate }: AddMajorProps) {
                     label='Tên ngành'
                     {...(errors.majorName && { error: true, helperText: errors.majorName.message })}
                   />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Controller
+                name='typeMajor'
+                control={control}
+                render={({ field }) => (
+                  <CustomTextField
+                    {...field}
+                    fullWidth
+                    label='Loại ngành'
+                    {...(errors.typeMajor && { error: true, helperText: errors.typeMajor.message })}
+                    select
+                  >
+                    {typeMajorOptions.map(option => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </CustomTextField>
                 )}
               />
             </Grid>

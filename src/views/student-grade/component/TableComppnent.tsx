@@ -15,14 +15,14 @@ export const ProgramRow = memo(
     return (
       <TableRow
         sx={{
-          backgroundColor: settings.mode === 'dark' ? '#4D55CC' : '#578FCA',
+          backgroundColor: settings.mode === 'dark' ? '#475569' : '#578FCA',
           position: 'sticky'
         }}
       >
         <TableCell
           key={`${program._id}-program`}
           sx={{
-            backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
+            backgroundColor: settings.mode === 'dark' ? '#334155' : '#578FCA7a'
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', pl: 1 }}>
@@ -54,12 +54,12 @@ export const CategoryRow = memo(
       <TableRow
         sx={{
           paddingLeft: `${level * 9}px`,
-          backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
+          backgroundColor: settings.mode === 'dark' ? '#475569' : '#578FCA7a'
         }}
       >
         <TableCell
           sx={{
-            backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
+            backgroundColor: settings.mode === 'dark' ? '#475569' : '#578FCA7a'
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', pl: level * 2 + 1 }}>
@@ -71,7 +71,7 @@ export const CategoryRow = memo(
         <TableCell
           align='center'
           sx={{
-            backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
+            backgroundColor: settings.mode === 'dark' ? '#475569' : '#578FCA7a'
           }}
         >
           <Typography variant='body2'>{category.credits || ''}</Typography>

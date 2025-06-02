@@ -21,7 +21,7 @@ import { useTrainingProgramStore } from '@/stores/trainingProgram.store'
 import Iconify from '@/components/iconify'
 import ProgressModal from '@/components/dialogs/progressModal'
 
-const TableTrainingProgram = dynamic(() => import('./tableTrainingProgram'), { ssr: false })
+const TableTrainingProgram = dynamic(() => import('./tableTrainingProgram'))
 const UpdateTrainingProgram = dynamic(() => import('./updateTrainingProgram'), { ssr: false })
 const DeleteTrainingProgram = dynamic(() => import('./deleteTrainingProgram'), { ssr: false })
 const ImportTrainingProgram = dynamic(() => import('./importTrainingProgram'), { ssr: false })

@@ -15,7 +15,7 @@ export const ProgramRow = memo(
     return (
       <TableRow
         sx={{
-          backgroundColor: settings.mode === 'dark' ? '#4D55CC' : '#578FCA',
+          backgroundColor: settings.mode === 'dark' ? '#475569' : '#93c5fd',
           position: 'sticky'
         }}
       >
@@ -25,7 +25,7 @@ export const ProgramRow = memo(
             position: 'sticky',
             left: 0,
             zIndex: 9,
-            backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
+            backgroundColor: settings.mode === 'dark' ? '#475569' : '#93c5fd'
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', pl: 1 }}>
@@ -57,7 +57,7 @@ export const CategoryRow = memo(
       <TableRow
         sx={{
           paddingLeft: `${level * 9}px`,
-          backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
+          backgroundColor: settings.mode === 'dark' ? '#334155' : '#93c5fd'
         }}
       >
         <TableCell
@@ -65,7 +65,7 @@ export const CategoryRow = memo(
             position: 'sticky',
             left: 0,
             zIndex: 6,
-            backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
+            backgroundColor: settings.mode === 'dark' ? '#334155' : '#bfdbfe'
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', pl: level * 2 + 1 }}>
@@ -81,7 +81,7 @@ export const CategoryRow = memo(
             left: 430.5,
             zIndex: 6,
             overflow: 'hidden',
-            backgroundColor: settings.mode === 'dark' ? '#7A73D1' : '#578FCA7a'
+            backgroundColor: settings.mode === 'dark' ? '#334155' : '#bfdbfe'
           }}
         >
           <Typography variant='body2'>{category.credits || ''}</Typography>
@@ -90,9 +90,9 @@ export const CategoryRow = memo(
           colSpan={2 + gradeData.length}
           sx={{
             position: 'sticky',
-            left: 430.5,
-            zIndex: 5,
-            overflow: 'hidden'
+            left: 450.5,
+            zIndex: 4,
+            backgroundColor: settings.mode === 'dark' ? '#334155' : '#bfdbfe'
           }}
         ></TableCell>
       </TableRow>
@@ -143,7 +143,7 @@ export const SubjectRow = memo(
         >
           <Box sx={{ pl: level * 2 + 1 }}>
             <Typography variant='body2' fontWeight='medium'>
-              {subject.courseName}
+              {subject.courseCode} - {subject.courseName}
             </Typography>
           </Box>
         </TableCell>
@@ -168,13 +168,13 @@ export const SubjectRow = memo(
           }}
         >
           <Typography variant='body2' color='text.secondary'>
-            {subject.courseCode || '-'}
+            {subject.isRequire ? 'BB' : 'TC'}
           </Typography>
         </TableCell>
         <TableCell
           sx={{
             position: 'sticky',
-            left: 604.5,
+            left: 570.5,
             zIndex: 6,
             overflow: 'hidden',
             boxShadow: '10px 0 10px -10px rgba(0, 0, 0, 0.3)',
@@ -182,7 +182,7 @@ export const SubjectRow = memo(
           }}
         >
           <Typography variant='body2' color='text.secondary'>
-            {subject.prerequisites || '-'}
+            {subject.preConditions || '-'}
           </Typography>
         </TableCell>
         {gradeData.map(student => {

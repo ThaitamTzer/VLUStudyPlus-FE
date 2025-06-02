@@ -38,26 +38,30 @@ export const TableHeader = memo(
   }) => {
     const { settings } = useSettings()
 
+    // Định nghĩa màu header theo đề xuất
+    const subjectHeader = settings.mode === 'dark' ? '#2A3C5E' : '#D2E3FC'
+    const studentHeader = settings.mode === 'dark' ? '#5F4822' : '#FFE3B3'
+
     // Memoized styles để tránh tính toán lại
     const stickyHeaderStyle = useMemo(
       () => ({
-        backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
+        backgroundColor: subjectHeader,
         textTransform: 'uppercase' as const,
         position: 'sticky' as const,
         left: 0,
         zIndex: 9
       }),
-      [settings.mode]
+      [subjectHeader]
     )
 
     const cellStyle = useMemo(
       () => ({
-        backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
+        backgroundColor: studentHeader,
         textTransform: 'uppercase' as const,
         zIndex: 8,
         left: 0
       }),
-      [settings.mode]
+      [studentHeader]
     )
 
     // Memoized student data để tránh re-render không cần thiết
@@ -240,7 +244,7 @@ export const TableHeader = memo(
             width={430}
             sx={{
               minWidth: 430,
-              backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
+              backgroundColor: subjectHeader,
               textTransform: 'uppercase',
               position: 'sticky',
               left: 0,
@@ -253,7 +257,7 @@ export const TableHeader = memo(
             width={50}
             sx={{
               minWidth: 50,
-              backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
+              backgroundColor: subjectHeader,
               textTransform: 'uppercase',
               position: 'sticky',
               left: 430.5,
@@ -263,40 +267,38 @@ export const TableHeader = memo(
             TC
           </TableCell>
           <TableCell
-            width={130}
+            width={90}
             sx={{
-              minWidth: 130,
-              backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
+              minWidth: 90,
+              backgroundColor: subjectHeader,
               textTransform: 'uppercase',
               position: 'sticky',
               left: 480.5,
               zIndex: 9
             }}
           >
-            Mã MH
+            Loại HP
           </TableCell>
           <TableCell
-            width={100}
+            width={180}
             sx={{
-              minWidth: 100,
-              backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
+              minWidth: 180,
+              backgroundColor: subjectHeader,
               textTransform: 'uppercase',
               position: 'sticky',
-              left: 604,
+              left: 570,
               zIndex: 9,
               boxShadow: '10px 0 10px -10px rgba(0, 0, 0, 0.3)'
             }}
           >
-            ĐKTQ
+            ĐK học trước
           </TableCell>
           {studentCells.map(student => (
             <TableCell
               size='small'
               key={`${student.id}`}
               sx={{
-                backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
-                textTransform: 'uppercase',
-                zIndex: 8,
+                ...cellStyle,
                 minWidth: 200
               }}
               align='center'

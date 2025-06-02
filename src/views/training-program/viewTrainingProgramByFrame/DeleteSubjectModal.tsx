@@ -52,8 +52,6 @@ const DeleteSubjectModal: React.FC<DeleteSubjectModalProps> = ({ open, onClose, 
   }
 
   const onSubmit = handleSubmit(async data => {
-    console.log('data', data)
-
     if (!subject._id) {
       toast.error('Không tìm thấy ID môn học')
 
@@ -104,6 +102,8 @@ const DeleteSubjectModal: React.FC<DeleteSubjectModalProps> = ({ open, onClose, 
       onClose={handleClose}
       title='Xóa môn học'
       maxWidth='sm'
+      canDrag
+      draggableTitle='draggable-dialog-title'
       actions={
         <>
           <Button variant='contained' onClick={handleClose} disabled={isSubmitting}>

@@ -23,6 +23,7 @@ import UpdateMajor from './updateMajor'
 import AlertDelete from '@/components/alertModal'
 import type { Major } from '@/types/management/majorType'
 import ViewMajor from './viewMajor'
+import AddConcentration from './addConcentration'
 
 export default function MajorPage() {
   const { toogleAddMajor, major, toogleDeleteMajor, openDeleteMajor, setMajor } = useMajorStore()
@@ -142,6 +143,7 @@ export default function MajorPage() {
       <AddMajor mutate={mutate} />
       <UpdateMajor mutate={mutate} />
       <ViewMajor />
+      <AddConcentration />
       <AlertDelete
         content={
           <p>

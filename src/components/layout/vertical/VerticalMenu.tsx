@@ -199,6 +199,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             </MenuItem>
           </SubMenu>
         )}
+        <MenuItem
+          href='/major-management'
+          icon={<Iconify icon='ph:certificate' />}
+          exactMatch={false}
+          activeUrl='/major-management'
+        >
+          Ngành
+        </MenuItem>
         {user?.role.name === 'BCN Khoa' && (
           <SubMenu label='NGƯỜI DÙNG' icon={<Iconify icon='solar:users-group-rounded-linear' />}>
             <MenuItem

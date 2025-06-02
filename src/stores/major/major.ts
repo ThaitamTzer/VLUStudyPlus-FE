@@ -10,6 +10,10 @@ type State = {
   openUpdateMajor: boolean
   openDeleteMajor: boolean
   openViewMajor: boolean
+
+  openAddConcentration: boolean
+  openUpdateConcentration: boolean
+  openDeleteConcentration: boolean
 }
 
 type Actions = {
@@ -20,6 +24,10 @@ type Actions = {
   toogleUpdateMajor: () => void
   toogleDeleteMajor: () => void
   toogleViewMajor: () => void
+
+  toogleAddConcentration: () => void
+  toogleUpdateConcentration: () => void
+  toogleDeleteConcentration: () => void
 }
 
 export const useMajorStore = create<State & Actions>(set => ({
@@ -31,11 +39,19 @@ export const useMajorStore = create<State & Actions>(set => ({
   openDeleteMajor: false,
   openViewMajor: false,
 
+  openAddConcentration: false,
+  openUpdateConcentration: false,
+  openDeleteConcentration: false,
+
   setMajors: majors => set({ majors }),
   setMajor: major => set({ major }),
   setTotal: total => set({ total }),
   toogleAddMajor: () => set(state => ({ openAddMajor: !state.openAddMajor })),
   toogleUpdateMajor: () => set(state => ({ openUpdateMajor: !state.openUpdateMajor })),
   toogleDeleteMajor: () => set(state => ({ openDeleteMajor: !state.openDeleteMajor })),
-  toogleViewMajor: () => set(state => ({ openViewMajor: !state.openViewMajor }))
+  toogleViewMajor: () => set(state => ({ openViewMajor: !state.openViewMajor })),
+
+  toogleAddConcentration: () => set(state => ({ openAddConcentration: !state.openAddConcentration })),
+  toogleUpdateConcentration: () => set(state => ({ openUpdateConcentration: !state.openUpdateConcentration })),
+  toogleDeleteConcentration: () => set(state => ({ openDeleteConcentration: !state.openDeleteConcentration }))
 }))

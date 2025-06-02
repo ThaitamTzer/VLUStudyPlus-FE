@@ -157,7 +157,7 @@ function UpdateAdviseByLec() {
       open={openUpdateAdvise}
       onClose={handleClose}
       title={`Ghi chú các vấn đề ${studentGrade?.userName} cần phải lưu ý `}
-      maxWidth='lg'
+      maxWidth='md'
       fullWidth
       onSubmit={onSubmit}
       actions={
@@ -210,11 +210,11 @@ function UpdateAdviseByLec() {
       <Divider sx={{ mb: 3 }} />
 
       <Typography variant='h6' gutterBottom>
-        Chọn kỳ học và nhập lời khuyên
+        Chọn kỳ học và nhập ghi chú
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12}>
           <Controller
             control={control}
             name='selectedTerm'
@@ -262,7 +262,7 @@ function UpdateAdviseByLec() {
           />
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12}>
           <Controller
             control={control}
             name='advise'
@@ -347,10 +347,10 @@ function UpdateAdviseByLec() {
       </Grid>
 
       <Card sx={{ mt: 2, p: 2, bgcolor: 'info.light', borderRadius: 1 }}>
-        <Typography variant='body2'>
+        <Typography variant='body2' color='black'>
           💡 <strong>Gợi ý:</strong> Hãy tư vấn cho sinh viên về:
         </Typography>
-        <Typography variant='body2' sx={{ mt: 1, ml: 2 }}>
+        <Typography variant='body2' sx={{ mt: 1, ml: 2 }} color='black'>
           • Các môn học cần ưu tiên đăng ký trong học kỳ tới
           <br />
           • Môn tiên quyết cần hoàn thành trước

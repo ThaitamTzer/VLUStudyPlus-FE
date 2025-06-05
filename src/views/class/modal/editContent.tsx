@@ -30,6 +30,7 @@ const schema = v.object({
   lectureId: v.pipe(v.string(), v.nonEmpty('Vui lòng chọn giảng viên')),
   classId: v.pipe(v.string(), v.nonEmpty('Vui lòng nhập mã lớp')),
   cohortId: v.pipe(v.string(), v.nonEmpty('Vui lòng chọn niên khóa')),
+  majorId: v.pipe(v.string(), v.nonEmpty('Vui lòng chọn ngành')),
   numberStudent: v.pipe(
     v.number(),
     v.integer('Số lượng học viên phải là số nguyên'),
@@ -62,7 +63,7 @@ export default function EditContent({
   const { lecturerData } = useAuth()
   const { setClassID } = useClassStore()
 
-  const { cohorOptions } = useShare()
+  const { cohorOptions, majorOptions } = useShare()
 
   const {
     control,
@@ -76,6 +77,7 @@ export default function EditContent({
       lectureId: '',
       classId: '',
       cohortId: '',
+      majorId: '',
       numberStudent: 0
     }
   })
@@ -89,6 +91,7 @@ export default function EditContent({
       lectureId: lecturer,
       classId: classData.classId,
       cohortId: classData.cohortId._id,
+      majorId: classData.majorId._id || '',
       numberStudent: classData.numberStudent
     })
   }, [classData, reset, lecturer])
@@ -120,6 +123,7 @@ export default function EditContent({
             lectureId: '',
             classId: '',
             cohortId: '',
+            majorId: '',
             numberStudent: 0
           },
           { keepValues: false }
@@ -198,6 +202,29 @@ export default function EditContent({
                     {...params}
                     label='Niên khóa'
                     {...(errors.cohortId && { error: true, helperText: errors.cohortId.message })}
+                  />
+                )}
+              />
+            )}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Controller
+            name='majorId'
+            control={control}
+            render={({ field: { onChange, value, ...field } }) => (
+              <Autocomplete
+                {...field}
+                id='majorId'
+                value={majorOptions?.find(major => major._id === value) || null}
+                onChange={(_, newValue) => onChange(newValue ? newValue._id : '')}
+                options={majorOptions || []}
+                getOptionLabel={option => option.majorName}
+                renderInput={params => (
+                  <CustomTextField
+                    {...params}
+                    label='Ngành'
+                    {...(errors.majorId && { error: true, helperText: errors.majorId.message })}
                   />
                 )}
               />

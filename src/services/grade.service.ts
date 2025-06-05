@@ -1,4 +1,5 @@
 import axiosClient from '@/libs/axios'
+import type { AdviseType } from '@/types/management/adviseType'
 import type { GradeTypeByClassCode, GradeTypeById } from '@/types/management/gradeTypes'
 
 const gradeService = {
@@ -121,20 +122,93 @@ const gradeService = {
     }
   },
 
-  updateAdvise: async (
-    gradeId: string,
+  getAdviseByStudentId: async (studentId: string) => {
+    const response = await axiosClient.get(`/api/grade/view-advise/${studentId}`)
+
+    return response.data as AdviseType[]
+  },
+
+  createAdvise: async (
+    studentId: string,
     termId: string,
-    data: { advise: string },
+    data: any,
     successCallback?: (res: any) => void,
     errorCallback?: (err: any) => void
   ) => {
     try {
-      return await axiosClient.put(`/api/grade/update-advise/${gradeId}/${termId}`, data).then(res => {
+      return await axiosClient.post(`/api/grade/create-advise/${studentId}/${termId}`, data).then(res => {
         if (successCallback) {
           successCallback(res.data)
         }
 
         return res.data
+      })
+    } catch (error) {
+      if (errorCallback) {
+        errorCallback(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+
+  updateAdvise: async (
+    id: string,
+    data: { advise: string },
+    successCallback?: (res: any) => void,
+    errorCallback?: (err: any) => void
+  ) => {
+    try {
+      return await axiosClient.put(`/api/grade/update-advise/${id}`, data).then(res => {
+        if (successCallback) {
+          successCallback(res.data)
+        }
+
+        return res.data
+      })
+    } catch (error) {
+      if (errorCallback) {
+        errorCallback(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+
+  updateActive: async (
+    studentId: string,
+    data: any,
+    successCallback?: (res: any) => void,
+    errorCallback?: (err: any) => void
+  ) => {
+    try {
+      return await axiosClient.put(`/api/grade/update-active/${studentId}`, data).then(res => {
+        if (successCallback) {
+          successCallback(res.data)
+        }
+
+        return res.data
+      })
+    } catch (error) {
+      if (errorCallback) {
+        errorCallback(error)
+      }
+
+      return Promise.reject(error)
+    }
+  },
+
+  updateMajor: async (
+    gradeId: string,
+    data: any,
+    successCallback?: (res: any) => void,
+    errorCallback?: (err: any) => void
+  ) => {
+    try {
+      return await axiosClient.put(`/api/grade/update-major/${gradeId}`, data).then(res => {
+        if (successCallback) {
+          successCallback(res.data)
+        }
       })
     } catch (error) {
       if (errorCallback) {

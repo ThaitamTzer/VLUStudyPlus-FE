@@ -23,6 +23,11 @@ export type Class = {
     _id: string
     cohortId: string
   }
+  majorId: {
+    _id: string
+    majorName: string
+    typeMajor: string
+  }
   numberStudent: number
   statusImport: boolean
 }
@@ -33,6 +38,11 @@ export type ClassData = {
   cohortId: {
     _id: string
     cohortId: string
+  }
+  majorId: {
+    _id: string
+    majorName: string
+    typeMajor: string
   }
   numberStudent: number
   statusImport: boolean

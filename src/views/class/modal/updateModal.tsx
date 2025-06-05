@@ -39,6 +39,7 @@ const schema = v.object({
   lectureId: v.pipe(v.string(), v.nonEmpty('Vui lòng chọn giảng viên')),
   classId: v.pipe(v.string(), v.nonEmpty('Vui lòng nhập mã lớp')),
   cohortId: v.pipe(v.string(), v.nonEmpty('Vui lòng chọn niên khóa')),
+  majorId: v.pipe(v.string(), v.nonEmpty('Vui lòng chọn ngành')),
   numberStudent: v.pipe(
     v.number(),
     v.integer('Số lượng học viên phải là số nguyên'),
@@ -53,7 +54,7 @@ export default function UpdateModal({ mutate }: ManualUpdateClassProps) {
   const [loading, setLoading] = useState<boolean>(false)
   const { lecturerData } = useAuth()
 
-  const { cohorOptions } = useShare()
+  const { cohorOptions, majorOptions } = useShare()
 
   const {
     control,
@@ -67,6 +68,7 @@ export default function UpdateModal({ mutate }: ManualUpdateClassProps) {
       lectureId: '',
       classId: '',
       cohortId: '',
+      majorId: '',
       numberStudent: 0
     }
   })
@@ -80,6 +82,7 @@ export default function UpdateModal({ mutate }: ManualUpdateClassProps) {
       lectureId: classRoom?.lectureId,
       classId: classRoom?.classId,
       cohortId: classRoom?.cohortId?._id,
+      majorId: classRoom?.majorId?._id || '',
       numberStudent: classRoom?.numberStudent
     })
   }, [reset, classRoom])
@@ -199,6 +202,31 @@ export default function UpdateModal({ mutate }: ManualUpdateClassProps) {
                 )}
               />
             </Grid>
+
+            <Grid item xs={12}>
+              <Controller
+                name='majorId'
+                control={control}
+                render={({ field: { onChange, value, ...field } }) => (
+                  <Autocomplete
+                    {...field}
+                    id='majorId'
+                    value={majorOptions?.find(major => major._id === value) || null}
+                    onChange={(_, newValue) => onChange(newValue ? newValue._id : '')}
+                    options={majorOptions || []}
+                    getOptionLabel={option => option.majorName}
+                    renderInput={params => (
+                      <CustomTextField
+                        {...params}
+                        label='Ngành'
+                        {...(errors.majorId && { error: true, helperText: errors.majorId.message })}
+                      />
+                    )}
+                  />
+                )}
+              />
+            </Grid>
+
             <Grid item xs={12}>
               <Controller
                 name='numberStudent'

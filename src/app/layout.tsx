@@ -6,6 +6,7 @@ import type { ChildrenType } from '@core/types'
 
 // Style Imports
 import '@/app/globals.css'
+import '@mdxeditor/editor/style.css'
 
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'

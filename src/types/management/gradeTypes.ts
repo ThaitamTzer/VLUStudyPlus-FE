@@ -29,11 +29,15 @@ export type TermGradeType = {
 export type GradeType = {
   _id: string
   studentId: StudentType
-  majorOfStudent: null
   TCTL_CD: number
   TCTL_SV: number
   TCN: number
-  isActive: boolean
+  isActive: 'Còn học' | 'Thôi học' | 'Bảo lưu'
+  majorOfStudent: {
+    _id: string
+    majorId: string
+    concentrationName: string
+  }
   termGrades: TermGradeType[]
   createdAt: string | Date
   updatedAt: string | Date

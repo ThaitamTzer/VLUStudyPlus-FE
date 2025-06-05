@@ -37,6 +37,10 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
   const { user } = useAuth()
   const { toogleViewAdviseHistory, setCurrentStudentGradeData } = useGradeStore()
 
+  // Định nghĩa màu header theo đề xuất
+  const subjectHeader = settings.mode === 'dark' ? '#2A3C5E' : '#D2E3FC'
+  const studentHeader = settings.mode === 'dark' ? '#5F4822' : '#FFE3B3'
+
   const handleViewAdviseHistory = useCallback(() => {
     // Vì đây là bảng sinh viên, sẽ chỉ có 1 item trong gradeData
     if (gradeData.length > 0) {
@@ -48,18 +52,23 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
   // Memoized styles để tránh tính toán lại
   const stickyHeaderStyle = useMemo(
     () => ({
-      backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
-      textTransform: 'uppercase' as const
+      backgroundColor: subjectHeader,
+      textTransform: 'uppercase' as const,
+      position: 'sticky' as const,
+      left: 0,
+      zIndex: 9
     }),
-    [settings.mode]
+    [subjectHeader]
   )
 
   const cellStyle = useMemo(
     () => ({
-      backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
-      textTransform: 'uppercase' as const
+      backgroundColor: studentHeader,
+      textTransform: 'uppercase' as const,
+      zIndex: 8,
+      left: 0
     }),
-    [settings.mode]
+    [studentHeader]
   )
 
   // Memoized student data để tránh re-render không cần thiết
@@ -92,8 +101,7 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
           colSpan={4}
           align='right'
           sx={{
-            ...stickyHeaderStyle,
-            color: 'white'
+            ...stickyHeaderStyle
           }}
         >
           <Stack direction='row' spacing={1} alignItems='center' justifyContent='flex-end'>
@@ -109,15 +117,13 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
           <TableCell
             key={`advise-${student.id}`}
             sx={{
-              ...cellStyle,
-              color: 'white'
+              ...cellStyle
             }}
             align='center'
           >
             <Box sx={{ position: 'relative' }}>
               <Typography
                 variant='body2'
-                color='white'
                 sx={{
                   overflow: 'hidden'
                 }}
@@ -136,8 +142,7 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
           align='right'
           sx={{
             ...stickyHeaderStyle,
-            minWidth: 100,
-            color: 'white'
+            minWidth: 100
           }}
         >
           TCTL cần đạt
@@ -147,8 +152,7 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
             width={100}
             key={`tctl-cd-${student.id}`}
             sx={{
-              ...cellStyle,
-              color: 'white'
+              ...cellStyle
             }}
             align='center'
           >
@@ -164,8 +168,7 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
           align='right'
           sx={{
             ...stickyHeaderStyle,
-            minWidth: 100,
-            color: 'white'
+            minWidth: 100
           }}
         >
           TCTL Sinh viên
@@ -175,8 +178,7 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
             width={100}
             key={`tctl-sv-${student.id}`}
             sx={{
-              ...cellStyle,
-              color: 'white'
+              ...cellStyle
             }}
             align='center'
           >
@@ -190,9 +192,8 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
         <TableCell
           width={300}
           sx={{
-            backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
-            textTransform: 'uppercase',
-            color: 'white'
+            backgroundColor: subjectHeader,
+            textTransform: 'uppercase'
           }}
         >
           Tên môn học / Danh mục
@@ -200,9 +201,8 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
         <TableCell
           width={50}
           sx={{
-            backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
-            textTransform: 'uppercase',
-            color: 'white'
+            backgroundColor: subjectHeader,
+            textTransform: 'uppercase'
           }}
         >
           TC
@@ -210,9 +210,8 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
         <TableCell
           width={130}
           sx={{
-            backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
-            textTransform: 'uppercase',
-            color: 'white'
+            backgroundColor: subjectHeader,
+            textTransform: 'uppercase'
           }}
         >
           Mã MH
@@ -220,9 +219,8 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
         <TableCell
           width={100}
           sx={{
-            backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
-            textTransform: 'uppercase',
-            color: 'white'
+            backgroundColor: subjectHeader,
+            textTransform: 'uppercase'
           }}
         >
           ĐKTQ
@@ -230,10 +228,9 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
         <TableCell
           size='small'
           sx={{
-            backgroundColor: settings.mode === 'dark' ? '#211C84' : '#3674B5',
+            backgroundColor: studentHeader,
             textTransform: 'uppercase',
-            zIndex: 8,
-            color: 'white'
+            zIndex: 8
           }}
           align='center'
         >

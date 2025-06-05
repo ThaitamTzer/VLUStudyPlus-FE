@@ -180,6 +180,9 @@ const MenuItem: ForwardRefRenderFunction<HTMLLIElement, MenuItemProps> = (props,
           className={menuClasses.label}
           rootStyles={getMenuItemStyles('label')}
           textTruncate={textTruncate}
+          style={{
+            fontWeight: '700'
+          }}
         >
           {children}
         </StyledMenuLabel>

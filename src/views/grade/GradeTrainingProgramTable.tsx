@@ -42,7 +42,8 @@ const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({ t
     toogleUpdateAdvise,
     setCurrentAdviseGradeId,
     setCurrentAdviseTermId,
-    setCurrentAdvise
+    setCurrentAdvise,
+    setCurrentGradeData
   } = useGradeStore()
 
   const [currentPage, setCurrentPage] = useState(0)
@@ -146,7 +147,7 @@ const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({ t
   // Handle update advise
   const handleUpdateAdvise = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (student: StudentType, gradeId: string, _termGrades: any[]) => {
+    (student: StudentType, gradeId: string, _termGrades: any[], data: GradeType) => {
       setStudentGrade(student)
       setCurrentAdviseGradeId(gradeId)
 
@@ -154,7 +155,7 @@ const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({ t
       setCurrentAdviseTermId('')
       setCurrentAdvise('')
       setCurrentTermGrade(null as any)
-
+      setCurrentGradeData(data)
       toogleUpdateAdvise()
     },
     [
@@ -163,7 +164,8 @@ const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({ t
       setCurrentAdviseTermId,
       setCurrentAdvise,
       setCurrentTermGrade,
-      toogleUpdateAdvise
+      toogleUpdateAdvise,
+      setCurrentGradeData
     ]
   )
 

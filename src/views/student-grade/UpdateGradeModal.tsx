@@ -170,6 +170,7 @@ export default function ModalUpdateGrade({ mutate }: { mutate: KeyedMutator<any>
 
   return (
     <CustomDialog
+      canDrag
       open={openUpdateGradeStudent}
       onClose={handleClose}
       title={`Cập nhật điểm môn học`}

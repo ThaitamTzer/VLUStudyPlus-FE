@@ -103,8 +103,6 @@ export default function StudentGradePage() {
     }
   )
 
-  console.log('trainingProgramData', trainingProgramData)
-
   const { toogleImportGradeStudent } = useGradeStore()
 
   const handleOpenImportGrade = useCallback(() => {
@@ -180,13 +178,14 @@ export default function StudentGradePage() {
       elevation={0}
       sx={{
         height: '100%',
-        background: `linear-gradient(135deg, ${theme.palette[color].main}08, ${theme.palette[color].main}15)`,
-        border: `1px solid ${theme.palette[color].main}20`,
+        backgroundColor: theme.palette[color].main,
+        border: `1px solid ${theme.palette[color].dark || theme.palette[color].main}`,
         borderRadius: 2,
+        color: theme.palette.common.white,
         transition: 'all 0.3s ease',
         '&:hover': {
           transform: 'translateY(-4px)',
-          boxShadow: `0 8px 24px ${theme.palette[color].main}15`
+          boxShadow: `0 8px 24px ${theme.palette[color].dark || theme.palette[color].main}`
         }
       }}
     >
@@ -196,16 +195,19 @@ export default function StudentGradePage() {
             sx={{
               p: 1.5,
               borderRadius: 2,
-              background: `linear-gradient(135deg, ${theme.palette[color].main}20, ${theme.palette[color].main}30)`
+              backgroundColor: theme.palette[color].dark || theme.palette[color].main,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
           >
-            <Icon sx={{ fontSize: 32, color: theme.palette[color].main }} />
+            <Icon sx={{ fontSize: 32, color: theme.palette.common.white }} />
           </Box>
           <Box>
-            <Typography variant='h4' fontWeight='bold' color={theme.palette[color].main}>
+            <Typography variant='h4' fontWeight='bold' color={theme.palette.common.white}>
               {value}
             </Typography>
-            <Typography variant='body2' color='text.secondary'>
+            <Typography variant='body2' color={theme.palette.common.white}>
               {title}
             </Typography>
           </Box>
@@ -247,13 +249,14 @@ export default function StudentGradePage() {
               sx={{
                 mt: 3,
                 p: 3,
-                background: `linear-gradient(135deg, ${theme.palette.primary.main}08, ${theme.palette.secondary.main}08)`,
-                border: `1px solid ${theme.palette.primary.main}20`,
-                borderRadius: 2
+                backgroundColor: theme.palette.primary.main,
+                border: `1px solid ${theme.palette.primary.dark || theme.palette.primary.main}`,
+                borderRadius: 2,
+                color: theme.palette.common.white
               }}
             >
               <Box display='flex' alignItems='center' gap={1} mb={2}>
-                <Typography variant='h6' color='text.primary'>
+                <Typography variant='h6' color={theme.palette.common.white}>
                   Tiến độ tích lũy
                 </Typography>
                 <Tooltip title='Tỷ lệ tín chỉ đã tích lũy so với tổng số tín chỉ cần đạt'>
@@ -268,10 +271,10 @@ export default function StudentGradePage() {
                 sx={{
                   height: 10,
                   borderRadius: 5,
-                  backgroundColor: theme.palette.grey[200],
+                  backgroundColor: theme.palette.primary.dark,
                   '& .MuiLinearProgress-bar': {
                     borderRadius: 5,
-                    background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`
+                    backgroundColor: theme.palette.common.white
                   }
                 }}
               />

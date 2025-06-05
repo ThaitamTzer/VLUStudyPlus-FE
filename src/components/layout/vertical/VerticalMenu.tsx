@@ -199,14 +199,6 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             </MenuItem>
           </SubMenu>
         )}
-        <MenuItem
-          href='/major-management'
-          icon={<Iconify icon='ph:certificate' />}
-          exactMatch={false}
-          activeUrl='/major-management'
-        >
-          Ngành
-        </MenuItem>
         {user?.role.name === 'BCN Khoa' && (
           <SubMenu label='NGƯỜI DÙNG' icon={<Iconify icon='solar:users-group-rounded-linear' />}>
             <MenuItem
@@ -226,11 +218,6 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           </SubMenu>
         )}
         {user?.role.name === 'BCN Khoa' && (
-          <MenuItem href='/lecturer-management' icon={<Iconify icon='clarity:employee-group-line' />}>
-            CBGVNV
-          </MenuItem>
-        )}
-        {user?.role.name === 'BCN Khoa' && (
           <MenuItem href='/class-management' icon={<Iconify icon='ph:chalkboard-teacher' />}>
             LỚP NIÊN CHẾ
           </MenuItem>
@@ -244,6 +231,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               Sinh viên
             </MenuItem>
           </SubMenu>
+        )}
+        {user?.role.name === 'CVHT' && (
+          <MenuItem href='/send-message-lecturer' icon={<Iconify icon='si:mail-line' />}>
+            THÔNG BÁO
+          </MenuItem>
         )}
 
         {(user?.role.name === 'CVHT' || user?.role.name === 'BCN Khoa') && (
@@ -269,6 +261,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         {(user?.role.name === 'CVHT' || user?.role.name === 'BCN Khoa') && (
           <MenuItem href='/training-program' icon={<Iconify icon='solar:book-bookmark-linear' />}>
             KHUNG CTĐT
+          </MenuItem>
+        )}
+        {user?.role.name === 'BCN Khoa' && (
+          <MenuItem href='/statistics' icon={<Iconify icon='solar:chart-linear' />}>
+            THỐNG KÊ
           </MenuItem>
         )}
         {/* <SubMenu label='CTĐT' icon={<Iconify icon='solar:book-bookmark-linear' />}>

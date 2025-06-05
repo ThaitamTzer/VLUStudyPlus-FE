@@ -12,8 +12,7 @@ import {
   IconButton,
   Tooltip,
   TableSortLabel,
-  TablePagination,
-  Chip
+  TablePagination
 } from '@mui/material'
 
 import type { ClassStudentType } from '@/types/management/classStudentType'
@@ -104,15 +103,7 @@ export default function ClassStudentList(props: ClassStudentListProps) {
                   Ngày sinh
                 </TableSortLabel>
               </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={sortField === 'isActive'}
-                  direction={sortOrder === 'desc' ? 'desc' : 'asc'}
-                  onClick={() => handleSort('isActive')}
-                >
-                  Tình trạng
-                </TableSortLabel>
-              </TableCell>
+
               <TableCell colSpan={2}>
                 <TableSortLabel
                   active={sortField === 'isBlock'}
@@ -136,13 +127,6 @@ export default function ClassStudentList(props: ClassStudentListProps) {
                   <TableCell size='small'>{UserInfor(student)}</TableCell>
                   <TableCell size='small'>{student.cohortId}</TableCell>
                   <TableCell size='small'>{fDate(student.dateOfBirth, 'dd/MM/yyyy')}</TableCell>
-                  <TableCell size='small'>
-                    {student.isActive ? (
-                      <Chip label='Còn học' color='success' size='small' />
-                    ) : (
-                      <Chip label='Nghỉ học' color='error' size='small' />
-                    )}
-                  </TableCell>
                   <TableCell size='small'>
                     <IsBlock isBlock={student.isBlock} />
                   </TableCell>

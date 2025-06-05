@@ -6,6 +6,7 @@ export type ClassLecturer = {
   cohortId: string
   numberStudent: number
   statusImport: boolean
+  majorId: string
   createdAt: string | Date
   updatedAt: string | Date
 }

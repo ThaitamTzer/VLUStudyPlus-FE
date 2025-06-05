@@ -144,6 +144,7 @@ function UpdateGradeByLec() {
 
   return (
     <CustomDialog
+      canDrag
       open={openUpdateGrade}
       onClose={handleClose}
       title={`Nhập điểm cho ${studentGrade?.userName} - ${subject?.courseName}`}

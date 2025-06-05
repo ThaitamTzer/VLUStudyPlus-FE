@@ -33,6 +33,8 @@ type States = {
   subject: Subjects | null
   studentGrade: StudentType | null
 
+  currentGradeData: GradeType | null
+
   // For updating existing grade
   openUpdateExistingGrade: boolean
   currentTermGrade: TermGradeType | null
@@ -71,6 +73,7 @@ type Actions = {
   setStudentId: (studentId: string) => void
   setSubject: (subject: Subjects) => void
   setStudentGrade: (student: StudentType) => void
+  setCurrentGradeData: (currentGradeData: GradeType) => void
 
   // For updating existing grade
   toogleUpdateExistingGrade: () => void
@@ -110,6 +113,7 @@ export const useGradeStore = create<States & Actions>(set => ({
   studentId: '',
   subject: null,
   studentGrade: null,
+  currentGradeData: null,
 
   // For updating existing grade
   openUpdateExistingGrade: false,
@@ -147,6 +151,7 @@ export const useGradeStore = create<States & Actions>(set => ({
   setStudentId: (studentId: string) => set({ studentId }),
   setSubject: (subject: Subjects) => set({ subject }),
   setStudentGrade: (studentGrade: StudentType) => set({ studentGrade }),
+  setCurrentGradeData: (currentGradeData: GradeType) => set({ currentGradeData }),
 
   // For updating existing grade
   toogleUpdateExistingGrade: () => set(state => ({ openUpdateExistingGrade: !state.openUpdateExistingGrade })),

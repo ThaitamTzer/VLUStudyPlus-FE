@@ -412,6 +412,9 @@ const SubMenu: ForwardRefRenderFunction<HTMLLIElement, SubMenuProps> = (props, r
           className={menuClasses.label}
           rootStyles={getSubMenuItemStyles('label')}
           textTruncate={textTruncate}
+          style={{
+            fontWeight: '700'
+          }}
         >
           {label}
         </StyledMenuLabel>

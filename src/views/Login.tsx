@@ -17,7 +17,7 @@ const Login = () => {
   return (
     <div className='w-full h-full z-0 relative'>
       <div
-        className='w-full h-full flex justify-center items-center before:content-["*"] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-login before:z-[-1] overflow-hidden'
+        className='w-full h-full flex justify-center items-center before:content-[""] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-login before:z-[-1] overflow-hidden'
         style={{
           backgroundImage: 'url("/images/background/loginv1.jpg")',
           backgroundSize: 'cover',

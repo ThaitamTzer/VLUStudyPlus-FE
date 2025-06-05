@@ -135,6 +135,7 @@ export default function ImportGradeModal({ mutate }: { mutate: KeyedMutator<any>
 
   return (
     <CustomDialog
+      canDrag
       open={openImportGradeStudent}
       onClose={handleClose}
       title={`Nhập điểm môn học`}

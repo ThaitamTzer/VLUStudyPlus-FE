@@ -34,6 +34,7 @@ const schema = v.object({
     v.maxLength(11, 'Mã lớp không được vượt quá 11 ký tự')
   ),
   cohortId: v.pipe(v.string(), v.nonEmpty('Vui lòng chọn niên khóa')),
+  majorId: v.pipe(v.string(), v.nonEmpty('Vui lòng chọn ngành')),
   numberStudent: v.pipe(
     v.number(),
     v.integer('Số lượng học viên phải là số nguyên'),
@@ -60,7 +61,7 @@ export default function ManualAddClass({ mutate }: ManualAddClassProps) {
     }
   )
 
-  const { cohorOptions } = useShare()
+  const { cohorOptions, majorOptions } = useShare()
 
   useEffect(() => {
     if (!lecturersData?.lecturers) return
@@ -88,6 +89,7 @@ export default function ManualAddClass({ mutate }: ManualAddClassProps) {
       lectureId: '',
       classId: '',
       cohortId: '',
+      majorId: '',
       numberStudent: 0
     }
   })
@@ -235,6 +237,29 @@ export default function ManualAddClass({ mutate }: ManualAddClassProps) {
                     {...params}
                     label='Niên khóa'
                     {...(errors.cohortId && { error: true, helperText: errors.cohortId.message })}
+                  />
+                )}
+              />
+            )}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Controller
+            name='majorId'
+            control={control}
+            render={({ field: { onChange, value, ...field } }) => (
+              <Autocomplete
+                {...field}
+                id='majorId'
+                value={majorOptions?.find(major => major._id === value) || null}
+                onChange={(_, newValue) => onChange(newValue ? newValue._id : '')}
+                options={majorOptions || []}
+                getOptionLabel={option => option.majorName}
+                renderInput={params => (
+                  <CustomTextField
+                    {...params}
+                    label='Ngành'
+                    {...(errors.majorId && { error: true, helperText: errors.majorId.message })}
                   />
                 )}
               />

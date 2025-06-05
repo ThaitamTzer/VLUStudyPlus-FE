@@ -4,6 +4,7 @@ import { createContext, useState } from 'react'
 
 // import { usePathname } from 'next/navigation'
 
+import type { KeyedMutator } from 'swr'
 import useSWR from 'swr'
 
 import { useAuth } from '@/hooks/useAuth'
@@ -23,7 +24,7 @@ import type { ClassLecturer } from '@/types/management/classLecturerType'
 import type { ProcessResultType } from '@/types/management/processResultType'
 import resultProcessService from '@/services/resultProcess.service'
 import majorService from '@/services/major.service'
-import type { Major } from '@/types/management/majorType'
+import type { Major, MajorRes } from '@/types/management/majorType'
 
 type ShareContextType = {
   cohorOptions: Cohort[]
@@ -57,6 +58,8 @@ type ShareContextType = {
   setLimitStudent: (limit: number) => void
   pageMajor: number
   setPageMajor: (page: number) => void
+
+  mutateMajor: KeyedMutator<MajorRes>
 }
 
 const defaultProvider: ShareContextType = {
@@ -89,7 +92,8 @@ const defaultProvider: ShareContextType = {
   majorOptions: [],
   setMajorOptions: () => null,
   pageMajor: 100,
-  setPageMajor: () => null
+  setPageMajor: () => null,
+  mutateMajor: () => Promise.resolve(undefined)
 }
 
 const ShareContext = createContext(defaultProvider)
@@ -172,7 +176,7 @@ const ShareProvider = ({ children }: Props) => {
     revalidateOnFocus: false
   })
 
-  useSWR(user ? '/major' : null, () => majorService.getAll(pageMajor), {
+  const { mutate: mutateMajor } = useSWR(user ? '/major' : null, () => majorService.getAll(pageMajor, 100), {
     onSuccess: data => {
       setMajorOptions(data.majors)
     },
@@ -209,7 +213,8 @@ const ShareProvider = ({ children }: Props) => {
     majorOptions,
     setMajorOptions,
     pageMajor,
-    setPageMajor
+    setPageMajor,
+    mutateMajor: mutateMajor
   }
 
   return (

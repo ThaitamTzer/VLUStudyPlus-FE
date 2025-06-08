@@ -235,7 +235,7 @@ const learnProcessService = {
     }
 
     const res = await axiosClient.get(
-      `/api/academic-processing/view-list-academicProcessing-of-category-CVHT?id=${id}`,
+      `/api/academic-processing/view-list-academicProcessing-of-CVHT?categoryId=${id}`,
       {
         params
       }

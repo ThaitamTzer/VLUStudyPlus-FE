@@ -5,6 +5,11 @@ export type LearnProcessType = {
   createdAt: string | Date
   updatedAt: string | Date
   isNotification: boolean
+  termId: {
+    _id: string
+    abbreviatName: string
+    academicYear: string
+  }
 }
 
 type ProcessingHandle = {

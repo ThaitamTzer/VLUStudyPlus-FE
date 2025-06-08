@@ -11,10 +11,11 @@ import {
   Typography,
   Card,
   MenuItem,
-  TablePagination
+  TablePagination,
+  Button
 } from '@mui/material'
 import useSWR, { mutate as fetching } from 'swr'
-
+import * as XLSX from 'xlsx-js-style'
 import { toast } from 'react-toastify'
 
 import { useAcedemicProcessStore } from '@/stores/acedemicProcess.store'
@@ -57,7 +58,9 @@ export default function ViewAcedemicProcess() {
     toogleSendEmailRemind,
     toogleSendEmailRemindCommitment,
     sessionCVHT,
-    setSessionCVHT
+    setSessionCVHT,
+    limit,
+    setLimit
   } = useAcedemicProcessStore()
 
   const { cohorOptions } = useShare()
@@ -65,27 +68,34 @@ export default function ViewAcedemicProcess() {
   const id = useMemo(() => session?._id || sessionCVHT?._id, [session, sessionCVHT])
 
   const [page, setPage] = useState(1)
-  const [limit, setLimit] = useState(10)
   const [filterField, setFilterField] = useState('')
   const [filterValue, setFilterValue] = useState('')
   const [sortField, setSortField] = useState('')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
   const [searchKey, setSearchKey] = useState('')
   const [loading, setLoading] = useState(false)
+  const [totalItems, setTotalItems] = useState(0)
 
   const fetcher = [`/api/acedemicProcess/${id}`, page, limit, filterField, filterValue, sortField, sortOrder, searchKey]
 
-  const { data, isLoading, mutate } = useSWR(id ? fetcher : null, () =>
-    learnProcessService.viewProcessByCategory(
-      id as string,
-      page,
-      limit,
-      filterField,
-      filterValue,
-      sortField,
-      sortOrder,
-      searchKey
-    )
+  const { data, isLoading, mutate } = useSWR(
+    id ? fetcher : null,
+    () =>
+      learnProcessService.viewProcessByCategory(
+        id as string,
+        page,
+        limit,
+        filterField,
+        filterValue,
+        sortField,
+        sortOrder,
+        searchKey
+      ),
+    {
+      onSuccess: data => {
+        setTotalItems(data?.pagination.totalItems || 0)
+      }
+    }
   )
 
   const handleSort = (field: string) => {
@@ -140,6 +150,197 @@ export default function ViewAcedemicProcess() {
     setSession(null)
     setSessionCVHT(null)
   }
+
+  const handleExportExcel = useCallback(async () => {
+    if (totalItems === 0) {
+      alert('Không có dữ liệu để xuất')
+
+      return
+    }
+
+    try {
+      // Lấy toàn bộ dữ liệu
+      const allData = await learnProcessService.viewProcessByCategory(
+        id as string,
+        1, // page = 1
+        totalItems, // limit = totalItems để lấy tất cả
+        filterField,
+        filterValue,
+        sortField,
+        sortOrder,
+        searchKey
+      )
+
+      if (!allData?.data || allData.data.length === 0) {
+        alert('Không có dữ liệu để xuất')
+
+        return
+      }
+
+      // Tạo dữ liệu cho Excel theo đúng thứ tự cột yêu cầu
+      const excelData = allData.data.map((item, index) => {
+        const stt = index + 1
+
+        return {
+          TT: stt,
+          MSSV: item.studentId || '',
+          Họ: item.lastName || '',
+          Tên: item.firstName || '',
+          Khóa: item.cohortName || '',
+          'Mã Lớp SV': item.classId || '',
+          'Cố vấn học tập': item.handlerName || '',
+          'CVHT ghi nhận tình trạng xử lý': item.CVHTHandle?.processingResultName || '',
+          'CVHT ghi chú cụ thể khác': item.CVHTNote || '',
+          'Phân loại đối tượng theo hướng dẫn': item.groupedByInstruction || '',
+          'Số điện thoại SV': item.sdtsv || '',
+          'Số điện thoại liên hệ': item.sdtlh || '',
+          'Số điện thoại HKTT': item.sdthktt || '',
+          'Số điện thoại cha': item.sdtcha || '',
+          'Số điện thoại mẹ': item.sdtme || '',
+          Ngành: item.major || '',
+          'Điểm TBC': item.DTBC || 0,
+          'Điểm TBCTL': item.DTBCTL || 0,
+          ĐTB10: item.DTB10 || 0,
+          'ĐTBCTL 10': item.DTBCTL10 || 0,
+          'Số TCTL': item.TCTL || 0,
+          'Số TC còn nợ': item.TCCN || 0,
+          'Tổng TC CTĐT': item.TONGTCCTDT || 0,
+          '% tích lũy': item.percentTL ? parseFloat(item.percentTL.toFixed(2)) : 0,
+          'XLHT HK241 (UIS - XLHT theo quy chế)': item.processingHandle?.statusProcess || '',
+          'Đếm số lần bị XLHT qua 10 học kỳ (Từ HK201 đến HK241)': item.countWarning?.academicWarningsCount || 0,
+          'Tình trạng ĐKMH HK242 (17/3/2025)': item.courseRegistration?.isRegister ? 'Có ĐK' : 'Không ĐK',
+          'Năm SV tuyển sinh': item.admissionYear || '',
+          RQS: item.RQS || '',
+          Khoa: item.faculty || '',
+          'Danh sách': item.list || '',
+          'Tình trạng (12/3/25)': item.statusOn?.status || '',
+          'SV năm thứ (xếp theo STC trung bình toàn trường)': item.yearLevel || '',
+          'Lý do XLHT HK241': item.reasonHandling?.reason || '',
+          'Kết quả XLHT các HK trước': item.resultHandlingBefore || ''
+        }
+      })
+
+      // Tạo worksheet
+      const ws = XLSX.utils.json_to_sheet(excelData)
+
+      // Tự động điều chỉnh độ rộng cột
+      const colWidths = [
+        { wch: 5 }, // TT
+        { wch: 15 }, // MSSV
+        { wch: 15 }, // Họ
+        { wch: 10 }, // Tên
+        { wch: 8 }, // Khóa
+        { wch: 15 }, // Mã Lớp SV
+        { wch: 20 }, // Cố vấn học tập
+        { wch: 25 }, // CVHT ghi nhận
+        { wch: 25 }, // CVHT ghi chú
+        { wch: 20 }, // Phân loại đối tượng
+        { wch: 15 }, // SĐT SV
+        { wch: 15 }, // SĐT liên hệ
+        { wch: 15 }, // SĐT HKTT
+        { wch: 15 }, // SĐT cha
+        { wch: 15 }, // SĐT mẹ
+        { wch: 25 }, // Ngành
+        { wch: 10 }, // Điểm TBC
+        { wch: 12 }, // Điểm TBCTL
+        { wch: 10 }, // ĐTB10
+        { wch: 12 }, // ĐTBCTL 10
+        { wch: 10 }, // Số TCTL
+        { wch: 12 }, // Số TC còn nợ
+        { wch: 12 }, // Tổng TC CTĐT
+        { wch: 10 }, // % tích lũy
+        { wch: 30 }, // XLHT HK241
+        { wch: 15 }, // Đếm số lần XLHT
+        { wch: 25 }, // Tình trạng ĐKMH
+        { wch: 12 }, // Năm SV tuyển sinh
+        { wch: 8 }, // RQS
+        { wch: 30 }, // Khoa
+        { wch: 10 }, // Danh sách
+        { wch: 15 }, // Tình trạng
+        { wch: 30 }, // SV năm thứ
+        { wch: 40 }, // Lý do XLHT
+        { wch: 30 } // Kết quả XLHT trước
+      ]
+
+      ws['!cols'] = colWidths
+
+      // Tăng độ cao của dòng tiêu đề
+      ws['!rows'] = [{ hpt: 70 }] // 70 points height cho dòng đầu tiên (header)
+
+      ws['A1'].s = {
+        font: { bold: true, sz: 20, color: { rgb: 'FFFFFF' } },
+        alignment: { vertical: 'center', wrapText: true },
+        fill: { fgColor: { rgb: '4472C4' } }
+      }
+
+      const headerStyle = {
+        font: { bold: true, color: { rgb: '000000' } },
+        alignment: { vertical: 'center', wrapText: true },
+        fill: { fgColor: { rgb: 'D9E1F2' } },
+        border: {
+          top: { style: 'thin', color: { rgb: '000000' } },
+          bottom: { style: 'thin', color: { rgb: '000000' } },
+          left: { style: 'thin', color: { rgb: '000000' } },
+          right: { style: 'thin', color: { rgb: '000000' } }
+        }
+      }
+
+      const getheaders = () => {
+        const headersArray: string[] = []
+
+        if (ws['!ref']) {
+          const range = XLSX.utils.decode_range(ws['!ref'])
+
+          for (let col = range.s.c; col <= range.e.c; col++) {
+            const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col })
+
+            headersArray.push(cellAddress)
+          }
+        }
+
+        return headersArray
+      }
+
+      const headers = getheaders()
+
+      headers.forEach(cell => {
+        ws[cell].s = headerStyle
+      })
+
+      // Style cho nội dung border
+      const dataRange = XLSX.utils.decode_range(ws['!ref'] || '')
+
+      for (let R = 1; R <= dataRange.e.r; ++R) {
+        for (let C = 0; C <= dataRange.e.c; ++C) {
+          const cellAddress = XLSX.utils.encode_cell({ r: R, c: C })
+
+          if (!ws[cellAddress]) continue
+          ws[cellAddress].s = {
+            border: {
+              top: { style: 'thin', color: { rgb: '000000' } },
+              bottom: { style: 'thin', color: { rgb: '000000' } },
+              left: { style: 'thin', color: { rgb: '000000' } },
+              right: { style: 'thin', color: { rgb: '000000' } }
+            }
+          }
+        }
+      }
+
+      // Tạo workbook
+      const wb = XLSX.utils.book_new()
+
+      XLSX.utils.book_append_sheet(wb, ws, 'Danh sách xử lý học vụ')
+
+      // Tạo tên file với thời gian hiện tại
+      const fileName = `DS_XuLyHocVu_${new Date().toISOString().slice(0, 10)}.xlsx`
+
+      // Xuất file
+      XLSX.writeFile(wb, fileName)
+    } catch (error) {
+      console.error('Lỗi khi xuất Excel:', error)
+      alert('Có lỗi xảy ra khi xuất Excel. Vui lòng thử lại!')
+    }
+  }, [totalItems, id, filterField, filterValue, sortField, sortOrder, searchKey])
 
   return (
     <>
@@ -205,6 +406,15 @@ export default function ViewAcedemicProcess() {
                   toogleManualAddFromViewByCate={toogleManualAddFromViewByCate}
                   toogleSendEmailRemindCommitment={toogleSendEmailRemindCommitment}
                 />
+                <Button
+                  variant='contained'
+                  color='success'
+                  startIcon={<Iconify icon='mdi:file-excel' />}
+                  onClick={handleExportExcel}
+                  disabled={totalItems === 0 || isLoading}
+                >
+                  Xuất Excel ({totalItems} bản ghi)
+                </Button>
               </div>
             </div>
             <TableAcedemicProcess

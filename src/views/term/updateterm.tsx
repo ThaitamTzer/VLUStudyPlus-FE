@@ -83,9 +83,6 @@ export default function UpdateTerm(props: UpdateTermProps) {
     }
   }, [term, reset])
 
-  console.log(academicYears)
-  console.log(term)
-
   const startDate = useWatch({
     control,
     name: 'startDate'
@@ -108,10 +105,10 @@ export default function UpdateTerm(props: UpdateTermProps) {
       term._id,
       {
         termName: data.termName,
-        academicYear: data.academicYear,
         abbreviatName: data.abbreviatName,
-        startDate: fDate(data.startDate, 'dd/MM/yyyy'),
-        endDate: fDate(data.endDate, 'dd/MM/yyyy')
+        academicYear: data.academicYear,
+        startDate: fDate(data.startDate, 'yyyy-MM-dd'),
+        endDate: fDate(data.endDate, 'yyyy-MM-dd')
       },
       () => {
         toast.success('Sửa học kỳ thành công')

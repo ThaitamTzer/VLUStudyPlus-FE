@@ -71,6 +71,11 @@ export const useColumns = () => {
         cell: infor => infor.getValue(),
         sortingFn: 'alphanumeric'
       }),
+      columnHelper.accessor('termId.abbreviatName', {
+        header: 'Học kỳ',
+        cell: infor => infor.getValue(),
+        sortingFn: 'alphanumeric'
+      }),
       columnHelper.accessor('action', {
         header: '',
         meta: {

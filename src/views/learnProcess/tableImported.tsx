@@ -243,30 +243,28 @@ export default function TableImported(prop: TableImportedProps) {
   })
 
   return (
-    <>
-      <Card>
-        <CardContent>
-          <Grid container>
-            <Grid item xs={12} sm={4}>
-              <DebouncedInput
-                value={globalFilter ?? ''}
-                onChange={value => setGlobalFilter(String(value))}
-                placeholder='Tìm kiếm'
-                className='max-sm:is-full'
-                fullWidth
-              />
-            </Grid>
+    <Card>
+      <CardContent>
+        <Grid container>
+          <Grid item xs={12} sm={4}>
+            <DebouncedInput
+              value={globalFilter ?? ''}
+              onChange={value => setGlobalFilter(String(value))}
+              placeholder='Tìm kiếm'
+              className='max-sm:is-full'
+              fullWidth
+            />
           </Grid>
-        </CardContent>
-        <TanstackTable table={table} title='Danh sách xử lý học tập đã thêm' />
-        <TablePagination
-          component={() => <TablePaginationComponent table={table as Table<unknown>} />}
-          count={table.getFilteredRowModel().rows.length}
-          rowsPerPage={table.getState().pagination.pageSize}
-          page={table.getState().pagination.pageIndex + 1}
-          onPageChange={(_, page) => table.setPageIndex(page - 1)}
-        />
-      </Card>
-    </>
+        </Grid>
+      </CardContent>
+      <TanstackTable table={table} title='Danh sách xử lý học tập đã thêm' />
+      <TablePagination
+        component={() => <TablePaginationComponent table={table as Table<unknown>} />}
+        count={table.getFilteredRowModel().rows.length}
+        rowsPerPage={table.getState().pagination.pageSize}
+        page={table.getState().pagination.pageIndex + 1}
+        onPageChange={(_, page) => table.setPageIndex(page - 1)}
+      />
+    </Card>
   )
 }

@@ -547,10 +547,10 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                   <TableCell width={200}>{d.CVHTHandle?.processingResultName || '-'}</TableCell>
                   <TableCell width={200}>{d.CVHTNote || '-'}</TableCell>
                   <TableCell width={10}>{d.handlerName || '-'}</TableCell>
-                  <TableCell width={10}>{d.groupedByInstruction || '-'}</TableCell>
+                  <TableCell width={150}>{d.groupedByInstruction || '-'}</TableCell>
                   <TableCell>{d.processingHandle?.statusProcess || '-'}</TableCell>
                   <TableCell width={200}>{d.reasonHandling?.reason || '-'}</TableCell>
-                  <TableCell>
+                  <TableCell width={150}>
                     {d.statusOn?.status ? (
                       <Badge
                         sx={{
@@ -575,7 +575,7 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
                       </Badge>
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell width={150}>
                     {d.courseRegistration?.isRegister ? (
                       <Badge
                         sx={{

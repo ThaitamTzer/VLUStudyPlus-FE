@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
 
 // import { usePathname } from 'next/navigation'
 
@@ -25,6 +25,7 @@ import type { ProcessResultType } from '@/types/management/processResultType'
 import resultProcessService from '@/services/resultProcess.service'
 import majorService from '@/services/major.service'
 import type { Major, MajorRes } from '@/types/management/majorType'
+import CacheManager, { CACHE_KEYS } from '@/utils/cache'
 
 type ShareContextType = {
   cohorOptions: Cohort[]
@@ -60,6 +61,10 @@ type ShareContextType = {
   setPageMajor: (page: number) => void
 
   mutateMajor: KeyedMutator<MajorRes>
+
+  // Thêm functions để quản lý cache
+  clearCache: () => void
+  refreshCache: () => Promise<void>
 }
 
 const defaultProvider: ShareContextType = {
@@ -93,7 +98,9 @@ const defaultProvider: ShareContextType = {
   setMajorOptions: () => null,
   pageMajor: 100,
   setPageMajor: () => null,
-  mutateMajor: () => Promise.resolve(undefined)
+  mutateMajor: () => Promise.resolve(undefined),
+  clearCache: () => null,
+  refreshCache: () => Promise.resolve()
 }
 
 const ShareContext = createContext(defaultProvider)
@@ -127,61 +134,124 @@ const ShareProvider = ({ children }: Props) => {
   const fetcherClass = ['/class', page, limit]
   const fetcherStudent = ['/students', pageStudent, limitStudent]
 
+  // Load dữ liệu từ cache khi component mount
+  useEffect(() => {
+    if (!user) return
+
+    // Load từ cache nếu có
+    const cachedCohort = CacheManager.get<Cohort[]>(CACHE_KEYS.COHORT_OPTIONS)
+    const cachedClass = CacheManager.get<Class[]>(CACHE_KEYS.CLASS_OPTIONS)
+    const cachedTerm = CacheManager.get<Term[]>(CACHE_KEYS.TERM_OPTIONS)
+    const cachedStudent = CacheManager.get<Student[]>(CACHE_KEYS.STUDENT_OPTIONS)
+    const cachedTypeProcess = CacheManager.get<TypeProcessType[]>(CACHE_KEYS.TYPE_PROCESS)
+    const cachedClassCVHT = CacheManager.get<ClassLecturer[]>(CACHE_KEYS.CLASS_CVHT)
+    const cachedResultProcess = CacheManager.get<ProcessResultType[]>(CACHE_KEYS.RESULT_PROCESS)
+    const cachedMajor = CacheManager.get<Major[]>(CACHE_KEYS.MAJOR_OPTIONS)
+
+    if (cachedCohort) setCohortOptions(cachedCohort)
+    if (cachedClass) setClassOptions(cachedClass)
+    if (cachedTerm) setTermOptions(cachedTerm)
+    if (cachedStudent) setStudentOptions(cachedStudent)
+    if (cachedTypeProcess) setProcessType(cachedTypeProcess)
+    if (cachedClassCVHT) setClassCVHT(cachedClassCVHT)
+    if (cachedResultProcess) setProcessResult(cachedResultProcess)
+    if (cachedMajor) setMajorOptions(cachedMajor)
+  }, [user])
+
   useSWR(user ? '/cohort' : null, cohortService.getAll, {
     onSuccess: data => {
       setCohortOptions(data)
+      CacheManager.set(CACHE_KEYS.COHORT_OPTIONS, data, 10 * 60 * 1000) // Cache 10 phút
     },
-    revalidateOnFocus: false
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false
   })
 
   useSWR(user ? fetcherClass : null, () => classService.getAll(page, limit), {
     onSuccess: data => {
       setClassOptions(data.data)
+      CacheManager.set(CACHE_KEYS.CLASS_OPTIONS, data.data, 10 * 60 * 1000)
     },
-    revalidateOnFocus: false
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false
   })
 
   useSWR(user ? fetcherTerm : null, () => termService.getAll(pageTerm, limitTerm), {
     onSuccess: data => {
       setTermOptions(data.terms)
+      CacheManager.set(CACHE_KEYS.TERM_OPTIONS, data.terms, 10 * 60 * 1000)
     },
-    revalidateOnFocus: false
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false
   })
 
   useSWR(user ? fetcherStudent : null, () => studentService.getList(pageStudent, limitStudent), {
     onSuccess: data => {
       setStudentOptions(data.students)
+      CacheManager.set(CACHE_KEYS.STUDENT_OPTIONS, data.students, 10 * 60 * 1000)
     },
-    revalidateOnFocus: false
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false
   })
 
   useSWR(user ? '/type-process' : null, typeProcessService.getAll, {
     onSuccess: data => {
       setProcessType(data)
+      CacheManager.set(CACHE_KEYS.TYPE_PROCESS, data, 15 * 60 * 1000) // Cache 15 phút cho dữ liệu ít thay đổi
     },
-    revalidateOnFocus: false
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false
   })
 
   useSWR(user ? '/classCVHT' : null, classLecturerService.getList, {
     onSuccess: data => {
       setClassCVHT(data)
+      CacheManager.set(CACHE_KEYS.CLASS_CVHT, data, 10 * 60 * 1000)
     },
-    revalidateOnFocus: false
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false
   })
 
   useSWR(user ? '/api/processing-result' : null, resultProcessService.getAll, {
     onSuccess: data => {
       setProcessResult(data)
+      CacheManager.set(CACHE_KEYS.RESULT_PROCESS, data, 5 * 60 * 1000) // Cache 5 phút cho dữ liệu thay đổi thường xuyên
     },
-    revalidateOnFocus: false
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false
   })
 
   const { mutate: mutateMajor } = useSWR(user ? '/major' : null, () => majorService.getAll(pageMajor, 100), {
     onSuccess: data => {
       setMajorOptions(data.majors)
+      CacheManager.set(CACHE_KEYS.MAJOR_OPTIONS, data.majors, 15 * 60 * 1000)
     },
-    revalidateOnFocus: false
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false
   })
+
+  // Functions để quản lý cache
+  const clearCache = () => {
+    CacheManager.clear()
+    console.log('Đã xóa tất cả cache')
+  }
+
+  const refreshCache = async () => {
+    if (!user) return
+
+    try {
+      // Xóa cache cũ
+      Object.values(CACHE_KEYS).forEach(key => {
+        CacheManager.remove(key)
+      })
+
+      // Fetch lại dữ liệu mới (SWR sẽ tự động gọi lại các API)
+      // Có thể trigger manual refresh nếu cần
+      console.log('Đã refresh cache')
+    } catch (error) {
+      console.error('Lỗi khi refresh cache:', error)
+    }
+  }
 
   const value = {
     cohorOptions,
@@ -214,7 +284,9 @@ const ShareProvider = ({ children }: Props) => {
     setMajorOptions,
     pageMajor,
     setPageMajor,
-    mutateMajor: mutateMajor
+    mutateMajor: mutateMajor,
+    clearCache,
+    refreshCache
   }
 
   return (

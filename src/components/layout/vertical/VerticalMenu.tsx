@@ -222,6 +222,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             LỚP NIÊN CHẾ
           </MenuItem>
         )}
+        <MenuItem href='/class-management' icon={<Iconify icon='ph:chalkboard-teacher' />}>
+          LỚP NIÊN CHẾ
+        </MenuItem>
         {user?.role.name === 'CVHT' && (
           <SubMenu label='LỚP - CVHT' icon={<Iconify icon='fluent:class-24-regular' />}>
             <MenuItem href='/classLecturer' icon={<Iconify icon='fluent:class-24-regular' />}>
@@ -264,9 +267,26 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           </MenuItem>
         )}
         {user?.role.name === 'BCN Khoa' && (
-          <MenuItem href='/statistics' icon={<Iconify icon='solar:chart-linear' />}>
-            THỐNG KÊ
-          </MenuItem>
+          <SubMenu label='THỐNG KÊ' icon={<Iconify icon='solar:chart-linear' />}>
+            <MenuItem href='/statistics-XLHT-student' icon={<Iconify icon='solar:chart-linear' />}>
+              XLHT học kỳ
+            </MenuItem>
+            <MenuItem href='/statistics-XLHT-class' icon={<Iconify icon='solar:chart-linear' />}>
+              XLHT Lớp niên chế
+            </MenuItem>
+            <MenuItem href='/statistics-XLHT-cvht' icon={<Iconify icon='solar:chart-linear' />}>
+              XLHT CVHT
+            </MenuItem>
+            <MenuItem href='/statistics-XLHT-status' icon={<Iconify icon='solar:chart-linear' />}>
+              XLHT theo trạng thái
+            </MenuItem>
+            <MenuItem href='/statistics-student-kqht' icon={<Iconify icon='solar:chart-linear' />}>
+              SLSV KQHT
+            </MenuItem>
+            <MenuItem href='/statistics-student-tthk' icon={<Iconify icon='solar:chart-linear' />}>
+              Tình trạng học tập
+            </MenuItem>
+          </SubMenu>
         )}
         {/* <SubMenu label='CTĐT' icon={<Iconify icon='solar:book-bookmark-linear' />}>
           <MenuItem href='/training-program' icon={<Iconify icon='solar:book-bookmark-linear' />}>

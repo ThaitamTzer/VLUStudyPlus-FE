@@ -7,10 +7,10 @@ export const metadata: Metadata = {
   description: 'Thống kê'
 }
 
-const StatisticsPage = dynamic(() => import('@/views/statistics/statisticsPage'), {
+const StatisticsXLHTstudentPage = dynamic(() => import('@/views/statistics/statisticsXLHTstudentpage'), {
   ssr: false
 })
 
 export default function Page() {
-  return <StatisticsPage />
+  return <StatisticsXLHTstudentPage />
 }

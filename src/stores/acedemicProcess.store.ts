@@ -31,6 +31,8 @@ type States = {
   session: LearnProcessType | null
   sessionCVHT: LearnProcessType | null
   openViewByCategoryCVHT: boolean
+
+  limit: number
 }
 
 type Actions = {
@@ -63,6 +65,8 @@ type Actions = {
   setIsCompleted: (isCompleted: boolean) => void
   setSession: (session: LearnProcessType | null) => void
   setSessionCVHT: (sessionCVHT: LearnProcessType | null) => void
+
+  setLimit: (limit: number) => void
 }
 
 export const useAcedemicProcessStore = create<States & Actions>(set => ({
@@ -94,6 +98,7 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
   session: null,
   sessionCVHT: null,
   openViewByCategoryCVHT: false,
+  limit: 10,
   setSession: session => set({ session }),
   setSessionCVHT: sessionCVHT => set({ sessionCVHT }),
   setIsProcessing: isProcessing => set({ isProcessing }),
@@ -128,5 +133,6 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
   toogleDeleteViewAcedemicProcess: () =>
     set(state => ({ openDeleteViewAcedemicProcess: !state.openDeleteViewAcedemicProcess })),
   toogleSendEmailRemindCommitment: () =>
-    set(state => ({ openSendEmailRemindCommitment: !state.openSendEmailRemindCommitment }))
+    set(state => ({ openSendEmailRemindCommitment: !state.openSendEmailRemindCommitment })),
+  setLimit: limit => set({ limit })
 }))

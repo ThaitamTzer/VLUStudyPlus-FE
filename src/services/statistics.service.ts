@@ -1,4 +1,5 @@
 import axiosClient from '@/libs/axios'
+import type { StatisticsProcessByTerm } from '@/types/statisticsType'
 
 const statisticsService = {
   getStatistics: async (startYear?: string, endYear?: string, term?: string, customParams?: Record<string, any>) => {
@@ -11,7 +12,7 @@ const statisticsService = {
 
     const res = await axiosClient.get('/api/statistics/get-statistic-by-term', { params })
 
-    return res.data
+    return res.data as StatisticsProcessByTerm
   },
 
   getStatisticsByprocessOfCVHT: async (

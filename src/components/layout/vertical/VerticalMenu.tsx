@@ -222,9 +222,6 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             LỚP NIÊN CHẾ
           </MenuItem>
         )}
-        <MenuItem href='/class-management' icon={<Iconify icon='ph:chalkboard-teacher' />}>
-          LỚP NIÊN CHẾ
-        </MenuItem>
         {user?.role.name === 'CVHT' && (
           <SubMenu label='LỚP - CVHT' icon={<Iconify icon='fluent:class-24-regular' />}>
             <MenuItem href='/classLecturer' icon={<Iconify icon='fluent:class-24-regular' />}>
@@ -268,6 +265,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         )}
         {user?.role.name === 'BCN Khoa' && (
           <SubMenu label='THỐNG KÊ' icon={<Iconify icon='solar:chart-linear' />}>
+            <MenuItem href='/statistics' icon={<Iconify icon='solar:chart-linear' />}>
+              Tổng quan
+            </MenuItem>
             <MenuItem href='/statistics-XLHT-student' icon={<Iconify icon='solar:chart-linear' />}>
               XLHT học kỳ
             </MenuItem>

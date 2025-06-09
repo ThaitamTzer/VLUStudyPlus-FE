@@ -206,7 +206,7 @@ export default function ProcessResultPage() {
               className='max-sm:is-full'
               onClick={toogleAddResultProcess}
             >
-              Thêm danh mục
+              Thêm
             </Button>
           </div>
         </div>

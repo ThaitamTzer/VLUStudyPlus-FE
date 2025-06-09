@@ -45,7 +45,6 @@ const columnHelper = createColumnHelper<CohortTypeWithAction>()
 
 export default function CohortPage() {
   const {
-    cohorts,
     setCohorts,
     toogleAddCohort,
     toogleUpdateCohort,
@@ -56,7 +55,7 @@ export default function CohortPage() {
     toogleViewCohort
   } = useCohortStore()
 
-  const { mutate } = useSWR('/api/cohort', cohortService.getAll, {
+  const { mutate, data: cohorts } = useSWR('/api/cohort', cohortService.getAll, {
     onSuccess: data => {
       setCohorts(data)
     }
@@ -144,25 +143,37 @@ export default function CohortPage() {
       return
     }
 
+    const toastId = toast.loading('Xóa niên khóa...')
+
     setLoading(true)
     await cohortService.delete(
       cohort._id,
       () => {
         toogleDeleteCohort()
         mutate()
-        toast.success('Xóa niên khóa thành công')
+        toast.update(toastId, {
+          render: 'Xóa niên khóa thành công',
+          type: 'success',
+          isLoading: false,
+          autoClose: 3000
+        })
         setLoading(false)
       },
-      () => {
+      err => {
         toogleDeleteCohort()
         setLoading(false)
-        toast.error('Xóa niên khóa thất bại')
+        toast.update(toastId, {
+          render: err.message || 'Xóa niên khóa thất bại',
+          type: 'error',
+          isLoading: false,
+          autoClose: 3000
+        })
       }
     )
   }
 
   const table = useReactTable({
-    data: cohorts,
+    data: cohorts || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),

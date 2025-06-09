@@ -268,22 +268,22 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             <MenuItem href='/statistics' icon={<Iconify icon='solar:chart-linear' />}>
               Tổng quan
             </MenuItem>
-            <MenuItem href='/statistics-XLHT-student' icon={<Iconify icon='solar:chart-linear' />}>
+            <MenuItem href='/statistics-XLHT-student' icon={<Iconify icon='solar:calendar-outline' />}>
               XLHT học kỳ
             </MenuItem>
-            <MenuItem href='/statistics-XLHT-class' icon={<Iconify icon='solar:chart-linear' />}>
+            <MenuItem href='/statistics-XLHT-class' icon={<Iconify icon='ph:users-three-light' />}>
               XLHT Lớp niên chế
             </MenuItem>
-            <MenuItem href='/statistics-XLHT-cvht' icon={<Iconify icon='solar:chart-linear' />}>
+            <MenuItem href='/statistics-XLHT-cvht' icon={<Iconify icon='solar:user-check-outline' />}>
               XLHT CVHT
             </MenuItem>
-            <MenuItem href='/statistics-XLHT-status' icon={<Iconify icon='solar:chart-linear' />}>
+            <MenuItem href='/statistics-XLHT-status' icon={<Iconify icon='pajamas:status-alert' />}>
               XLHT theo trạng thái
             </MenuItem>
-            <MenuItem href='/statistics-student-kqht' icon={<Iconify icon='solar:chart-linear' />}>
+            <MenuItem href='/statistics-student-kqht' icon={<Iconify icon='solar:document-text-outline' />}>
               SLSV KQHT
             </MenuItem>
-            <MenuItem href='/statistics-student-tthk' icon={<Iconify icon='solar:chart-linear' />}>
+            <MenuItem href='/statistics-student-tthk' icon={<Iconify icon='tdesign:activity' />}>
               Tình trạng học tập
             </MenuItem>
           </SubMenu>

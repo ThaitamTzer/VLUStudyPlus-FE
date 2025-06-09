@@ -3,6 +3,8 @@
 import { useCallback, useMemo, useState } from 'react'
 
 import useSWR from 'swr'
+import * as XLSX from 'xlsx-js-style'
+import { toast } from 'react-toastify'
 
 import {
   createColumnHelper,
@@ -18,7 +20,7 @@ import {
   type Table as TableType
 } from '@tanstack/react-table'
 
-import { Card, CardContent, Grid, MenuItem, Skeleton, TablePagination } from '@mui/material'
+import { Card, CardContent, Grid, MenuItem, Skeleton, TablePagination, Button } from '@mui/material'
 
 import { fuzzyFilter } from '../apps/invoice/list/InvoiceListTable'
 import TanstackTable from '@/components/TanstackTable'
@@ -28,6 +30,7 @@ import CustomTextField from '@/@core/components/mui/TextField'
 import PageHeader from '@/components/page-header'
 import { useShare } from '@/hooks/useShare'
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
+import Iconify from '@/components/iconify'
 
 interface StatisticsProcessByStudentTTHKType {
   cvht: string
@@ -169,9 +172,155 @@ export default function StatisticsStudentTTHKPage() {
     table.getFilteredRowModel().rows.length
   ])
 
+  const handleExportExcel = useCallback(async () => {
+    if (tableData.length === 0) {
+      toast.error('Không có dữ liệu để xuất')
+
+      return
+    }
+
+    try {
+      // Tạo dữ liệu cho Excel
+      const excelData = tableData.map((item, index) => ({
+        STT: index + 1,
+        'Mã lớp': item.classCode || '',
+        CVHT: item.cvht || '',
+        Ngành: item.majorName || '',
+        'Niên chế': item.cohort || '',
+        'Tốt nghiệp đúng hạn': item.counttndh || 0,
+        'Tốt nghiệp không đúng hạn': item.counttnkdh || 0,
+        'Bảo lưu': item.countbl || 0,
+        'Thôi học': item.countth || 0,
+        'Năm tốt nghiệp': item.ntn || ''
+      }))
+
+      // Tạo worksheet
+      const ws = XLSX.utils.json_to_sheet(excelData)
+
+      // Thêm một dòng trống ở đầu cho tiêu đề
+      XLSX.utils.sheet_add_aoa(ws, [[]], { origin: 'A1' })
+
+      // Dịch chuyển tất cả dữ liệu xuống 1 dòng
+      const range = XLSX.utils.decode_range(ws['!ref'] || '')
+
+      for (let R = range.e.r; R >= 0; R--) {
+        for (let C = range.s.c; C <= range.e.c; C++) {
+          const oldCell = XLSX.utils.encode_cell({ r: R, c: C })
+          const newCell = XLSX.utils.encode_cell({ r: R + 1, c: C })
+
+          if (ws[oldCell]) {
+            ws[newCell] = ws[oldCell]
+            delete ws[oldCell]
+          }
+        }
+      }
+
+      // Thêm tiêu đề vào ô A1
+      ws['A1'] = { v: 'Thống kê tiến độ tốt nghiệp sinh viên theo lớp niên chế', t: 's' }
+
+      // Cập nhật range để bao gồm tiêu đề
+      const numCols = Object.keys(excelData[0] || {}).length
+
+      ws['!ref'] = XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: excelData.length + 1, c: numCols - 1 } })
+
+      // Merge ô tiêu đề để trải dài qua tất cả các cột
+      ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: numCols - 1 } }]
+
+      // Tự động điều chỉnh độ rộng cột
+      const colWidths = [
+        { wch: 5 }, // STT
+        { wch: 15 }, // Mã lớp
+        { wch: 20 }, // CVHT
+        { wch: 25 }, // Ngành
+        { wch: 12 }, // Niên chế
+        { wch: 18 }, // Tốt nghiệp đúng hạn
+        { wch: 20 }, // Tốt nghiệp không đúng hạn
+        { wch: 12 }, // Bảo lưu
+        { wch: 12 }, // Thôi học
+        { wch: 15 } // Năm tốt nghiệp
+      ]
+
+      ws['!cols'] = colWidths
+
+      // Style cho tiêu đề
+      const titleStyle = {
+        font: { bold: true, sz: 16, color: { rgb: '000000' } },
+        alignment: { vertical: 'center', horizontal: 'center', wrapText: true },
+        fill: { fgColor: { rgb: '4472C4' } },
+        border: {
+          top: { style: 'thin', color: { rgb: '000000' } },
+          bottom: { style: 'thin', color: { rgb: '000000' } },
+          left: { style: 'thin', color: { rgb: '000000' } },
+          right: { style: 'thin', color: { rgb: '000000' } }
+        }
+      }
+
+      // Áp dụng style cho tiêu đề
+      if (ws['A1']) {
+        ws['A1'].s = titleStyle
+      }
+
+      // Style cho header
+      const headerStyle = {
+        font: { bold: true, color: { rgb: '000000' } },
+        alignment: { vertical: 'center', horizontal: 'center', wrapText: true },
+        fill: { fgColor: { rgb: 'D9E1F2' } },
+        border: {
+          top: { style: 'thin', color: { rgb: '000000' } },
+          bottom: { style: 'thin', color: { rgb: '000000' } },
+          left: { style: 'thin', color: { rgb: '000000' } },
+          right: { style: 'thin', color: { rgb: '000000' } }
+        }
+      }
+
+      // Áp dụng style cho header (dòng 2)
+      for (let C = 0; C < numCols; ++C) {
+        const headerCell = XLSX.utils.encode_cell({ r: 1, c: C })
+
+        if (ws[headerCell]) {
+          ws[headerCell].s = headerStyle
+        }
+      }
+
+      // Style cho dữ liệu (bắt đầu từ dòng 3)
+      for (let R = 2; R < excelData.length + 2; ++R) {
+        for (let C = 0; C < numCols; ++C) {
+          const cellAddress = XLSX.utils.encode_cell({ r: R, c: C })
+
+          if (ws[cellAddress]) {
+            ws[cellAddress].s = {
+              alignment: { vertical: 'center', horizontal: 'center' },
+              border: {
+                top: { style: 'thin', color: { rgb: '000000' } },
+                bottom: { style: 'thin', color: { rgb: '000000' } },
+                left: { style: 'thin', color: { rgb: '000000' } },
+                right: { style: 'thin', color: { rgb: '000000' } }
+              }
+            }
+          }
+        }
+      }
+
+      // Tạo workbook
+      const wb = XLSX.utils.book_new()
+
+      XLSX.utils.book_append_sheet(wb, ws, 'Thống kê tiến độ SV')
+
+      // Tạo tên file với thời gian hiện tại
+      const fileName = `ThongKe_TienDoSinhVien_${new Date().toISOString().slice(0, 10)}.xlsx`
+
+      // Xuất file
+      XLSX.writeFile(wb, fileName)
+      toast.success('Xuất Excel thành công!')
+    } catch (error) {
+      console.error('Lỗi khi xuất Excel:', error)
+      toast.error('Có lỗi xảy ra khi xuất Excel. Vui lòng thử lại!')
+    }
+  }, [tableData])
+
   return (
     <>
-      <PageHeader title='Thống kê số lượng SV đã được cập nhật KQHT theo lớp niên chế' />
+      <PageHeader title='Thống kê tiến độ tốt nghiệp sinh viên theo lớp niên chế' />
       <Card>
         <CardContent>
           <Grid container spacing={6}>
@@ -208,19 +357,16 @@ export default function StatisticsStudentTTHKPage() {
             <MenuItem value={20}>20</MenuItem>
             <MenuItem value={50}>50</MenuItem>
           </CustomTextField>
+          <Button
+            variant='contained'
+            color='success'
+            startIcon={<Iconify icon='mdi:file-excel' />}
+            onClick={handleExportExcel}
+            disabled={tableData.length === 0 || isLoading}
+          >
+            Xuất Excel ({tableData.length} bản ghi)
+          </Button>
         </div>
-        {/* {selectedClass.length === 0 ? (
-          <div className='flex justify-center items-center p-8'>
-            <div className='text-center text-gray-500'>
-              <p className='text-lg mb-2'>📊</p>
-              <p>Vui lòng chọn lớp niên chế để xem thống kê</p>
-            </div>
-          </div>
-        ) : isLoading ? (
-          <Skeleton variant='rectangular' height={500} animation='wave' />
-        ) : (
-          renderTable
-        )} */}
         {isLoading ? <Skeleton variant='rectangular' height={500} animation='wave' /> : renderTable}
       </Card>
     </>

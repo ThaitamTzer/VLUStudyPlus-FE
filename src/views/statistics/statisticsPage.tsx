@@ -20,7 +20,7 @@ import dashboardService from '@/services/dashboard.service'
 import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
 import CustomAvatar from '@/@core/components/mui/Avatar'
 import { useSettings } from '@/@core/hooks/useSettings'
-import type { StatisticsProcessByTerm } from '@/types/statisticsType'
+import type { StatisticsProcessByTerm, StatisticsProcessOfCVHT } from '@/types/statisticsType'
 import statisticsService from '@/services/statistics.service'
 
 // Types
@@ -46,6 +46,7 @@ type DashboardStats = {
   academicProcessingStatusDht: any
   academicProcessingStatusCht: any
   statisticsXLHTByTerm: StatisticsProcessByTerm
+  getStatisticsByprocessOfCVHT: StatisticsProcessOfCVHT | null
 }
 
 export default function StatisticsPage() {
@@ -54,6 +55,11 @@ export default function StatisticsPage() {
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  // State riêng cho dữ liệu CVHT
+  const [cvhtLoading, setCvhtLoading] = useState(true)
+  const [cvhtStats, setCvhtStats] = useState<StatisticsProcessOfCVHT | null>(null)
+  const [cvhtError, setCvhtError] = useState<string | null>(null)
 
   // Định nghĩa các tông màu đa dạng
   const colorPalette = {
@@ -89,7 +95,7 @@ export default function StatisticsPage() {
       try {
         setLoading(true)
 
-        // Gọi tất cả API song song để tối ưu hiệu suất
+        // Gọi tất cả API song song để tối ưu hiệu suất (trừ API CVHT chậm)
         const [
           studentCount,
           lectureCount,
@@ -127,7 +133,8 @@ export default function StatisticsPage() {
           onTimeGraduatedStudentCountByCohort,
           academicProcessingStatusDht,
           academicProcessingStatusCht,
-          statisticsXLHTByTerm
+          statisticsXLHTByTerm,
+          getStatisticsByprocessOfCVHT: null // Sẽ được cập nhật riêng
         })
       } catch (err) {
         setError('Có lỗi xảy ra khi tải dữ liệu dashboard')
@@ -138,6 +145,26 @@ export default function StatisticsPage() {
     }
 
     fetchDashboardData()
+  }, [])
+
+  // useEffect riêng để gọi API CVHT chậm
+  useEffect(() => {
+    const fetchCvhtData = async () => {
+      try {
+        setCvhtLoading(true)
+        setCvhtError(null)
+        const cvhtResult = await statisticsService.getStatisticsByprocessOfCVHT()
+
+        setCvhtStats(cvhtResult)
+      } catch (err) {
+        setCvhtError('Có lỗi xảy ra khi tải dữ liệu CVHT')
+        console.error('CVHT fetch error:', err)
+      } finally {
+        setCvhtLoading(false)
+      }
+    }
+
+    fetchCvhtData()
   }, [])
 
   // Chuẩn bị dữ liệu cho bar chart
@@ -161,23 +188,19 @@ export default function StatisticsPage() {
   const pieChartData = [
     {
       cohortId: 'K28',
-      onTimeGraduatedCount: 100
+      onTimeGraduatedCount: 80
     },
     {
-      cohortId: 'K26',
-      onTimeGraduatedCount: 100
+      cohortId: 'K27',
+      onTimeGraduatedCount: 106
     },
     {
       cohortId: 'K29',
-      onTimeGraduatedCount: 100
+      onTimeGraduatedCount: 80
     },
     {
-      cohortId: 'K31',
-      onTimeGraduatedCount: 100
-    },
-    {
-      cohortId: 'K21',
-      onTimeGraduatedCount: 100
+      cohortId: 'K30',
+      onTimeGraduatedCount: 70
     }
   ]
 
@@ -203,6 +226,162 @@ export default function StatisticsPage() {
       return found ? found.count : 0
     })
   }))
+
+  // Chuẩn bị dữ liệu cho biểu đồ Top 10 CVHT
+  const cvhtDataArray = cvhtStats?.statistics || []
+
+  // Tính tổng số liệu cho mỗi CVHT
+  const cvhtSummary = cvhtDataArray.reduce((acc: any, item: any) => {
+    const cvht = item.cvht
+
+    if (!acc[cvht]) {
+      acc[cvht] = {
+        cvht: cvht,
+        countslxl: 0,
+        countsslcxl: 0,
+        count: 0
+      }
+    }
+
+    acc[cvht].countslxl += item.countslxl
+    acc[cvht].countsslcxl += item.countsslcxl
+    acc[cvht].count += item.count
+
+    return acc
+  }, {})
+
+  // Lấy top 10 CVHT theo tổng count và sắp xếp giảm dần
+  const top10CVHT = Object.values(cvhtSummary)
+    .sort((a: any, b: any) => b.count - a.count)
+    .slice(0, 10)
+
+  // Tạo series cho biểu đồ CVHT horizontal stacked bar
+  const cvhtSeries = [
+    {
+      name: 'Đã xử lý',
+      data: top10CVHT.map((item: any) => item.countslxl)
+    },
+    {
+      name: 'Chưa xử lý',
+      data: top10CVHT.map((item: any) => item.countsslcxl)
+    }
+  ]
+
+  const cvhtCategories = top10CVHT.map((item: any) => item.cvht)
+
+  // Cấu hình cho biểu đồ CVHT horizontal stacked bar
+  const cvhtBarOptions: ApexOptions = {
+    chart: {
+      parentHeightOffset: 0,
+      toolbar: { show: false },
+      type: 'bar',
+      stacked: true
+    },
+    plotOptions: {
+      bar: {
+        horizontal: true,
+        barHeight: '70%',
+        borderRadius: 6,
+        borderRadiusApplication: 'end',
+        dataLabels: {
+          total: {
+            enabled: true,
+            style: {
+              fontSize: '12px',
+              fontWeight: 700,
+              color: colorPalette.darkBlue
+            }
+          }
+        }
+      }
+    },
+    colors: [
+      colorPalette.blue, // Sinh viên loại xuống lớp
+      colorPalette.orange // Sinh viên sắp sẽ loại xuống lớp
+    ],
+    grid: {
+      strokeDashArray: 8,
+      borderColor: 'var(--mui-palette-divider)',
+      xaxis: {
+        lines: { show: true }
+      },
+      yaxis: {
+        lines: { show: false }
+      },
+      padding: {
+        top: 0,
+        left: 20,
+        right: 20,
+        bottom: 0
+      }
+    },
+    dataLabels: {
+      enabled: true,
+      style: {
+        colors: ['#fff'],
+        fontSize: '11px',
+        fontWeight: 600
+      },
+      formatter: function (val: number) {
+        return val > 0 ? val.toString() : ''
+      }
+    },
+    tooltip: {
+      enabled: true,
+      style: {
+        fontSize: '14px'
+      },
+      y: {
+        formatter: function (val: number) {
+          return `${val} sinh viên`
+        }
+      }
+    },
+    legend: {
+      show: true,
+      position: 'top',
+      horizontalAlign: 'left',
+      floating: false,
+      fontSize: '12px',
+      fontFamily: 'inherit',
+      fontWeight: 500
+    },
+    xaxis: {
+      axisTicks: { show: false },
+      axisBorder: { show: false },
+      labels: {
+        style: {
+          fontSize: '12px',
+          colors: colorPalette.darkBlue,
+          fontWeight: 500
+        },
+        formatter: function (val: string) {
+          return val.toString()
+        }
+      },
+      title: {
+        text: 'Số lượng XLHT',
+        style: {
+          color: colorPalette.darkBlue,
+          fontSize: '14px',
+          fontWeight: 600
+        }
+      },
+      categories: cvhtCategories
+    },
+    yaxis: {
+      axisTicks: { show: false },
+      axisBorder: { show: false },
+      labels: {
+        style: {
+          fontSize: '11px',
+          colors: colorPalette.darkBlue,
+          fontWeight: 600
+        },
+        maxWidth: 200
+      }
+    }
+  }
 
   // Cấu hình cho stacked bar chart
   const stackedBarOptions: ApexOptions = {
@@ -564,7 +743,7 @@ export default function StatisticsPage() {
         <Grid item xs={12} sm={6} md={3}>
           <CardStatHorizontalCustom
             stats={stats.studentCount.toLocaleString()}
-            title='Tổng Sinh Viên'
+            title='Sinh Viên'
             avatarIcon='tabler-users'
             avatarColor='primary'
             avatarSkin='light'
@@ -580,7 +759,7 @@ export default function StatisticsPage() {
         <Grid item xs={12} sm={6} md={3}>
           <CardStatHorizontalCustom
             stats={stats.lectureCount.toLocaleString()}
-            title='Tổng Giảng Viên'
+            title='Giảng Viên'
             avatarIcon='tabler-user-check'
             avatarColor='success'
             avatarSkin='light'
@@ -596,7 +775,7 @@ export default function StatisticsPage() {
         <Grid item xs={12} sm={6} md={3}>
           <CardStatHorizontalCustom
             stats={stats.classCount.toLocaleString()}
-            title='Tổng Lớp Học'
+            title='Lớp Học'
             avatarIcon='tabler-school'
             avatarColor='warning'
             avatarSkin='light'
@@ -937,6 +1116,67 @@ export default function StatisticsPage() {
                 series={stackedSeries}
                 options={stackedBarOptions}
               />
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Top 10 CVHT Chart - Biểu đồ Top 10 giảng viên CVHT */}
+        <Grid item xs={12}>
+          <Card
+            sx={{
+              background: `linear-gradient(135deg, ${colorPalette.lightRed}10, ${colorPalette.lightOrange}10)`,
+              border: `2px solid ${colorPalette.red}30`,
+              '&:hover': {
+                boxShadow: `0 8px 25px ${colorPalette.red}20`,
+                transition: 'all 0.3s ease'
+              }
+            }}
+          >
+            <CardContent>
+              <Box display='flex' alignItems='center' mb={3}>
+                <Box
+                  sx={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: '50%',
+                    background: `linear-gradient(135deg, ${colorPalette.red}, ${colorPalette.orange})`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mr: 2
+                  }}
+                >
+                  <Typography variant='h5' color='white'>
+                    👨‍🏫
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant='h6' gutterBottom fontWeight='bold' sx={{ color: colorPalette.red }}>
+                    Top CVHT Xử Lý Học Tập
+                  </Typography>
+                  <Typography variant='body2' sx={{ color: colorPalette.orange }}>
+                    Thống kê sinh viên xử lý học tập theo từng CVHT
+                  </Typography>
+                </Box>
+              </Box>
+              {cvhtLoading ? (
+                <Box display='flex' justifyContent='center' alignItems='center' height={400}>
+                  <Box textAlign='center'>
+                    <CircularProgress size={40} thickness={4} sx={{ color: colorPalette.red, mb: 2 }} />
+                    <Typography variant='body2' sx={{ color: colorPalette.red }}>
+                      Đang tải dữ liệu CVHT...
+                    </Typography>
+                  </Box>
+                </Box>
+              ) : cvhtError ? (
+                <Box display='flex' justifyContent='center' alignItems='center' height={400}>
+                  <Typography color={colorPalette.red} variant='body1'>
+                    {cvhtError}
+                  </Typography>
+                </Box>
+              ) : (
+                <AppReactApexCharts type='bar' height={400} width='100%' series={cvhtSeries} options={cvhtBarOptions} />
+              )}
             </CardContent>
           </Card>
         </Grid>

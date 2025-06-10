@@ -116,7 +116,7 @@ export default function ImportClass({ mutate }: { mutate: KeyedMutator<any> }) {
 
     formData.append('file', data.file[0])
 
-    const toastId = toast.loading('Dữ liệu đang được xử lý, vui lòng chờ trong giây lát')
+    const toastId = toast.loading('Dữ liệu đang được xử lý, vui lòng chờ trong giây lát...')
 
     await classService.import(
       formData,

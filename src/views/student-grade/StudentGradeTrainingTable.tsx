@@ -12,12 +12,13 @@ import Iconify from '@/components/iconify'
 import { CategoryRow, ProgramRow, SubjectRow } from './component/TableComppnent'
 import { TableHeader } from './component/TableHeader'
 import { useGradeStore } from '@/stores/grade/grade.store'
+import { useAuth } from '@/hooks/useAuth'
 
 // import { UserType } from '@/types/userType'
 
 interface GradeTrainingProgramTableProps {
   trainingProgramData: TrainingProgramByFrame[]
-  gradeData: GradeTypeById
+  gradeData: GradeTypeById | null
 }
 
 interface GradeInfo {
@@ -25,6 +26,27 @@ interface GradeInfo {
 }
 
 const StudentGradeTrainingTable: React.FC<GradeTrainingProgramTableProps> = ({ trainingProgramData, gradeData }) => {
+  const { user } = useAuth()
+
+  // Tạo fake gradeData để hiển thị cột sinh viên khi không có dữ liệu
+  const displayGradeData = useMemo(() => {
+    if (gradeData) return [gradeData]
+
+    // Tạo fake data để hiển thị UI
+    return [
+      {
+        _id: '',
+        studentId: user?.userId || 'current-user',
+        termGrades: [],
+        TCTL_SV: 0,
+        TCTL_CD: 0,
+        TCN: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      } as any
+    ]
+  }, [gradeData, user?.userId])
+
   const handleUpdateGrade = useCallback((subjectId: string, studentId: string, subject: Subjects) => {
     // Sinh viên nhập điểm mới - mở modal ImportGradeModal
     const { toogleImportGradeStudent, setSubjectId, setSubject } = useGradeStore.getState()
@@ -117,7 +139,7 @@ const StudentGradeTrainingTable: React.FC<GradeTrainingProgramTableProps> = ({ t
             className='text-green-700'
             key={key}
             onClick={() => {
-              handleUpdateGrade(subjectId, studentId, subject)
+              handleUpdateGrade(subjectId, studentId || user?.userId || 'current-user', subject)
             }}
           >
             <Iconify icon='tabler:edit' />
@@ -136,7 +158,7 @@ const StudentGradeTrainingTable: React.FC<GradeTrainingProgramTableProps> = ({ t
           color={color}
           size='small'
           variant={status === 'x' ? 'filled' : 'filled'}
-          onClick={() => handleUpdateExistingGrade(subjectId, studentId, subject)}
+          onClick={() => handleUpdateExistingGrade(subjectId, studentId || user?.userId || 'current-user', subject)}
           sx={{
             cursor: 'pointer',
             '&:hover': {
@@ -148,7 +170,7 @@ const StudentGradeTrainingTable: React.FC<GradeTrainingProgramTableProps> = ({ t
         />
       )
     },
-    [handleUpdateGrade, handleUpdateExistingGrade]
+    [handleUpdateGrade, handleUpdateExistingGrade, user]
   )
 
   // Memoized categories renderer để tránh re-render không cần thiết
@@ -157,7 +179,7 @@ const StudentGradeTrainingTable: React.FC<GradeTrainingProgramTableProps> = ({ t
       return categories.map(category => {
         return (
           <Fragment key={category._id}>
-            <CategoryRow category={category} level={level} gradeData={gradeData ? [gradeData] : []} />
+            <CategoryRow category={category} level={level} gradeData={displayGradeData} />
 
             {/* Subjects trong category */}
             {category.subjects?.map(subject => (
@@ -166,7 +188,7 @@ const StudentGradeTrainingTable: React.FC<GradeTrainingProgramTableProps> = ({ t
                 subject={subject}
                 level={level + 1}
                 gradesMap={gradesMap}
-                gradeData={gradeData ? [gradeData] : []}
+                gradeData={displayGradeData}
                 renderGradeCell={renderGradeCell}
               />
             ))}
@@ -177,7 +199,7 @@ const StudentGradeTrainingTable: React.FC<GradeTrainingProgramTableProps> = ({ t
         )
       })
     },
-    [gradeData, gradesMap, renderGradeCell]
+    [displayGradeData, gradesMap, renderGradeCell]
   )
 
   // Flatten data cho virtualization
@@ -218,19 +240,19 @@ const StudentGradeTrainingTable: React.FC<GradeTrainingProgramTableProps> = ({ t
   return (
     <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 180px)' }}>
       <Table stickyHeader aria-label='training program table' size='small' sx={{ minWidth: 1200 }}>
-        <TableHeader gradeData={gradeData ? [gradeData] : []} />
+        <TableHeader gradeData={displayGradeData} />
         <TableBody>
           {flattenedData.map(item => {
             switch (item.type) {
               case 'program':
-                return <ProgramRow key={item.data._id} program={item.data} gradeData={gradeData ? [gradeData] : []} />
+                return <ProgramRow key={item.data._id} program={item.data} gradeData={displayGradeData} />
               case 'category':
                 return (
                   <CategoryRow
                     key={item.data._id}
                     category={item.data}
                     level={item.level}
-                    gradeData={gradeData ? [gradeData] : []}
+                    gradeData={displayGradeData}
                   />
                 )
               case 'subject':
@@ -240,7 +262,7 @@ const StudentGradeTrainingTable: React.FC<GradeTrainingProgramTableProps> = ({ t
                     subject={item.data}
                     level={item.level}
                     gradesMap={gradesMap}
-                    gradeData={gradeData ? [gradeData] : []}
+                    gradeData={displayGradeData}
                     renderGradeCell={renderGradeCell}
                   />
                 )

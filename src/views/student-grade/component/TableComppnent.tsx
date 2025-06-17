@@ -47,7 +47,7 @@ export const ProgramRow = memo(
 ProgramRow.displayName = 'ProgramRow'
 
 export const CategoryRow = memo(
-  ({ category, level, gradeData }: { category: Categories; level: number; gradeData: GradeTypeById[] }) => {
+  ({ category, level, gradeData }: { category: Categories; level: number; gradeData: GradeTypeById[] | null }) => {
     const { settings } = useSettings()
 
     return (
@@ -77,7 +77,7 @@ export const CategoryRow = memo(
           <Typography variant='body2'>{category.credits || ''}</Typography>
         </TableCell>
         <TableCell
-          colSpan={2 + gradeData.length}
+          colSpan={2 + (gradeData?.length || 0)}
           sx={{
             overflow: 'hidden',
             backgroundColor: settings.mode === 'dark' ? '#334155' : '#bfdbfe'
@@ -106,7 +106,7 @@ export const SubjectRow = memo(
     subject: Subjects
     level: number
     gradesMap: Map<string, GradeInfo>
-    gradeData: GradeTypeById[]
+    gradeData: GradeTypeById[] | null
     renderGradeCell: (
       grade: number | undefined,
       status: string | undefined,
@@ -140,7 +140,7 @@ export const SubjectRow = memo(
             {subject.prerequisites || '-'}
           </Typography>
         </TableCell>
-        {gradeData.map(student => {
+        {gradeData?.map(student => {
           const studentGrade = subjectGrades[student.studentId]
 
           return (

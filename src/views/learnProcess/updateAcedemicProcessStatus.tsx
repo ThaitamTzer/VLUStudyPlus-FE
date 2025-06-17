@@ -31,8 +31,16 @@ const schema = v.object({
 
 type FormInput = InferInput<typeof schema>
 
-export default function UpdateAcedemicProcessStatus({ mutate }: { mutate: KeyedMutator<any> }) {
-  const { toogleUpdateAcedemicProcessStatus, openUpdateAcedemicProcessStatus, processing } = useAcedemicProcessStore()
+export default function UpdateAcedemicProcessStatus({
+  mutate,
+  open,
+  onClose
+}: {
+  mutate: KeyedMutator<any>
+  open: boolean
+  onClose: () => void
+}) {
+  const { processing } = useAcedemicProcessStore()
   const [loading, setLoading] = useState(false)
   const { resultProcess } = useShare()
 
@@ -58,8 +66,8 @@ export default function UpdateAcedemicProcessStatus({ mutate }: { mutate: KeyedM
     }
   }, [processing, reset])
 
-  const onClose = () => {
-    toogleUpdateAcedemicProcessStatus()
+  const onCloseModal = () => {
+    onClose()
     reset()
   }
 
@@ -74,6 +82,7 @@ export default function UpdateAcedemicProcessStatus({ mutate }: { mutate: KeyedM
       processing._id,
       data,
       () => {
+        mutate()
         toast.update(toastId, {
           render: 'Cập nhật thành công',
           type: 'success',
@@ -81,7 +90,6 @@ export default function UpdateAcedemicProcessStatus({ mutate }: { mutate: KeyedM
           autoClose: 2000
         })
         onClose()
-        mutate()
         setLoading(false)
       },
       err => {
@@ -97,7 +105,7 @@ export default function UpdateAcedemicProcessStatus({ mutate }: { mutate: KeyedM
   })
 
   return (
-    <Dialog open={openUpdateAcedemicProcessStatus} onClose={onClose} fullWidth maxWidth='sm'>
+    <Dialog open={open} onClose={onCloseModal} fullWidth maxWidth='sm'>
       <form onSubmit={onSubmit}>
         <DialogTitle>
           <IconButton

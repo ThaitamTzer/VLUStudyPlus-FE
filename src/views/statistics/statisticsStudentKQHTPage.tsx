@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from 'react'
 
 import useSWR from 'swr'
-import * as XLSX from 'xlsx-js-style'
+import ExcelJS from 'exceljs'
 import { toast } from 'react-toastify'
 
 import {
@@ -20,7 +20,8 @@ import {
   type Table as TableType
 } from '@tanstack/react-table'
 
-import { Card, CardContent, FormControl, Grid, MenuItem, Skeleton, TablePagination, Button } from '@mui/material'
+import { Card, CardContent, FormControl, Grid, MenuItem, Skeleton, TablePagination } from '@mui/material'
+import { LoadingButton } from '@mui/lab'
 
 import { fuzzyFilter } from '../apps/invoice/list/InvoiceListTable'
 import TanstackTable from '@/components/TanstackTable'
@@ -72,10 +73,26 @@ const columns: ColumnDef<StatisticsProcessByStudentKQHTTypeWithSTT, any>[] = [
 export default function StatisticsStudentKQHTPage() {
   const { termOptions, classOptions } = useShare()
 
-  const [selectedAcademicYear, setSelectedAcademicYear] = useState<string>('2024-2025')
-  const [selectedTerm, setSelectedTerm] = useState<string>('')
+  const today = new Date().toISOString().split('T')[0]
+
+  const currentTerm = useMemo(() => {
+    return termOptions.find(term => {
+      return today >= term.startDate && today <= term.endDate
+    })
+  }, [termOptions, today])
+
+  const currentAcademicYear = useMemo(() => {
+    return new Date().getFullYear()
+  }, [])
+
+  const [selectedAcademicYear, setSelectedAcademicYear] = useState<string>(
+    `${currentAcademicYear}-${currentAcademicYear + 1}`
+  )
+
+  const [selectedTerm, setSelectedTerm] = useState<string>(currentTerm?._id || '')
   const [globalFilter, setGlobalFilter] = useState('')
   const [selectedClass, setSelectedClass] = useState<string[]>([])
+  const [isExport, setIsExport] = useState<boolean>(false)
 
   const academicYears = useMemo(() => {
     const currentYear = new Date().getFullYear()
@@ -188,138 +205,171 @@ export default function StatisticsStudentKQHTPage() {
       return
     }
 
+    setIsExport(true)
+
     try {
-      // Tạo dữ liệu cho Excel
-      const excelData = tableData.map((item, index) => ({
-        STT: index + 1,
-        'Mã lớp': item.classCode || '',
-        CVHT: item.cvht || '',
-        Ngành: item.majorName || '',
-        'Học kỳ': item.termAbbreviatName || '',
-        'SL đã có điểm': item.countdnd || 0,
-        'SL chưa có điểm': item.countcnd || 0,
-        'Tổng số lượng': item.count || 0
-      }))
+      // Tạo workbook và worksheet
+      const workbook = new ExcelJS.Workbook()
+      const worksheet = workbook.addWorksheet('Thống kê XLHT theo học kỳ')
 
-      // Tạo worksheet
-      const ws = XLSX.utils.json_to_sheet(excelData)
+      // Thêm logo
+      try {
+        const logoResponse = await fetch('/images/logo-van-lang.png')
+        const logoBuffer = await logoResponse.arrayBuffer()
 
-      // Thêm một dòng trống ở đầu cho tiêu đề
-      XLSX.utils.sheet_add_aoa(ws, [[]], { origin: 'A1' })
+        const logoId = workbook.addImage({
+          buffer: logoBuffer,
+          extension: 'png'
+        })
 
-      // Dịch chuyển tất cả dữ liệu xuống 1 dòng
-      const range = XLSX.utils.decode_range(ws['!ref'] || '')
-
-      for (let R = range.e.r; R >= 0; R--) {
-        for (let C = range.s.c; C <= range.e.c; C++) {
-          const oldCell = XLSX.utils.encode_cell({ r: R, c: C })
-          const newCell = XLSX.utils.encode_cell({ r: R + 1, c: C })
-
-          if (ws[oldCell]) {
-            ws[newCell] = ws[oldCell]
-            delete ws[oldCell]
-          }
-        }
+        worksheet.addImage(logoId, {
+          tl: { col: 1, row: 1 },
+          ext: { width: 100, height: 100 }
+        })
+      } catch (logoError) {
+        console.warn('Không thể tải logo:', logoError)
       }
 
-      // Thêm tiêu đề vào ô A1
-      ws['A1'] = { v: 'Thống kê số lượng SV đã được cập nhật KQHT theo lớp niên chế', t: 's' }
+      // Thêm dòng trống để tạo khoảng cách cho logo
+      worksheet.addRow([])
+      worksheet.addRow([])
+      worksheet.addRow([])
+      worksheet.addRow([])
 
-      // Cập nhật range để bao gồm tiêu đề
-      const numCols = Object.keys(excelData[0] || {}).length
+      // Thêm header trường đại học bên cạnh logo (cột B)
+      const universityRow = worksheet.addRow(['TRƯỜNG ĐẠI HỌC VĂN LANG'])
 
-      ws['!ref'] = XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: excelData.length + 1, c: numCols - 1 } })
+      universityRow.getCell(1).font = { bold: true, size: 16 }
+      universityRow.getCell(1).alignment = { horizontal: 'left', vertical: 'middle' }
+      worksheet.mergeCells(universityRow.number, 1, universityRow.number, 4)
 
-      // Merge ô tiêu đề để trải dài qua tất cả các cột
-      ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: numCols - 1 } }]
+      const facultyRow = worksheet.addRow(['KHOA CÔNG NGHỆ THÔNG TIN'])
 
-      // Tự động điều chỉnh độ rộng cột
-      const colWidths = [
-        { wch: 5 }, // STT
-        { wch: 15 }, // Mã lớp
-        { wch: 20 }, // CVHT
-        { wch: 25 }, // Ngành
-        { wch: 15 }, // Học kỳ
-        { wch: 15 }, // SL đã có điểm
-        { wch: 15 }, // SL chưa có điểm
-        { wch: 15 } // Tổng số lượng
-      ]
+      facultyRow.getCell(1).font = { bold: true, size: 15 }
+      facultyRow.getCell(1).alignment = { horizontal: 'left', vertical: 'middle' }
+      worksheet.mergeCells(facultyRow.number, 1, facultyRow.number, 4)
 
-      ws['!cols'] = colWidths
+      // Thêm vài dòng trống để tạo khoảng cách
+      worksheet.addRow([])
+      worksheet.addRow([])
 
-      // Style cho tiêu đề
-      const titleStyle = {
-        font: { bold: true, sz: 16, color: { rgb: '000000' } },
-        alignment: { vertical: 'center', horizontal: 'center', wrapText: true },
-        fill: { fgColor: { rgb: '4472C4' } },
-        border: {
-          top: { style: 'thin', color: { rgb: '000000' } },
-          bottom: { style: 'thin', color: { rgb: '000000' } },
-          left: { style: 'thin', color: { rgb: '000000' } },
-          right: { style: 'thin', color: { rgb: '000000' } }
-        }
+      // Tiêu đề chính ở giữa
+      const titleRow = worksheet.addRow(['THỐNG KÊ SỐ LƯỢNG SV ĐÃ ĐƯỢC CẬP NHẬT KQHT THEO LỚP NIÊN CHẾ'])
+
+      titleRow.getCell(1).font = { bold: true, size: 16, color: { argb: 'FFFFFFFF' } }
+      titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' }
+      titleRow.getCell(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF4472C4' }
+      }
+      titleRow.getCell(1).border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
       }
 
-      // Áp dụng style cho tiêu đề
-      if (ws['A1']) {
-        ws['A1'].s = titleStyle
-      }
+      // Thêm header cho bảng dữ liệu
+      const headers = ['STT', 'Mã lớp', 'CVHT', 'Ngành', 'Học kỳ', 'SL đã có điểm', 'SL chưa có điểm', 'Tổng số lượng']
+      const headerRow = worksheet.addRow(headers)
+
+      worksheet.mergeCells(titleRow.number, 1, titleRow.number, headers.length)
 
       // Style cho header
-      const headerStyle = {
-        font: { bold: true, color: { rgb: '000000' } },
-        alignment: { vertical: 'center', horizontal: 'center', wrapText: true },
-        fill: { fgColor: { rgb: 'D9E1F2' } },
-        border: {
-          top: { style: 'thin', color: { rgb: '000000' } },
-          bottom: { style: 'thin', color: { rgb: '000000' } },
-          left: { style: 'thin', color: { rgb: '000000' } },
-          right: { style: 'thin', color: { rgb: '000000' } }
+      headerRow.eachCell((cell: any) => {
+        cell.font = { bold: true }
+        cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFD9E1F2' }
         }
-      }
-
-      // Áp dụng style cho header (dòng 2)
-      for (let C = 0; C < numCols; ++C) {
-        const headerCell = XLSX.utils.encode_cell({ r: 1, c: C })
-
-        if (ws[headerCell]) {
-          ws[headerCell].s = headerStyle
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
         }
-      }
+      })
 
-      // Style cho dữ liệu (bắt đầu từ dòng 3)
-      for (let R = 2; R < excelData.length + 2; ++R) {
-        for (let C = 0; C < numCols; ++C) {
-          const cellAddress = XLSX.utils.encode_cell({ r: R, c: C })
+      // Thêm dữ liệu
+      tableData.forEach((item, index) => {
+        const row = worksheet.addRow([
+          index + 1,
+          item.classCode || '',
+          item.cvht || '',
+          item.majorName || '',
+          item.termAbbreviatName || '',
+          item.countdnd || 0,
+          item.countcnd || 0,
+          item.count || 0
+        ])
 
-          if (ws[cellAddress]) {
-            ws[cellAddress].s = {
-              alignment: { vertical: 'center', horizontal: 'center' },
-              border: {
-                top: { style: 'thin', color: { rgb: '000000' } },
-                bottom: { style: 'thin', color: { rgb: '000000' } },
-                left: { style: 'thin', color: { rgb: '000000' } },
-                right: { style: 'thin', color: { rgb: '000000' } }
-              }
-            }
+        // Style cho dữ liệu
+        row.eachCell((cell: any) => {
+          cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }
+          cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' }
           }
+        })
+      })
+
+      // Tự động điều chỉnh độ rộng cột
+      const colWidths = [8, 20, 35, 15]
+
+      worksheet.columns.forEach((column: any, index: number) => {
+        if (colWidths[index]) {
+          column.width = colWidths[index]
         }
-      }
+      })
 
-      // Tạo workbook
-      const wb = XLSX.utils.book_new()
+      // Thêm phần ký tên ở cuối
+      const currentDate = new Date()
+      const dateString = `TP.HCM, ngày   tháng   năm ${currentDate.getFullYear()}`
 
-      XLSX.utils.book_append_sheet(wb, ws, 'Thống kê KQHT')
+      // Thêm dòng ngày tháng và merge với toàn bộ số cột
+      const totalColumns = headers.length
+      const dateRow = worksheet.addRow([dateString])
+
+      dateRow.getCell(1).alignment = { horizontal: 'right' }
+      dateRow.getCell(1).font = { italic: true }
+
+      // Merge dòng ngày tháng từ cột A đến cột cuối
+      worksheet.mergeCells(dateRow.number, 1, dateRow.number, totalColumns)
+
+      // Thêm dòng "Người lập danh sách" và merge với toàn bộ số cột
+      const signerRow = worksheet.addRow(['Người lập danh sách              '])
+
+      signerRow.getCell(1).alignment = { horizontal: 'right' }
+      signerRow.getCell(1).font = { bold: true }
+
+      // Merge dòng người ký từ cột A đến cột cuối
+      worksheet.mergeCells(signerRow.number, 1, signerRow.number, totalColumns)
 
       // Tạo tên file với thời gian hiện tại
-      const fileName = `ThongKe_KQHT_SinhVien_${new Date().toISOString().slice(0, 10)}.xlsx`
+      const fileName = `ThongKe_XLHT_TheoHocKy_${new Date().toISOString().slice(0, 10)}.xlsx`
 
       // Xuất file
-      XLSX.writeFile(wb, fileName)
+      const buffer = await workbook.xlsx.writeBuffer()
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+
+      a.href = url
+      a.download = fileName
+      a.click()
+      window.URL.revokeObjectURL(url)
+
       toast.success('Xuất Excel thành công!')
     } catch (error) {
       console.error('Lỗi khi xuất Excel:', error)
       toast.error('Có lỗi xảy ra khi xuất Excel. Vui lòng thử lại!')
+    } finally {
+      setIsExport(false)
     }
   }, [tableData])
 
@@ -391,15 +441,17 @@ export default function StatisticsStudentKQHTPage() {
             <MenuItem value={20}>20</MenuItem>
             <MenuItem value={50}>50</MenuItem>
           </CustomTextField>
-          <Button
+          <LoadingButton
             variant='contained'
             color='success'
             startIcon={<Iconify icon='mdi:file-excel' />}
             onClick={handleExportExcel}
             disabled={tableData.length === 0 || isLoading}
+            loading={isExport}
+            loadingPosition='start'
           >
             Xuất Excel ({tableData.length} bản ghi)
-          </Button>
+          </LoadingButton>
         </div>
         {selectedClass.length === 0 ? (
           <div className='flex justify-center items-center p-8'>

@@ -278,7 +278,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               XLHT CVHT
             </MenuItem>
             <MenuItem href='/statistics-XLHT-status' icon={<Iconify icon='pajamas:status-alert' />}>
-              XLHT theo trạng thái
+              XLHT trạng thái
             </MenuItem>
             <MenuItem href='/statistics-student-kqht' icon={<Iconify icon='solar:document-text-outline' />}>
               SLSV KQHT

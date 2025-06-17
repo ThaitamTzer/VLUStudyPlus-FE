@@ -32,7 +32,7 @@ const UserInfo = memo(({ student }: { student: UserType }) => {
 
 UserInfo.displayName = 'UserInfo'
 
-export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) => {
+export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] | null }) => {
   const { settings } = useSettings()
   const { user } = useAuth()
   const { toogleViewAdviseHistory, setCurrentStudentGradeData } = useGradeStore()
@@ -43,7 +43,7 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
 
   const handleViewAdviseHistory = useCallback(() => {
     // Vì đây là bảng sinh viên, sẽ chỉ có 1 item trong gradeData
-    if (gradeData.length > 0) {
+    if (gradeData && gradeData.length > 0) {
       setCurrentStudentGradeData(gradeData[0])
       toogleViewAdviseHistory()
     }
@@ -72,9 +72,10 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
   )
 
   // Memoized student data để tránh re-render không cần thiết
-  const studentCells = useMemo(
-    () =>
-      gradeData.map(student => {
+  const studentCells = useMemo(() => {
+    // Nếu có dữ liệu thật, sử dụng dữ liệu đó
+    if (gradeData && gradeData.length > 0) {
+      return gradeData.map(student => {
         const latestTermGrade = student.termGrades.at(-1)
         const hasAdviseHistory = student.termGrades.some(term => term.advise && term.advise.trim() !== '')
 
@@ -89,9 +90,24 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
           latestTermGrade,
           hasAdviseHistory
         }
-      }),
-    [gradeData]
-  )
+      })
+    }
+
+    // Nếu không có dữ liệu, tạo một student cell giả để hiển thị cột điểm
+    return [
+      {
+        id: user?.userId || 'current-user',
+        advise: 'Chưa có tư vấn',
+        TCTL_CD: '-',
+        TCTL_SV: '-',
+        studentInfo: user?.userId || 'current-user',
+        gradeId: '',
+        termId: '',
+        latestTermGrade: null,
+        hasAdviseHistory: false
+      }
+    ]
+  }, [gradeData, user?.userId])
 
   return (
     <TableHead sx={{ position: 'sticky', top: 0, zIndex: 10 }}>
@@ -105,15 +121,15 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
           }}
         >
           <Stack direction='row' spacing={1} alignItems='center' justifyContent='flex-end'>
-            <Typography variant='inherit'>Ghi chú</Typography>
-            <Tooltip title='Xem lịch sử ghi chú'>
+            <Typography variant='inherit'>Tư vấn</Typography>
+            <Tooltip title='Xem lịch sử tư vấn'>
               <CustomIconButton variant='contained' size='small' color='warning' onClick={handleViewAdviseHistory}>
                 <HistoryIcon fontSize='small' />
               </CustomIconButton>
             </Tooltip>
           </Stack>
         </TableCell>
-        {studentCells.map(student => (
+        {studentCells?.map(student => (
           <TableCell
             key={`advise-${student.id}`}
             sx={{
@@ -128,7 +144,7 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
                   overflow: 'hidden'
                 }}
               >
-                {student?.advise || 'Chưa có ghi chú'}
+                {student?.advise || 'Chưa có tư vấn'}
               </Typography>
             </Box>
           </TableCell>
@@ -147,7 +163,7 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
         >
           TCTL cần đạt
         </TableCell>
-        {studentCells.map(student => (
+        {studentCells?.map(student => (
           <TableCell
             width={100}
             key={`tctl-cd-${student.id}`}
@@ -173,7 +189,7 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] }) 
         >
           TCTL Sinh viên
         </TableCell>
-        {studentCells.map(student => (
+        {studentCells?.map(student => (
           <TableCell
             width={100}
             key={`tctl-sv-${student.id}`}

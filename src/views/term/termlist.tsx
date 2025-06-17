@@ -63,7 +63,19 @@ export default function TermList(props: TermListProps) {
                 <TableCell size='small'>{fDate(row.startDate, 'dd/MM/yyyy')}</TableCell>
                 <TableCell size='small'>{fDate(row.endDate, 'dd/MM/yyyy')}</TableCell>
                 <TableCell size='small'>
-                  <Chip size='small' label={row.status} color={row.status === 'Đã kết thúc' ? 'success' : 'error'} />
+                  <Chip
+                    size='small'
+                    label={row.status}
+                    color={
+                      row.status === 'Đã kết thúc'
+                        ? 'success'
+                        : row.status === 'Đang hoạt động'
+                          ? 'info'
+                          : row.status === 'Chưa bắt đầu'
+                            ? 'warning'
+                            : 'error'
+                    }
+                  />
                 </TableCell>
                 <TableCell
                   sx={{

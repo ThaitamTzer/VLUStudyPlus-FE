@@ -11,14 +11,15 @@ import {
   Typography,
   Card,
   MenuItem,
-  TablePagination,
-  Button
+  TablePagination
 } from '@mui/material'
 import useSWR, { mutate as fetching } from 'swr'
 
 import { toast } from 'react-toastify'
 
-import * as XLSX from 'xlsx-js-style'
+import ExcelJS from 'exceljs'
+
+import { LoadingButton } from '@mui/lab'
 
 import { useAcedemicProcessStore } from '@/stores/acedemicProcess.store'
 import learnProcessService from '@/services/learnProcess.service'
@@ -47,20 +48,30 @@ export default function ViewAcedemicProcessCVHT() {
     openManualAddFromViewByCate,
     toogleEditViewAcedemicProcess,
     setProcessing,
-    toogleDeleteViewAcedemicProcess,
-    openDeleteViewAcedemicProcess,
+    toogleDeleteViewAcedemicProcessCVHT,
+    openDeleteViewAcedemicProcessCVHT,
     processing,
     toogleViewDetailAcademicProcess,
-    toogleUpdateAcedemicProcessStatus,
+    toogleUpdateAcedemicProcessStatusCVHT,
     toogleSendEmailRemind,
     toogleViewByCategoryCVHT,
     sessionCVHT,
     setSessionCVHT,
     openViewByCategoryCVHT,
-    toogleSendEmailRemindCommitment
+    toogleSendEmailRemindCommitment,
+    openUpdateAcedemicProcessStatusCVHT
   } = useAcedemicProcessStore()
 
-  const { cohorOptions } = useShare()
+  const { cohorOptions, termOptions } = useShare()
+
+  const today = new Date()
+
+  const currentTerm = termOptions.find(term => {
+    const startDate = new Date(term.startDate)
+    const endDate = new Date(term.endDate)
+
+    return today >= startDate && today <= endDate
+  })
 
   const id = useMemo(() => sessionCVHT?._id, [sessionCVHT])
   const [page, setPage] = useState(1)
@@ -72,6 +83,7 @@ export default function ViewAcedemicProcessCVHT() {
   const [searchKey, setSearchKey] = useState('')
   const [loading, setLoading] = useState(false)
   const [totalItems, setTotalItems] = useState(0)
+  const [isExport, setIsExport] = useState(false)
 
   const fetcher = [
     `/api/acedemicProcessCVHT/${id}`,
@@ -124,7 +136,7 @@ export default function ViewAcedemicProcessCVHT() {
         setLoading(false)
         mutate()
         fetching(`/api/notification/get-number-notification/${id}`)
-        toogleDeleteViewAcedemicProcess()
+        toogleDeleteViewAcedemicProcessCVHT()
         toast.update(toastId, {
           render: 'Xóa dữ liệu thành công',
           type: 'success',
@@ -135,14 +147,14 @@ export default function ViewAcedemicProcessCVHT() {
       err => {
         setLoading(false)
         toast.update(toastId, {
-          render: err.message,
+          render: err?.message || 'Có lỗi xảy ra',
           type: 'error',
           isLoading: false,
           autoClose: 3000
         })
       }
     )
-  }, [processing, mutate, toogleDeleteViewAcedemicProcess, id])
+  }, [processing, mutate, toogleDeleteViewAcedemicProcessCVHT, id])
 
   const handleExportExcel = useCallback(async () => {
     if (totalItems === 0) {
@@ -150,6 +162,8 @@ export default function ViewAcedemicProcessCVHT() {
 
       return
     }
+
+    setIsExport(true)
 
     try {
       // Lấy toàn bộ dữ liệu
@@ -170,168 +184,229 @@ export default function ViewAcedemicProcessCVHT() {
         return
       }
 
-      // Tạo dữ liệu cho Excel theo đúng thứ tự cột yêu cầu
-      const excelData = allData.data.map((item, index) => {
-        const stt = index + 1
+      // Tạo workbook mới
+      const workbook = new ExcelJS.Workbook()
+      const worksheet = workbook.addWorksheet('Danh sách xử lý học vụ')
 
-        return {
-          TT: stt,
-          MSSV: item.studentId || '',
-          Họ: item.lastName || '',
-          Tên: item.firstName || '',
-          Khóa: item.cohortName || '',
-          'Mã Lớp SV': item.classId || '',
-          'Cố vấn học tập': item.handlerName || '',
-          'CVHT ghi nhận tình trạng xử lý': item.CVHTHandle?.processingResultName || '',
-          'CVHT ghi chú cụ thể khác': item.CVHTNote || '',
-          'Phân loại đối tượng theo hướng dẫn': item.groupedByInstruction || '',
-          'Số điện thoại SV': item.sdtsv || '',
-          'Số điện thoại liên hệ': item.sdtlh || '',
-          'Số điện thoại HKTT': item.sdthktt || '',
-          'Số điện thoại cha': item.sdtcha || '',
-          'Số điện thoại mẹ': item.sdtme || '',
-          Ngành: item.major || '',
-          'Điểm TBC': item.DTBC || 0,
-          'Điểm TBCTL': item.DTBCTL || 0,
-          ĐTB10: item.DTB10 || 0,
-          'ĐTBCTL 10': item.DTBCTL10 || 0,
-          'Số TCTL': item.TCTL || 0,
-          'Số TC còn nợ': item.TCCN || 0,
-          'Tổng TC CTĐT': item.TONGTCCTDT || 0,
-          '% tích lũy': item.percentTL ? parseFloat(item.percentTL.toFixed(2)) : 0,
-          'XLHT HK241 (UIS - XLHT theo quy chế)': item.processingHandle?.statusProcess || '',
-          'Đếm số lần bị XLHT qua 10 học kỳ (Từ HK201 đến HK241)': item.countWarning?.academicWarningsCount || 0,
-          'Tình trạng ĐKMH HK242 (17/3/2025)': item.courseRegistration?.isRegister ? 'Có ĐK' : 'Không ĐK',
-          'Năm SV tuyển sinh': item.admissionYear || '',
-          RQS: item.RQS || '',
-          Khoa: item.faculty || '',
-          'Danh sách': item.list || '',
-          'Tình trạng (12/3/25)': item.statusOn?.status || '',
-          'SV năm thứ (xếp theo STC trung bình toàn trường)': item.yearLevel || '',
-          'Lý do XLHT HK241': item.reasonHandling?.reason || '',
-          'Kết quả XLHT các HK trước': item.resultHandlingBefore || ''
+      // Thêm logo nếu có file
+      try {
+        const logoResponse = await fetch('/images/logo-van-lang.png')
+
+        if (logoResponse.ok) {
+          const logoBuffer = await logoResponse.arrayBuffer()
+
+          const logoImageId = workbook.addImage({
+            buffer: logoBuffer,
+            extension: 'png'
+          })
+
+          worksheet.addImage(logoImageId, {
+            tl: { col: 1, row: 1 },
+            ext: { width: 100, height: 100 }
+          })
+        }
+      } catch (error) {
+        console.log('Không thể load logo:', error)
+
+        // Tiếp tục tạo Excel mà không có logo
+      }
+
+      worksheet.addRow([]) // Dòng trống
+      worksheet.addRow([]) // Dòng trống
+      worksheet.addRow([]) // Dòng trống
+      worksheet.addRow([]) // Dòng trống
+
+      // Thêm header trường và khoa
+      const headerRow1 = worksheet.addRow(['TRƯỜNG ĐẠI HỌC VĂN LANG'])
+      const headerRow2 = worksheet.addRow(['KHOA CÔNG NGHỆ THÔNG TIN'])
+
+      worksheet.addRow([]) // Dòng trống
+
+      // Merge cells cho header
+      worksheet.mergeCells('A7:AH7') // Merge toàn bộ dòng 1
+      worksheet.mergeCells('A8:AH8') // Merge toàn bộ dòng 2
+
+      // Style cho header trường
+      headerRow1.getCell(1).font = { bold: true, size: 16 }
+      headerRow1.getCell(1).alignment = { horizontal: 'left', vertical: 'middle' }
+      headerRow1.height = 30
+
+      // Style cho header khoa
+      headerRow2.getCell(1).font = { bold: true, size: 14 }
+      headerRow2.getCell(1).alignment = { horizontal: 'left', vertical: 'middle' }
+      headerRow2.height = 25
+
+      // Thêm header cột
+      const headers = [
+        'TT',
+        'MSSV',
+        'Họ',
+        'Tên',
+        'Khóa',
+        'Mã Lớp SV',
+        'Cố vấn học tập',
+        'CVHT ghi nhận tình trạng xử lý',
+        'CVHT ghi chú cụ thể khác',
+        'Phân loại đối tượng theo hướng dẫn',
+        'Số điện thoại SV',
+        'Số điện thoại liên hệ',
+        'Số điện thoại HKTT',
+        'Số điện thoại cha',
+        'Số điện thoại mẹ',
+        'Ngành',
+        'Điểm TBC',
+        'Điểm TBCTL',
+        'ĐTB10',
+        'ĐTBCTL 10',
+        'Số TCTL',
+        'Số TC còn nợ',
+        'Tổng TC CTĐT',
+        '% tích lũy',
+        'XLHT HK241 (UIS - XLHT theo quy chế)',
+        `Đếm số lần bị XLHT qua các học kỳ đến ${currentTerm?.abbreviatName || ''})`,
+        'Tình trạng ĐKMH HK242 (17/3/2025)',
+        'Năm SV tuyển sinh',
+        'RQS',
+        'Khoa',
+        'Danh sách',
+        'Tình trạng (12/3/25)',
+        'SV năm thứ (xếp theo STC trung bình toàn trường)',
+        'Lý do XLHT HK241',
+        'Kết quả XLHT các HK trước'
+      ]
+
+      const headerRow = worksheet.addRow(headers)
+
+      // Style cho header
+      headerRow.eachCell((cell: any) => {
+        cell.font = { bold: true }
+        cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9E1F2' } }
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
         }
       })
+      headerRow.height = 70
 
-      // Tạo worksheet
-      const ws = XLSX.utils.json_to_sheet(excelData)
+      // Thêm dữ liệu
+      allData.data.forEach((item, index) => {
+        const rowData = [
+          index + 1,
+          item.studentId || '',
+          item.lastName || '',
+          item.firstName || '',
+          item.cohortName || '',
+          item.classId || '',
+          item.handlerName || '',
+          item.CVHTHandle?.processingResultName || '',
+          item.CVHTNote || '',
+          item.groupedByInstruction || '',
+          item.sdtsv || '',
+          item.sdtlh || '',
+          item.sdthktt || '',
+          item.sdtcha || '',
+          item.sdtme || '',
+          item.major || '',
+          item.DTBC || 0,
+          item.DTBCTL || 0,
+          item.DTB10 || 0,
+          item.DTBCTL10 || 0,
+          item.TCTL || 0,
+          item.TCCN || 0,
+          item.TONGTCCTDT || 0,
+          item.percentTL ? parseFloat(item.percentTL.toFixed(2)) : 0,
+          item.processingHandle?.statusProcess || '',
+          item.countWarning?.academicWarningsCount || 0,
+          item.courseRegistration?.isRegister ? 'Có ĐK' : 'Không ĐK',
+          item.admissionYear || '',
+          item.RQS || '',
+          item.faculty || '',
+          item.list || '',
+          item.statusOn?.status || '',
+          item.yearLevel || '',
+          item.reasonHandling?.reason || '',
+          item.resultHandlingBefore || ''
+        ]
+
+        const row = worksheet.addRow(rowData)
+
+        // Style cho data rows
+        row.eachCell((cell: any) => {
+          cell.alignment = { vertical: 'middle', wrapText: true }
+          cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' }
+          }
+        })
+      })
 
       // Tự động điều chỉnh độ rộng cột
       const colWidths = [
-        { wch: 5 }, // TT
-        { wch: 15 }, // MSSV
-        { wch: 15 }, // Họ
-        { wch: 10 }, // Tên
-        { wch: 8 }, // Khóa
-        { wch: 15 }, // Mã Lớp SV
-        { wch: 20 }, // Cố vấn học tập
-        { wch: 25 }, // CVHT ghi nhận
-        { wch: 25 }, // CVHT ghi chú
-        { wch: 20 }, // Phân loại đối tượng
-        { wch: 15 }, // SĐT SV
-        { wch: 15 }, // SĐT liên hệ
-        { wch: 15 }, // SĐT HKTT
-        { wch: 15 }, // SĐT cha
-        { wch: 15 }, // SĐT mẹ
-        { wch: 25 }, // Ngành
-        { wch: 10 }, // Điểm TBC
-        { wch: 12 }, // Điểm TBCTL
-        { wch: 10 }, // ĐTB10
-        { wch: 12 }, // ĐTBCTL 10
-        { wch: 10 }, // Số TCTL
-        { wch: 12 }, // Số TC còn nợ
-        { wch: 12 }, // Tổng TC CTĐT
-        { wch: 10 }, // % tích lũy
-        { wch: 30 }, // XLHT HK241
-        { wch: 15 }, // Đếm số lần XLHT
-        { wch: 25 }, // Tình trạng ĐKMH
-        { wch: 12 }, // Năm SV tuyển sinh
-        { wch: 8 }, // RQS
-        { wch: 30 }, // Khoa
-        { wch: 10 }, // Danh sách
-        { wch: 15 }, // Tình trạng
-        { wch: 30 }, // SV năm thứ
-        { wch: 40 }, // Lý do XLHT
-        { wch: 30 } // Kết quả XLHT trước
+        5, 15, 15, 10, 8, 15, 20, 25, 25, 20, 15, 15, 15, 15, 15, 25, 10, 12, 10, 12, 10, 12, 12, 10, 30, 15, 25, 12, 8,
+        30, 10, 15, 30, 40, 30
       ]
 
-      ws['!cols'] = colWidths
-
-      // Tăng độ cao của dòng tiêu đề
-      ws['!rows'] = [{ hpt: 70 }] // 70 points height cho dòng đầu tiên (header)
-
-      ws['A1'].s = {
-        font: { bold: true, sz: 20, color: { rgb: 'FFFFFF' } },
-        alignment: { vertical: 'center', wrapText: true },
-        fill: { fgColor: { rgb: '4472C4' } }
-      }
-
-      const headerStyle = {
-        font: { bold: true, color: { rgb: '000000' } },
-        alignment: { vertical: 'center', wrapText: true },
-        fill: { fgColor: { rgb: 'D9E1F2' } },
-        border: {
-          top: { style: 'thin', color: { rgb: '000000' } },
-          bottom: { style: 'thin', color: { rgb: '000000' } },
-          left: { style: 'thin', color: { rgb: '000000' } },
-          right: { style: 'thin', color: { rgb: '000000' } }
+      worksheet.columns.forEach((column: any, index: number) => {
+        if (colWidths[index]) {
+          column.width = colWidths[index]
         }
-      }
-
-      const getheaders = () => {
-        const headersArray: string[] = []
-
-        if (ws['!ref']) {
-          const range = XLSX.utils.decode_range(ws['!ref'])
-
-          for (let col = range.s.c; col <= range.e.c; col++) {
-            const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col })
-
-            headersArray.push(cellAddress)
-          }
-        }
-
-        return headersArray
-      }
-
-      const headers = getheaders()
-
-      headers.forEach(cell => {
-        ws[cell].s = headerStyle
       })
 
-      // Style cho nội dung border
-      const dataRange = XLSX.utils.decode_range(ws['!ref'] || '')
+      // Thêm phần ký tên ở cuối
+      const currentDate = new Date()
+      const dateString = `TP.HCM, ngày   tháng   năm ${currentDate.getFullYear()}`
 
-      for (let R = 1; R <= dataRange.e.r; ++R) {
-        for (let C = 0; C <= dataRange.e.c; ++C) {
-          const cellAddress = XLSX.utils.encode_cell({ r: R, c: C })
+      // Thêm 2 dòng trống
+      worksheet.addRow([])
+      worksheet.addRow([])
 
-          if (!ws[cellAddress]) continue
-          ws[cellAddress].s = {
-            border: {
-              top: { style: 'thin', color: { rgb: '000000' } },
-              bottom: { style: 'thin', color: { rgb: '000000' } },
-              left: { style: 'thin', color: { rgb: '000000' } },
-              right: { style: 'thin', color: { rgb: '000000' } }
-            }
-          }
-        }
-      }
+      // Thêm dòng ngày tháng và merge với toàn bộ số cột
+      const totalColumns = headers.length
+      const dateRow = worksheet.addRow([dateString])
 
-      // Tạo workbook
-      const wb = XLSX.utils.book_new()
+      dateRow.getCell(1).alignment = { horizontal: 'right' }
+      dateRow.getCell(1).font = { italic: true }
 
-      XLSX.utils.book_append_sheet(wb, ws, 'Danh sách xử lý học vụ')
+      // Merge dòng ngày tháng từ cột A đến cột cuối
+      worksheet.mergeCells(dateRow.number, 1, dateRow.number, totalColumns)
+
+      // Thêm dòng "Người lập danh sách" và merge với toàn bộ số cột
+      const signerRow = worksheet.addRow(['Người lập danh sách              '])
+
+      signerRow.getCell(1).alignment = { horizontal: 'right' }
+      signerRow.getCell(1).font = { bold: true }
+
+      // Merge dòng người ký từ cột A đến cột cuối
+      worksheet.mergeCells(signerRow.number, 1, signerRow.number, totalColumns)
+
+      // Thêm 3 dòng trống cho chữ ký
+      worksheet.addRow([])
+      worksheet.addRow([])
+      worksheet.addRow([])
 
       // Tạo tên file với thời gian hiện tại
       const fileName = `DS_XuLyHocVu_${new Date().toISOString().slice(0, 10)}.xlsx`
 
       // Xuất file
-      XLSX.writeFile(wb, fileName)
+      const buffer = await workbook.xlsx.writeBuffer()
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+
+      a.href = url
+      a.download = fileName
+      a.click()
+      window.URL.revokeObjectURL(url)
     } catch (error) {
       console.error('Lỗi khi xuất Excel:', error)
       alert('Có lỗi xảy ra khi xuất Excel. Vui lòng thử lại!')
+    } finally {
+      setIsExport(false)
     }
   }, [totalItems, id, filterField, filterValue, sortField, sortOrder, searchKey])
 
@@ -410,15 +485,16 @@ export default function ViewAcedemicProcessCVHT() {
                   toogleManualAddFromViewByCate={toogleManualAddFromViewByCate}
                   toogleSendEmailRemindCommitment={toogleSendEmailRemindCommitment}
                 />
-                <Button
+                <LoadingButton
                   variant='contained'
                   color='success'
                   startIcon={<Iconify icon='mdi:file-excel' />}
                   onClick={handleExportExcel}
                   disabled={totalItems === 0 || isLoading}
+                  loading={isExport}
                 >
                   Xuất Excel ({totalItems} bản ghi)
-                </Button>
+                </LoadingButton>
               </div>
             </div>
             <TableAcedemicProcess
@@ -431,9 +507,9 @@ export default function ViewAcedemicProcessCVHT() {
               handleSort={handleSort}
               setProcessing={setProcessing}
               toogleEditViewAcedemicProcess={toogleEditViewAcedemicProcess}
-              toogleDeleteViewAcedemicProcess={toogleDeleteViewAcedemicProcess}
+              toogleDeleteViewAcedemicProcess={toogleDeleteViewAcedemicProcessCVHT}
               toogleViewDetailAcedemicProcess={toogleViewDetailAcademicProcess}
-              toogleOpenUpdateAcedemicProcessStatus={toogleUpdateAcedemicProcessStatus}
+              toogleOpenUpdateAcedemicProcessStatus={toogleUpdateAcedemicProcessStatusCVHT}
               mutateListAcedemicProcessCVHT={mutate}
             />
             <TablePagination
@@ -458,7 +534,11 @@ export default function ViewAcedemicProcessCVHT() {
         </DialogContent>
       </Dialog>
       {/* <ViewDetailAcedecmicProcess id={processing?._id || ''} /> */}
-      <UpdateAcedemicProcessStatus mutate={mutate} />
+      <UpdateAcedemicProcessStatus
+        mutate={mutate}
+        open={openUpdateAcedemicProcessStatusCVHT}
+        onClose={toogleUpdateAcedemicProcessStatusCVHT}
+      />
 
       <ManualAddAcedemicProcess
         mutate={mutate}
@@ -468,8 +548,8 @@ export default function ViewAcedemicProcessCVHT() {
       {/* <SendMailModal id={sessionCVHT?._id || ''} mutate={mutate} /> */}
       <SendMailModalRemind id={sessionCVHT?._id || ''} />
       <AlertDelete
-        open={openDeleteViewAcedemicProcess}
-        onClose={toogleDeleteViewAcedemicProcess}
+        open={openDeleteViewAcedemicProcessCVHT}
+        onClose={toogleDeleteViewAcedemicProcessCVHT}
         content={`Bạn có chắc chắn muốn xóa xữ lý học tập của sinh viên ${processing?.firstName} ${processing?.lastName} không?`}
         onSubmit={onDelete}
         title='Xóa xữ lý học tập'

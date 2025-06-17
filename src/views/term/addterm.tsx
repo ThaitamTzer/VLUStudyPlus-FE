@@ -32,6 +32,7 @@ import Iconify from '@/components/iconify'
 import { fDate } from '@/utils/format-time'
 import { termFormSchema } from '@/schema/termSchema'
 import { getAcademicYear } from './helper'
+import { CustomDialog } from '@/components/CustomDialog'
 
 type AddTermProps = {
   mutate: KeyedMutator<TermType>
@@ -113,6 +114,189 @@ export default function AddTerm(props: AddTermProps) {
       setValue('endDate', '') // Reset end date if start date is after end date
     }
   }
+
+  return (
+    <CustomDialog
+      open={openAddTerm}
+      onClose={handleClose}
+      title='Thêm học kỳ'
+      canDrag
+      PaperProps={{
+        sx: {
+          overflow: 'visible'
+        }
+      }}
+      onSubmit={onSubmit}
+      actions={
+        <>
+          <Button variant='outlined' onClick={handleClose}>
+            Hủy
+          </Button>
+          <LoadingButton loading={loading} type='submit' variant='contained'>
+            Lưu
+          </LoadingButton>
+        </>
+      }
+    >
+      <Grid container spacing={3}>
+        <Grid item xs={6}>
+          <Controller
+            name='termName'
+            control={control}
+            render={({ field }) => (
+              <CustomTextField
+                {...field}
+                fullWidth
+                placeholder='Học kỳ 2'
+                label='Tên học kỳ'
+                {...(errors.termName && { error: true, helperText: errors.termName.message })}
+              />
+            )}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <Controller
+            name='abbreviatName'
+            control={control}
+            render={({ field }) => (
+              <CustomTextField
+                {...field}
+                fullWidth
+                label='Tên viết tắt'
+                placeholder='VD: HK252'
+                {...(errors.abbreviatName && { error: true, helperText: errors.abbreviatName.message })}
+              />
+            )}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Controller
+            name='academicYear'
+            control={control}
+            render={({ field }) => (
+              <CustomTextField
+                {...field}
+                select
+                label='Năm học'
+                fullWidth
+                SelectProps={{
+                  displayEmpty: true,
+                  MenuProps: {
+                    sx: { maxHeight: 300 }
+                  }
+                }}
+                onChange={e => {
+                  field.onChange(e)
+
+                  // Reset dates when academic year changes
+                  setValue('startDate', '')
+                  setValue('endDate', '')
+                }}
+              >
+                {getAcademicYear().map(year => (
+                  <MenuItem key={year} value={year}>
+                    {year}
+                  </MenuItem>
+                ))}
+              </CustomTextField>
+            )}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Controller
+            name='startDate'
+            control={control}
+            rules={{ required: 'Ngày bắt đầu không được để trống' }}
+            render={({ field: { value, onChange, onBlur } }) => {
+              const [startYear] = academicYear ? academicYear.split('-') : []
+              const minDate = startYear ? new Date(`${startYear}-01-01`) : undefined
+              const maxDate = startYear ? new Date(`${Number(startYear) + 1}-12-31`) : undefined
+
+              return (
+                <AppReactDatepicker
+                  id='startDate'
+                  onChange={date => {
+                    handleStartDateChange(date)
+                    onChange(date ? format(date, 'yyyy-MM-dd') : '')
+                  }}
+                  onBlur={onBlur}
+                  selected={value ? new Date(value) : null}
+                  locale='vi'
+                  dateFormat='dd/MM/yyyy'
+                  showYearDropdown
+                  showMonthDropdown
+                  minDate={minDate}
+                  maxDate={maxDate}
+                  popperPlacement='top'
+                  placeholderText='Ngày bắt đầu'
+                  disabled={!academicYear}
+                  customInput={
+                    <CustomTextField
+                      value={value}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      fullWidth
+                      label='Ngày bắt đầu'
+                      {...(errors.startDate && { error: true, helperText: errors.startDate.message })}
+                    />
+                  }
+                />
+              )
+            }}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Controller
+            name='endDate'
+            control={control}
+            rules={{
+              required: 'Ngày kết thúc không được để trống',
+              validate: value => {
+                const startDate = getValues('startDate')
+
+                return (
+                  !startDate ||
+                  new Date(value) >= new Date(startDate) ||
+                  'Ngày kết thúc không được đi trước ngày bắt đầu'
+                )
+              }
+            }}
+            render={({ field: { value, onChange } }) => {
+              const [startYear] = academicYear ? academicYear.split('-') : []
+              const minDate = startDate ? new Date(startDate) : undefined
+              const maxDate = startYear ? new Date(`${Number(startYear) + 1}-12-31`) : undefined
+
+              return (
+                <AppReactDatepicker
+                  selected={value ? new Date(value) : null}
+                  onChange={date => onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                  id='endDate'
+                  locale='vi'
+                  dateFormat='dd/MM/yyyy'
+                  showYearDropdown
+                  showMonthDropdown
+                  minDate={minDate}
+                  maxDate={maxDate}
+                  popperPlacement='top'
+                  placeholderText='Ngày kết thúc'
+                  disabled={!academicYear}
+                  customInput={
+                    <CustomTextField
+                      value={value}
+                      onChange={onChange}
+                      fullWidth
+                      label='Ngày kết thúc'
+                      {...(errors.endDate && { error: true, helperText: errors.endDate.message })}
+                    />
+                  }
+                />
+              )
+            }}
+          />
+        </Grid>
+      </Grid>
+    </CustomDialog>
+  )
 
   return (
     <Dialog

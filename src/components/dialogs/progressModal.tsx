@@ -34,20 +34,20 @@ export default function ProgressModal({
   const [progress, setProgress] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
 
-  // Reset when modal is closed
+  // Reset khi modal đóng
   useEffect(() => {
     setProgress(0)
     setIsPaused(false)
   }, [open])
 
-  // Phase 1: Increase progress to pauseAt
+  // Giai đoạn 1: Tăng tiến độ đến pauseAt
   useEffect(() => {
     let timer: NodeJS.Timeout
 
     if (open && isProcessing && !isCompleted) {
       timer = setInterval(() => {
         setProgress(prev => {
-          const next = prev + Math.floor(Math.random() * 3) + 1
+          const next = prev + Math.floor(Math.random() * 2) + 1
 
           if (next >= pauseAt) {
             clearInterval(timer)
@@ -58,32 +58,32 @@ export default function ProgressModal({
 
           return next
         })
-      }, 500)
+      }, 1000)
     }
 
     return () => clearInterval(timer)
   }, [open, isProcessing, isCompleted, pauseAt])
 
-  // Phase 2: Complete to 100%
+  // Giai đoạn 2: Hoàn thành đến 100%
   useEffect(() => {
     let completeTimer: NodeJS.Timeout
 
     if (isCompleted && progress < 100) {
       completeTimer = setInterval(() => {
         setProgress(prev => {
-          const next = Math.min(prev + Math.floor(Math.random() * 3) + 1, 100)
+          const next = Math.min(prev + Math.floor(Math.random() * 2) + 1, 100)
 
           if (next === 100) clearInterval(completeTimer)
 
           return next
         })
-      }, 150)
+      }, 300)
     }
 
     return () => clearInterval(completeTimer)
   }, [isCompleted, progress])
 
-  // Ensure 100% progress when completed
+  // Đảm bảo tiến độ 100% khi hoàn thành
   useEffect(() => {
     if (isCompleted && progress < 100) {
       setProgress(100)

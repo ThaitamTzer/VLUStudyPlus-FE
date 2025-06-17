@@ -1,7 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
-
 import useSWR from 'swr'
 import {
   Box,
@@ -13,24 +11,19 @@ import {
   LinearProgress,
   Tooltip,
   IconButton,
-  useTheme,
-  Button,
-  Alert
+  useTheme
 } from '@mui/material'
 import SchoolIcon from '@mui/icons-material/School'
 import GradeIcon from '@mui/icons-material/Grade'
 import CreditScoreIcon from '@mui/icons-material/CreditScore'
 import InfoIcon from '@mui/icons-material/Info'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
-import AddIcon from '@mui/icons-material/Add'
-import RefreshIcon from '@mui/icons-material/Refresh'
 
 import trainingProgramService from '@/services/trainingprogram.service'
 
 import gradeService from '@/services/grade.service'
 import PageHeader from '@/components/page-header'
 import ImportGradeModal from './ImportGradeModal'
-import { useGradeStore } from '@/stores/grade/grade.store'
 import ModalUpdateGrade from './UpdateGradeModal'
 import ViewAdviseHistoryModal from './ViewAdviseHistoryModal'
 import { useAuth } from '@/hooks/useAuth'
@@ -44,45 +37,6 @@ type StatCardProps = {
   color: 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success'
 }
 
-const EmptyState = ({ toogleImportGradeStudent }: { toogleImportGradeStudent: () => void }) => {
-  const theme = useTheme()
-
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '60vh',
-        textAlign: 'center',
-        p: 3
-      }}
-    >
-      <SchoolIcon sx={{ fontSize: 80, color: theme.palette.grey[400], mb: 2 }} />
-      <Typography variant='h5' color='text.secondary' gutterBottom>
-        Chưa có dữ liệu điểm
-      </Typography>
-      <Typography variant='body1' color='text.secondary' sx={{ maxWidth: 400, mb: 3 }}>
-        Hiện tại chưa có dữ liệu điểm nào được nhập. Vui lòng nhập điểm để xem thông tin chi tiết.
-      </Typography>
-      <Button
-        variant='contained'
-        startIcon={<AddIcon />}
-        onClick={toogleImportGradeStudent}
-        sx={{
-          borderRadius: 2,
-          textTransform: 'none',
-          px: 3,
-          py: 1
-        }}
-      >
-        Nhập điểm
-      </Button>
-    </Box>
-  )
-}
-
 export default function StudentGradePage() {
   const theme = useTheme()
   const { user } = useAuth()
@@ -90,7 +44,7 @@ export default function StudentGradePage() {
 
   const cohortId = cohorOptions.find(cohort => cohort.cohortId === user?.cohortId)?._id
 
-  const { data, isLoading, mutate, error } = useSWR('api/grade/view-grade-SV', gradeService.getGradeStudent, {
+  const { data, isLoading, mutate } = useSWR('api/grade/view-grade-SV', gradeService.getGradeStudent, {
     errorRetryCount: 4,
     shouldRetryOnError: false
   })
@@ -103,12 +57,6 @@ export default function StudentGradePage() {
     }
   )
 
-  const { toogleImportGradeStudent } = useGradeStore()
-
-  const handleOpenImportGrade = useCallback(() => {
-    toogleImportGradeStudent()
-  }, [toogleImportGradeStudent])
-
   if (isLoading) {
     return (
       <>
@@ -120,37 +68,41 @@ export default function StudentGradePage() {
     )
   }
 
-  if (error) {
-    return (
-      <>
-        <PageHeader title='Kết quả học tập' />
-        <Box sx={{ p: 3 }}>
-          <Alert severity='error' sx={{ mb: 2 }}>
-            Không thể tải dữ liệu điểm. Vui lòng thử lại sau.
-          </Alert>
-          <Button variant='contained' onClick={() => mutate()} startIcon={<RefreshIcon />}>
-            Thử lại
-          </Button>
-        </Box>
-      </>
-    )
-  }
+  // Xử lý lỗi - nếu sinh viên chưa nhập điểm thì hiển thị như trường hợp không có dữ liệu
+  // if (error && error.message !== 'Sinh viên chưa nhập điểm') {
+  //   return (
+  //     <>
+  //       <PageHeader title='Kết quả học tập' />
+  //       <Box sx={{ p: 3 }}>
+  //         <Alert severity='error' sx={{ mb: 2 }}>
+  //           Không thể tải dữ liệu điểm. Vui lòng thử lại sau.
+  //         </Alert>
+  //         <Button variant='contained' onClick={() => mutate()} startIcon={<RefreshIcon />}>
+  //           Thử lại
+  //         </Button>
+  //       </Box>
+  //     </>
+  //   )
+  // }
 
-  if (!data?.termGrades || data.termGrades.length === 0) {
-    return (
-      <>
-        <PageHeader title='Kết quả học tập' />
-        <EmptyState toogleImportGradeStudent={handleOpenImportGrade} />
-        <ImportGradeModal mutate={mutate} />
-      </>
-    )
-  }
+  // Hiển thị EmptyState khi không có dữ liệu hoặc sinh viên chưa nhập điểm
+  // if (!data?.termGrades || data.termGrades.length === 0 || (error && error.message === 'Sinh viên chưa nhập điểm')) {
+  //   return (
+  //     <>
+  //       <PageHeader title='Kết quả học tập' />
+  //       <EmptyState toogleImportGradeStudent={handleOpenImportGrade} />
+  //       <ImportGradeModal mutate={mutate} />
+  //     </>
+  //   )
+  // }
 
   const calculateGPA = () => {
+    if (!data?.termGrades) return 0
+
     let totalCredits = 0
     let totalPoints = 0
 
-    data?.termGrades.forEach(term => {
+    data.termGrades.forEach(term => {
       term.gradeOfSubject.forEach(subject => {
         if (subject.status === 'x') {
           totalCredits += subject.subjectId.credits
@@ -290,7 +242,7 @@ export default function StudentGradePage() {
           </Grid>
 
           <Grid item xs={12}>
-            <StudentGradeTrainingTable trainingProgramData={trainingProgramData?.data || []} gradeData={data} />
+            <StudentGradeTrainingTable trainingProgramData={trainingProgramData?.data || []} gradeData={data || null} />
           </Grid>
         </Grid>
       </Box>

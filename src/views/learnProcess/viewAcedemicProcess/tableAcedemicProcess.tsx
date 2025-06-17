@@ -18,6 +18,8 @@ import {
 import type { KeyedMutator } from 'swr'
 import useSWR from 'swr'
 
+import { toast } from 'react-toastify'
+
 import StyledTableRow from '@/components/table/StyledTableRow'
 import TableLoading from '@/components/table/TableLoading'
 import TableNoData from '@/components/table/TableNotFound'
@@ -64,6 +66,8 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
     mutateListAcedemicProcessCVHT
   } = props
 
+  console.log(data)
+
   const [openFormViewer, setOpenFormViewer] = useState(false)
   const [formInstance, setFormInstance] = useState<FormInstanceType | null>(null)
   const [formInstanceBCNK, setFormInstanceBCNK] = useState<FormInstanceType | null>(null)
@@ -77,6 +81,9 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
     {
       onSuccess: data => {
         setFormInstance(data)
+      },
+      onError: error => {
+        toast.error(error.message || 'Lỗi khi tải đơn')
       }
     }
   )
@@ -87,6 +94,14 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
     {
       onSuccess: data => {
         setFormInstanceBCNK(data)
+      },
+      onError: error => {
+        toast.error(error.message || 'Lỗi khi tải đơn', {
+          autoClose: 3000
+        })
+        setFormInstanceBCNK(null)
+        setOpenFormViewer(false)
+        setStudentId('')
       }
     }
   )
@@ -121,17 +136,19 @@ export default function TableAcedemicProcess(props: TableAcedemicProcessProps) {
             <Badge sx={{ backgroundColor: 'success.main', color: 'white', padding: '5px 10px', borderRadius: '5px' }}>
               Hoàn thành
             </Badge>
-            <Tooltip title='Xem đơn' arrow>
-              <CustomIconButton
-                size='small'
-                color='info'
-                variant='contained'
-                sx={{ ml: 1 }}
-                onClick={() => handleViewDetailForm(student._id, student.lastName + ' ' + student.firstName)}
-              >
-                <Iconify icon='mdi:file-document-outline' />
-              </CustomIconButton>
-            </Tooltip>
+            {student.CVHTHandle?.commitment && (
+              <Tooltip title='Xem đơn' arrow>
+                <CustomIconButton
+                  size='small'
+                  color='info'
+                  variant='contained'
+                  sx={{ ml: 1 }}
+                  onClick={() => handleViewDetailForm(student._id, student.lastName + ' ' + student.firstName)}
+                >
+                  <Iconify icon='mdi:file-document-outline' />
+                </CustomIconButton>
+              </Tooltip>
+            )}
           </>
         )
 

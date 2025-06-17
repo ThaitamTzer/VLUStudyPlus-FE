@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 
+import useSWR from 'swr'
+
 // MUI Imports
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
@@ -9,6 +11,10 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import Select from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
 import type { SxProps, Theme } from '@mui/material/styles'
 import { useTheme } from '@mui/material/styles'
 import type { ApexOptions } from 'apexcharts'
@@ -22,6 +28,7 @@ import CustomAvatar from '@/@core/components/mui/Avatar'
 import { useSettings } from '@/@core/hooks/useSettings'
 import type { StatisticsProcessByTerm, StatisticsProcessOfCVHT } from '@/types/statisticsType'
 import statisticsService from '@/services/statistics.service'
+import { useShare } from '@/hooks/useShare'
 
 // Types
 type StudentCountByCohortType = {
@@ -52,14 +59,22 @@ type DashboardStats = {
 export default function StatisticsPage() {
   const theme = useTheme()
   const { settings } = useSettings()
-  const [loading, setLoading] = useState(true)
-  const [stats, setStats] = useState<DashboardStats | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const { termOptions } = useShare()
 
-  // State riêng cho dữ liệu CVHT
-  const [cvhtLoading, setCvhtLoading] = useState(true)
-  const [cvhtStats, setCvhtStats] = useState<StatisticsProcessOfCVHT | null>(null)
-  const [cvhtError, setCvhtError] = useState<string | null>(null)
+  const [selectedTerm, setSelectedTerm] = useState('')
+
+  useEffect(() => {
+    const today = new Date()
+
+    const currentTerm = termOptions.find(term => {
+      const startDate = new Date(term.startDate)
+      const endDate = new Date(term.endDate)
+
+      return today >= startDate && today <= endDate
+    })
+
+    setSelectedTerm(currentTerm?._id || '')
+  }, [termOptions])
 
   // Định nghĩa các tông màu đa dạng
   const colorPalette = {
@@ -90,121 +105,114 @@ export default function StatisticsPage() {
     lightRed: '#EF5350'
   }
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true)
+  // Sử dụng useSWR để fetch và cache dữ liệu dashboard chính
+  const {
+    data: stats,
+    error,
+    isLoading
+  } = useSWR<DashboardStats>(
+    'dashboard-stats',
+    async () => {
+      // Gọi tất cả API song song để tối ưu hiệu suất (trừ API CVHT chậm)
+      const [
+        studentCount,
+        lectureCount,
+        classCount,
+        academicProcessingCount,
+        gradeCount,
+        onTimeGraduatedStudentCount,
+        studentCountByCohort,
+        onTimeGraduatedStudentCountByCohort,
+        academicProcessingStatusDht,
+        academicProcessingStatusCht,
+        statisticsXLHTByTerm
+      ] = await Promise.all([
+        dashboardService.studentCount(),
+        dashboardService.lectureCount(),
+        dashboardService.classCount(),
+        dashboardService.academicProcessingCount(),
+        dashboardService.gradeCount(),
+        dashboardService.onTimeGraduatedStudentCount(),
+        dashboardService.studentCountByCohort(),
+        dashboardService.onTimeGraduatedStudentCountByCohort(),
+        dashboardService.academicProcessingStatusDht(),
+        dashboardService.academicProcessingStatusCht(),
+        statisticsService.getStatistics()
+      ])
 
-        // Gọi tất cả API song song để tối ưu hiệu suất (trừ API CVHT chậm)
-        const [
-          studentCount,
-          lectureCount,
-          classCount,
-          academicProcessingCount,
-          gradeCount,
-          onTimeGraduatedStudentCount,
-          studentCountByCohort,
-          onTimeGraduatedStudentCountByCohort,
-          academicProcessingStatusDht,
-          academicProcessingStatusCht,
-          statisticsXLHTByTerm
-        ] = await Promise.all([
-          dashboardService.studentCount(),
-          dashboardService.lectureCount(),
-          dashboardService.classCount(),
-          dashboardService.academicProcessingCount(),
-          dashboardService.gradeCount(),
-          dashboardService.onTimeGraduatedStudentCount(),
-          dashboardService.studentCountByCohort(),
-          dashboardService.onTimeGraduatedStudentCountByCohort(),
-          dashboardService.academicProcessingStatusDht(),
-          dashboardService.academicProcessingStatusCht(),
-          statisticsService.getStatistics()
-        ])
-
-        setStats({
-          studentCount,
-          lectureCount,
-          classCount,
-          academicProcessingCount,
-          gradeCount,
-          onTimeGraduatedStudentCount,
-          studentCountByCohort,
-          onTimeGraduatedStudentCountByCohort,
-          academicProcessingStatusDht,
-          academicProcessingStatusCht,
-          statisticsXLHTByTerm,
-          getStatisticsByprocessOfCVHT: null // Sẽ được cập nhật riêng
-        })
-      } catch (err) {
-        setError('Có lỗi xảy ra khi tải dữ liệu dashboard')
-        console.error('Dashboard fetch error:', err)
-      } finally {
-        setLoading(false)
+      return {
+        studentCount,
+        lectureCount,
+        classCount,
+        academicProcessingCount,
+        gradeCount,
+        onTimeGraduatedStudentCount,
+        studentCountByCohort,
+        onTimeGraduatedStudentCountByCohort,
+        academicProcessingStatusDht,
+        academicProcessingStatusCht,
+        statisticsXLHTByTerm,
+        getStatisticsByprocessOfCVHT: null // Sẽ được cập nhật riêng
       }
+    },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      refreshInterval: 5 * 60 * 1000 // Refresh mỗi 5 phút
     }
+  )
 
-    fetchDashboardData()
-  }, [])
-
-  // useEffect riêng để gọi API CVHT chậm
-  useEffect(() => {
-    const fetchCvhtData = async () => {
-      try {
-        setCvhtLoading(true)
-        setCvhtError(null)
-        const cvhtResult = await statisticsService.getStatisticsByprocessOfCVHT()
-
-        setCvhtStats(cvhtResult)
-      } catch (err) {
-        setCvhtError('Có lỗi xảy ra khi tải dữ liệu CVHT')
-        console.error('CVHT fetch error:', err)
-      } finally {
-        setCvhtLoading(false)
-      }
+  // useSWR riêng để gọi API CVHT chậm
+  const {
+    data: cvhtStats,
+    error: cvhtError,
+    isLoading: cvhtLoading
+  } = useSWR<StatisticsProcessOfCVHT>(
+    ['cvht-stats', selectedTerm],
+    () => statisticsService.getStatisticsByprocessOfCVHT('', '', selectedTerm),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      refreshInterval: 10 * 60 * 1000 // Refresh mỗi 10 phút do API chậm
     }
+  )
 
-    fetchCvhtData()
-  }, [])
+  // Chuẩn bị dữ liệu cho bar chart (tốt nghiệp đúng hạn)
+  const chartData = stats?.onTimeGraduatedStudentCountByCohort
 
-  // Chuẩn bị dữ liệu cho bar chart
-  const chartData =
-    stats?.studentCountByCohort.filter(item => item.studentCount > 0).sort((a, b) => b.studentCount - a.studentCount) ||
-    []
+  // const chartData = [
+  //   {
+  //     cohortId: 'K28',
+  //     onTimeGraduatedCount: 80
+  //   },
+  //   {
+  //     cohortId: 'K27',
+  //     onTimeGraduatedCount: 106
+  //   },
+  //   {
+  //     cohortId: 'K29',
+  //     onTimeGraduatedCount: 80
+  //   },
+  //   {
+  //     cohortId: 'K30',
+  //     onTimeGraduatedCount: 70
+  //   }
+  // ].sort((a, b) => b.onTimeGraduatedCount - a.onTimeGraduatedCount)
 
   const series = [
     {
-      name: 'Số lượng sinh viên',
-      data: chartData.map(item => ({
+      name: 'SV tốt nghiệp đúng hạn',
+      data: chartData?.map(item => ({
         x: `Khóa ${item.cohortId}`,
-        y: item.studentCount
+        y: item.onTimeGraduatedCount
       }))
     }
   ]
 
-  // Chuẩn bị dữ liệu cho pie chart (tốt nghiệp đúng hạn)
-  // const pieChartData = stats?.onTimeGraduatedStudentCountByCohort.filter(item => item.onTimeGraduatedCount > 0) || []
+  // Chuẩn bị dữ liệu cho pie chart (sinh viên theo khóa)
+  const pieChartData = stats?.studentCountByCohort.filter(item => item.studentCount > 0) || []
 
-  const pieChartData = [
-    {
-      cohortId: 'K28',
-      onTimeGraduatedCount: 80
-    },
-    {
-      cohortId: 'K27',
-      onTimeGraduatedCount: 106
-    },
-    {
-      cohortId: 'K29',
-      onTimeGraduatedCount: 80
-    },
-    {
-      cohortId: 'K30',
-      onTimeGraduatedCount: 70
-    }
-  ]
-
-  const pieSeries = pieChartData.map(item => item.onTimeGraduatedCount) || []
+  const pieSeries = pieChartData.map(item => item.studentCount) || []
 
   const pieLabels = pieChartData.map(item => `Khóa ${item.cohortId}`)
 
@@ -562,7 +570,7 @@ export default function StatisticsPage() {
       },
       y: {
         formatter: function (val: number) {
-          return val + ' sinh viên'
+          return val + ' sinh viên tốt nghiệp đúng hạn'
         }
       }
     },
@@ -618,7 +626,7 @@ export default function StatisticsPage() {
     }
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Box
         display='flex'
@@ -842,8 +850,8 @@ export default function StatisticsPage() {
           >
             <CardStatsVerticalCustom
               stats={stats.onTimeGraduatedStudentCount.toLocaleString()}
-              title='SV Tốt Nghiệp Đúng Hạn'
-              subtitle='Tổng số sinh viên'
+              title='SV Tốt Nghiệp Đúng Hạn '
+              subtitle='Tổng số sinh viên (Dự đoán)'
               avatarIcon='tabler-medal'
               avatarColor='info'
               avatarSkin='light'
@@ -954,14 +962,14 @@ export default function StatisticsPage() {
                 </Box>
                 <Box>
                   <Typography variant='h6' gutterBottom fontWeight='bold' sx={{ color: colorPalette.darkBlue }}>
-                    Biểu Đồ Sinh Viên Theo Khóa
+                    SV Tốt Nghiệp Đúng Hạn Theo Khóa
                   </Typography>
                   <Typography variant='body2' sx={{ color: colorPalette.blue }}>
-                    Thống kê số lượng sinh viên các khóa có sinh viên
+                    Số lượng dự đoán sinh viên tốt nghiệp đúng hạn theo từng khóa
                   </Typography>
                 </Box>
               </Box>
-              <AppReactApexCharts type='bar' height={350} width='100%' series={series} options={options} />
+              <AppReactApexCharts type='bar' height={350} width='100%' series={series as any} options={options} />
             </CardContent>
           </Card>
         </Grid>
@@ -997,7 +1005,7 @@ export default function StatisticsPage() {
                   </Typography>
                 </Box>
                 <Typography variant='h6' gutterBottom fontWeight='bold' sx={{ color: colorPalette.darkBlue }}>
-                  SV Tốt Nghiệp Đúng Hạn Theo Khóa
+                  Biểu Đồ Sinh Viên Theo Khóa
                 </Typography>
               </Box>
               <Box mt={2}>
@@ -1133,30 +1141,65 @@ export default function StatisticsPage() {
             }}
           >
             <CardContent>
-              <Box display='flex' alignItems='center' mb={3}>
-                <Box
-                  sx={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: '50%',
-                    background: `linear-gradient(135deg, ${colorPalette.red}, ${colorPalette.orange})`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    mr: 2
-                  }}
-                >
-                  <Typography variant='h5' color='white'>
-                    👨‍🏫
-                  </Typography>
+              <Box display='flex' alignItems='center' justifyContent='space-between' mb={3}>
+                <Box display='flex' alignItems='center'>
+                  <Box
+                    sx={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: '50%',
+                      background: `linear-gradient(135deg, ${colorPalette.red}, ${colorPalette.orange})`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mr: 2
+                    }}
+                  >
+                    <Typography variant='h5' color='white'>
+                      👨‍🏫
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant='h6' gutterBottom fontWeight='bold' sx={{ color: colorPalette.red }}>
+                      Top CVHT Xử Lý Học Tập
+                    </Typography>
+                    <Typography variant='body2' sx={{ color: colorPalette.orange }}>
+                      Thống kê sinh viên xử lý học tập theo từng CVHT
+                    </Typography>
+                  </Box>
                 </Box>
-                <Box>
-                  <Typography variant='h6' gutterBottom fontWeight='bold' sx={{ color: colorPalette.red }}>
-                    Top CVHT Xử Lý Học Tập
-                  </Typography>
-                  <Typography variant='body2' sx={{ color: colorPalette.orange }}>
-                    Thống kê sinh viên xử lý học tập theo từng CVHT
-                  </Typography>
+                <Box sx={{ minWidth: 200 }}>
+                  <FormControl fullWidth size='small'>
+                    <InputLabel id='term-select-label' sx={{ color: colorPalette.red }}>
+                      Chọn học kỳ
+                    </InputLabel>
+                    <Select
+                      labelId='term-select-label'
+                      value={selectedTerm}
+                      label='Chọn học kỳ'
+                      onChange={e => setSelectedTerm(e.target.value as string)}
+                      sx={{
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: colorPalette.red + '40'
+                        },
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                          borderColor: colorPalette.red
+                        },
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: colorPalette.red
+                        }
+                      }}
+                    >
+                      <MenuItem value=''>
+                        <em>Tất cả học kỳ</em>
+                      </MenuItem>
+                      {termOptions.map(term => (
+                        <MenuItem key={term._id} value={term._id}>
+                          {term.abbreviatName}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Box>
               </Box>
               {cvhtLoading ? (

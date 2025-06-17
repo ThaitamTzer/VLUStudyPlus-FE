@@ -27,7 +27,7 @@ export default function ViewAdviseHistoryModal() {
     <CustomDialog
       open={openViewAdviseHistory}
       onClose={handleClose}
-      title='📚 Lịch sử ghi chú học tập'
+      title='📚 Lịch sử tư vấn học tập'
       maxWidth='md'
       fullWidth
       actions={
@@ -153,10 +153,10 @@ export default function ViewAdviseHistoryModal() {
               <CardContent>
                 <HistoryIcon sx={{ fontSize: 64, color: 'grey.400', mb: 2 }} />
                 <Typography variant='h6' color='text.secondary' gutterBottom>
-                  Chưa có ghi chú nào
+                  Chưa có tư vấn nào
                 </Typography>
                 <Typography variant='body2' color='text.secondary'>
-                  Chưa có giảng viên nào để lại ghi chú cho quá trình học tập của bạn.
+                  Chưa có giảng viên nào để lại tư vấn cho quá trình học tập của bạn.
                 </Typography>
               </CardContent>
             </Card>
@@ -174,7 +174,7 @@ export default function ViewAdviseHistoryModal() {
                       {adviseHistory.length}
                     </Typography>
                     <Typography variant='body2' color='text.secondary'>
-                      Tổng số ghi chú
+                      Tổng số tư vấn
                     </Typography>
                   </Box>
                   <Box textAlign='center'>
@@ -190,7 +190,7 @@ export default function ViewAdviseHistoryModal() {
                       {Math.round((adviseHistory.length / (currentStudentGradeData?.termGrades?.length || 1)) * 100)}%
                     </Typography>
                     <Typography variant='body2' color='text.secondary'>
-                      Tỷ lệ có ghi chú
+                      Tỷ lệ có tư vấn
                     </Typography>
                   </Box>
                 </Stack>

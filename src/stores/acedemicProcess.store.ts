@@ -23,6 +23,7 @@ type States = {
   openDeleteViewAcedemicProcess: boolean
   openViewDetailAcademicProcess: boolean
   openUpdateAcedemicProcessStatus: boolean
+  openUpdateAcedemicProcessStatusCVHT: boolean
   openSendEmail: boolean
   openSendEmailRemind: boolean
   openSendEmailRemindCommitment: boolean
@@ -31,7 +32,7 @@ type States = {
   session: LearnProcessType | null
   sessionCVHT: LearnProcessType | null
   openViewByCategoryCVHT: boolean
-
+  openDeleteViewAcedemicProcessCVHT: boolean
   limit: number
 }
 
@@ -58,6 +59,7 @@ type Actions = {
   toogleDeleteViewAcedemicProcess: () => void
   toogleViewDetailAcademicProcess: () => void
   toogleUpdateAcedemicProcessStatus: () => void
+  toogleUpdateAcedemicProcessStatusCVHT: () => void
   tooogleSendEmail: () => void
   toogleSendEmailRemind: () => void
   toogleSendEmailRemindCommitment: () => void
@@ -65,7 +67,7 @@ type Actions = {
   setIsCompleted: (isCompleted: boolean) => void
   setSession: (session: LearnProcessType | null) => void
   setSessionCVHT: (sessionCVHT: LearnProcessType | null) => void
-
+  toogleDeleteViewAcedemicProcessCVHT: () => void
   setLimit: (limit: number) => void
 }
 
@@ -90,6 +92,7 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
   openDeleteViewAcedemicProcess: false,
   openViewDetailAcademicProcess: false,
   openUpdateAcedemicProcessStatus: false,
+  openUpdateAcedemicProcessStatusCVHT: false,
   openSendEmail: false,
   openSendEmailRemind: false,
   openSendEmailRemindCommitment: false,
@@ -99,10 +102,13 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
   sessionCVHT: null,
   openViewByCategoryCVHT: false,
   limit: 10,
+  openDeleteViewAcedemicProcessCVHT: false,
   setSession: session => set({ session }),
   setSessionCVHT: sessionCVHT => set({ sessionCVHT }),
   setIsProcessing: isProcessing => set({ isProcessing }),
   setIsCompleted: isCompleted => set({ isCompleted }),
+  toogleUpdateAcedemicProcessStatusCVHT: () =>
+    set(state => ({ openUpdateAcedemicProcessStatusCVHT: !state.openUpdateAcedemicProcessStatusCVHT })),
   toogleSendEmailRemind: () => set(state => ({ openSendEmailRemind: !state.openSendEmailRemind })),
   tooogleSendEmail: () => set(state => ({ openSendEmail: !state.openSendEmail })),
   toogleUpdateAcedemicProcessStatus: () =>
@@ -134,5 +140,7 @@ export const useAcedemicProcessStore = create<States & Actions>(set => ({
     set(state => ({ openDeleteViewAcedemicProcess: !state.openDeleteViewAcedemicProcess })),
   toogleSendEmailRemindCommitment: () =>
     set(state => ({ openSendEmailRemindCommitment: !state.openSendEmailRemindCommitment })),
+  toogleDeleteViewAcedemicProcessCVHT: () =>
+    set(state => ({ openDeleteViewAcedemicProcessCVHT: !state.openDeleteViewAcedemicProcessCVHT })),
   setLimit: limit => set({ limit })
 }))

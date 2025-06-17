@@ -148,7 +148,7 @@ const learnProcessService = {
     try {
       return await axiosClient.delete(`/api/academic-processing/delete-academicProcessing/${id}`).then(res => {
         if (sucessCallback) {
-          sucessCallback(res.data)
+          sucessCallback(res)
         }
 
         return res

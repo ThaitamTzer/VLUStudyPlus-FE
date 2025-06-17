@@ -1178,6 +1178,13 @@ export default function StatisticsPage() {
                       value={selectedTerm}
                       label='Chọn học kỳ'
                       onChange={e => setSelectedTerm(e.target.value as string)}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 300
+                          }
+                        }
+                      }}
                       sx={{
                         '& .MuiOutlinedInput-notchedOutline': {
                           borderColor: colorPalette.red + '40'

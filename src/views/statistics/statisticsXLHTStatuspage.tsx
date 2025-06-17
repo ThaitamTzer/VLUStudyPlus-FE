@@ -88,6 +88,8 @@ export default function StatisticsXLHTStatusPage() {
     () => statisticsService.getStatisticsByStatus(startYear || '2024', endYear || '2025', selectedTerm || '')
   )
 
+  console.log('data', data)
+
   const columns = useMemo<ColumnDef<StatisticsProcessByStatusTypeWithSTT, any>[]>(
     () => [
       columnHelper.accessor('stt', {
@@ -197,7 +199,7 @@ export default function StatisticsXLHTStatusPage() {
       worksheet.addRow([])
 
       // Tiêu đề chính ở giữa
-      const titleRow = worksheet.addRow(['THỐNG KÊ XLHT SINH VIÊN THEO TRẠNG THÁI'])
+      const titleRow = worksheet.addRow(['THỐNG KÊ XLHT THEO TRẠNG THÁI'])
 
       titleRow.getCell(1).font = { bold: true, size: 16, color: { argb: 'FFFFFFFF' } }
       titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' }
@@ -338,7 +340,7 @@ export default function StatisticsXLHTStatusPage() {
 
   return (
     <>
-      <PageHeader title='Thống kê XLHT sinh viên theo trạng thái' />
+      <PageHeader title='Thống kê XLHT theo trạng thái' />
       <Card>
         <CardContent>
           <Grid container spacing={6}>
@@ -349,7 +351,14 @@ export default function StatisticsXLHTStatusPage() {
                 fullWidth
                 value={selectedTerm}
                 SelectProps={{
-                  displayEmpty: true
+                  displayEmpty: true,
+                  MenuProps: {
+                    PaperProps: {
+                      style: {
+                        maxHeight: 300
+                      }
+                    }
+                  }
                 }}
                 onChange={e => setSelectedTerm(e.target.value)}
               >

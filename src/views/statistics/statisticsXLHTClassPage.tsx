@@ -365,7 +365,14 @@ export default function StatisticsXLHTClassPage() {
                 fullWidth
                 value={selectedTerm}
                 SelectProps={{
-                  displayEmpty: true
+                  displayEmpty: true,
+                  MenuProps: {
+                    PaperProps: {
+                      style: {
+                        maxHeight: 300
+                      }
+                    }
+                  }
                 }}
                 onChange={handleTermChange}
               >

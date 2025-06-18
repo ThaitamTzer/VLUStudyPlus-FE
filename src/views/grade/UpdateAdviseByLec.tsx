@@ -37,6 +37,7 @@ import gradeService from '@/services/grade.service'
 import termService from '@/services/term.service'
 import type { TermGradeType } from '@/types/management/gradeTypes'
 import type { AdviseType } from '@/types/management/adviseType'
+import { useShare } from '@/hooks/useShare'
 
 const adviseSchema = v.object({
   selectedTerm: v.pipe(v.string(), v.nonEmpty('Vui lòng chọn kỳ học')),
@@ -57,6 +58,8 @@ function UpdateAdviseByLec() {
     currentGradeData
   } = useGradeStore()
 
+  const { termOptions } = useShare()
+
   const [isLoading, setIsLoading] = useState(false)
   const [selectedTermGrade, setSelectedTermGrade] = useState<TermGradeType | null>(null)
 
@@ -64,8 +67,8 @@ function UpdateAdviseByLec() {
   const [total, setTotal] = useState(0)
 
   const { data: terms, isLoading: isLoadingTerms } = useSWR(
-    idClass ? [`/api/term/get-all-term/${idClass}`] : null,
-    () => termService.getAll(page, 10, 'termName', '', '', '', '', ''),
+    idClass ? [`/api/term/get-all-term/${idClass}`, page, 100, 'termName', '', '', '', '', ''] : null,
+    () => termService.getAll(page, 100, 'termName', '', '', '', '', ''),
     {
       revalidateOnFocus: false,
       onSuccess: data => {
@@ -334,7 +337,7 @@ function UpdateAdviseByLec() {
             render={({ field }) => (
               <CustomAutocomplete
                 {...field}
-                options={terms?.terms || []}
+                options={termOptions.sort((a, b) => a.abbreviatName.localeCompare(b.abbreviatName)) || []}
                 getOptionLabel={option => `${option.abbreviatName} - ${option.termName} - ${option.status}` || ''}
                 isOptionEqualToValue={(option, value) => option._id === value._id}
                 onChange={(_, value) => {

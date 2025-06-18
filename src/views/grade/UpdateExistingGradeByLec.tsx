@@ -61,8 +61,8 @@ function UpdateExistingGradeByLec() {
   const currentGradeOfSubject = currentTermGrade?.gradeOfSubject[currentGradeSubjectIndex]
 
   const { data: terms, isLoading: isLoadingTerms } = useSWR(
-    ['terms', page, 10, '', '', '', searchTerm],
-    () => termService.getAll(page, 10, '', '', '', '', '', searchTerm),
+    ['terms', page, 100, '', '', '', searchTerm],
+    () => termService.getAll(page, 100, '', '', '', '', '', searchTerm),
     {
       onSuccess: data => {
         setTotal(data.pagination.totalItems)
@@ -280,7 +280,7 @@ function UpdateExistingGradeByLec() {
             render={({ field }) => (
               <CustomAutocomplete
                 {...field}
-                options={terms?.terms || []}
+                options={terms?.terms.sort((a, b) => a.abbreviatName.localeCompare(b.abbreviatName)) || []}
                 getOptionLabel={option => option.abbreviatName || ''}
                 isOptionEqualToValue={(option, value) => option._id === value._id}
                 renderOption={(props, option) => (

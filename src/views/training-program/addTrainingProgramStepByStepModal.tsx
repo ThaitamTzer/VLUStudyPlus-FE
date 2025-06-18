@@ -264,7 +264,7 @@ export default function AddTrainingProgramStepByStepModal(props: AddTrainingProg
                   variant='outlined'
                   color='primary'
                   onClick={() => {
-                    window.open('/public/files/chuongtrinhdaotao.xlsx')
+                    window.open('/files/chuongtrinhdaotao.xlsx')
                   }}
                 >
                   Tải file mẫu

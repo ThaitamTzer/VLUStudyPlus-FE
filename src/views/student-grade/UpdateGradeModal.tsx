@@ -17,14 +17,12 @@ import { toast } from 'react-toastify'
 
 import { LoadingButton } from '@mui/lab'
 
-import useSWR from 'swr'
-
 import { CustomDialog } from '@/components/CustomDialog'
 import { useGradeStore } from '@/stores/grade/grade.store'
 import CustomTextField from '@/@core/components/mui/TextField'
 import gradeService from '@/services/grade.service'
-import termService from '@/services/term.service'
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
+import { useShare } from '@/hooks/useShare'
 
 const gradeSchema = v.object({
   term: v.pipe(v.string(), v.nonEmpty('Mã học kỳ không được để trống')),
@@ -40,32 +38,21 @@ type GradeSchema = InferInput<typeof gradeSchema>
 export default function ModalUpdateGrade({ mutate }: { mutate: KeyedMutator<any> }) {
   const { openUpdateGradeStudent, toogleUpdateGradeStudent, termGradeUpdate, subject, subjectId } = useGradeStore()
   const [isLoading, setIsLoading] = useState(false)
-  const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
 
-  const { data: terms, isLoading: isLoadingTerms } = useSWR(
-    ['termsOptions', page, 10, '', '', '', ''],
-    () => termService.getAll(page, 10, '', '', '', '', '', ''),
-    {
-      onSuccess: data => {
-        setTotal(data.pagination.totalItems)
-      },
-      revalidateOnMount: true
-    }
-  )
+  const { termOptions } = useShare()
 
-  const handleScroll = (event: React.SyntheticEvent) => {
-    const listboxNode = event.currentTarget
+  console.log('termGradeUpdate', termGradeUpdate)
 
-    if (
-      listboxNode.scrollTop + listboxNode.clientHeight >= listboxNode.scrollHeight - 1 &&
-      !isLoadingTerms &&
-      terms?.terms.length &&
-      terms?.terms.length < total
-    ) {
-      setPage(prev => prev + 1)
-    }
-  }
+  // const { data: terms, isLoading: isLoadingTerms } = useSWR(
+  //   ['termsOptions', page, 10, '', '', '', ''],
+  //   () => termService.getAll(page, 10, '', '', '', '', '', ''),
+  //   {
+  //     onSuccess: data => {
+  //       setTotal(data.pagination.totalItems)
+  //     },
+  //     revalidateOnMount: true
+  //   }
+  // )
 
   // Tìm điểm hiện tại của môn học
   const currentGradeOfSubject = useMemo(() => {
@@ -274,7 +261,7 @@ export default function ModalUpdateGrade({ mutate }: { mutate: KeyedMutator<any>
             render={({ field }) => (
               <CustomAutocomplete
                 {...field}
-                options={terms?.terms || []}
+                options={termOptions || []}
                 getOptionLabel={option => option.abbreviatName || ''}
                 isOptionEqualToValue={(option, value) => option._id === value._id}
                 renderOption={(props, option) => (
@@ -294,7 +281,7 @@ export default function ModalUpdateGrade({ mutate }: { mutate: KeyedMutator<any>
                     field.onChange('')
                   }
                 }}
-                value={terms?.terms.find(term => term._id === field.value) || null}
+                value={termOptions?.find(term => term._id === field.value) || null}
                 renderInput={params => (
                   <CustomTextField
                     {...params}
@@ -305,10 +292,6 @@ export default function ModalUpdateGrade({ mutate }: { mutate: KeyedMutator<any>
                     })}
                   />
                 )}
-                ListboxProps={{
-                  onScroll: handleScroll
-                }}
-                loading={isLoadingTerms}
                 noOptionsText='Không tìm thấy học kỳ'
                 filterOptions={(options, state) => {
                   const filtered = options?.filter(option =>

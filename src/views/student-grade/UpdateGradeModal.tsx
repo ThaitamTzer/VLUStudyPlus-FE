@@ -41,8 +41,6 @@ export default function ModalUpdateGrade({ mutate }: { mutate: KeyedMutator<any>
 
   const { termOptions } = useShare()
 
-  console.log('termGradeUpdate', termGradeUpdate)
-
   // const { data: terms, isLoading: isLoadingTerms } = useSWR(
   //   ['termsOptions', page, 10, '', '', '', ''],
   //   () => termService.getAll(page, 10, '', '', '', '', '', ''),

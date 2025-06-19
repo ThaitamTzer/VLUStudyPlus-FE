@@ -40,6 +40,35 @@ type StatisticsProcessOfCVHTTypeWithSTT = StatisticsProcessOfCVHTType & {
 // Di chuyển columnHelper ra ngoài component để tránh tạo mới mỗi lần render
 const columnHelper = createColumnHelper<StatisticsProcessOfCVHTTypeWithSTT>()
 
+// Memoize columns definition để tránh tạo mới mỗi lần render
+const columns: ColumnDef<StatisticsProcessOfCVHTTypeWithSTT, any>[] = [
+  columnHelper.accessor('stt', {
+    header: 'STT',
+    cell: info => info.row.index + 1
+  }),
+  columnHelper.accessor('cvht', {
+    header: 'Cố vấn học tập'
+  }),
+  columnHelper.accessor('classCode', {
+    header: 'Mã lớp'
+  }),
+  columnHelper.accessor('termAbbreviatName', {
+    header: 'Học kỳ'
+  }),
+  columnHelper.accessor('majorName', {
+    header: 'Ngành'
+  }),
+  columnHelper.accessor('countslxl', {
+    header: 'SLSV xử lý'
+  }),
+  columnHelper.accessor('countsslcxl', {
+    header: 'SLSV chưa xử lý'
+  }),
+  columnHelper.accessor('count', {
+    header: 'Tổng số lượng'
+  })
+]
+
 export default function StatisticsXLHTstudentProcessOfCVHTPage() {
   const { termOptions } = useShare()
   const today = new Date().toISOString().split('T')[0]
@@ -82,44 +111,27 @@ export default function StatisticsXLHTstudentProcessOfCVHTPage() {
     return { startYear: start, endYear: end }
   }, [selectedAcademicYear])
 
+  // Tối ưu SWR key để tránh re-fetch không cần thiết
+  const swrKey = useMemo(() => {
+    return ['statistics-xlht-cvht', startYear || '2024', endYear || '2025', selectedTerm || '']
+  }, [startYear, endYear, selectedTerm])
+
   const { data, isLoading } = useSWR<StatisticsProcessOfCVHT>(
-    ['statistics-xlht-cvht', startYear || '2024', endYear || '2025', selectedTerm || ''],
-    () => statisticsService.getStatisticsByprocessOfCVHT(startYear || '2024', endYear || '2025', selectedTerm || '')
+    swrKey,
+    () => statisticsService.getStatisticsByprocessOfCVHT(startYear || '2024', endYear || '2025', selectedTerm || ''),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false
+    }
   )
 
-  const columns = useMemo<ColumnDef<StatisticsProcessOfCVHTTypeWithSTT, any>[]>(
-    () => [
-      columnHelper.accessor('stt', {
-        header: 'STT',
-        cell: info => info.row.index + 1
-      }),
-      columnHelper.accessor('cvht', {
-        header: 'Cố vấn học tập'
-      }),
-      columnHelper.accessor('classCode', {
-        header: 'Mã lớp'
-      }),
-      columnHelper.accessor('termAbbreviatName', {
-        header: 'Học kỳ'
-      }),
-      columnHelper.accessor('majorName', {
-        header: 'Ngành'
-      }),
-      columnHelper.accessor('countslxl', {
-        header: 'SLSV xử lý'
-      }),
-      columnHelper.accessor('countsslcxl', {
-        header: 'SLSV chưa xử lý'
-      }),
-      columnHelper.accessor('count', {
-        header: 'Tổng số lượng'
-      })
-    ],
-    [] // Loại bỏ columnHelper khỏi dependency array
-  )
+  // Memoize table data
+  const tableData = useMemo(() => {
+    return (data?.statistics as StatisticsProcessOfCVHTTypeWithSTT[]) || []
+  }, [data?.statistics])
 
   const table = useReactTable({
-    data: (data?.statistics as StatisticsProcessOfCVHTTypeWithSTT[]) || [],
+    data: tableData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),

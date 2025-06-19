@@ -178,7 +178,7 @@ const ShareProvider = ({ children }: Props) => {
 
   useSWR(user ? fetcherTerm : null, () => termService.getAll(pageTerm, limitTerm), {
     onSuccess: data => {
-      setTermOptions(data.terms)
+      setTermOptions(data.terms.sort((b, a) => a.abbreviatName.localeCompare(b.abbreviatName)))
       CacheManager.set(CACHE_KEYS.TERM_OPTIONS, data.terms, 10 * 60 * 1000)
     },
     revalidateOnFocus: false,

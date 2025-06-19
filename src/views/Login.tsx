@@ -19,7 +19,7 @@ const Login = () => {
       <div
         className='w-full h-full flex justify-center items-center before:content-[""] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-login before:z-[-1] overflow-hidden'
         style={{
-          backgroundImage: 'url("/images/background/loginv1.jpg")',
+          backgroundImage: 'url("/images/background/loginbackground.jpg")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -36,9 +36,11 @@ const Login = () => {
             }
           }}
         >
-          <Link href={'/'} className='flex justify-center scale-150'>
-            <Logo />
-          </Link>
+          <div className='p-4 w-fit mx-auto'>
+            <Link href={'/'} className='flex justify-center scale-150 bg-white/50 rounded-md p-1'>
+              <Logo />
+            </Link>
+          </div>
           <div className='text-center max-w-[px] mx-auto'>
             <h2
               className='text-base sm:text-[35px] text-[#fefef3] sm:font-bold'
@@ -77,7 +79,7 @@ const Login = () => {
           </div>
           <div className='text-center'>
             <Typography variant='body2' className='text-white text-[18px]'>
-              © {new Date().getFullYear()} - Bản Quyền Thuộc Phòng Đào Tạo, Trường Đại Học Văn Lang.
+              © {new Date().getFullYear()} - Bản Quyền Thuộc Khoa Công nghệ Thông tin, Trường Đại Học Văn Lang.
             </Typography>
           </div>
         </Box>

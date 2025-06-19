@@ -1200,11 +1200,13 @@ export default function StatisticsPage() {
                       <MenuItem value=''>
                         <em>Tất cả học kỳ</em>
                       </MenuItem>
-                      {termOptions.map(term => (
-                        <MenuItem key={term._id} value={term._id}>
-                          {term.abbreviatName}
-                        </MenuItem>
-                      ))}
+                      {termOptions
+                        .sort((b, a) => a.abbreviatName.localeCompare(b.abbreviatName))
+                        .map(term => (
+                          <MenuItem key={term._id} value={term._id}>
+                            {term.abbreviatName}
+                          </MenuItem>
+                        ))}
                     </Select>
                   </FormControl>
                 </Box>

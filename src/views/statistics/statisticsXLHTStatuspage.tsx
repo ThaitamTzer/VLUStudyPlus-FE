@@ -40,6 +40,26 @@ type StatisticsProcessByStatusTypeWithSTT = StatisticsProcessByStatusType & {
 // Di chuyển columnHelper ra ngoài component để tránh tạo mới mỗi lần render
 const columnHelper = createColumnHelper<StatisticsProcessByStatusTypeWithSTT>()
 
+// Memoize columns definition để tránh tạo mới mỗi lần render
+const columns: ColumnDef<StatisticsProcessByStatusTypeWithSTT, any>[] = [
+  columnHelper.accessor('stt', {
+    header: 'STT',
+    cell: info => info.row.index + 1
+  }),
+  columnHelper.accessor('status', {
+    header: 'Trạng thái'
+  }),
+  columnHelper.accessor('termAbbreviatName', {
+    header: 'Học kỳ'
+  }),
+  columnHelper.accessor('majorName', {
+    header: 'Ngành'
+  }),
+  columnHelper.accessor('count', {
+    header: 'Tổng số lượng'
+  })
+]
+
 export default function StatisticsXLHTStatusPage() {
   const { termOptions } = useShare()
 
@@ -83,37 +103,27 @@ export default function StatisticsXLHTStatusPage() {
     return { startYear: start, endYear: end }
   }, [selectedAcademicYear])
 
+  // Tối ưu SWR key để tránh re-fetch không cần thiết
+  const swrKey = useMemo(() => {
+    return ['statistics-xlht-student-by-status', startYear || '2024', endYear || '2025', selectedTerm || '']
+  }, [startYear, endYear, selectedTerm])
+
   const { data, isLoading } = useSWR<StatisticsProcessByStatus>(
-    ['statistics-xlht-student-by-status', startYear || '2024', endYear || '2025', selectedTerm || ''],
-    () => statisticsService.getStatisticsByStatus(startYear || '2024', endYear || '2025', selectedTerm || '')
+    swrKey,
+    () => statisticsService.getStatisticsByStatus(startYear || '2024', endYear || '2025', selectedTerm || ''),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false
+    }
   )
 
-  console.log('data', data)
-
-  const columns = useMemo<ColumnDef<StatisticsProcessByStatusTypeWithSTT, any>[]>(
-    () => [
-      columnHelper.accessor('stt', {
-        header: 'STT',
-        cell: info => info.row.index + 1
-      }),
-      columnHelper.accessor('status', {
-        header: 'Trạng thái'
-      }),
-      columnHelper.accessor('termAbbreviatName', {
-        header: 'Học kỳ'
-      }),
-      columnHelper.accessor('majorName', {
-        header: 'Ngành'
-      }),
-      columnHelper.accessor('count', {
-        header: 'Tổng số lượng'
-      })
-    ],
-    [] // Loại bỏ columnHelper khỏi dependency array
-  )
+  // Memoize table data để tránh re-render table không cần thiết
+  const tableData = useMemo(() => {
+    return (data?.statistics as StatisticsProcessByStatusTypeWithSTT[]) || []
+  }, [data?.statistics])
 
   const table = useReactTable({
-    data: (data?.statistics as StatisticsProcessByStatusTypeWithSTT[]) || [],
+    data: tableData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -312,7 +322,7 @@ export default function StatisticsXLHTStatusPage() {
     } finally {
       setIsExport(false)
     }
-  }, [data])
+  }, [tableData])
 
   const renderTable = useMemo(() => {
     return (

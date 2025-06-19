@@ -129,7 +129,7 @@ export default function StudentGradePage() {
       elevation={0}
       sx={{
         height: '100%',
-        backgroundColor: `${theme.palette[color].main}20`,
+        backgroundColor: `${theme.palette[color].main}`,
         border: `1px solid ${theme.palette[color].dark || theme.palette[color].main}`,
         borderRadius: 2,
         color: theme.palette.common.white,

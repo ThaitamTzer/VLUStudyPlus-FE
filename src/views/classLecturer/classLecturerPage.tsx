@@ -22,7 +22,6 @@ import Iconify from '@/components/iconify'
 
 const UpdateGradeByLec = dynamic(() => import('../grade/UpdateGradeByLec'), { ssr: false })
 const UpdateExistingGradeByLec = dynamic(() => import('../grade/UpdateExistingGradeByLec'), { ssr: false })
-const UpdateAdviseByLec = dynamic(() => import('../grade/UpdateAdviseByLec'), { ssr: false })
 
 export default function ClassLecturerPage() {
   const { data, mutate, isLoading } = useSWR('/api/class/view-list-class-of-CVHT', classLecturerService.getList, {
@@ -111,7 +110,6 @@ export default function ClassLecturerPage() {
       <ModalViewGradeByClass />
       <UpdateGradeByLec />
       <UpdateExistingGradeByLec />
-      <UpdateAdviseByLec />
     </>
   )
 }

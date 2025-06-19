@@ -6,9 +6,12 @@ import { Grid, Typography, Card, CardContent, Divider, Box, Chip, Button, Stack 
 import HistoryIcon from '@mui/icons-material/History'
 import MessageIcon from '@mui/icons-material/Message'
 import SchoolIcon from '@mui/icons-material/School'
+import useSWR from 'swr'
 
 import { CustomDialog } from '@/components/CustomDialog'
 import { useGradeStore } from '@/stores/grade/grade.store'
+import gradeService from '@/services/grade.service'
+import type { AdviseType } from '@/types/management/adviseType'
 
 export default function ViewAdviseHistoryModal() {
   const { openViewAdviseHistory, toogleViewAdviseHistory, currentStudentGradeData } = useGradeStore()
@@ -18,10 +21,15 @@ export default function ViewAdviseHistoryModal() {
   }, [toogleViewAdviseHistory])
 
   // Lọc và sắp xếp các ghi chú theo thứ tự mới nhất trước
-  const adviseHistory =
-    currentStudentGradeData?.termGrades
-      ?.filter(termGrade => termGrade.advise && termGrade.advise.trim() !== '')
-      ?.sort((a, b) => new Date(b.term.academicYear).getTime() - new Date(a.term.academicYear).getTime()) || []
+
+  const { data: adviseHistory } = useSWR(
+    currentStudentGradeData?.studentId ? [`/api/grade/view-advise/${currentStudentGradeData?.studentId}`] : null,
+    () => gradeService.getAdviseByStudentId(currentStudentGradeData?.studentId || ''),
+    {
+      revalidateOnFocus: false,
+      revalidateOnMount: true
+    }
+  )
 
   return (
     <CustomDialog
@@ -58,9 +66,9 @@ export default function ViewAdviseHistoryModal() {
         </Grid>
 
         {/* Hiển thị các ghi chú */}
-        {adviseHistory.length > 0 ? (
-          adviseHistory.map((termGrade, index) => (
-            <Grid item xs={12} key={termGrade._id}>
+        {adviseHistory && adviseHistory.length > 0 ? (
+          adviseHistory.map((adviseRecord: AdviseType, index) => (
+            <Grid item xs={12} key={adviseRecord._id}>
               <Card
                 variant='outlined'
                 sx={{
@@ -75,72 +83,53 @@ export default function ViewAdviseHistoryModal() {
                     <Stack direction='row' spacing={1} alignItems='center'>
                       <MessageIcon color={index === 0 ? 'success' : 'action'} />
                       <Typography variant='h6' color={index === 0 ? 'success.main' : 'text.primary'}>
-                        {termGrade.term.termName}
+                        Học kỳ {adviseRecord.termId.abbreviatName}
                       </Typography>
                       {index === 0 && <Chip label='Mới nhất' color='success' size='small' variant='filled' />}
                     </Stack>
-                    <Typography variant='body2' color='text.secondary'>
-                      Năm học: {termGrade.term.academicYear}
+                    <Typography variant='caption' color='text.secondary'>
+                      {new Date(adviseRecord.createdAt).toLocaleDateString('vi-VN')}
                     </Typography>
                   </Stack>
 
                   <Divider sx={{ mb: 2 }} />
 
-                  {/* Nội dung ghi chú */}
-                  <Box
-                    sx={{
-                      bgcolor: index === 0 ? 'success.50' : 'grey.50',
-                      p: 2,
-                      borderRadius: 1,
-                      border: '1px solid',
-                      borderColor: index === 0 ? 'success.200' : 'grey.200'
-                    }}
-                  >
-                    <Typography
-                      variant='body1'
+                  {/* Hiển thị tất cả tư vấn trong học kỳ */}
+                  {adviseRecord.allAdvise.map((advise, adviseIndex) => (
+                    <Box
+                      key={advise._id}
                       sx={{
-                        fontStyle: 'italic',
-                        lineHeight: 1.6,
-                        color: 'text.primary'
+                        mb: adviseIndex < adviseRecord.allAdvise.length - 1 ? 2 : 0,
+                        bgcolor: index === 0 && adviseIndex === 0 ? 'success.50' : 'grey.50',
+                        p: 2,
+                        borderRadius: 1,
+                        border: '1px solid',
+                        borderColor: index === 0 && adviseIndex === 0 ? 'success.200' : 'grey.200'
                       }}
                     >
-                      &quot;{termGrade.advise}&quot;
-                    </Typography>
-                  </Box>
-
-                  {/* Thông tin học kỳ */}
-                  {termGrade.gradeOfSubject.length > 0 && (
-                    <Box sx={{ mt: 2 }}>
-                      <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
-                        📊 Số môn học trong học kỳ: {termGrade.gradeOfSubject.length}
+                      <Typography
+                        variant='body1'
+                        sx={{
+                          fontStyle: 'italic',
+                          lineHeight: 1.6,
+                          color: 'text.primary',
+                          mb: 1
+                        }}
+                      >
+                        {advise.advise}
                       </Typography>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                        {termGrade.gradeOfSubject.slice(0, 3).map((grade, idx) => (
-                          <Chip
-                            key={idx}
-                            label={`${grade.subjectId.courseName}: ${grade.grade}`}
-                            size='small'
-                            variant='outlined'
-                            color={
-                              grade.grade >= 8
-                                ? 'success'
-                                : grade.grade >= 6.5
-                                  ? 'warning'
-                                  : grade.grade < 5
-                                    ? 'error'
-                                    : 'default'
-                            }
-                          />
-                        ))}
-                        {termGrade.gradeOfSubject.length > 3 && (
-                          <Chip
-                            label={`+${termGrade.gradeOfSubject.length - 3} môn khác`}
-                            size='small'
-                            variant='outlined'
-                            color='default'
-                          />
-                        )}
-                      </Box>
+                      <Typography variant='caption' color='text.secondary'>
+                        Ngày tư vấn: {new Date(advise.createdAdviseAt).toLocaleString('vi-VN')}
+                      </Typography>
+                    </Box>
+                  ))}
+
+                  {/* Thống kê số lượng tư vấn */}
+                  {adviseRecord.allAdvise.length > 1 && (
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant='body2' color='text.secondary'>
+                        📝 Tổng số tư vấn trong kỳ: {adviseRecord.allAdvise.length}
+                      </Typography>
                     </Box>
                   )}
                 </CardContent>
@@ -158,42 +147,6 @@ export default function ViewAdviseHistoryModal() {
                 <Typography variant='body2' color='text.secondary'>
                   Chưa có giảng viên nào để lại tư vấn cho quá trình học tập của bạn.
                 </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        )}
-
-        {/* Thống kê */}
-        {adviseHistory.length > 0 && (
-          <Grid item xs={12}>
-            <Card variant='outlined' sx={{ bgcolor: 'info.50', border: '1px solid', borderColor: 'info.200' }}>
-              <CardContent>
-                <Stack direction='row' spacing={4} justifyContent='center'>
-                  <Box textAlign='center'>
-                    <Typography variant='h4' color='info.main'>
-                      {adviseHistory.length}
-                    </Typography>
-                    <Typography variant='body2' color='text.secondary'>
-                      Tổng số tư vấn
-                    </Typography>
-                  </Box>
-                  <Box textAlign='center'>
-                    <Typography variant='h4' color='info.main'>
-                      {currentStudentGradeData?.termGrades?.length || 0}
-                    </Typography>
-                    <Typography variant='body2' color='text.secondary'>
-                      Tổng số học kỳ
-                    </Typography>
-                  </Box>
-                  <Box textAlign='center'>
-                    <Typography variant='h4' color='info.main'>
-                      {Math.round((adviseHistory.length / (currentStudentGradeData?.termGrades?.length || 1)) * 100)}%
-                    </Typography>
-                    <Typography variant='body2' color='text.secondary'>
-                      Tỷ lệ có tư vấn
-                    </Typography>
-                  </Box>
-                </Stack>
               </CardContent>
             </Card>
           </Grid>

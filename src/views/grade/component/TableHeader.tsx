@@ -263,7 +263,7 @@ export const TableHeader = memo(
                   variant='text'
                   startIcon={<Iconify icon='tabler:edit' />}
                   onClick={() =>
-                    onUpdateAdvise(
+                    onUpdateAdvise?.(
                       student.studentInfo,
                       student.gradeId,
                       gradeData.find(g => g._id === student.gradeId)?.termGrades || [],

@@ -41,6 +41,8 @@ import { TableHeader } from './component/TableHeader'
 import gradeService from '@/services/grade.service'
 import { useShare } from '@/hooks/useShare'
 import CustomTextField from '@/@core/components/mui/TextField'
+import { useGradeStore } from '@/stores/grade/grade.store'
+import UpdateAdviseByLec from './UpdateAdviseByLec'
 
 interface GradeTrainingProgramTableProps {
   trainingProgramData: TrainingProgramByFrame[]
@@ -62,6 +64,9 @@ const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({
   const [currentPage, setCurrentPage] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   const { termOptions } = useShare()
+
+  // Store để quản lý dialog xem ghi chú
+  const { toogleUpdateAdvise, setStudentGrade, setCurrentAdviseGradeId, setCurrentGradeData } = useGradeStore()
 
   // State cho tìm kiếm sinh viên
   const [searchTerm, setSearchTerm] = useState('')
@@ -753,6 +758,19 @@ const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({
     toast.info('Đã hủy các thay đổi', { autoClose: 2000 })
   }
 
+  const handleUpdateAdvise = useCallback(
+    (student: StudentType, gradeId: string, _termGrades: any[], data: GradeType) => {
+      // Set thông tin sinh viên vào store
+      setStudentGrade(student)
+      setCurrentAdviseGradeId(gradeId)
+      setCurrentGradeData(data)
+
+      // Mở dialog xem ghi chú
+      toogleUpdateAdvise()
+    },
+    [setStudentGrade, setCurrentAdviseGradeId, setCurrentGradeData, toogleUpdateAdvise]
+  )
+
   return (
     <>
       <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
@@ -823,7 +841,7 @@ const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({
 
       <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 180px)' }}>
         <Table stickyHeader aria-label='training program table' size='small' sx={{ minWidth: 1200 }}>
-          <TableHeader gradeData={filteredGradeData} />
+          <TableHeader gradeData={filteredGradeData} onUpdateAdvise={handleUpdateAdvise} />
           <TableBody>
             {isLoading
               ? renderSkeleton()
@@ -863,6 +881,9 @@ const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({
       </TableContainer>
 
       <UpdateGradeDialog />
+
+      {/* Dialog xem ghi chú */}
+      <UpdateAdviseByLec />
     </>
   )
 }

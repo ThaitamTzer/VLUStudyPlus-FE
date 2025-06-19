@@ -1,6 +1,6 @@
 import { memo, useMemo, useCallback } from 'react'
 
-import { Box, Stack, TableCell, TableHead, TableRow, Typography, Tooltip } from '@mui/material'
+import { Box, Stack, TableCell, TableHead, TableRow, Typography, Button } from '@mui/material'
 import HistoryIcon from '@mui/icons-material/History'
 
 import type { GradeTypeById } from '@/types/management/gradeTypes'
@@ -10,7 +10,6 @@ import { useSettings } from '@/@core/hooks/useSettings'
 import StyledTableRow from '@/components/table/StyledTableRow'
 import type { UserType } from '@/types/userType'
 import { useGradeStore } from '@/stores/grade/grade.store'
-import CustomIconButton from '@/@core/components/mui/IconButton'
 
 // Memoized component cho UserInfo
 const UserInfo = memo(({ student }: { student: UserType }) => {
@@ -122,11 +121,6 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] | n
         >
           <Stack direction='row' spacing={1} alignItems='center' justifyContent='flex-end'>
             <Typography variant='inherit'>Tư vấn</Typography>
-            <Tooltip title='Xem lịch sử tư vấn'>
-              <CustomIconButton variant='contained' size='small' color='warning' onClick={handleViewAdviseHistory}>
-                <HistoryIcon fontSize='small' />
-              </CustomIconButton>
-            </Tooltip>
           </Stack>
         </TableCell>
         {studentCells?.map(student => (
@@ -137,16 +131,15 @@ export const TableHeader = memo(({ gradeData }: { gradeData: GradeTypeById[] | n
             }}
             align='center'
           >
-            <Box sx={{ position: 'relative' }}>
-              <Typography
-                variant='body2'
-                sx={{
-                  overflow: 'hidden'
-                }}
-              >
-                {student?.advise || 'Chưa có tư vấn'}
-              </Typography>
-            </Box>
+            <Button
+              startIcon={<HistoryIcon fontSize='small' />}
+              size='small'
+              variant='contained'
+              color='warning'
+              onClick={handleViewAdviseHistory}
+            >
+              Xem tư vấn
+            </Button>
           </TableCell>
         ))}
       </TableRow>

@@ -14,6 +14,7 @@ export interface Field {
 }
 
 export interface Section {
+  id?: string
   sectionTitle: string
   fields: Field[]
 }

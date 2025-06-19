@@ -23,7 +23,6 @@ import trainingProgramService from '@/services/trainingprogram.service'
 
 import gradeService from '@/services/grade.service'
 import PageHeader from '@/components/page-header'
-import ImportGradeModal from './ImportGradeModal'
 import ModalUpdateGrade from './UpdateGradeModal'
 import ViewAdviseHistoryModal from './ViewAdviseHistoryModal'
 import { useAuth } from '@/hooks/useAuth'
@@ -48,8 +47,6 @@ export default function StudentGradePage() {
     errorRetryCount: 4,
     shouldRetryOnError: false
   })
-
-  console.log('data', data)
 
   const { data: trainingProgramData } = useSWR(
     cohortId ? ['trainingProgramForStudent', cohortId] : null,
@@ -132,7 +129,7 @@ export default function StudentGradePage() {
       elevation={0}
       sx={{
         height: '100%',
-        backgroundColor: theme.palette[color].main,
+        backgroundColor: `${theme.palette[color].main}20`,
         border: `1px solid ${theme.palette[color].dark || theme.palette[color].main}`,
         borderRadius: 2,
         color: theme.palette.common.white,
@@ -248,7 +245,6 @@ export default function StudentGradePage() {
           </Grid>
         </Grid>
       </Box>
-      <ImportGradeModal mutate={mutate} />
       <ModalUpdateGrade mutate={mutate} />
       <ViewAdviseHistoryModal />
     </>

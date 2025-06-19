@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
 
+// @ts-ignore
+import { v4 as uuidv4 } from 'uuid'
+
 import { Button, DialogActions, DialogContent, DialogTitle, Tab, Tabs } from '@mui/material'
 
 import { toast } from 'react-toastify'
@@ -106,8 +109,10 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
     handleChange('sections', newSections)
   }
 
-  const removeSection = (index: number) => {
-    const newSections = formData.sections.filter((_: Section, i: number) => i !== index)
+  const removeSection = (sectionIdOrTitle: string) => {
+    const newSections = formData.sections.filter(
+      sec => (sec as any).id !== sectionIdOrTitle && sec.sectionTitle !== sectionIdOrTitle
+    )
 
     handleChange('sections', newSections)
   }
@@ -136,14 +141,22 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
   }
 
   const addContentSection = () => {
-    const contentSectionCount = formData.sections.filter(
-      section => !section.fields.some(field => field.type === 'signature')
-    ).length
+    // Tìm chỉ số lớn nhất đã dùng để tránh trùng lặp khi xoá/ thêm lại
+    const existedIndexes = formData.sections
+      .filter(section => !section.fields.some(field => field.type === 'signature'))
+      .map(sec => {
+        const match = sec.sectionTitle.match(/contentSection(\d+)/)
+
+        return match ? Number(match[1]) : 0
+      })
+
+    const nextIndex = existedIndexes.length ? Math.max(...existedIndexes) + 1 : 1
 
     handleChange('sections', [
       ...formData.sections,
       {
-        sectionTitle: `contentSection${contentSectionCount + 1}`,
+        id: uuidv4(),
+        sectionTitle: `contentSection${nextIndex}`,
         fields: [
           {
             label: '',
@@ -159,14 +172,21 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
   }
 
   const addSignatureSection = () => {
-    const signatureSectionCount = formData.sections.filter(section =>
-      section.fields.some(field => field.type === 'signature')
-    ).length
+    const existedIndexes = formData.sections
+      .filter(section => section.fields.some(field => field.type === 'signature'))
+      .map(sec => {
+        const match = sec.sectionTitle.match(/signatureSection(\d+)/)
+
+        return match ? Number(match[1]) : 0
+      })
+
+    const nextIndex = existedIndexes.length ? Math.max(...existedIndexes) + 1 : 1
 
     const newSections = [...formData.sections]
 
     newSections.push({
-      sectionTitle: `signatureSection${signatureSectionCount + 1}`,
+      id: uuidv4(),
+      sectionTitle: `signatureSection${nextIndex}`,
       fields: [
         {
           label: SIGNATURE_TYPES[0].label,
@@ -198,100 +218,99 @@ export default function FormTemplateForm({ template, onClose }: FormTemplateForm
   }
 
   const addContentField = (sectionIndex: number, direction: 'right' | 'down' = 'down', currentField?: Field) => {
-    const newSections = [...formData.sections]
-    const fields = newSections[sectionIndex].fields
+    const newSections = formData.sections.map((sec, idx) => {
+      if (idx !== sectionIndex) return sec
 
-    // Tìm field cuối cùng để xác định vị trí mới
-    const lastField = currentField || fields[fields.length - 1]
-    const { row, column } = findNextPosition(sectionIndex, direction, lastField.row, lastField.column)
+      const lastField = currentField || sec.fields[sec.fields.length - 1]
+      const { row, column } = findNextPosition(sectionIndex, direction, lastField.row, lastField.column)
 
-    // Lấy giá trị mặc định từ fieldTypes cho tất cả trường
-    const defaultFieldType = FIELD_TYPES.find(type => type.value === currentField?.type)
+      const defaultFieldType = FIELD_TYPES.find(type => type.value === currentField?.type)
 
-    // Thêm field mới với vị trí đã tính toán và các giá trị mặc định
-    const newField = {
-      label: '',
-      key: generateKey(''),
-      type: 'text',
-      row,
-      column,
-      required: true,
-      minLength: defaultFieldType?.minLength,
-      maxLength: defaultFieldType?.maxLength,
-      min: defaultFieldType?.min,
-      max: defaultFieldType?.max,
-      pattern: ''
-    }
+      const newField: Field = {
+        label: '',
+        key: generateKey(''),
+        type: 'text',
+        row,
+        column,
+        required: true,
+        minLength: defaultFieldType?.minLength,
+        maxLength: defaultFieldType?.maxLength,
+        min: defaultFieldType?.min,
+        max: defaultFieldType?.max,
+        pattern: ''
+      }
 
-    fields.push(newField)
-    newSections[sectionIndex].fields = fields
+      return { ...sec, fields: [...sec.fields, newField] }
+    })
+
     handleChange('sections', newSections)
   }
 
   const addSignatureField = (sectionIndex: number, direction: 'right' | 'down' = 'down', currentField?: Field) => {
-    const newSections = [...formData.sections]
-    const fields = newSections[sectionIndex].fields
+    const newSections = formData.sections.map((sec, idx) => {
+      if (idx !== sectionIndex) return sec
 
-    // Tìm field cuối cùng để xác định vị trí mới
-    const lastField = currentField || fields[fields.length - 1]
-    const { row, column } = findNextPosition(sectionIndex, direction, lastField.row, lastField.column)
+      const lastField = currentField || sec.fields[sec.fields.length - 1]
+      const { row, column } = findNextPosition(sectionIndex, direction, lastField.row, lastField.column)
 
-    const signatureLabel = SIGNATURE_TYPES[0].label
+      const signatureLabel = SIGNATURE_TYPES[0].label
 
-    // Thêm field mới với vị trí đã tính toán
-    const newField = {
-      label: signatureLabel,
-      key: generateKey(signatureLabel),
-      type: 'signature',
-      signatureType: SIGNATURE_TYPES[0].value,
-      row,
-      column,
-      required: true
-    }
+      const newField: Field = {
+        label: signatureLabel,
+        key: generateKey(signatureLabel),
+        type: 'signature',
+        signatureType: SIGNATURE_TYPES[0].value,
+        row,
+        column,
+        required: true
+      }
 
-    fields.push(newField)
-    newSections[sectionIndex].fields = fields
+      return { ...sec, fields: [...sec.fields, newField] }
+    })
+
     handleChange('sections', newSections)
   }
 
   const removeContentField = (sectionIndex: number, fieldIndex: number) => {
-    const newSections = [...formData.sections]
-    const section = newSections[sectionIndex]
+    const newSections = formData.sections.map((sec, idx) => {
+      if (idx !== sectionIndex) return sec
 
-    section.fields = section.fields.filter((_: Field, i: number) => i !== fieldIndex)
+      return { ...sec, fields: sec.fields.filter((_, i) => i !== fieldIndex) }
+    })
+
     handleChange('sections', newSections)
   }
 
   const removeSignatureField = (sectionIndex: number, fieldIndex: number) => {
-    const newSections = [...formData.sections]
-    const section = newSections[sectionIndex]
+    const newSections = formData.sections.map((sec, idx) => {
+      if (idx !== sectionIndex) return sec
 
-    section.fields = section.fields.filter((_: Field, i: number) => i !== fieldIndex)
+      return { ...sec, fields: sec.fields.filter((_, i) => i !== fieldIndex) }
+    })
+
     handleChange('sections', newSections)
   }
 
   const handleFieldChange = (sectionIndex: number, fieldIndex: number, updatedField: Field) => {
-    const newSections = [...formData.sections]
-    const section = newSections[sectionIndex]
+    const newSections = formData.sections.map((sec, idx) => {
+      if (idx !== sectionIndex) return sec
 
-    // Lấy giá trị mặc định từ fieldTypes khi thay đổi loại trường
-    const defaultValues = FIELD_TYPES.find(type => type.value === updatedField.type)
+      const defaultValues = FIELD_TYPES.find(type => type.value === updatedField.type)
 
-    // Cập nhật key tự động dựa trên label và thêm các giá trị mặc định
-    const fieldWithGeneratedKey = {
-      ...updatedField,
-      key: generateKey(updatedField.label),
-      minLength: updatedField.minLength || defaultValues?.minLength,
-      maxLength: updatedField.maxLength || defaultValues?.maxLength,
-      min: updatedField.min || defaultValues?.min,
-      max: updatedField.max || defaultValues?.max
-    }
+      const fieldWithGeneratedKey = {
+        ...updatedField,
+        key: generateKey(updatedField.label),
+        minLength: updatedField.minLength || defaultValues?.minLength,
+        maxLength: updatedField.maxLength || defaultValues?.maxLength,
+        min: updatedField.min || defaultValues?.min,
+        max: updatedField.max || defaultValues?.max
+      }
 
-    section.fields = [
-      ...section.fields.slice(0, fieldIndex),
-      fieldWithGeneratedKey,
-      ...section.fields.slice(fieldIndex + 1)
-    ]
+      return {
+        ...sec,
+        fields: [...sec.fields.slice(0, fieldIndex), fieldWithGeneratedKey, ...sec.fields.slice(fieldIndex + 1)]
+      }
+    })
 
     handleChange('sections', newSections)
   }

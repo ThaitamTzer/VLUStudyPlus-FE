@@ -18,7 +18,8 @@ import {
   DialogContent,
   DialogActions,
   Stack,
-  Typography
+  Typography,
+  Tooltip
 } from '@mui/material'
 
 import { useDebounce } from 'react-use'
@@ -165,6 +166,13 @@ const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({
       void status
       void key
 
+      const getTermLabel = (termId?: string) => {
+        if (!termId) return ''
+        const term = termOptions?.find(t => t._id === termId)
+
+        return term?.abbreviatName || ''
+      }
+
       const getChipColor = (g: number | undefined): 'success' | 'warning' | 'error' | 'default' | 'info' => {
         if (g === undefined) return 'default'
         if (g >= 8) return 'success'
@@ -213,29 +221,37 @@ const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({
           const displayVal = editedValueCurrent !== undefined ? editedValueCurrent : (grade ?? editedValueOther)
 
           return (
-            <Chip
-              label={displayVal ?? '-'}
-              size='small'
-              color={
-                stateType === 'currentEdit'
-                  ? 'info'
-                  : stateType === 'otherEdit'
-                    ? 'secondary'
-                    : getChipColor(displayVal)
-              }
-              variant={stateType === 'normal' ? 'filled' : 'outlined'}
-              onClick={() => {
-                // Nếu ô đang chứa điểm tạm (chưa lưu) thì không cho mở dialog cập nhật
-                if (stateType !== 'normal') return
-
-                if (grade !== undefined) {
-                  handleOpenUpdateDialog(studentId, subject)
-                } else {
-                  toast.info('Vui lòng chọn học kỳ trước khi cập nhật điểm', { autoClose: 3000 })
+            <div className='flex items-center justify-center gap-2'>
+              <Chip
+                label={displayVal ?? '-'}
+                size='small'
+                color={
+                  stateType === 'currentEdit'
+                    ? 'info'
+                    : stateType === 'otherEdit'
+                      ? 'secondary'
+                      : getChipColor(displayVal)
                 }
-              }}
-              sx={{ cursor: displayVal !== undefined ? 'pointer' : 'default' }}
-            />
+                variant={stateType === 'normal' ? 'filled' : 'outlined'}
+                onClick={() => {
+                  // Nếu ô đang chứa điểm tạm (chưa lưu) thì không cho mở dialog cập nhật
+                  if (stateType !== 'normal') return
+
+                  if (grade !== undefined) {
+                    handleOpenUpdateDialog(studentId, subject)
+                  } else {
+                    toast.info('Vui lòng chọn học kỳ trước khi cập nhật điểm', { autoClose: 3000 })
+                  }
+                }}
+                sx={{ cursor: displayVal !== undefined ? 'pointer' : 'default' }}
+              />
+              {stateType !== 'normal' && (
+                <Typography variant='body2' color='text.secondary'>
+                  {getTermLabel(stateType === 'otherEdit' ? otherTermEntry?.[0].split('-')[2] : selectedTermId)} chưa
+                  lưu
+                </Typography>
+              )}
+            </div>
           )
         }
 
@@ -256,68 +272,123 @@ const GradeTrainingProgramTable: React.FC<GradeTrainingProgramTableProps> = ({
             sx={{ width: 60 }}
           />
         ) : (
-          <Box
-            onClick={() => {
-              if (stateType === 'currentEdit') {
-                setIsEditing(true)
-
-                return
-              }
-
-              if (stateType === 'normal' && grade === undefined) {
-                setIsEditing(true)
-              }
-
-              // Nếu điểm thuộc học kỳ khác nhưng muốn chuyển sang kỳ hiện tại
-              if (stateType === 'otherEdit') {
-                // Chuyển key sang kỳ hiện tại
-                const oldKey = otherTermEntry ? otherTermEntry[0] : ''
-
-                if (oldKey) {
-                  setEditedGrades(prev => {
-                    const copy = { ...prev }
-                    const gradeVal = copy[oldKey].grade
-
-                    delete copy[oldKey]
-                    const newKey = `${studentId}-${subjectId}-${selectedTermId}`
-
-                    copy[newKey] = { grade: gradeVal }
-
-                    return copy
-                  })
-                }
-
-                // Bắt đầu chỉnh sửa nếu muốn
-                setIsEditing(true)
-              }
-            }}
-            sx={{
-              cursor:
-                stateType === 'currentEdit' || (stateType === 'normal' && grade === undefined) ? 'pointer' : 'default',
-              display: 'flex',
-              justifyContent: 'center'
-            }}
-          >
+          <Box>
             {(() => {
               const displayVal = editedValueCurrent !== undefined ? editedValueCurrent : (grade ?? editedValueOther)
 
               if (displayVal === undefined) {
-                return <Chip label='+' variant='outlined' size='small' />
+                return (
+                  <Chip
+                    label='+'
+                    variant='outlined'
+                    size='small'
+                    onClick={() => {
+                      if (stateType === 'currentEdit') {
+                        setIsEditing(true)
+
+                        return
+                      }
+
+                      if (stateType === 'normal' && grade === undefined) {
+                        setIsEditing(true)
+                      }
+
+                      // Nếu điểm thuộc học kỳ khác nhưng muốn chuyển sang kỳ hiện tại
+                      if (stateType === 'otherEdit') {
+                        // Chuyển key sang kỳ hiện tại
+                        const oldKey = otherTermEntry ? otherTermEntry[0] : ''
+
+                        if (oldKey) {
+                          setEditedGrades(prev => {
+                            const copy = { ...prev }
+                            const gradeVal = copy[oldKey].grade
+
+                            delete copy[oldKey]
+                            const newKey = `${studentId}-${subjectId}-${selectedTermId}`
+
+                            copy[newKey] = { grade: gradeVal }
+
+                            return copy
+                          })
+                        }
+
+                        // Bắt đầu chỉnh sửa nếu muốn
+                        setIsEditing(true)
+                      }
+                    }}
+                  />
+                )
               }
 
               return (
-                <Chip
-                  label={displayVal}
-                  color={
-                    stateType === 'currentEdit'
-                      ? 'info'
-                      : stateType === 'otherEdit'
-                        ? 'secondary'
-                        : getChipColor(displayVal)
-                  }
-                  variant={stateType === 'normal' ? 'filled' : 'outlined'}
-                  size='small'
-                />
+                <div className='flex items-center justify-center gap-2'>
+                  <Tooltip
+                    title={
+                      stateType === 'currentEdit'
+                        ? 'Chỉnh sửa'
+                        : stateType === 'otherEdit'
+                          ? `Nhấp để chuyển điểm từ ${getTermLabel(otherTermEntry?.[0].split('-')[2])} sang ${getTermLabel(selectedTermId)}`
+                          : ''
+                    }
+                  >
+                    <Chip
+                      label={displayVal}
+                      color={
+                        stateType === 'currentEdit'
+                          ? 'info'
+                          : stateType === 'otherEdit'
+                            ? 'secondary'
+                            : getChipColor(displayVal)
+                      }
+                      variant={stateType === 'normal' ? 'filled' : 'outlined'}
+                      size='small'
+                      onClick={() => {
+                        if (stateType === 'currentEdit') {
+                          setIsEditing(true)
+
+                          return
+                        }
+
+                        if (stateType === 'normal' && grade === undefined) {
+                          setIsEditing(true)
+                        }
+
+                        // Nếu điểm thuộc học kỳ khác nhưng muốn chuyển sang kỳ hiện tại
+                        if (stateType === 'otherEdit') {
+                          // Chuyển key sang kỳ hiện tại
+                          const oldKey = otherTermEntry ? otherTermEntry[0] : ''
+
+                          if (oldKey) {
+                            setEditedGrades(prev => {
+                              const copy = { ...prev }
+                              const gradeVal = copy[oldKey].grade
+
+                              delete copy[oldKey]
+                              const newKey = `${studentId}-${subjectId}-${selectedTermId}`
+
+                              copy[newKey] = { grade: gradeVal }
+
+                              return copy
+                            })
+                          }
+
+                          // Bắt đầu chỉnh sửa nếu muốn
+                          setIsEditing(true)
+                        }
+                      }}
+                    />
+                  </Tooltip>
+                  {stateType === 'currentEdit' && (
+                    <Typography variant='body2' color='text.secondary'>
+                      {getTermLabel(selectedTermId)}
+                    </Typography>
+                  )}
+                  {stateType === 'otherEdit' && (
+                    <Typography variant='body2' color='text.secondary'>
+                      {getTermLabel(otherTermEntry?.[0].split('-')[2])} {'=>'} {getTermLabel(selectedTermId)}
+                    </Typography>
+                  )}
+                </div>
               )
             })()}
           </Box>

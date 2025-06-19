@@ -19,7 +19,7 @@ import type { Field, Section } from '../types'
 interface SignatureTabProps {
   sections: Section[]
   onSectionChange: (index: number, field: keyof Section, value: any) => void
-  onRemoveSection: (index: number) => void
+  onRemoveSection: (sectionId: string) => void
   onAddSignatureField: (sectionIndex: number, direction: 'right' | 'down', currentField?: Field) => void
   onRemoveSignatureField: (sectionIndex: number, fieldIndex: number) => void
   onAddSignatureSection: () => void
@@ -73,7 +73,7 @@ export default function SignatureTab({
           <Paper key={sectionIndex} variant='outlined' sx={{ p: 2, mb: 2 }}>
             <Box sx={{ mb: 2, display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
               <Tooltip title='Xóa phần'>
-                <IconButton onClick={() => onRemoveSection(realSectionIndex)} color='error'>
+                <IconButton onClick={() => onRemoveSection(section.id || section.sectionTitle)} color='error'>
                   <DeleteIcon />
                 </IconButton>
               </Tooltip>

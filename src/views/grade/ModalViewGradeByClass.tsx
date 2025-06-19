@@ -62,7 +62,8 @@ export default function ModalViewGradeByClass() {
   const {
     data: gradeData,
     isLoading: isLoadingGrade,
-    error: gradeError
+    error: gradeError,
+    mutate: mutateGrade
   } = useSWR(idClass ? fetchGrade : null, () => gradeService.getGradeByClassCode(idClass), {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
@@ -141,7 +142,11 @@ export default function ModalViewGradeByClass() {
     if (trainingProgramData?.data && gradeData?.data) {
       return (
         <Suspense fallback={<TableSkeleton />}>
-          <GradeTrainingProgramTable trainingProgramData={trainingProgramData.data} gradeData={gradeData.data} />
+          <GradeTrainingProgramTable
+            trainingProgramData={trainingProgramData.data}
+            gradeData={gradeData.data}
+            mutateGrade={mutateGrade}
+          />
         </Suspense>
       )
     }
@@ -154,7 +159,8 @@ export default function ModalViewGradeByClass() {
     gradeError,
     trainingProgramData,
     gradeData,
-    handleRetryTrainingProgram
+    handleRetryTrainingProgram,
+    mutateGrade
   ])
 
   return (

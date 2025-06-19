@@ -11,14 +11,12 @@ import { toast } from 'react-toastify'
 
 import { LoadingButton } from '@mui/lab'
 
-import useSWR from 'swr'
-
 import CustomTextField from '@/@core/components/mui/TextField'
 import { useAcedemicProcessStore } from '@/stores/acedemicProcess.store'
 import learnProcessService from '@/services/learnProcess.service'
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
-import termService from '@/services/term.service'
 import { CustomDialog } from '@/components/CustomDialog'
+import { useShare } from '@/hooks/useShare'
 
 type UpdateAcedemicProcessProps = {
   mutate: KeyedMutator<any>
@@ -38,22 +36,9 @@ type UpdateAcedemicProcessForm = v.InferInput<typeof schema>
 export default function UpdateAcedemicProcess(props: UpdateAcedemicProcessProps) {
   const { mutate } = props
   const [loading, setLoading] = useState<boolean>(false)
-  const [page, setPage] = useState<number>(1)
-  const [total, setTotal] = useState<number>(0)
+  const { termOptions } = useShare()
 
   const { openUpdateAcedemicProcess, toogleUpdateAcedemicProcess, acedemicProcess } = useAcedemicProcessStore()
-
-  const { data: terms, isLoading: isLoadingTerms } = useSWR(
-    ['termsUpdateAcedemicProcess', page, 10, '', '', ''],
-    () => termService.getAll(page, 10, '', '', '', '', ''),
-    {
-      onSuccess: data => {
-        setTotal(data.pagination.totalItems)
-      },
-      revalidateOnFocus: false,
-      revalidateOnMount: true
-    }
-  )
 
   const {
     control,
@@ -115,24 +100,11 @@ export default function UpdateAcedemicProcess(props: UpdateAcedemicProcessProps)
     )
   })
 
-  const handleScroll = (event: React.SyntheticEvent) => {
-    const listboxNode = event.currentTarget
-
-    if (
-      listboxNode.scrollTop + listboxNode.clientHeight >= listboxNode.scrollHeight - 1 &&
-      !isLoadingTerms &&
-      terms?.terms.length &&
-      terms?.terms.length < total
-    ) {
-      setPage(prev => prev + 1)
-    }
-  }
-
   return (
     <CustomDialog
       open={openUpdateAcedemicProcess}
       onClose={handleClose}
-      title='Cập nhật tiêu đề xử lý học tập'
+      title='Cập nhật kỳ xử lý học tập'
       onSubmit={onSubmit}
       canDrag
       maxWidth='sm'
@@ -156,7 +128,7 @@ export default function UpdateAcedemicProcess(props: UpdateAcedemicProcessProps)
             render={({ field }) => (
               <CustomAutocomplete
                 {...field}
-                options={terms?.terms || []}
+                options={termOptions.sort((b, a) => a.abbreviatName.localeCompare(b.abbreviatName)) || []}
                 getOptionLabel={option => option.abbreviatName || ''}
                 isOptionEqualToValue={(option, value) => option._id === value._id}
                 renderOption={(props, option) => <li {...props}>{option.abbreviatName}</li>}
@@ -167,7 +139,7 @@ export default function UpdateAcedemicProcess(props: UpdateAcedemicProcessProps)
                     field.onChange('')
                   }
                 }}
-                value={terms?.terms.find(term => term._id === field.value) || null}
+                value={termOptions.find(term => term._id === field.value) || null}
                 renderInput={params => (
                   <CustomTextField
                     {...params}
@@ -178,18 +150,7 @@ export default function UpdateAcedemicProcess(props: UpdateAcedemicProcessProps)
                     })}
                   />
                 )}
-                ListboxProps={{
-                  onScroll: handleScroll
-                }}
-                loading={isLoadingTerms}
                 noOptionsText='Không tìm thấy học kỳ'
-                filterOptions={(options, state) => {
-                  const filtered = options?.filter(option =>
-                    option.termName.toLowerCase().includes(state.inputValue.toLowerCase())
-                  )
-
-                  return filtered
-                }}
               />
             )}
           />

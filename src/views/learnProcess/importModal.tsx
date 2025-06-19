@@ -128,7 +128,7 @@ export default function ImportModal(props: ImportModalProps) {
       setFiles={setFiles}
       onOpen={openImportModal}
       onClose={onClose}
-      title='Import danh sách xử lý học tập'
+      title={`Import ${acedemicProcess?.title || ''}`}
       onSubmit={onSubmit}
       setValue={setValue}
       reset={reset}

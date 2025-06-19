@@ -25,7 +25,10 @@ const UpdateExistingGradeByLec = dynamic(() => import('../grade/UpdateExistingGr
 const UpdateAdviseByLec = dynamic(() => import('../grade/UpdateAdviseByLec'), { ssr: false })
 
 export default function ClassLecturerPage() {
-  const { data, mutate, isLoading } = useSWR('/api/class/view-list-class-of-CVHT', classLecturerService.getList)
+  const { data, mutate, isLoading } = useSWR('/api/class/view-list-class-of-CVHT', classLecturerService.getList, {
+    revalidateOnFocus: false
+  })
+
   const { classCode } = useClassStudentStore()
   const { loading, resetProgress } = useUploadStore()
 

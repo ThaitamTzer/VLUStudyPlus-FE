@@ -34,7 +34,6 @@ import { useGradeStore } from '@/stores/grade/grade.store'
 import CustomTextField from '@/@core/components/mui/TextField'
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
 import gradeService from '@/services/grade.service'
-import termService from '@/services/term.service'
 import type { TermGradeType } from '@/types/management/gradeTypes'
 import type { AdviseType } from '@/types/management/adviseType'
 import { useShare } from '@/hooks/useShare'
@@ -62,20 +61,6 @@ function UpdateAdviseByLec() {
 
   const [isLoading, setIsLoading] = useState(false)
   const [selectedTermGrade, setSelectedTermGrade] = useState<TermGradeType | null>(null)
-
-  const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-
-  const { data: terms, isLoading: isLoadingTerms } = useSWR(
-    idClass ? [`/api/term/get-all-term/${idClass}`, page, 100, 'termName', '', '', '', '', ''] : null,
-    () => termService.getAll(page, 100, 'termName', '', '', '', '', ''),
-    {
-      revalidateOnFocus: false,
-      onSuccess: data => {
-        setTotal(data.pagination.totalItems)
-      }
-    }
-  )
 
   const {
     data: adviseData,
@@ -188,19 +173,6 @@ function UpdateAdviseByLec() {
     setSelectedTermGrade(null)
     reset()
   }, [toogleUpdateAdvise, setCurrentAdviseGradeId, setCurrentAdviseTermId, reset])
-
-  const handleScroll = (event: React.SyntheticEvent) => {
-    const listboxNode = event.currentTarget
-
-    if (
-      listboxNode.scrollTop + listboxNode.clientHeight >= listboxNode.scrollHeight - 1 &&
-      !isLoadingTerms &&
-      terms?.terms.length &&
-      terms?.terms.length < total
-    ) {
-      setPage(prev => prev + 1)
-    }
-  }
 
   const onSubmit = handleSubmit(data => {
     if (!currentAdviseGradeId || !data.selectedTerm) {
@@ -353,7 +325,7 @@ function UpdateAdviseByLec() {
                     setSelectedTermGrade(null)
                   }
                 }}
-                value={terms?.terms.find(term => term._id === field.value) || null}
+                value={termOptions?.find(term => term._id === field.value) || null}
                 renderInput={params => (
                   <CustomTextField
                     {...params}
@@ -364,10 +336,6 @@ function UpdateAdviseByLec() {
                     })}
                   />
                 )}
-                ListboxProps={{
-                  onScroll: handleScroll
-                }}
-                loading={isLoadingTerms}
                 noOptionsText='Không tìm thấy học kỳ'
                 filterOptions={(options, state) => {
                   const filtered = options?.filter(option =>

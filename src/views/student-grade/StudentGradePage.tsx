@@ -14,7 +14,7 @@ import {
   useTheme
 } from '@mui/material'
 import SchoolIcon from '@mui/icons-material/School'
-import GradeIcon from '@mui/icons-material/Grade'
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh'
 import CreditScoreIcon from '@mui/icons-material/CreditScore'
 import InfoIcon from '@mui/icons-material/Info'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
@@ -48,6 +48,8 @@ export default function StudentGradePage() {
     errorRetryCount: 4,
     shouldRetryOnError: false
   })
+
+  console.log('data', data)
 
   const { data: trainingProgramData } = useSWR(
     cohortId ? ['trainingProgramForStudent', cohortId] : null,
@@ -189,7 +191,7 @@ export default function StudentGradePage() {
                 <StatCard icon={SchoolIcon} title='Tín chỉ cần đạt' value={data?.TCTL_CD || 0} color='info' />
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <StatCard icon={GradeIcon} title='Tín chỉ nợ' value={data?.TCN || 0} color='warning' />
+                <StatCard icon={PriorityHighIcon} title='Tín chỉ nợ' value={data?.TCN || 0} color='warning' />
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
                 <StatCard icon={EmojiEventsIcon} title='GPA hiện tại' value={calculateGPA()} color='success' />
@@ -219,7 +221,7 @@ export default function StudentGradePage() {
               </Box>
               <LinearProgress
                 variant='determinate'
-                value={progressPercentage}
+                value={progressPercentage > 100 ? 100 : progressPercentage}
                 sx={{
                   height: 10,
                   borderRadius: 5,
@@ -231,11 +233,11 @@ export default function StudentGradePage() {
                 }}
               />
               <Box display='flex' justifyContent='space-between' mt={1}>
-                <Typography variant='body2' color='text.secondary'>
+                <Typography variant='body2' color='white'>
                   Đã hoàn thành
                 </Typography>
-                <Typography variant='body2' color='text.secondary' fontWeight='bold'>
-                  {progressPercentage.toFixed(1)}%
+                <Typography variant='body2' color='white' fontWeight='bold'>
+                  {progressPercentage > 100 ? '100%' : `${progressPercentage.toFixed(1)}%`}
                 </Typography>
               </Box>
             </Card>

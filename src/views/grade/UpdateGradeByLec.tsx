@@ -4,7 +4,7 @@ import { memo, useCallback, useState, useEffect } from 'react'
 
 import { Grid, Box, Button, Chip, Card, CardContent, Typography, Divider } from '@mui/material'
 
-import useSWR, { mutate } from 'swr'
+import { mutate } from 'swr'
 
 import * as v from 'valibot'
 import type { InferInput } from 'valibot'
@@ -20,9 +20,9 @@ import { LoadingButton } from '@mui/lab'
 import { CustomDialog } from '@/components/CustomDialog'
 import { useGradeStore } from '@/stores/grade/grade.store'
 import CustomTextField from '@/@core/components/mui/TextField'
-import termService from '@/services/term.service'
 import gradeService from '@/services/grade.service'
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
+import { useShare } from '@/hooks/useShare'
 
 const gradeSchema = v.object({
   term: v.pipe(v.string(), v.nonEmpty('Mã học kỳ không được để trống')),
@@ -37,20 +37,9 @@ type GradeSchema = InferInput<typeof gradeSchema>
 
 function UpdateGradeByLec() {
   const { openUpdateGrade, toogleUpdateGrade, studentId, subject, studentGrade, idClass } = useGradeStore()
-  const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [searchTerm, setSearchTerm] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
-  const { data: terms, isLoading: isLoadingTerms } = useSWR(
-    ['terms', page, 100, '', '', '', searchTerm],
-    () => termService.getAll(page, 100, '', '', '', '', '', searchTerm),
-    {
-      onSuccess: data => {
-        setTotal(data.pagination.totalItems)
-      }
-    }
-  )
+  const { termOptions } = useShare()
 
   const {
     control,
@@ -69,8 +58,6 @@ function UpdateGradeByLec() {
   // Reset search when modal opens
   useEffect(() => {
     if (openUpdateGrade) {
-      setSearchTerm('')
-      setPage(1)
       reset()
     }
   }, [openUpdateGrade, reset])
@@ -78,22 +65,7 @@ function UpdateGradeByLec() {
   const handleClose = useCallback(() => {
     toogleUpdateGrade()
     reset() // Reset form when closing
-    setSearchTerm('') // Clear search term
-    setPage(1) // Reset page
   }, [toogleUpdateGrade, reset])
-
-  const handleScroll = (event: React.SyntheticEvent) => {
-    const listboxNode = event.currentTarget
-
-    if (
-      listboxNode.scrollTop + listboxNode.clientHeight >= listboxNode.scrollHeight - 1 &&
-      !isLoadingTerms &&
-      terms?.terms.length &&
-      terms?.terms.length < total
-    ) {
-      setPage(prev => prev + 1)
-    }
-  }
 
   const onSubmit = handleSubmit(data => {
     const dataFormat = {
@@ -215,7 +187,7 @@ function UpdateGradeByLec() {
             render={({ field }) => (
               <CustomAutocomplete
                 {...field}
-                options={terms?.terms.sort((a, b) => a.abbreviatName.localeCompare(b.abbreviatName)) || []}
+                options={termOptions.sort((a, b) => a.abbreviatName.localeCompare(b.abbreviatName)) || []}
                 getOptionLabel={option => option.abbreviatName || ''}
                 isOptionEqualToValue={(option, value) => option._id === value._id}
                 renderOption={(props, option) => (
@@ -228,16 +200,7 @@ function UpdateGradeByLec() {
                     />
                   </li>
                 )}
-                onChange={(_, value) => {
-                  if (value) {
-                    field.onChange(value._id)
-                    setSearchTerm('') // Clear search term when option is selected
-                  } else {
-                    field.onChange('')
-                    setSearchTerm('') // Clear search term when value is cleared
-                  }
-                }}
-                value={terms?.terms.find(term => term._id === field.value) || null}
+                value={termOptions?.find(term => term._id === field.value) || null}
                 renderInput={params => (
                   <CustomTextField
                     {...params}
@@ -246,43 +209,9 @@ function UpdateGradeByLec() {
                       error: true,
                       helperText: errors.term.message?.toString()
                     })}
-                    onChange={e => {
-                      const value = e.target.value
-
-                      setSearchTerm(value)
-
-                      if (!value) {
-                        setPage(1) // Reset page when clearing search
-                      }
-                    }}
-                    onFocus={() => {
-                      // When focusing on empty field, show all options
-                      if (!field.value) {
-                        setSearchTerm('')
-                        setPage(1)
-                      }
-                    }}
                   />
                 )}
-                ListboxProps={{
-                  onScroll: handleScroll
-                }}
-                loading={isLoadingTerms}
                 noOptionsText='Không tìm thấy học kỳ'
-                filterOptions={(options, state) => {
-                  // If there's no input value, return all options
-                  if (!state.inputValue) {
-                    return options || []
-                  }
-
-                  const filtered = options?.filter(
-                    option =>
-                      option.termName.toLowerCase().includes(state.inputValue.toLowerCase()) ||
-                      option.abbreviatName.toLowerCase().includes(state.inputValue.toLowerCase())
-                  )
-
-                  return filtered || []
-                }}
               />
             )}
           />

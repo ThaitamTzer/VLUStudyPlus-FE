@@ -4,7 +4,7 @@ import { memo, useCallback, useState, useEffect } from 'react'
 
 import { Grid, Box, Button, Chip, Card, CardContent, Typography, Divider } from '@mui/material'
 
-import useSWR, { mutate } from 'swr'
+import { mutate } from 'swr'
 
 import * as v from 'valibot'
 import type { InferInput } from 'valibot'
@@ -22,7 +22,7 @@ import { useGradeStore } from '@/stores/grade/grade.store'
 import CustomTextField from '@/@core/components/mui/TextField'
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
 import gradeService from '@/services/grade.service'
-import termService from '@/services/term.service'
+import { useShare } from '@/hooks/useShare'
 
 const gradeSchema = v.object({
   term: v.pipe(v.string(), v.nonEmpty('Học kỳ không được để trống')),
@@ -53,22 +53,11 @@ function UpdateExistingGradeByLec() {
     setCurrentTermGradeId
   } = useGradeStore()
 
+  const { termOptions } = useShare()
+
   const [isLoading, setIsLoading] = useState(false)
-  const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [searchTerm, setSearchTerm] = useState('')
 
   const currentGradeOfSubject = currentTermGrade?.gradeOfSubject[currentGradeSubjectIndex]
-
-  const { data: terms, isLoading: isLoadingTerms } = useSWR(
-    ['terms', page, 100, '', '', '', searchTerm],
-    () => termService.getAll(page, 100, '', '', '', '', '', searchTerm),
-    {
-      onSuccess: data => {
-        setTotal(data.pagination.totalItems)
-      }
-    }
-  )
 
   const {
     control,
@@ -101,8 +90,6 @@ function UpdateExistingGradeByLec() {
     setIsUpdatingExisting(false)
     setCurrentGradeId('')
     setCurrentTermGradeId('')
-    setSearchTerm('')
-    setPage(1)
     reset()
   }, [
     toogleUpdateExistingGrade,
@@ -280,7 +267,7 @@ function UpdateExistingGradeByLec() {
             render={({ field }) => (
               <CustomAutocomplete
                 {...field}
-                options={terms?.terms.sort((a, b) => a.abbreviatName.localeCompare(b.abbreviatName)) || []}
+                options={termOptions.sort((a, b) => a.abbreviatName.localeCompare(b.abbreviatName)) || []}
                 getOptionLabel={option => option.abbreviatName || ''}
                 isOptionEqualToValue={(option, value) => option._id === value._id}
                 renderOption={(props, option) => (
@@ -293,16 +280,7 @@ function UpdateExistingGradeByLec() {
                     />
                   </li>
                 )}
-                onChange={(_, value) => {
-                  if (value) {
-                    field.onChange(value._id)
-                    setSearchTerm('')
-                  } else {
-                    field.onChange('')
-                    setSearchTerm('')
-                  }
-                }}
-                value={terms?.terms.find(term => term._id === field.value) || null}
+                value={termOptions.find(term => term._id === field.value) || null}
                 renderInput={params => (
                   <CustomTextField
                     {...params}
@@ -311,38 +289,8 @@ function UpdateExistingGradeByLec() {
                       error: true,
                       helperText: errors.term.message?.toString()
                     })}
-                    onChange={e => {
-                      const value = e.target.value
-
-                      setSearchTerm(value)
-
-                      if (!value) {
-                        setPage(1)
-                      }
-                    }}
-                    onFocus={() => {
-                      if (!field.value) {
-                        setSearchTerm('')
-                        setPage(1)
-                      }
-                    }}
                   />
                 )}
-                ListboxProps={{
-                  onScroll: (event: React.SyntheticEvent) => {
-                    const listboxNode = event.currentTarget
-
-                    if (
-                      listboxNode.scrollTop + listboxNode.clientHeight >= listboxNode.scrollHeight - 1 &&
-                      !isLoadingTerms &&
-                      terms?.terms.length &&
-                      terms.terms.length < total
-                    ) {
-                      setPage(prev => prev + 1)
-                    }
-                  }
-                }}
-                loading={isLoadingTerms}
                 noOptionsText='Không tìm thấy học kỳ'
                 filterOptions={(options, state) => {
                   if (!state.inputValue) {

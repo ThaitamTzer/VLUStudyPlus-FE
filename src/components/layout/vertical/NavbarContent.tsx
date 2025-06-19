@@ -75,7 +75,9 @@ import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
 // ]
 
 const NavbarContent = () => {
-  const { data: notifications, mutate } = useSWR('/api/notification/get-notification', notificationService.getAll)
+  const { data: notifications, mutate } = useSWR('/api/notification/get-notification', notificationService.getAll, {
+    revalidateOnFocus: false
+  })
 
   return (
     <div

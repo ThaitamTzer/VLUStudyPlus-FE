@@ -1035,10 +1035,10 @@ export default function StatisticsPage() {
                     },
                     labels: pieLabels,
                     colors: [
-                      colorPalette.green,
-                      colorPalette.blue,
-                      colorPalette.orange,
-                      colorPalette.purple,
+                      colorPalette.lightGreen,
+                      colorPalette.skyBlue,
+                      colorPalette.lightOrange,
+                      colorPalette.lightPurple,
                       colorPalette.lightBlue,
                       colorPalette.darkGreen
                     ],

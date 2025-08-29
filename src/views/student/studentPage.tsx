@@ -17,7 +17,7 @@ import CustomTextField from '@/@core/components/mui/TextField'
 import DebouncedInput from '@/components/debouncedInput'
 import StudentFiller from './fillter'
 
-const StudentList = dynamic(() => import('./studentList'), { ssr: true })
+const StudentList = dynamic(() => import('./studentList'), { ssr: false })
 const AddStudent = dynamic(() => import('./addStudent'), { ssr: false })
 const UpdateStudent = dynamic(() => import('./updateStudent'), { ssr: false })
 const AlertModal = dynamic(() => import('@/components/alertModal'), { ssr: false })

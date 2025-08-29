@@ -99,6 +99,7 @@ export default function UpdateAddStudent({ mutate }: { mutate: KeyedMutator<any>
         dateOfBirth: fDate(data.dateOfBirth, 'yyyy-MM-dd')
       },
       () => {
+        mutate()
         toast.update(toastId, {
           render: 'Cập nhật sinh viên thành công',
           type: 'success',
@@ -108,7 +109,6 @@ export default function UpdateAddStudent({ mutate }: { mutate: KeyedMutator<any>
         })
         setLoading(false)
         onClose()
-        mutate()
       },
       err => {
         toast.update(toastId, {
